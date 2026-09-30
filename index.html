@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coucho · Control UX Prototype</title>
+<style>
+:root{--bg:#0b0f18;--panel:#171d2b;--panel2:#1d2536;--stroke:#2a3448;--text:#f6f8ff;--muted:#9ba8bc;--accent:#6f7cff;--accent2:#8c65ff;--good:#63d9a7}
+*{box-sizing:border-box}body{margin:0;height:100vh;overflow:hidden;background:radial-gradient(circle at 85% 0,#20284c 0,transparent 38%),var(--bg);font:14px "Segoe UI",system-ui,sans-serif;color:var(--text)}
+button,input,select{font:inherit;color:inherit}.app{height:100vh;display:grid;grid-template-columns:220px 1fr}.side{padding:18px 14px;background:#0d121d;border-right:1px solid var(--stroke);display:flex;flex-direction:column}.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 22px}.logo{width:35px;height:35px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:800}.brand b{font-size:18px}.brand small{display:block;color:var(--muted)}nav{display:grid;gap:5px}.nav,.settings{border:0;background:transparent;text-align:left;padding:11px 12px;border-radius:11px;cursor:pointer;color:#bdc6d5}.nav:hover,.settings:hover{background:#151c2a}.nav.on{background:#1b2340;color:white;box-shadow:inset 2px 0 #7c87ff}.bottom{margin-top:auto}.controller{border:1px solid var(--stroke);border-radius:12px;padding:11px;margin-bottom:8px;background:#121925}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:6px}.controller small{display:block;color:var(--muted);margin-top:4px}
+main{overflow:auto;padding:0 30px 42px}.top{height:70px;position:sticky;top:0;z-index:4;background:linear-gradient(var(--bg) 60%,transparent);display:flex;align-items:center;justify-content:space-between}.pill{border:1px solid #315d51;background:#10261f;color:#c8f6e1;padding:7px 10px;border-radius:99px}.tools{display:flex;gap:8px}button{border:1px solid var(--stroke);background:#151c29;border-radius:10px;padding:9px 12px;cursor:pointer}button:hover{filter:brightness(1.15)}.primary{border:0;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:650}.page{display:none;max-width:1220px;margin:auto}.page.on{display:block}.hero{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:24px 0}.hero h1{font-size:32px;letter-spacing:-1px;margin:0 0 6px}.hero p{color:var(--muted);max-width:650px;margin:0}.status{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat,.card,.appCard,.field,.preview{border:1px solid var(--stroke);background:rgba(25,32,47,.86);border-radius:15px}.stat{padding:14px}.stat small,.muted{color:var(--muted)}.stat b{display:block;font-size:15px;margin-top:4px}.section{display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px}.section h2{font-size:17px;margin:0}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:13px}.card{padding:17px;min-height:220px}.card.active{border-color:#3f7565}.cardHead{display:flex;justify-content:space-between;gap:10px}.cardTitle{display:flex;gap:10px;align-items:center}.cardIcon{width:42px;height:42px;border-radius:12px;background:#222b4b;display:grid;place-items:center;font-size:20px}.card h3{margin:0}.state{font-size:11px;color:var(--good);margin-top:2px}.flow{display:flex;justify-content:center;align-items:center;gap:7px;margin:25px 0}.node{border:1px solid var(--stroke);background:#121925;border-radius:9px;padding:8px;font-size:12px}.arrow{color:#667389}.cardActions{display:flex;gap:8px}.cardActions button{flex:1}.empty{display:none;min-height:390px;border:1px dashed var(--stroke);border-radius:20px;place-items:center;text-align:center;padding:40px}.empty h2{font-size:23px;margin:8px}.empty p{color:var(--muted);max-width:480px}.apps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:11px}.appCard{padding:14px;display:flex;align-items:center;gap:11px}.appIcon{width:40px;height:40px;border-radius:10px;background:#252e41;display:grid;place-items:center;font-weight:700}.appInfo{flex:1}.appInfo small{display:block;color:var(--muted)}
+.overlay{display:none;position:fixed;inset:0;z-index:20;background:#050810cc;backdrop-filter:blur(8px);place-items:center;padding:22px}.overlay.on{display:grid}.modal{width:min(930px,96vw);max-height:92vh;overflow:auto;border:1px solid #354158;border-radius:22px;background:#111724;box-shadow:0 30px 90px #0008}.modalHead,.modalFoot{padding:20px 22px;border-bottom:1px solid var(--stroke);display:flex;justify-content:space-between;gap:14px}.modalHead h2{margin:0}.modalHead p{margin:4px 0 0;color:var(--muted)}.modalBody{padding:18px 22px;display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.form{display:grid;gap:11px}.field{padding:13px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.field input,.field select{width:100%;padding:10px;border:1px solid #3a465e;background:#0e1420;border-radius:9px}.preview{padding:16px;height:max-content}.preview h3{color:var(--muted);font-size:12px}.previewName{font-size:23px;font-weight:700;margin:10px 0 18px}.summary{display:grid;gap:9px}.summary div{padding:9px;border-radius:9px;background:#111827}.summary small{display:block;color:var(--muted)}.safe{margin-top:14px;padding:10px;border:1px solid #315d51;background:#10261f;border-radius:10px;color:#c8f6e1}.advanced{display:none}.advanced.on{display:block}.link{border:0;background:transparent;color:#b8c0ff;text-align:left;padding-left:0}.modalFoot{border-top:1px solid var(--stroke);border-bottom:0;align-items:center}.right{display:flex;gap:8px}
+@media(max-width:800px){.app{grid-template-columns:70px 1fr}.brand div:last-child,.nav span,.settings span,.controller{display:none}.side{text-align:center}.status{grid-template-columns:1fr}.modalBody{grid-template-columns:1fr}.hero{align-items:start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="brand"><div class="logo">C</div><div><b>Coucho</b><small>Control</small></div></div>
+  <nav><button class="nav on" data-page="home">◫ <span>Couchsets</span></button><button class="nav" data-page="library">▦ <span>Biblioteca</span></button></nav>
+  <div class="bottom"><div class="controller"><b><i class="dot"></i>Mando conectado</b><small>Xbox Wireless Controller</small></div><button class="settings" id="settings">⚙ <span>Configuración</span></button></div>
+</aside>
+<main>
+  <div class="top"><div class="pill"><i class="dot"></i><span id="activeTop">Gaming activo</span></div><div class="tools"><button id="firstUse">Simular primer uso</button><button id="hop">Abrir Hop ↗</button></div></div>
+  <section class="page on" id="home">
+    <div class="hero"><div><h1>Tu espacio, listo en un toque.</h1><p>Crea entornos para jugar, trabajar o relajarte. Coucho se encarga de las pantallas, la app y el acceso rápido.</p></div><button class="primary" id="newSet">＋ Nuevo Couchset</button></div>
+    <div id="normal">
+      <div class="status"><div class="stat"><small>Couchset actual</small><b id="activeName">Gaming</b><span class="muted">Listo para usar</span></div><div class="stat"><small>Pantallas</small><b>TV 4K + Monitor</b><span class="muted">2 detectadas · estado confirmado</span></div><div class="stat"><small>Control</small><b>Xbox Wireless Controller</b><span class="muted">Conectado ahora</span></div></div>
+      <div class="section"><h2>Mis Couchsets</h2><span class="muted">Activa uno o edítalo sin entrar a configuraciones separadas.</span></div>
+      <div class="cards" id="cards"></div>
+    </div>
+    <div class="empty" id="empty"><div><div style="font-size:42px">🛋️</div><h2>Crea tu primer Couchset</h2><p>Elige qué pantallas usar y qué quieres abrir. Coucho pondrá valores seguros en lo demás para que puedas probarlo enseguida.</p><button class="primary" id="emptyCreate">Crear Couchset</button></div></div>
+  </section>
+  <section class="page" id="library">
+    <div class="hero"><div><h1>Biblioteca</h1><p>Apps disponibles desde Hop y dentro de tus Couchsets. Coucho detecta; tú decides qué tener a mano.</p></div><button class="primary">＋ Agregar app</button></div>
+    <div class="section"><h2>En Hop</h2><span class="muted">Disponibles desde el sofá</span></div><div class="apps" id="apps"></div>
+  </section>
+</main>
+</div>
+<div class="overlay" id="editor">
+<div class="modal">
+  <div class="modalHead"><div><h2 id="editorTitle">Nuevo Couchset</h2><p>Arma el entorno. Lo avanzado aparece solo si lo necesitas.</p></div><button id="close">×</button></div>
+  <div class="modalBody">
+    <div class="form">
+      <div class="field"><label>Nombre</label><input id="name" value="Gaming"></div>
+      <div class="field"><label>Pantallas</label><select id="display"><option>TV 4K + Monitor</option><option>TV 4K</option><option>Escritorio</option><option>Sin cambios</option></select><button class="link" id="displayAdvanced">Personalizar disposición de pantallas →</button></div>
+      <div class="field"><label>Aplicación al activar</label><select id="app"><option>Steam</option><option>Playnite</option><option>Moonlight</option><option>Chrome</option><option>Ninguna</option></select></div>
+      <div class="field"><label>Activar con · opcional</label><select id="shortcut"><option>Sin atajo</option><option>Guide + A</option><option>Guide + X</option><option>Guide + Y</option></select></div>
+      <button class="link" id="advancedBtn">▸ Personalizar opciones avanzadas</button>
+      <div class="advanced" id="advanced"><div class="field"><label>Confirmación de pantallas</label><select><option>15 segundos · recomendado</option><option>30 segundos</option><option>60 segundos</option></select></div></div>
+    </div>
+    <aside class="preview"><h3>ASÍ QUEDARÁ</h3><div class="previewName" id="pName">Gaming</div><div class="summary"><div><small>Activar con</small><b id="pShortcut">Activación manual</b></div><div><small>Pantallas</small><b id="pDisplay">TV 4K + Monitor</b></div><div><small>Abrir</small><b id="pApp">Steam</b></div></div><div class="safe">✓ Restauración segura activada.</div></aside>
+  </div>
+  <div class="modalFoot"><span class="muted">Puedes cambiar cualquier detalle después.</span><div class="right"><button id="cancel">Cancelar</button><button class="primary" id="save">Guardar y probar</button></div></div>
+</div>
+</div>
+<div class="overlay" id="settingsModal"><div class="modal" style="width:min(650px,96vw)"><div class="modalHead"><div><h2>Configuración</h2><p>Preferencias globales de Coucho.</p></div><button id="settingsClose">×</button></div><div class="modalBody" style="grid-template-columns:1fr"><div class="form"><div class="field"><label>Al iniciar Coucho</label><select><option>Abrir Control</option><option>Abrir Hop</option><option>Quedar en segundo plano</option></select></div><div class="field"><label>Apariencia</label><select><option>Adaptativa · recomendada</option><option>Mica</option><option>Acrílico</option><option>Sólida</option></select></div><button class="link">Opciones avanzadas y recuperación →</button></div></div></div></div>
+<script>
+var sets=[
+{id:1,name:"Gaming",display:"TV 4K + Monitor",app:"Steam",shortcut:"Guide + A",icon:"🎮",active:true},
+{id:2,name:"Escritorio",display:"Escritorio",app:"Ninguna",shortcut:"Guide + X",icon:"🖥️",active:false},
+{id:3,name:"Películas",display:"TV 4K",app:"Plex",shortcut:"Guide + Y",icon:"🎬",active:false}
+],editing=null,empty=false;
+function q(s){return document.querySelector(s)}function qa(s){return Array.from(document.querySelectorAll(s))}
+function render(){
+ q("#cards").innerHTML=sets.map(function(c){return '<article class="card '+(c.active?'active':'')+'"><div class="cardHead"><div class="cardTitle"><div class="cardIcon">'+c.icon+'</div><div><h3>'+c.name+'</h3><div class="state">'+(c.active?'● ACTIVO':'Listo')+'</div></div></div><span>⋯</span></div><div class="flow"><div class="node">'+(c.shortcut==="Sin atajo"?"Manual":c.shortcut)+'</div><span class="arrow">→</span><div class="node">'+c.display+'</div><span class="arrow">→</span><div class="node">'+c.app+'</div></div><div class="cardActions"><button class="primary activate" data-id="'+c.id+'">'+(c.active?'Activo':'▶ Activar')+'</button><button class="edit" data-id="'+c.id+'">Editar</button></div></article>'}).join("");
+ qa(".activate").forEach(function(b){b.onclick=function(){activate(+b.dataset.id)}});qa(".edit").forEach(function(b){b.onclick=function(){openEditor(+b.dataset.id)}})
+}
+function activate(id){sets.forEach(function(c){c.active=c.id===id});var c=sets.find(function(x){return x.id===id});q("#activeTop").textContent=c.name+" activo";q("#activeName").textContent=c.name;render()}
+qa(".nav").forEach(function(b){b.onclick=function(){qa(".nav").forEach(function(x){x.classList.remove("on")});b.classList.add("on");qa(".page").forEach(function(x){x.classList.remove("on")});q("#"+b.dataset.page).classList.add("on")}})
+function sync(){q("#pName").textContent=q("#name").value||"Sin nombre";q("#pDisplay").textContent=q("#display").value;q("#pApp").textContent=q("#app").value;q("#pShortcut").textContent=q("#shortcut").value==="Sin atajo"?"Activación manual":q("#shortcut").value}
+function openEditor(id){editing=id||null;var c=id?sets.find(function(x){return x.id===id}):{name:"Nuevo Couchset",display:"TV 4K + Monitor",app:"Steam",shortcut:"Sin atajo"};q("#editorTitle").textContent=id?"Editar Couchset":"Nuevo Couchset";q("#name").value=c.name;q("#display").value=c.display;q("#app").value=c.app;q("#shortcut").value=c.shortcut;sync();q("#editor").classList.add("on")}
+["#name","#display","#app","#shortcut"].forEach(function(s){q(s).oninput=sync});q("#newSet").onclick=function(){openEditor()};q("#emptyCreate").onclick=function(){openEditor()};q("#close").onclick=q("#cancel").onclick=function(){q("#editor").classList.remove("on")};q("#advancedBtn").onclick=function(){q("#advanced").classList.toggle("on");q("#advancedBtn").textContent=(q("#advanced").classList.contains("on")?"▾":"▸")+" Personalizar opciones avanzadas"};q("#displayAdvanced").onclick=function(){alert("Aquí entraríamos a la edición avanzada de pantallas solo cuando el usuario la pida.")};
+q("#save").onclick=function(){var v={name:q("#name").value||"Couchset",display:q("#display").value,app:q("#app").value,shortcut:q("#shortcut").value};if(editing){Object.assign(sets.find(function(x){return x.id===editing}),v)}else{v.id=Date.now();v.icon="✨";v.active=false;sets.push(v)}render();q("#editor").classList.remove("on");empty=false;q("#normal").style.display="block";q("#empty").style.display="none"};
+q("#firstUse").onclick=function(){empty=!empty;q("#normal").style.display=empty?"none":"block";q("#empty").style.display=empty?"grid":"none";q("#firstUse").textContent=empty?"Volver a mis Couchsets":"Simular primer uso"};q("#settings").onclick=function(){q("#settingsModal").classList.add("on")};q("#settingsClose").onclick=function(){q("#settingsModal").classList.remove("on")};q("#hop").onclick=function(){alert("Aquí Control entregaría la superficie a Hop.")};
+q("#apps").innerHTML=[["Steam","Juegos","S"],["Playnite","Launcher","P"],["Moonlight","Streaming","M"],["Plex","Multimedia","P"]].map(function(a){return '<div class="appCard"><div class="appIcon">'+a[2]+'</div><div class="appInfo"><b>'+a[0]+'</b><small>'+a[1]+'</small></div><button>Visible</button></div>'}).join("");
+render();
+</script>
+</body>
+</html>
