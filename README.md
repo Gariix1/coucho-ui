@@ -1,2 +1,3 @@
 # coucho-ui
-Coucho UI design
+
+Coucho UI prototypes.
