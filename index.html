@@ -231,6 +231,36 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .confirm{display:none;padding:15px 18px;border-top:1px solid var(--divider);align-items:center;justify-content:space-between;gap:12px}.confirm.show{display:flex}.confirm b{font-size:11px}.confirm small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.count{color:var(--confirm-count)}
 .toast{display:none;position:fixed;right:20px;bottom:20px;z-index:90;min-width:230px;border:1px solid var(--glass-border);border-radius:var(--r-compact);background:var(--floating-bg);backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14);box-shadow:var(--shadow);padding:14px 16px}
 .toast.show{display:block}.toast b{display:block;font-size:10px}.toast span{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+.test-only{display:none}
+body.test-mode .test-only{display:inline-flex}
+.test-tools{
+  display:none;align-items:center;justify-content:space-between;gap:12px;
+  margin:-4px 0 16px;padding:10px 12px;border:1px dashed var(--glass-border);
+  border-radius:var(--r-control);background:var(--glass-surface);color:var(--text2);font-size:12px
+}
+body.test-mode .test-tools{display:flex}
+.test-tools-actions{display:flex;gap:8px}
+.delete-mode{
+  width:36px;height:36px;padding:0;align-items:center;justify-content:center;
+  border:1px solid var(--glass-soft-border);border-radius:var(--r-control);
+  background:var(--glass-command);color:var(--muted);font-size:14px
+}
+.delete-mode:hover{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.38);color:#f87171}
+.hero-tools{display:flex;align-items:center;gap:8px}
+.empty-state{
+  grid-column:1/-1;min-height:230px;border:1px dashed var(--glass-border);
+  border-radius:var(--r-panel);background:var(--glass-panel);
+  display:grid;place-items:center;text-align:center;padding:24px
+}
+.empty-state .empty-icon{
+  width:56px;height:56px;margin:0 auto 14px;border:1px solid var(--glass-soft-border);
+  border-radius:var(--r-card);background:var(--glass-control);display:grid;place-items:center;
+  color:var(--accent);font-size:24px
+}
+.empty-state h3{margin:0;font-size:18px;font-weight:600}
+.empty-state p{margin:6px 0 16px;color:var(--text2);font-size:12px}
+#testBtn.active{border-color:var(--accent);color:var(--accent);background:var(--selected-bg)}
+
 @media(max-width:760px){
   .wrap{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.display-options{grid-template-columns:1fr}
 }
@@ -252,7 +282,16 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn icon" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">☀</button>
+          <button class="btn icon" id="testBtn" title="Modo de prueba" aria-label="Modo de prueba">🧪</button>
           <button class="btn icon" id="newBtn" title="Nuevo">＋</button>
+        </div>
+      </div>
+
+      <div class="test-tools">
+        <span>Modo de prueba · datos locales</span>
+        <div class="test-tools-actions">
+          <button class="btn" id="clearModes">Vaciar modos</button>
+          <button class="btn" id="restoreDemo">Restaurar demo</button>
         </div>
       </div>
 
@@ -261,6 +300,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
           <div class="namebox">
             <div class="mode-icon" id="heroIcon">🎮</div>
             <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName">Gaming</h2></div>
+          </div>
+          <div class="hero-tools">
+            <button class="delete-mode test-only" id="deleteActive" title="Eliminar este modo" aria-label="Eliminar este modo">✕</button>
           </div>
         </div>
 
@@ -373,11 +415,26 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 <script>
 (function(){
-  var sets=[
-    {id:1,name:'Gaming',icon:'🎮',mode:'both',display:'TV + Monitor',app:'Steam',shortcut:'Guide + A',active:true},
-    {id:2,name:'Películas',icon:'🎬',mode:'tv',display:'Solo TV',app:'Plex',shortcut:'Manual',active:false},
-    {id:3,name:'Escritorio',icon:'🖥️',mode:'monitor',display:'Solo Monitor',app:'Ninguna',shortcut:'Manual',active:false}
-  ];
+  function demoSets(){
+    return [
+      {id:1,name:'Gaming',icon:'🎮',mode:'both',display:'TV + Monitor',app:'Steam',shortcut:'Guide + A',active:true},
+      {id:2,name:'Películas',icon:'🎬',mode:'tv',display:'Solo TV',app:'Plex',shortcut:'Manual',active:false},
+      {id:3,name:'Escritorio',icon:'🖥️',mode:'monitor',display:'Solo Monitor',app:'Ninguna',shortcut:'Manual',active:false}
+    ];
+  }
+
+  function loadSets(){
+    try{
+      var saved=localStorage.getItem('coucho-test-sets');
+      if(saved!==null){
+        var parsed=JSON.parse(saved);
+        if(Array.isArray(parsed)) return parsed;
+      }
+    }catch(_){}
+    return demoSets();
+  }
+
+  var sets=loadSets();
 
   var editTarget=null;
   var shortcutTarget=null;
@@ -395,7 +452,23 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   function qa(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
   function byId(id){return sets.find(function(x){return x.id===id})}
   function active(){return sets.find(function(x){return x.active})||sets[0]}
-  function resolveId(raw){return raw==='active'?active().id:Number(raw)}
+  function resolveId(raw){
+    var a=active();
+    return raw==='active'?(a?a.id:null):Number(raw);
+  }
+  function saveSets(){
+    localStorage.setItem('coucho-test-sets',JSON.stringify(sets));
+  }
+  function normalizeActive(){
+    if(sets.length===0)return;
+    var current=sets.find(function(x){return x.active});
+    if(!current)sets[0].active=true;
+    var kept=false;
+    sets.forEach(function(s){
+      if(s.active&&!kept){kept=true;return}
+      if(s.active)s.active=false;
+    });
+  }
   function logo(app){return app==='Ninguna'?'—':app.charAt(0).toUpperCase()}
   function autoMeta(app){
     if(app==='Plex') return {name:'Películas',icon:'🎬'};
@@ -428,6 +501,23 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   }
 
   function render(){
+    normalizeActive();
+    var hero=q('.hero');
+    if(sets.length===0){
+      hero.style.display='none';
+      q('#cards').innerHTML=
+        '<div class="empty-state">'+
+          '<div><div class="empty-icon">＋</div>'+
+          '<h3>Crea tu primer modo</h3>'+
+          '<p>Elige tus pantallas y, si quieres, una app.</p>'+
+          '<button class="btn primary" id="emptyCreate">Crear modo</button></div>'+
+        '</div>';
+      q('#emptyCreate').onclick=openNew;
+      saveSets();
+      return;
+    }
+
+    hero.style.display='';
     var a=active();
     q('#heroName').textContent=a.name;q('#heroIcon').textContent=a.icon;
     q('#heroDisplays').innerHTML=displayMarkup(a.mode,false);q('#heroDisplayName').textContent=a.display;
@@ -435,7 +525,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
     q('#cards').innerHTML=sets.filter(function(s){return !s.active}).map(function(s){
       return '<article class="card">'+
-        '<div class="card-head"><div class="card-name"><div class="card-icon">'+s.icon+'</div><b>'+s.name+'</b></div></div>'+
+        '<div class="card-head"><div class="card-name"><div class="card-icon">'+s.icon+'</div><b>'+s.name+'</b></div>'+
+          '<button class="delete-mode test-only delete-card" data-id="'+s.id+'" title="Eliminar este modo" aria-label="Eliminar '+s.name+'">✕</button>'+
+        '</div>'+
         '<button class="card-display display-trigger" data-id="'+s.id+'"><div><div class="displays">'+displayMarkup(s.mode,true)+'</div><div class="card-display-name">'+s.display+'</div></div></button>'+
         '<div class="card-meta">'+
           '<button class="app-trigger" data-id="'+s.id+'"><span class="mi">▶</span><div><small>Apps</small><b>'+s.app+'</b></div></button>'+
@@ -445,6 +537,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       '</article>';
     }).join('');
     bindDynamic();
+    saveSets();
   }
 
   function bindDynamic(){
@@ -452,6 +545,17 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     qa('.app-trigger').forEach(function(b){b.onclick=function(e){openAppPop(e.currentTarget,b.dataset.id,false)}});
     qa('.shortcut-trigger').forEach(function(b){b.onclick=function(){openShortcut(b.dataset.id)}});
     qa('.activate').forEach(function(b){b.onclick=function(){activate(Number(b.dataset.id))}});
+    qa('.delete-card').forEach(function(b){b.onclick=function(){removeSet(Number(b.dataset.id))}});
+  }
+
+  function removeSet(id){
+    var removed=byId(id);
+    if(!removed)return;
+    var wasActive=!!removed.active;
+    sets=sets.filter(function(s){return s.id!==id});
+    if(wasActive&&sets.length)sets[0].active=true;
+    render();
+    toast('Modo eliminado',removed.name);
   }
 
   function activate(id){
@@ -528,6 +632,37 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     document.documentElement.dataset.theme=next;
     localStorage.setItem('coucho-theme',next);
     syncThemeButton();
+  };
+
+  var testMode=localStorage.getItem('coucho-test-mode')==='1';
+  function syncTestMode(){
+    document.body.classList.toggle('test-mode',testMode);
+    q('#testBtn').classList.toggle('active',testMode);
+    q('#testBtn').title=testMode?'Salir del modo de prueba':'Modo de prueba';
+    q('#testBtn').setAttribute('aria-label',q('#testBtn').title);
+  }
+
+  q('#testBtn').onclick=function(){
+    testMode=!testMode;
+    localStorage.setItem('coucho-test-mode',testMode?'1':'0');
+    syncTestMode();
+  };
+
+  q('#deleteActive').onclick=function(){
+    var a=active();
+    if(a)removeSet(a.id);
+  };
+
+  q('#clearModes').onclick=function(){
+    sets=[];
+    render();
+    toast('Modos vaciados','Ya puedes probar el flujo desde cero');
+  };
+
+  q('#restoreDemo').onclick=function(){
+    sets=demoSets();
+    render();
+    toast('Demo restaurada','3 modos');
   };
 
   q('#newBtn').onclick=q('#newBtn2').onclick=openNew;
@@ -625,6 +760,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   });
 
   syncThemeButton();
+  syncTestMode();
   render();
 })();
 </script>
