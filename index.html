@@ -3,496 +3,82 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Coucho · Control UX V3</title>
+<title>Coucho · Ultra Minimal V5</title>
 <style>
-:root{
-  --bg:#0a0d14;--nav:#10151e;--surface:#151c28;--surface2:#1b2331;--surface3:#222c3d;
-  --stroke:rgba(255,255,255,.08);--stroke2:rgba(255,255,255,.15);--text:#f5f7fb;
-  --muted:#9ca8ba;--muted2:#6f7b8d;--accent:#7887ff;--accent2:#9b70ff;
-  --ok:#62d5a5;--warn:#efc86e;--danger:#ff7e8b;--shadow:0 24px 70px rgba(0,0,0,.35)
-}
-*{box-sizing:border-box}html,body{height:100%}
-body{margin:0;overflow:hidden;color:var(--text);font:14px/1.42 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;
-background:radial-gradient(900px 560px at 78% -18%,rgba(111,124,255,.16),transparent 65%),var(--bg)}
-button,input{font:inherit;color:inherit}button{cursor:pointer}.hidden{display:none!important}
-.window{height:100%;display:grid;grid-template-rows:42px 1fr}.titlebar{display:flex;align-items:center;justify-content:space-between;background:rgba(9,12,18,.94);border-bottom:1px solid rgba(255,255,255,.035);user-select:none}
-.title-left{display:flex;align-items:center;gap:9px;padding-left:14px;color:#cad1dd;font-size:12px}.brandmark{width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:10px;font-weight:800}
-.winbtns{display:flex;height:100%}.winbtns span{width:46px;display:grid;place-items:center;color:#aeb8c7}.winbtns span:hover{background:rgba(255,255,255,.05)}.winbtns span:last-child:hover{background:#c42b1c;color:white}
-.shell{min-height:0;display:grid;grid-template-columns:230px minmax(0,1fr)}
-.nav{min-height:0;background:rgba(14,19,29,.83);border-right:1px solid var(--stroke);backdrop-filter:blur(25px);padding:10px;display:flex;flex-direction:column}
-.navbrand{height:56px;display:flex;align-items:center;gap:10px;padding:0 10px}.navlogo{width:35px;height:35px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:800;box-shadow:0 8px 24px rgba(116,131,255,.22)}
-.navbrand b{display:block;font-size:16px}.navbrand small{display:block;color:var(--muted);font-size:11px}
-.navlist{display:grid;gap:3px;margin-top:6px}.navbtn,.navfooter{height:42px;border:0;background:transparent;border-radius:8px;color:#b9c3d2;text-align:left;padding:0 12px;display:flex;align-items:center;gap:11px;position:relative}
-.navbtn:hover,.navfooter:hover{background:rgba(255,255,255,.045);color:white}.navbtn.active,.navfooter.active{background:rgba(255,255,255,.07);color:white}.navbtn.active:before,.navfooter.active:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:3px;background:#8c98ff}
-.navico{width:20px;text-align:center}.navspacer{flex:1}.device{margin:8px 4px 10px;padding:11px;border:1px solid var(--stroke);border-radius:11px;background:rgba(255,255,255,.025)}.device b{font-size:11px}.device small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:6px;box-shadow:0 0 10px rgba(98,213,165,.55)}
-.content{min-height:0;min-width:0;overflow:auto}.page{display:none;max-width:1280px;margin:0 auto;padding:18px 28px 48px}.page.active{display:block}
-.toolbar{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}.crumb{color:var(--muted);font-size:11px}.title{margin:2px 0 0;font-size:28px;letter-spacing:-.7px;font-weight:650}.subtitle{margin:5px 0 0;color:var(--muted);max-width:720px;font-size:12px}
-.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{min-height:34px;border:1px solid var(--stroke2);background:rgba(255,255,255,.045);border-radius:8px;padding:7px 12px;color:#f2f5fb;display:inline-flex;align-items:center;justify-content:center;gap:7px}
-.btn:hover{background:rgba(255,255,255,.075)}.btn.primary{border-color:transparent;background:linear-gradient(135deg,#7484ff,#9470ff);font-weight:600;box-shadow:0 8px 24px rgba(115,130,255,.18)}.btn.primary:hover{filter:brightness(1.08)}.btn.subtle{border-color:transparent;background:transparent;color:#bac5d5}.btn.danger{color:#ffc2c9;background:rgba(255,126,139,.07);border-color:rgba(255,126,139,.2)}
-.panel{border:1px solid var(--stroke);background:rgba(22,29,42,.77);border-radius:16px}
-.home-hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.72fr);overflow:hidden;border:1px solid var(--stroke2);border-radius:18px;background:linear-gradient(145deg,rgba(34,43,62,.92),rgba(18,25,36,.94));box-shadow:0 16px 44px rgba(0,0,0,.16)}
-.home-main{padding:22px 24px}.eyebrow{font-size:10px;color:#b8c2d1;text-transform:uppercase;letter-spacing:.85px;font-weight:650}.home-main h2{font-size:27px;margin:8px 0 3px;letter-spacing:-.7px}.meta{color:var(--muted);font-size:12px}
-.flow{display:grid;grid-template-columns:150px 34px minmax(210px,1fr) 34px 135px;align-items:center;margin-top:22px}.flow-node{min-height:78px;border:1px solid var(--stroke);border-radius:12px;background:rgba(7,10,16,.32);padding:11px;display:flex;gap:9px;align-items:center}.flow-node .ico{width:34px;height:34px;border-radius:9px;background:rgba(120,135,255,.12);display:grid;place-items:center}.flow-node small{display:block;color:var(--muted);font-size:9px}.connector{height:1px;background:#5a6780;position:relative}.connector:after{content:"";position:absolute;right:-1px;top:-3px;width:6px;height:6px;border-top:1px solid #7f8cff;border-right:1px solid #7f8cff;transform:rotate(45deg)}
-.display-mini{display:flex;gap:5px;align-items:flex-end;margin-top:4px}.screen{border:1px solid #58657c;border-radius:4px;background:linear-gradient(145deg,#101724,#202c43);position:relative}.screen:after{content:"";position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);width:12px;height:4px;border-left:1px solid #58657c;border-right:1px solid #58657c}.screen.tv{width:60px;height:35px}.screen.pc{width:44px;height:28px}.screen.primary{border-color:#8794ff}
-.home-side{border-left:1px solid var(--stroke);padding:19px;background:rgba(8,11,17,.23)}.status-list{display:grid;gap:8px}.status-row{display:grid;grid-template-columns:30px 1fr auto;gap:9px;align-items:center;padding:8px;border-radius:9px;background:rgba(255,255,255,.025)}.status-ico{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.04);display:grid;place-items:center}.status-row b{font-size:10px}.status-row small{display:block;color:var(--muted);font-size:9px}.ok{color:#a6e9c9;font-size:9px}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:14px;margin:24px 2px 11px}.section-head h3{margin:0;font-size:15px}.section-head p{margin:3px 0 0;color:var(--muted);font-size:11px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));gap:11px}.card{border:1px solid var(--stroke);border-radius:14px;background:linear-gradient(145deg,rgba(24,31,45,.92),rgba(18,24,35,.92));padding:14px}.card.active-card{border-color:rgba(98,213,165,.34)}.cardtop{display:flex;justify-content:space-between;align-items:flex-start}.cardname{display:flex;align-items:center;gap:9px}.cardico{width:38px;height:38px;border-radius:10px;background:rgba(120,135,255,.12);display:grid;place-items:center;font-size:18px}.card h4{margin:0;font-size:15px}.cardstate{font-size:9px;color:var(--muted);margin-top:2px}.cardstate.active{color:#a9e9ca}.mini-flow{display:grid;grid-template-columns:1fr 18px 1.15fr 18px 1fr;align-items:center;margin:14px 0;padding:8px;border-radius:9px;background:rgba(7,10,16,.3)}.mini{text-align:center;font-size:9px}.mini-line{height:1px;background:#536079}.appbadge{width:28px;height:28px;border-radius:7px;background:#273147;display:grid;place-items:center;margin:auto;font-weight:700}.keycap{display:inline-flex;min-width:24px;height:21px;padding:0 5px;border:1px solid #4c5870;border-radius:6px;align-items:center;justify-content:center;background:#151d2a;font-size:8px;font-weight:600}.keycap.round{min-width:21px;width:21px;border-radius:50%;background:#26315b;border-color:#5263b6}.cardactions{display:flex;gap:7px}.cardactions .btn{flex:1;min-height:30px;font-size:10px;padding:5px 8px}
-.first-shell{min-height:calc(100vh - 112px);display:grid;place-items:center}.first-composer{width:min(980px,100%);border:1px solid var(--stroke2);border-radius:18px;background:linear-gradient(145deg,rgba(25,33,47,.96),rgba(15,21,31,.97));box-shadow:var(--shadow);overflow:hidden}
-.first-head{padding:20px 22px 16px;border-bottom:1px solid var(--stroke);display:flex;justify-content:space-between;gap:15px;align-items:flex-start}.first-head h2{margin:0;font-size:22px;letter-spacing:-.5px}.first-head p{margin:4px 0 0;color:var(--muted);font-size:11px}.detected{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.detected span{font-size:9px;padding:4px 7px;border:1px solid var(--stroke);border-radius:99px;background:rgba(255,255,255,.025);color:#bac5d5}
-.first-body{padding:18px 22px}.first-name{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.first-name-left{display:flex;align-items:center;gap:10px}.first-name-icon{width:38px;height:38px;border-radius:11px;background:var(--accentSoft,rgba(120,135,255,.12));display:grid;place-items:center;font-size:18px}.first-name h3{margin:0;font-size:18px}.edit-name{border:0;background:transparent;color:#b6c0ff;font-size:10px}
-.setup-row{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0;border-top:1px solid rgba(255,255,255,.055)}.setup-row:first-of-type{border-top:0}.setup-label b{display:block;font-size:12px}.setup-label small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
-.setup-content{min-width:0}.display-preview{display:flex;align-items:end;gap:8px;min-height:62px}.display-box{position:relative;border:1px solid #58657b;border-radius:5px;background:linear-gradient(145deg,#101724,#202b42);display:grid;place-items:center;color:#cad3e2;font-size:10px}.display-box:after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:17px;height:6px;border-left:1px solid #58657b;border-right:1px solid #58657b}.display-box.big{width:92px;height:52px}.display-box.small{width:70px;height:42px}.display-box.primary{border-color:#8593ff;box-shadow:0 0 0 1px rgba(133,147,255,.12)}.display-box .badge{position:absolute;top:4px;left:5px;width:16px;height:16px;border-radius:5px;background:#2c3650;display:grid;place-items:center;font-size:8px}.display-caption{color:var(--muted);font-size:9px;margin-top:8px}
-.app-strip{display:flex;gap:8px;flex-wrap:wrap}.app-tile{width:78px;min-height:72px;border:1px solid var(--stroke);border-radius:10px;background:rgba(255,255,255,.025);padding:8px;text-align:left}.app-tile:hover{background:rgba(255,255,255,.045)}.app-tile.selected{border-color:rgba(122,137,255,.55);background:rgba(120,135,255,.08)}.apptilelogo{width:29px;height:29px;border-radius:8px;background:#29344a;display:grid;place-items:center;font-weight:700;margin-bottom:6px}.app-tile b{font-size:9px}.more-apps{display:flex;align-items:center;color:#b6c0ff;font-size:10px;padding:0 6px}
-.shortcut-box{display:flex;align-items:center;gap:10px}.shortcut-current{min-width:170px;height:42px;border:1px solid var(--stroke);border-radius:10px;background:rgba(255,255,255,.025);display:flex;align-items:center;justify-content:center;gap:5px;color:#cfd6e4}.optional{color:var(--muted2);font-size:9px;margin-left:4px}
-.quick-summary{margin-top:10px;padding:12px;border:1px solid var(--stroke);border-radius:12px;background:rgba(7,10,16,.25);display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.sum-node{display:flex;align-items:center;gap:6px;font-size:10px}.sum-arrow{color:#68758a}
-.safe-line{margin-top:10px;display:flex;align-items:center;justify-content:center;gap:7px;color:#bcefd9;font-size:9px}.first-foot{padding:14px 22px 19px;border-top:1px solid var(--stroke);display:flex;justify-content:space-between;align-items:center;gap:12px}.first-foot span{color:var(--muted);font-size:9px}
-.drawer-overlay{display:none;position:fixed;inset:42px 0 0 0;background:rgba(3,6,11,.6);backdrop-filter:blur(8px);z-index:60}.drawer-overlay.open{display:block}.drawer{position:absolute;right:0;top:0;bottom:0;width:min(560px,95vw);background:#121822;border-left:1px solid var(--stroke2);box-shadow:-20px 0 60px rgba(0,0,0,.28);display:flex;flex-direction:column}.drawer-head{padding:18px 19px 14px;border-bottom:1px solid var(--stroke);display:flex;justify-content:space-between;gap:12px}.drawer-head h3{margin:0;font-size:18px}.drawer-head p{margin:3px 0 0;color:var(--muted);font-size:10px}.drawer-body{padding:18px;overflow:auto;flex:1}.drawer-foot{padding:13px 18px 18px;border-top:1px solid var(--stroke);display:flex;justify-content:flex-end;gap:8px}
-.monitor-stage{height:240px;border:1px solid var(--stroke);border-radius:13px;background:radial-gradient(260px 150px at 50% 40%,rgba(120,135,255,.08),transparent 75%),#0d131d;position:relative;margin-bottom:14px}.stage-display{position:absolute;border:1px solid #59667c;border-radius:7px;background:linear-gradient(145deg,#111927,#202c43);display:grid;place-items:center;font-size:17px;font-weight:650;color:#d4dbea;transition:.15s}.stage-display.selected{border-color:#8a97ff;box-shadow:0 0 0 2px rgba(138,151,255,.11)}.stage-display.off{opacity:.35}.stage-display.one{width:190px;height:112px;left:48px;top:78px}.stage-display.two{width:225px;height:132px;right:44px;top:42px}.stage-display .screen-name{position:absolute;bottom:7px;font-size:8px;color:#a5b0c2;font-weight:400}.primary-tag{position:absolute;top:8px;right:8px;padding:3px 5px;border-radius:99px;background:rgba(120,135,255,.16);color:#cbd1ff;font-size:7px;font-weight:500}
-.display-options{display:grid;gap:8px}.option-row{min-height:54px;border:1px solid var(--stroke);border-radius:10px;background:rgba(255,255,255,.025);padding:9px 11px;display:flex;align-items:center;justify-content:space-between;gap:10px}.option-row b{display:block;font-size:10px}.option-row small{display:block;color:var(--muted);font-size:8px;margin-top:2px}.segmented{display:inline-flex;padding:3px;border:1px solid var(--stroke);border-radius:9px;background:rgba(255,255,255,.025)}.segmented button{border:0;background:transparent;border-radius:7px;padding:5px 8px;color:#aeb8c8;font-size:9px}.segmented button.active{background:rgba(255,255,255,.08);color:white}
-.capture-overlay{display:none;position:fixed;inset:42px 0 0 0;background:rgba(3,6,11,.72);backdrop-filter:blur(12px);z-index:70;place-items:center}.capture-overlay.open{display:grid}.capture-card{width:min(520px,92vw);border:1px solid var(--stroke2);border-radius:18px;background:linear-gradient(145deg,#192131,#101620);box-shadow:var(--shadow);padding:22px;text-align:center}.capture-card h3{margin:0;font-size:20px}.capture-card p{margin:5px 0 18px;color:var(--muted);font-size:10px}.controller-art{width:210px;height:122px;margin:0 auto 18px;position:relative;border:1px solid #46536a;border-radius:42% 42% 36% 36% / 48% 48% 32% 32%;background:linear-gradient(145deg,#171f2c,#222c3d);box-shadow:inset 0 0 30px rgba(255,255,255,.02)}.stick{position:absolute;width:34px;height:34px;border-radius:50%;border:1px solid #505d73;background:#0f151f}.stick.left{left:42px;top:48px}.stick.right{right:53px;bottom:22px}.guide{position:absolute;left:50%;top:24px;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;border:1px solid #65728a;background:#1a2331;display:grid;place-items:center;font-size:8px}.abtn{position:absolute;right:44px;top:43px;width:25px;height:25px;border-radius:50%;background:#285b3d;border:1px solid #3b8e5a;display:grid;place-items:center;font-size:9px;font-weight:700}.xbtn{position:absolute;right:72px;top:42px;width:23px;height:23px;border-radius:50%;background:#23456e;border:1px solid #3d6ba4;display:grid;place-items:center;font-size:8px}.detected-combo{min-height:58px;border:1px solid var(--stroke);border-radius:11px;background:rgba(255,255,255,.025);display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:14px}.capture-actions{display:flex;justify-content:center;gap:8px}
-.library-tools{display:flex;justify-content:space-between;gap:12px;margin-bottom:13px}.search{width:260px;height:34px;border:1px solid var(--stroke2);background:#101620;border-radius:8px;padding:0 10px;color:white}.appgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:10px}.libcard{border:1px solid var(--stroke);border-radius:13px;background:rgba(22,29,42,.75);padding:12px}.libtop{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center}.liblogo{width:40px;height:40px;border-radius:10px;background:#283248;display:grid;place-items:center;font-weight:700}.libcard h4{margin:0}.libcard small{color:var(--muted);font-size:9px}.pill{font-size:8px;padding:4px 6px;border:1px solid rgba(98,213,165,.18);border-radius:99px;color:#b7ecd2;background:rgba(98,213,165,.05)}
-.settings{max-width:980px}.settings h3{font-size:12px;margin:20px 0 8px}.setrow{min-height:58px;border:1px solid var(--stroke);border-bottom:0;background:rgba(22,29,42,.74);display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:10px 12px}.setrow:first-of-type{border-radius:11px 11px 0 0}.setrow:last-of-type{border-bottom:1px solid var(--stroke);border-radius:0 0 11px 11px}.setico{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.04);display:grid;place-items:center}.setrow b{display:block;font-size:10px}.setrow small{display:block;color:var(--muted);font-size:9px}.toggle{width:38px;height:21px;border:0;border-radius:99px;background:#3a4453;position:relative}.toggle:after{content:"";position:absolute;width:15px;height:15px;border-radius:50%;background:white;left:3px;top:3px;transition:.15s}.toggle.on{background:#7585ff}.toggle.on:after{left:20px}.select{height:31px;min-width:160px;border:1px solid #394459;border-radius:7px;background:#111824;color:white;padding:0 8px}
-.activation-overlay{display:none;position:fixed;inset:42px 0 0 0;background:rgba(3,6,11,.7);backdrop-filter:blur(10px);z-index:80;place-items:center}.activation-overlay.open{display:grid}.activation{width:min(690px,94vw);border:1px solid var(--stroke2);border-radius:17px;background:linear-gradient(145deg,#182131,#101620);box-shadow:var(--shadow);overflow:hidden}.activation-head{padding:18px 20px 14px;border-bottom:1px solid var(--stroke)}.activation-head h3{margin:0;font-size:19px}.activation-head p{margin:3px 0 0;color:var(--muted);font-size:10px}.steps{padding:16px 18px}.step{display:grid;grid-template-columns:28px 1fr auto;gap:9px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.045)}.step:last-child{border:0}.stepico{width:27px;height:27px;border-radius:8px;background:rgba(255,255,255,.04);display:grid;place-items:center}.step b{font-size:10px}.step small{display:block;color:var(--muted);font-size:8px}.step em{font-style:normal;color:var(--muted2);font-size:8px}.step.active .stepico{background:rgba(120,135,255,.12);color:#ced4ff}.step.done .stepico{background:rgba(98,213,165,.08);color:#a8e8ca}.step.done em{color:#a8e8ca}.step.active em{color:#c8ceff}.progress{height:3px;background:#273143}.progress div{height:100%;width:0;background:linear-gradient(90deg,#7484ff,#9a70ff);transition:width .35s}.confirm{display:none;padding:13px 18px 17px;border-top:1px solid var(--stroke);align-items:center;justify-content:space-between;gap:12px}.confirm.show{display:flex}.confirm b{font-size:10px}.confirm small{display:block;color:var(--muted);font-size:8px}.count{color:#efd37f;font-variant-numeric:tabular-nums}
-.toast{display:none;position:fixed;right:20px;bottom:20px;z-index:99;min-width:260px;max-width:350px;border:1px solid var(--stroke2);border-radius:11px;background:#18202e;box-shadow:var(--shadow);padding:11px 13px}.toast.show{display:block}.toast b{display:block;font-size:10px}.toast span{display:block;color:var(--muted);font-size:9px;margin-top:2px}
-@media(max-width:980px){.shell{grid-template-columns:74px 1fr}.navbrand>div:last-child,.navbtn span:last-child,.navfooter span:last-child,.device{display:none}.navbrand{justify-content:center}.navbtn,.navfooter{justify-content:center;padding:0}.home-hero{grid-template-columns:1fr}.home-side{border-left:0;border-top:1px solid var(--stroke)}.flow{grid-template-columns:1fr;gap:7px}.connector{width:1px;height:20px;margin:auto}.setup-row{grid-template-columns:1fr}.setup-row>.btn{justify-self:start}}
-@media(max-width:650px){.page{padding:14px 16px 36px}.toolbar{align-items:flex-start;flex-direction:column}.first-head{flex-direction:column}.first-foot{align-items:flex-start;flex-direction:column}.stage-display.one{left:20px}.stage-display.two{right:20px}.library-tools{flex-direction:column}.search{width:100%}}
+:root{--bg:#0a0d14;--nav:#10151e;--surface:#151c28;--line:rgba(255,255,255,.085);--line2:rgba(255,255,255,.15);--text:#f6f8fc;--muted:#8f9bae;--accent:#7888ff;--accent2:#9b70ff;--ok:#63d6a6;--shadow:0 24px 70px rgba(0,0,0,.34)}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;overflow:hidden;color:var(--text);font:14px/1.35 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;background:radial-gradient(900px 520px at 78% -15%,rgba(118,131,255,.17),transparent 65%),var(--bg)}button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:2px solid #91a0ff;outline-offset:2px}.app{height:100%;display:grid;grid-template-rows:42px 1fr}.titlebar{display:flex;align-items:center;justify-content:space-between;background:#090c12ef;border-bottom:1px solid rgba(255,255,255,.035)}.brand{display:flex;align-items:center;gap:8px;padding-left:14px;color:#c9d1de;font-size:12px}.logo{width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:800;font-size:10px}.win{display:flex;height:100%}.win span{width:46px;display:grid;place-items:center;color:#aeb8c8}.win span:hover{background:rgba(255,255,255,.05)}.win span:last-child:hover{background:#c42b1c;color:#fff}
+.shell{min-height:0;display:grid;grid-template-columns:82px minmax(0,1fr)}.rail{background:rgba(14,19,29,.86);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:12px 8px;backdrop-filter:blur(26px)}.railmark{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:800;margin-bottom:18px;box-shadow:0 8px 24px rgba(118,132,255,.22)}.nav{width:100%;height:58px;border:0;background:transparent;border-radius:12px;color:#aeb9c9;display:grid;place-items:center;gap:3px;padding:6px 0}.nav:hover{background:rgba(255,255,255,.045);color:#fff}.nav.active{background:rgba(255,255,255,.07);color:#fff}.nav .ico{font-size:18px}.nav small{font-size:9px}.railfill{flex:1}.main{min-width:0;overflow:auto}.page{display:none;max-width:1120px;margin:0 auto;padding:22px 28px 44px}.page.active{display:block}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.top h1{margin:0;font-size:28px;letter-spacing:-.7px}.top-actions{display:flex;gap:8px}.btn{min-height:36px;border:1px solid var(--line2);background:rgba(255,255,255,.045);border-radius:10px;padding:8px 12px}.btn:hover{background:rgba(255,255,255,.075)}.btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:700;box-shadow:0 8px 24px rgba(118,132,255,.18)}.btn.icon{min-width:38px;padding:8px}.btn.ghost{border-color:transparent;background:transparent;color:#aeb9c9}.mini-status{display:flex;gap:7px;flex-wrap:wrap}.pill{font-size:10px;padding:5px 8px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.025);color:#bac4d3}
+.panel{border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(26,34,48,.94),rgba(17,23,33,.96));box-shadow:var(--shadow)}.active-panel{padding:20px}.active-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.active-left{display:flex;align-items:center;gap:11px}.active-icon{width:44px;height:44px;border-radius:13px;background:rgba(120,136,255,.13);display:grid;place-items:center;font-size:23px}.active-panel h2{margin:0;font-size:24px}.active-tag{font-size:9px;color:#ade9ca}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:5px}.flow{display:grid;grid-template-columns:1fr 30px 1.3fr 30px 1fr;align-items:center;margin:18px 0 4px}.flow-card{min-height:92px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);display:flex;align-items:center;justify-content:center;gap:9px;padding:10px;text-align:center}.flow-card .big{font-size:26px}.flow-card b{font-size:12px}.line{height:2px;background:linear-gradient(90deg,#58647b,#8290ff);position:relative}.line:after{content:"";position:absolute;right:-1px;top:-4px;width:8px;height:8px;border-top:1px solid #8995ff;border-right:1px solid #8995ff;transform:rotate(45deg)}.displays{display:flex;align-items:flex-end;justify-content:center;gap:7px}.screen{position:relative;border:1px solid #59667c;border-radius:5px;background:linear-gradient(145deg,#101724,#202c43)}.screen:after{content:"";position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:14px;height:5px;border-left:1px solid #59667c;border-right:1px solid #59667c}.screen.tv{width:70px;height:40px}.screen.pc{width:50px;height:31px}.screen.primary{border-color:#8996ff}.section{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 10px}.section h3{margin:0;font-size:15px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:11px}.card{border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,rgba(24,31,45,.94),rgba(17,23,34,.95));padding:14px}.card.active{border-color:rgba(99,214,166,.34)}.card-head{display:flex;align-items:center;justify-content:space-between}.card-name{display:flex;align-items:center;gap:9px}.card-icon{width:38px;height:38px;border-radius:11px;background:rgba(120,136,255,.12);display:grid;place-items:center;font-size:19px}.card b{font-size:14px}.state{font-size:9px;color:#a9e9c9;margin-top:1px}.card-flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:13px 0}.card-chip{min-height:56px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02);display:grid;place-items:center;text-align:center;font-size:9px;padding:6px}.app-logo{width:28px;height:28px;border-radius:8px;background:#283349;display:grid;place-items:center;font-weight:700}.card-actions{display:flex;gap:7px}.card-actions .btn{flex:1;min-height:32px;font-size:10px;padding:6px 8px}
+.creator-wrap{min-height:calc(100vh - 118px);display:grid;place-items:center}.creator{width:min(900px,100%);border:1px solid var(--line2);border-radius:22px;background:linear-gradient(145deg,rgba(26,34,48,.97),rgba(14,20,29,.98));box-shadow:var(--shadow);overflow:hidden}.creator-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.auto-name{display:flex;align-items:center;gap:11px}.auto-icon{width:44px;height:44px;border-radius:13px;background:rgba(120,136,255,.13);display:grid;place-items:center;font-size:23px}.auto-name h2{margin:0;font-size:24px}.auto-name small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.creator-body{padding:8px 20px 4px}.pick-row{display:grid;grid-template-columns:106px minmax(0,1fr) auto;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.055)}.pick-row:last-child{border-bottom:0}.pick-label{font-size:13px;font-weight:700}.pick-sub{font-size:9px;color:var(--muted);margin-top:2px}.display-preview{display:flex;align-items:flex-end;gap:8px;min-height:62px}.display-box{position:relative;border:1px solid #59667d;border-radius:6px;background:linear-gradient(145deg,#101724,#202c43);display:grid;place-items:center;font-size:10px;color:#d3dbea}.display-box:after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:16px;height:6px;border-left:1px solid #59667d;border-right:1px solid #59667d}.display-box.big{width:92px;height:52px}.display-box.small{width:70px;height:42px}.display-box.primary{border-color:#8996ff}.num{position:absolute;top:5px;left:5px;width:16px;height:16px;border-radius:50%;background:#0d131dcc;border:1px solid rgba(255,255,255,.13);display:grid;place-items:center;font-size:8px}.app-choices{display:flex;gap:8px;flex-wrap:wrap}.app-choice{width:76px;min-height:72px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.025);padding:8px;text-align:center}.app-choice:hover{background:rgba(255,255,255,.05)}.app-choice.selected{border-color:rgba(120,136,255,.55);background:rgba(120,136,255,.08)}.app-choice .app-logo{margin:0 auto 5px}.app-choice b{font-size:9px}.shortcut-box{min-width:170px;height:44px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.025);display:flex;align-items:center;justify-content:center;gap:5px}.key{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:25px;padding:0 7px;border:1px solid #4e5a72;border-radius:7px;background:#141c29;font-size:9px;font-weight:700}.key.round{min-width:24px;width:24px;border-radius:50%;background:#28345d;border-color:#5669c2}.live-summary{margin:4px 0 12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02);display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.sum{display:flex;align-items:center;gap:6px;font-size:10px}.arrow{color:#69768a}.recovery{display:flex;align-items:center;justify-content:center;gap:6px;color:#bdeed9;font-size:9px;padding-bottom:10px}.creator-foot{padding:14px 20px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}.creator-foot .btn{min-width:130px}.simple-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.simple-card{border:1px solid var(--line);border-radius:14px;background:rgba(22,29,42,.76);padding:14px;display:flex;align-items:center;gap:10px}.simple-icon{width:40px;height:40px;border-radius:11px;background:#283349;display:grid;place-items:center;font-weight:700}.simple-card b{font-size:12px}.simple-card small{display:block;color:var(--muted);font-size:9px}
+.overlay{display:none;position:fixed;inset:42px 0 0 0;z-index:50;background:rgba(4,7,12,.68);backdrop-filter:blur(10px)}.overlay.open{display:block}.drawer{position:absolute;right:0;top:0;bottom:0;width:min(500px,94vw);background:#121822;border-left:1px solid var(--line2);box-shadow:-20px 0 60px rgba(0,0,0,.28);display:flex;flex-direction:column}.drawer-head{padding:18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.drawer-head h3{margin:0;font-size:20px}.drawer-body{padding:18px;overflow:auto}.display-presets{display:grid;grid-template-columns:1fr;gap:10px}.preset{min-height:110px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);display:grid;grid-template-columns:130px 1fr;align-items:center;gap:14px;padding:12px;text-align:left}.preset:hover{background:rgba(255,255,255,.05)}.preset.selected{border-color:rgba(120,136,255,.55);background:rgba(120,136,255,.08)}.preset b{font-size:13px}.preset small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.drawer-foot{padding:16px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.capture-wrap{display:none;position:fixed;inset:42px 0 0 0;z-index:60;background:rgba(4,7,12,.74);backdrop-filter:blur(12px);place-items:center}.capture-wrap.open{display:grid}.capture{width:min(480px,92vw);border:1px solid var(--line2);border-radius:20px;background:linear-gradient(145deg,#182131,#101620);box-shadow:var(--shadow);padding:22px;text-align:center}.capture h3{margin:0;font-size:21px}.controller{width:215px;height:118px;margin:20px auto 16px;border:1px solid var(--line);border-radius:70px;background:#141b27;position:relative}.guide{position:absolute;left:50%;top:20px;transform:translateX(-50%);min-width:58px;height:28px;border-radius:999px;background:#253154;border:1px solid #5365be;display:grid;place-items:center;font-size:9px;font-weight:700}.stick{position:absolute;width:28px;height:28px;border-radius:50%;background:#202838;border:1px solid #465267;top:56px}.stick.left{left:35px}.stick.right{right:38px}.cbtn{position:absolute;width:30px;height:30px;border-radius:50%;border:1px solid #5466bd;background:#28345c;font-size:10px;font-weight:700}.cbtn.a{right:26px;top:49px}.cbtn.x{right:62px;top:24px}.cbtn.y{right:28px;top:14px}.capture-result{min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:13px}.capture-actions{display:flex;justify-content:center;gap:8px}
+.activation-wrap{display:none;position:fixed;inset:42px 0 0 0;z-index:70;background:rgba(4,7,12,.74);backdrop-filter:blur(10px);place-items:center}.activation-wrap.open{display:grid}.activation{width:min(620px,92vw);border:1px solid var(--line2);border-radius:18px;background:linear-gradient(145deg,#182131,#101620);box-shadow:var(--shadow);overflow:hidden}.activation-head{padding:18px 20px 14px;border-bottom:1px solid var(--line)}.activation-head h3{margin:0;font-size:19px}.steps{padding:15px 20px}.step{display:grid;grid-template-columns:30px 1fr auto;gap:9px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}.step:last-child{border-bottom:0}.step-icon{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.04);display:grid;place-items:center}.step b{font-size:10px}.step em{font-style:normal;color:var(--muted);font-size:8px}.step.active .step-icon{background:rgba(120,136,255,.15);color:#d2d8ff}.step.active em{color:#d2d8ff}.step.done .step-icon{background:rgba(99,214,166,.1);color:#ace9cf}.step.done em{color:#ace9cf}.progress{height:3px;background:#273143}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .35s}.confirm{display:none;padding:15px 20px;border-top:1px solid var(--line);align-items:center;justify-content:space-between;gap:12px}.confirm.show{display:flex}.confirm b{font-size:11px}.confirm small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.count{color:#efd37f}.toast{display:none;position:fixed;right:20px;bottom:20px;z-index:90;min-width:240px;border:1px solid var(--line2);border-radius:12px;background:#18202e;box-shadow:var(--shadow);padding:11px 13px}.toast.show{display:block}.toast b{display:block;font-size:10px}.toast span{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+@media(max-width:900px){.flow{grid-template-columns:1fr;gap:8px}.line{width:2px;height:18px;margin:auto}.pick-row{grid-template-columns:1fr}.pick-row>.btn{justify-self:start}}@media(max-width:650px){.shell{grid-template-columns:70px 1fr}.page{padding:16px}.top{align-items:flex-start;flex-direction:column}.creator-head{align-items:flex-start}.app-choices{gap:6px}.preset{grid-template-columns:1fr}.creator-foot{justify-content:stretch}.creator-foot .btn{width:100%}}
 </style>
 </head>
 <body>
-<div class="window">
-  <div class="titlebar">
-    <div class="title-left"><div class="brandmark">C</div><span>Coucho</span><span style="color:#687386">·</span><span>Control</span></div>
-    <div class="winbtns"><span>—</span><span>□</span><span>✕</span></div>
-  </div>
-
+<div class="app">
+  <div class="titlebar"><div class="brand"><div class="logo">C</div><span>Coucho · Control</span></div><div class="win"><span>—</span><span>□</span><span>✕</span></div></div>
   <div class="shell">
-    <aside class="nav">
-      <div class="navbrand"><div class="navlogo">C</div><div><b>Coucho</b><small>Control</small></div></div>
-      <div class="navlist">
-        <button class="navbtn active" data-page="home"><span class="navico">⌂</span><span>Inicio</span></button>
-        <button class="navbtn" data-page="library"><span class="navico">▦</span><span>Biblioteca</span></button>
-      </div>
-      <div class="navspacer"></div>
-      <div class="device"><b><i class="dot"></i>Mando conectado</b><small>Xbox Wireless Controller</small></div>
-      <button class="navfooter" data-page="settings"><span class="navico">⚙</span><span>Configuración</span></button>
-    </aside>
-
-    <main class="content">
+    <aside class="rail"><div class="railmark">C</div><button class="nav active" data-page="home"><span class="ico">⌂</span><small>Inicio</small></button><button class="nav" data-page="apps"><span class="ico">▦</span><small>Apps</small></button><div class="railfill"></div><button class="nav" data-page="settings"><span class="ico">⚙</span><small>Ajustes</small></button></aside>
+    <main class="main">
       <section class="page active" id="home">
-        <div class="toolbar">
-          <div><div class="crumb">Control / Inicio</div><h1 class="title">Inicio</h1></div>
-          <div class="actions"><button class="btn" id="simulateFirst">Simular primer inicio</button><button class="btn primary" id="openHop">Abrir Hop</button></div>
+        <div class="top"><div><h1>Inicio</h1><div class="mini-status"><span class="pill">2 pantallas</span><span class="pill">🎮 conectado</span></div></div><div class="top-actions"><button class="btn icon" id="newBtn">＋</button><button class="btn primary" id="hopBtn">Hop</button></div></div>
+        <div class="panel active-panel">
+          <div class="active-head"><div class="active-left"><div class="active-icon" id="activeIcon">🎮</div><div><div class="active-tag"><span class="dot"></span>ACTIVO</div><h2 id="activeName">Gaming</h2></div></div><div class="top-actions"><button class="btn" id="editActive">Editar</button><button class="btn primary" id="testActive">Probar</button></div></div>
+          <div class="flow"><div class="flow-card"><div class="big">🎮</div><b id="activeShortcut">Guide + A</b></div><div class="line"></div><div class="flow-card"><div class="displays"><div class="screen tv primary"></div><div class="screen pc"></div></div></div><div class="line"></div><div class="flow-card"><div class="app-logo" id="activeAppLogo">S</div><b id="activeApp">Steam</b></div></div>
         </div>
+        <div class="section"><h3>Couchsets</h3><button class="btn icon" id="newBtn2">＋</button></div><div class="cards" id="cards"></div>
+      </section>
 
-        <div class="home-hero">
-          <div class="home-main">
-            <div class="eyebrow"><i class="dot"></i> Entorno activo</div>
-            <h2 id="homeName">Gaming</h2>
-            <div class="meta" id="homeMeta">TV 4K + Monitor · Steam · Guide + A</div>
-            <div class="actions" style="margin-top:16px"><button class="btn primary" id="activateCurrent">▶ Activar de nuevo</button><button class="btn" id="editCurrent">✎ Editar</button></div>
-
-            <div class="flow">
-              <div class="flow-node"><div class="ico">🎮</div><div><small>Activar con</small><b id="homeShortcut">Guide + A</b></div></div>
-              <div class="connector"></div>
-              <div class="flow-node"><div class="ico">▣</div><div><small>Pantallas</small><div class="display-mini"><div class="screen tv primary"></div><div class="screen pc"></div></div></div></div>
-              <div class="connector"></div>
-              <div class="flow-node"><div class="ico" id="homeAppLogo">S</div><div><small>Abrir</small><b id="homeApp">Steam</b></div></div>
-            </div>
+      <section class="page" id="creator">
+        <div class="top"><div><h1>Nuevo</h1></div><button class="btn ghost" id="closeCreator">✕</button></div>
+        <div class="creator-wrap"><div class="creator">
+          <div class="creator-head"><div class="auto-name"><div class="auto-icon" id="autoIcon">🎮</div><div><h2 id="autoName">Gaming</h2><small>auto</small></div></div></div>
+          <div class="creator-body">
+            <div class="pick-row"><div><div class="pick-label">Pantallas</div><div class="pick-sub" id="displayShort">TV + Monitor</div></div><div class="display-preview" id="displayPreview"><div class="display-box big primary"><span class="num">2</span>TV</div><div class="display-box small"><span class="num">1</span>Monitor</div></div><button class="btn" id="changeDisplays">Cambiar</button></div>
+            <div class="pick-row"><div><div class="pick-label">App</div><div class="pick-sub">1 toque</div></div><div class="app-choices" id="appChoices"><button class="app-choice selected" data-app="Steam"><div class="app-logo">S</div><b>Steam</b></button><button class="app-choice" data-app="Playnite"><div class="app-logo">P</div><b>Playnite</b></button><button class="app-choice" data-app="Plex"><div class="app-logo">P</div><b>Plex</b></button><button class="app-choice" data-app="Ninguna"><div class="app-logo">—</div><b>Ninguna</b></button></div><span></span></div>
+            <div class="pick-row"><div><div class="pick-label">Atajo</div><div class="pick-sub">opcional</div></div><div class="shortcut-box" id="shortcutBox"><span style="color:var(--muted)">Manual</span></div><button class="btn" id="assignShortcut">Asignar</button></div>
+            <div class="live-summary"><div class="sum" id="sumShortcut"><span style="color:var(--muted)">Manual</span></div><div class="arrow">→</div><div class="sum">▣ <b id="sumDisplays">TV + Monitor</b></div><div class="arrow">→</div><div class="sum"><div class="app-logo" id="sumAppLogo">S</div><b id="sumApp">Steam</b></div></div><div class="recovery">↺ Recovery automático</div>
           </div>
-          <aside class="home-side">
-            <div class="eyebrow" style="margin-bottom:10px">Estado del sistema</div>
-            <div class="status-list">
-              <div class="status-row"><div class="status-ico">▣</div><div><b>2 pantallas</b><small>Estado confirmado</small></div><span class="ok">Listo</span></div>
-              <div class="status-row"><div class="status-ico">🎮</div><div><b>Xbox Controller</b><small>Conectado ahora</small></div><span class="ok">Listo</span></div>
-              <div class="status-row"><div class="status-ico">↺</div><div><b>Recuperación</b><small>Último estado protegido</small></div><span class="ok">Listo</span></div>
-            </div>
-          </aside>
-        </div>
-
-        <div class="section-head">
-          <div><h3>Tus Couchsets</h3><p>Cambia todo el entorno con una sola acción.</p></div>
-          <button class="btn primary" id="newSet">＋ Nuevo Couchset</button>
-        </div>
-        <div class="grid" id="couchsetGrid"></div>
+          <div class="creator-foot"><button class="btn primary" id="tryBtn">Probar</button></div>
+        </div></div>
       </section>
 
-      <section class="page" id="first">
-        <div class="toolbar">
-          <div><div class="crumb">Control / Primer inicio</div><h1 class="title">Tu primer Couchset</h1></div>
-          <button class="btn" id="exitFirst">Salir de la simulación</button>
-        </div>
-
-        <div class="first-shell">
-          <div class="first-composer">
-            <div class="first-head">
-              <div>
-                <h2>Configura solo lo que importa.</h2>
-                <p>Coucho ya detectó tu PC. Elige cómo quieres usarlo.</p>
-                <div class="detected"><span>✓ 2 pantallas</span><span>✓ Xbox Controller</span><span>✓ 18 apps</span></div>
-              </div>
-              <button class="btn subtle" id="firstHelp">¿Qué es un Couchset?</button>
-            </div>
-
-            <div class="first-body">
-              <div class="first-name">
-                <div class="first-name-left"><div class="first-name-icon">🎮</div><div><h3 id="firstName">Gaming</h3><div class="meta">Tu entorno para jugar</div></div></div>
-                <button class="edit-name" id="renameFirst">Cambiar nombre</button>
-              </div>
-
-              <div class="setup-row">
-                <div class="setup-label"><b>Pantallas</b><small>Usaremos lo que tienes ahora.</small></div>
-                <div class="setup-content">
-                  <div class="display-preview" id="firstDisplays"><div class="display-box big primary"><span class="badge">2</span>TV 4K</div><div class="display-box small"><span class="badge">1</span>Monitor</div></div>
-                  <div class="display-caption" id="displayCaption">TV principal · escritorio extendido</div>
-                </div>
-                <button class="btn" id="changeDisplays">Cambiar</button>
-              </div>
-
-              <div class="setup-row">
-                <div class="setup-label"><b>Aplicación</b><small>Opcional</small></div>
-                <div class="setup-content">
-                  <div class="app-strip" id="firstApps">
-                    <button class="app-tile selected" data-app="Steam"><div class="apptilelogo">S</div><b>Steam</b></button>
-                    <button class="app-tile" data-app="Playnite"><div class="apptilelogo">P</div><b>Playnite</b></button>
-                    <button class="app-tile" data-app="Plex"><div class="apptilelogo">P</div><b>Plex</b></button>
-                    <button class="app-tile" data-app="Ninguna"><div class="apptilelogo">—</div><b>Ninguna</b></button>
-                    <button class="more-apps" id="moreApps">Ver todas…</button>
-                  </div>
-                </div>
-                <span></span>
-              </div>
-
-              <div class="setup-row">
-                <div class="setup-label"><b>Activar con</b><small>Opcional</small></div>
-                <div class="setup-content">
-                  <div class="shortcut-box">
-                    <div class="shortcut-current" id="shortcutCurrent"><span style="color:var(--muted)">Sin atajo</span></div>
-                    <span class="optional">También podrás activarlo desde Hop.</span>
-                  </div>
-                </div>
-                <button class="btn" id="assignShortcut">Asignar</button>
-              </div>
-
-              <div class="quick-summary">
-                <div class="sum-node" id="sumShortcut"><span style="color:var(--muted)">Manual</span></div>
-                <span class="sum-arrow">→</span>
-                <div class="sum-node">▣ <b id="sumDisplay">TV + Monitor</b></div>
-                <span class="sum-arrow">→</span>
-                <div class="sum-node"><span class="appbadge" id="sumAppLogo">S</span><b id="sumApp">Steam</b></div>
-              </div>
-              <div class="safe-line">↺ Protegido: si el cambio de pantalla falla, Coucho vuelve al último estado confirmado.</div>
-            </div>
-
-            <div class="first-foot">
-              <span>Los perfiles de pantalla y atajos se guardan automáticamente.</span>
-              <div class="actions"><button class="btn" id="saveOnly">Guardar</button><button class="btn primary" id="saveTest">Guardar y probar</button></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="page" id="library">
-        <div class="toolbar">
-          <div><div class="crumb">Control / Biblioteca</div><h1 class="title">Biblioteca</h1><p class="subtitle">Elige qué apps quieres tener disponibles desde Hop.</p></div>
-          <div class="actions"><button class="btn" id="detectApps">↻ Detectar apps</button><button class="btn primary">＋ Agregar app</button></div>
-        </div>
-        <div class="library-tools"><div class="segmented" id="libFilter"><button class="active" data-filter="hop">En Hop</button><button data-filter="found">Detectadas</button><button data-filter="all">Todas</button></div><input class="search" id="searchApps" placeholder="Buscar aplicaciones"></div>
-        <div class="appgrid" id="appGrid"></div>
-      </section>
-
-      <section class="page" id="settings">
-        <div class="settings">
-          <div class="toolbar"><div><div class="crumb">Control / Configuración</div><h1 class="title">Configuración</h1><p class="subtitle">Preferencias globales. Las decisiones de cada Couchset se quedan dentro del Couchset.</p></div></div>
-          <h3>Inicio y comportamiento</h3>
-          <div class="setrow"><div class="setico">↻</div><div><b>Iniciar Coucho con Windows</b><small>Mantén Coucho listo al encender el PC.</small></div><button class="toggle on"></button></div>
-          <div class="setrow"><div class="setico">⌂</div><div><b>Al iniciar Coucho</b><small>Elige qué superficie ver primero.</small></div><select class="select"><option>Abrir Control</option><option>Abrir Hop</option><option>Segundo plano</option></select></div>
-          <div class="setrow"><div class="setico">◌</div><div><b>Icono en bandeja</b><small>Accede a Coucho aunque cierres la ventana.</small></div><button class="toggle on"></button></div>
-
-          <h3>Apariencia</h3>
-          <div class="setrow"><div class="setico">◐</div><div><b>Tema</b><small>Usa el sistema o fuerza claro/oscuro.</small></div><select class="select"><option>Usar el sistema</option><option>Oscuro</option><option>Claro</option></select></div>
-          <div class="setrow"><div class="setico">◇</div><div><b>Material</b><small>Apariencia de las superficies de Coucho.</small></div><select class="select"><option>Adaptativo · recomendado</option><option>Mica</option><option>Acrílico</option><option>Sólido</option></select></div>
-        </div>
-      </section>
+      <section class="page" id="apps"><div class="top"><div><h1>Apps</h1></div><button class="btn icon">＋</button></div><div class="simple-grid" id="appsGrid"></div></section>
+      <section class="page" id="settings"><div class="top"><div><h1>Ajustes</h1></div></div><div class="simple-grid"><div class="simple-card"><div class="simple-icon">⌂</div><div><b>Inicio</b><small>Control</small></div></div><div class="simple-card"><div class="simple-icon">◐</div><div><b>Tema</b><small>Sistema</small></div></div><div class="simple-card"><div class="simple-icon">↺</div><div><b>Recovery</b><small>Activo</small></div></div></div></section>
     </main>
   </div>
 </div>
 
-<div class="drawer-overlay" id="displayDrawer">
-  <div class="drawer">
-    <div class="drawer-head"><div><h3>Pantallas</h3><p>Haz que se vea como tu escritorio real. Coucho guardará esto como perfil automáticamente.</p></div><button class="btn" id="closeDisplays">✕</button></div>
-    <div class="drawer-body">
-      <div class="monitor-stage">
-        <button class="stage-display one" data-monitor="Monitor" id="monitor1">1<span class="screen-name">Monitor</span></button>
-        <button class="stage-display two selected" data-monitor="TV 4K" id="monitor2">2<span class="primary-tag">Principal</span><span class="screen-name">TV 4K</span></button>
-      </div>
+<div class="overlay" id="displayOverlay"><div class="drawer"><div class="drawer-head"><h3>Pantallas</h3><button class="btn icon" id="closeDisplay">✕</button></div><div class="drawer-body"><div class="display-presets">
+  <button class="preset selected" data-mode="both"><div class="display-preview"><div class="display-box big primary"><span class="num">2</span>TV</div><div class="display-box small"><span class="num">1</span>Monitor</div></div><div><b>TV + Monitor</b><small>TV principal</small></div></button>
+  <button class="preset" data-mode="tv"><div class="display-preview"><div class="display-box big primary"><span class="num">2</span>TV</div></div><div><b>Solo TV</b><small>sofá</small></div></button>
+  <button class="preset" data-mode="monitor"><div class="display-preview"><div class="display-box big primary"><span class="num">1</span>Monitor</div></div><div><b>Solo Monitor</b><small>escritorio</small></div></button>
+</div></div><div class="drawer-foot"><button class="btn" id="cancelDisplay">Cancelar</button><button class="btn primary" id="useDisplay">Usar</button></div></div></div>
 
-      <div class="actions" style="justify-content:space-between;margin-bottom:10px"><button class="btn" id="identifyDisplays">Identificar</button><span class="meta">Selecciona una pantalla para hacerla principal.</span></div>
+<div class="capture-wrap" id="captureOverlay"><div class="capture"><h3>Atajo</h3><div class="controller"><div class="guide">Guide</div><div class="stick left"></div><div class="stick right"></div><button class="cbtn a" id="capA">A</button><button class="cbtn x" id="capX">X</button><button class="cbtn y" id="capY">Y</button></div><div class="capture-result" id="captureResult"><span style="color:var(--muted)">Pulsa A · X · Y</span></div><div class="capture-actions"><button class="btn" id="captureCancel">Cancelar</button><button class="btn" id="captureNone">Manual</button><button class="btn primary" id="captureUse" style="display:none">Usar</button></div></div></div>
 
-      <div class="display-options">
-        <div class="option-row"><div><b>Usar pantallas</b><small>Elige lo que estará activo en este Couchset.</small></div><div class="segmented" id="screenMode"><button class="active" data-mode="both">Ambas</button><button data-mode="tv">Solo TV</button><button data-mode="monitor">Solo monitor</button></div></div>
-        <div class="option-row"><div><b>Pantalla principal</b><small id="primaryDescription">TV 4K</small></div><span class="pill">Se guarda automáticamente</span></div>
-      </div>
-    </div>
-    <div class="drawer-foot"><button class="btn" id="cancelDisplays">Cancelar</button><button class="btn primary" id="applyDisplays">Usar esta configuración</button></div>
-  </div>
-</div>
-
-<div class="capture-overlay" id="shortcutCapture">
-  <div class="capture-card">
-    <h3>Asigna un atajo</h3>
-    <p>Pulsa la combinación en tu control. Coucho la detectará.</p>
-    <div class="controller-art">
-      <div class="guide">Guide</div><div class="stick left"></div><div class="stick right"></div><button class="abtn" id="simA">A</button><button class="xbtn" id="simX">X</button>
-    </div>
-    <div class="detected-combo" id="detectedCombo"><span style="color:var(--muted)">Esperando combinación…</span></div>
-    <div class="capture-actions"><button class="btn" id="cancelCapture">Cancelar</button><button class="btn" id="noShortcut">Sin atajo</button><button class="btn primary hidden" id="useShortcut">Usar combinación</button></div>
-  </div>
-</div>
-
-<div class="activation-overlay" id="activation">
-  <div class="activation">
-    <div class="activation-head"><h3 id="activationTitle">Probando Gaming</h3><p>Coucho prepara el entorno y verifica que todo funcione.</p></div>
-    <div class="steps">
-      <div class="step" data-step="0"><div class="stepico">▣</div><div><b>Aplicar pantallas</b><small>Configurar y verificar el entorno.</small></div><em>Pendiente</em></div>
-      <div class="step" data-step="1"><div class="stepico">↺</div><div><b>Proteger estado anterior</b><small>Dejar rollback listo.</small></div><em>Pendiente</em></div>
-      <div class="step" data-step="2"><div class="stepico">▶</div><div><b>Abrir aplicación</b><small id="activationAppText">Iniciar Steam.</small></div><em>Pendiente</em></div>
-      <div class="step" data-step="3"><div class="stepico">◎</div><div><b>Preparar foco</b><small>Dejar todo listo para usar.</small></div><em>Pendiente</em></div>
-    </div>
-    <div class="progress"><div id="progress"></div></div>
-    <div class="confirm" id="confirm">
-      <div><b>¿Puedes ver las pantallas correctamente?</b><small>Se restaurarán en <span class="count" id="count">15</span> s si no confirmas.</small></div>
-      <div class="actions"><button class="btn" id="revert">Restaurar</button><button class="btn primary" id="keep">Conservar</button></div>
-    </div>
-  </div>
-</div>
-
+<div class="activation-wrap" id="activationOverlay"><div class="activation"><div class="activation-head"><h3 id="activationTitle">Probando Gaming</h3></div><div class="steps"><div class="step" data-step="0"><div class="step-icon">▣</div><b>Pantallas</b><em>Pendiente</em></div><div class="step" data-step="1"><div class="step-icon">↺</div><b>Recovery</b><em>Pendiente</em></div><div class="step" data-step="2"><div class="step-icon">▶</div><b>App</b><em>Pendiente</em></div><div class="step" data-step="3"><div class="step-icon">◎</div><b>Foco</b><em>Pendiente</em></div></div><div class="progress"><div id="progress"></div></div><div class="confirm" id="confirm"><div><b>¿Se ve bien?</b><small>Restaurar en <span class="count" id="count">15</span> s</small></div><div class="top-actions"><button class="btn" id="revert">Restaurar</button><button class="btn primary" id="keep">Conservar</button></div></div></div></div>
 <div class="toast" id="toast"><b id="toastTitle"></b><span id="toastText"></span></div>
-
 <script>
 (function(){
-  var sets=[
-    {id:1,name:"Gaming",display:"TV + Monitor",app:"Steam",shortcut:"Guide + A",icon:"🎮",active:true},
-    {id:2,name:"Escritorio",display:"Actual",app:"Ninguna",shortcut:"Guide + X",icon:"🖥",active:false},
-    {id:3,name:"Películas",display:"Solo TV",app:"Plex",shortcut:"Guide + Y",icon:"🎬",active:false}
-  ];
-  var apps=[
-    {name:"Steam",type:"Juegos",logo:"S",inHop:true},{name:"Playnite",type:"Launcher",logo:"P",inHop:true},
-    {name:"Moonlight",type:"Streaming",logo:"M",inHop:true},{name:"Plex",type:"Multimedia",logo:"P",inHop:true},
-    {name:"RetroArch",type:"Juegos",logo:"R",inHop:false},{name:"Chrome",type:"Aplicación",logo:"C",inHop:false},
-    {name:"Spotify",type:"Multimedia",logo:"S",inHop:false},{name:"Discord",type:"Aplicación",logo:"D",inHop:false}
-  ];
-  var draft={id:null,name:"Gaming",display:"TV + Monitor",app:"Steam",shortcut:"Sin atajo",primary:"TV 4K",screenMode:"both"};
-  var selectedShortcut=null,libraryFilter="hop",timer=null,countTimer=null;
-
-  function q(s){return document.querySelector(s)}
-  function qa(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
-  function activeSet(){return sets.find(function(x){return x.active})||sets[0]}
-  function byId(id){return sets.find(function(x){return x.id===id})}
-  function letter(name){return name==="Ninguna"?"—":name.charAt(0).toUpperCase()}
-
-  function show(id){
-    qa(".page").forEach(function(p){p.classList.toggle("active",p.id===id)});
-    qa(".navbtn,.navfooter").forEach(function(b){b.classList.toggle("active",b.dataset.page===id)});
-    q(".content").scrollTop=0;
-  }
-
-  function shortcutHtml(s){
-    if(!s||s==="Sin atajo") return '<span style="color:var(--muted)">Manual</span>';
-    var p=s.split(" + ");
-    return '<span class="keycap">'+p[0]+'</span><span style="margin:0 2px">+</span><span class="keycap round">'+p[1]+'</span>';
-  }
-
-  function renderSets(){
-    q("#couchsetGrid").innerHTML=sets.map(function(c){
-      return '<article class="card '+(c.active?'active-card':'')+'">'+
-      '<div class="cardtop"><div class="cardname"><div class="cardico">'+c.icon+'</div><div><h4>'+c.name+'</h4><div class="cardstate '+(c.active?'active':'')+'">'+(c.active?'● ACTIVO':'Listo')+'</div></div></div><span style="color:var(--muted2)">···</span></div>'+
-      '<div class="mini-flow"><div class="mini">'+shortcutHtml(c.shortcut)+'</div><div class="mini-line"></div><div class="mini">▣<br>'+c.display+'</div><div class="mini-line"></div><div class="mini"><div class="appbadge">'+letter(c.app)+'</div>'+c.app+'</div></div>'+
-      '<div class="cardactions"><button class="btn '+(c.active?'':'primary')+' activate" data-id="'+c.id+'">'+(c.active?'Activo':'▶ Activar')+'</button><button class="btn edit" data-id="'+c.id+'">Editar</button></div></article>'
-    }).join("");
-    qa(".activate").forEach(function(b){b.onclick=function(){startActivation(Number(b.dataset.id))}});
-    qa(".edit").forEach(function(b){b.onclick=function(){openFirst(Number(b.dataset.id))}});
-  }
-
-  function refreshHome(){
-    var c=activeSet();
-    q("#homeName").textContent=c.name;
-    q("#homeMeta").textContent=c.display+" · "+c.app+" · "+c.shortcut;
-    q("#homeShortcut").textContent=c.shortcut==="Sin atajo"?"Manual":c.shortcut;
-    q("#homeApp").textContent=c.app;
-    q("#homeAppLogo").textContent=letter(c.app);
-  }
-
-  function openFirst(id){
-    if(id){
-      var c=byId(id);
-      draft={id:c.id,name:c.name,display:c.display,app:c.app,shortcut:c.shortcut,primary:"TV 4K",screenMode:c.display==="Solo TV"?"tv":"both"};
-    }else{
-      draft={id:null,name:"Gaming",display:"TV + Monitor",app:"Steam",shortcut:"Sin atajo",primary:"TV 4K",screenMode:"both"};
-    }
-    q("#firstName").textContent=draft.name;
-    qa("#firstApps .app-tile").forEach(function(b){b.classList.toggle("selected",b.dataset.app===draft.app)});
-    updateShortcut();
-    updateDisplayPreview();
-    show("first");
-  }
-
-  function updateShortcut(){
-    q("#shortcutCurrent").innerHTML=shortcutHtml(draft.shortcut);
-    q("#sumShortcut").innerHTML=shortcutHtml(draft.shortcut);
-  }
-
-  function updateDisplayPreview(){
-    var box=q("#firstDisplays"),caption=q("#displayCaption");
-    if(draft.screenMode==="tv"){
-      box.innerHTML='<div class="display-box big primary"><span class="badge">2</span>TV 4K</div>';
-      caption.textContent="Solo TV 4K · principal";
-      draft.display="Solo TV";
-      q("#sumDisplay").textContent="Solo TV";
-    }else if(draft.screenMode==="monitor"){
-      box.innerHTML='<div class="display-box big primary"><span class="badge">1</span>Monitor</div>';
-      caption.textContent="Solo Monitor · principal";
-      draft.display="Solo monitor";
-      q("#sumDisplay").textContent="Solo monitor";
-    }else{
-      var tvPrimary=draft.primary==="TV 4K";
-      box.innerHTML='<div class="display-box big '+(tvPrimary?'primary':'')+'"><span class="badge">2</span>TV 4K</div><div class="display-box small '+(!tvPrimary?'primary':'')+'"><span class="badge">1</span>Monitor</div>';
-      caption.textContent=draft.primary+" principal · escritorio extendido";
-      draft.display="TV + Monitor";
-      q("#sumDisplay").textContent="TV + Monitor";
-    }
-  }
-
-  function renderLibrary(){
-    var term=q("#searchApps").value.trim().toLowerCase();
-    var filtered=apps.filter(function(a){
-      if(libraryFilter==="hop"&&!a.inHop)return false;
-      if(libraryFilter==="found"&&a.inHop)return false;
-      if(term&&a.name.toLowerCase().indexOf(term)<0&&a.type.toLowerCase().indexOf(term)<0)return false;
-      return true;
-    });
-    q("#appGrid").innerHTML=filtered.map(function(a){
-      return '<article class="libcard"><div class="libtop"><div class="liblogo">'+a.logo+'</div><div><h4>'+a.name+'</h4><small>'+a.type+'</small></div><span class="pill">'+(a.inHop?'En Hop':'Detectada')+'</span></div><div class="actions" style="margin-top:10px"><button class="btn">'+(a.inHop?'Editar':'＋ Añadir')+'</button><button class="btn">'+(a.inHop?'Ocultar':'Ignorar')+'</button></div></article>'
-    }).join("");
-  }
-
-  function toast(title,text){
-    q("#toastTitle").textContent=title;q("#toastText").textContent=text;q("#toast").classList.add("show");
-    clearTimeout(window._toast);window._toast=setTimeout(function(){q("#toast").classList.remove("show")},2400);
-  }
-
-  function saveDraft(test){
-    var id=draft.id;
-    if(id){
-      Object.assign(byId(id),{name:draft.name,display:draft.display,app:draft.app,shortcut:draft.shortcut});
-    }else{
-      id=Date.now();
-      sets.push({id:id,name:draft.name,display:draft.display,app:draft.app,shortcut:draft.shortcut,icon:"✨",active:false});
-    }
-    renderSets();
-    if(test) startActivation(id);
-    else{show("home");toast("Couchset guardado","Pantallas y atajo quedaron guardados automáticamente.")}
-  }
-
-  function startActivation(id){
-    var c=byId(id);if(!c)return;
-    clearInterval(timer);clearInterval(countTimer);
-    q("#activationTitle").textContent="Probando "+c.name;
-    q("#activationAppText").textContent=c.app==="Ninguna"?"No hay aplicación que abrir.":"Iniciar "+c.app+".";
-    q("#confirm").classList.remove("show");q("#progress").style.width="0%";
-    qa(".step").forEach(function(s){s.classList.remove("active","done");s.querySelector("em").textContent="Pendiente"});
-    q("#activation").classList.add("open");
-    var step=0;
-    function paint(){
-      qa(".step").forEach(function(s,i){
-        if(i<step){s.classList.add("done");s.classList.remove("active");s.querySelector("em").textContent="Listo"}
-        else if(i===step){s.classList.add("active");s.querySelector("em").textContent="En curso"}
-      });
-      q("#progress").style.width=((step+1)*25)+"%";
-    }
-    paint();
-    timer=setInterval(function(){
-      step++;
-      if(step>=4){
-        clearInterval(timer);
-        qa(".step").forEach(function(s){s.classList.remove("active");s.classList.add("done");s.querySelector("em").textContent="Listo"});
-        q("#progress").style.width="100%";
-        q("#confirm").classList.add("show");
-        var left=15;q("#count").textContent=left;
-        countTimer=setInterval(function(){left--;q("#count").textContent=left;if(left<=0){clearInterval(countTimer);q("#activation").classList.remove("open");toast("Configuración restaurada","Coucho volvió al estado anterior.")}},1000);
-        q("#keep").onclick=function(){clearInterval(countTimer);sets.forEach(function(x){x.active=x.id===c.id});renderSets();refreshHome();q("#activation").classList.remove("open");show("home");toast(c.name+" está activo","Pantallas confirmadas y sesión guardada.")};
-        q("#revert").onclick=function(){clearInterval(countTimer);q("#activation").classList.remove("open");toast("Estado restaurado","No se conservaron los cambios.")};
-        return;
-      }
-      paint();
-    },520);
-  }
-
-  qa(".navbtn,.navfooter").forEach(function(b){b.onclick=function(){show(b.dataset.page)}});
-  q("#simulateFirst").onclick=function(){openFirst(null)};
-  q("#exitFirst").onclick=function(){show("home")};
-  q("#newSet").onclick=function(){openFirst(null)};
-  q("#editCurrent").onclick=function(){openFirst(activeSet().id)};
-  q("#activateCurrent").onclick=function(){startActivation(activeSet().id)};
-  q("#openHop").onclick=function(){toast("Abrir Hop","En la app real, Control entregaría la superficie a Hop.")};
-
-  q("#renameFirst").onclick=function(){
-    var next=prompt("Nombre del Couchset",draft.name);
-    if(next&&next.trim()){draft.name=next.trim();q("#firstName").textContent=draft.name}
-  };
-  q("#firstHelp").onclick=function(){toast("Couchset","Un Couchset combina pantallas, una app y opcionalmente un atajo en un solo entorno.")};
-
-  qa("#firstApps .app-tile").forEach(function(b){b.onclick=function(){
-    draft.app=b.dataset.app;
-    qa("#firstApps .app-tile").forEach(function(x){x.classList.toggle("selected",x===b)});
-    q("#sumApp").textContent=draft.app;q("#sumAppLogo").textContent=letter(draft.app);
-  }});
-  q("#moreApps").onclick=function(){show("library")};
-
-  q("#changeDisplays").onclick=function(){
-    q("#displayDrawer").classList.add("open");
-    qa("#screenMode button").forEach(function(b){b.classList.toggle("active",b.dataset.mode===draft.screenMode)});
-    q("#monitor1").classList.toggle("selected",draft.primary==="Monitor");
-    q("#monitor2").classList.toggle("selected",draft.primary==="TV 4K");
-    q("#primaryDescription").textContent=draft.primary;
-  };
-  function closeDisplayDrawer(){q("#displayDrawer").classList.remove("open")}
-  q("#closeDisplays").onclick=closeDisplayDrawer;q("#cancelDisplays").onclick=closeDisplayDrawer;
-  qa(".stage-display").forEach(function(b){b.onclick=function(){
-    draft.primary=b.dataset.monitor;
-    qa(".stage-display").forEach(function(x){x.classList.toggle("selected",x===b)});
-    q("#monitor1 .primary-tag")?.remove();q("#monitor2 .primary-tag")?.remove();
-    var tag=document.createElement("span");tag.className="primary-tag";tag.textContent="Principal";b.appendChild(tag);
-    q("#primaryDescription").textContent=draft.primary;
-  }});
-  qa("#screenMode button").forEach(function(b){b.onclick=function(){
-    draft.screenMode=b.dataset.mode;
-    qa("#screenMode button").forEach(function(x){x.classList.toggle("active",x===b)});
-    q("#monitor1").classList.toggle("off",draft.screenMode==="tv");
-    q("#monitor2").classList.toggle("off",draft.screenMode==="monitor");
-  }});
-  q("#identifyDisplays").onclick=function(){toast("Identificar pantallas","En la app real, aparecería 1 y 2 en cada pantalla física.")};
-  q("#applyDisplays").onclick=function(){updateDisplayPreview();closeDisplayDrawer()};
-
-  q("#assignShortcut").onclick=function(){
-    selectedShortcut=null;q("#detectedCombo").innerHTML='<span style="color:var(--muted)">Esperando combinación…</span>';q("#useShortcut").classList.add("hidden");q("#shortcutCapture").classList.add("open");
-  };
-  function detectShortcut(button){
-    selectedShortcut="Guide + "+button;
-    q("#detectedCombo").innerHTML='<span class="keycap">Guide</span><span>+</span><span class="keycap round">'+button+'</span><span style="color:#a9e7c8;margin-left:8px;font-size:9px">Combinación detectada</span>';
-    q("#useShortcut").classList.remove("hidden");
-  }
-  q("#simA").onclick=function(){detectShortcut("A")};q("#simX").onclick=function(){detectShortcut("X")};
-  q("#cancelCapture").onclick=function(){q("#shortcutCapture").classList.remove("open")};
-  q("#noShortcut").onclick=function(){draft.shortcut="Sin atajo";updateShortcut();q("#shortcutCapture").classList.remove("open")};
-  q("#useShortcut").onclick=function(){if(selectedShortcut){draft.shortcut=selectedShortcut;updateShortcut();q("#shortcutCapture").classList.remove("open")}};
-
-  q("#saveOnly").onclick=function(){saveDraft(false)};q("#saveTest").onclick=function(){saveDraft(true)};
-
-  qa("#libFilter button").forEach(function(b){b.onclick=function(){libraryFilter=b.dataset.filter;qa("#libFilter button").forEach(function(x){x.classList.toggle("active",x===b)});renderLibrary()}});
-  q("#searchApps").oninput=renderLibrary;q("#detectApps").onclick=function(){toast("Detección completada","3 aplicaciones nuevas encontradas.")};
-
-  qa(".toggle").forEach(function(t){t.onclick=function(){t.classList.toggle("on")}});
-  renderSets();refreshHome();renderLibrary();updateShortcut();updateDisplayPreview();
+const sets=[{id:1,name:'Gaming',icon:'🎮',display:'TV + Monitor',mode:'both',app:'Steam',shortcut:'Guide + A',active:true},{id:2,name:'Películas',icon:'🎬',display:'Solo TV',mode:'tv',app:'Plex',shortcut:'Manual',active:false},{id:3,name:'Escritorio',icon:'🖥️',display:'Solo Monitor',mode:'monitor',app:'Ninguna',shortcut:'Guide + X',active:false}];
+const appList=['Steam','Playnite','Plex','Moonlight','RetroArch','Chrome'];let draft=null,selectedMode='both',captured=null,editingId=null,runTimer=null,countdownTimer=null;const q=s=>document.querySelector(s),qa=s=>Array.from(document.querySelectorAll(s)),byId=id=>sets.find(x=>x.id===id),active=()=>sets.find(x=>x.active)||sets[0],logo=a=>a==='Ninguna'?'—':a.charAt(0).toUpperCase();
+function autoFor(app){if(app==='Plex')return{name:'Películas',icon:'🎬'};if(app==='Ninguna')return{name:'Escritorio',icon:'🖥️'};return{name:'Gaming',icon:'🎮'}}
+function shortcutMarkup(v){if(!v||v==='Manual')return'<span style="color:var(--muted)">Manual</span>';const p=v.split(' + ');return'<span class="key">'+p[0]+'</span><span>+</span><span class="key round">'+p[1]+'</span>'}
+function show(id){qa('.page').forEach(p=>p.classList.toggle('active',p.id===id));qa('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===id));q('.main').scrollTop=0}
+function toast(t,s){q('#toastTitle').textContent=t;q('#toastText').textContent=s;q('#toast').classList.add('show');clearTimeout(window._toast);window._toast=setTimeout(()=>q('#toast').classList.remove('show'),2200)}
+function renderHome(){const s=active();q('#activeName').textContent=s.name;q('#activeIcon').textContent=s.icon;q('#activeShortcut').textContent=s.shortcut;q('#activeApp').textContent=s.app;q('#activeAppLogo').textContent=logo(s.app)}
+function renderCards(){q('#cards').innerHTML=sets.map(s=>'<article class="card '+(s.active?'active':'')+'"><div class="card-head"><div class="card-name"><div class="card-icon">'+s.icon+'</div><div><b>'+s.name+'</b><div class="state">'+(s.active?'● ACTIVO':'Listo')+'</div></div></div></div><div class="card-flow"><div class="card-chip">'+s.shortcut+'</div><div class="card-chip">▣<br>'+s.display+'</div><div class="card-chip"><div class="app-logo">'+logo(s.app)+'</div>'+s.app+'</div></div><div class="card-actions"><button class="btn '+(s.active?'':'primary')+' run" data-id="'+s.id+'">'+(s.active?'Activo':'Probar')+'</button><button class="btn edit" data-id="'+s.id+'">Editar</button></div></article>').join('');qa('.run').forEach(b=>b.onclick=()=>startActivation(Number(b.dataset.id),false));qa('.edit').forEach(b=>b.onclick=()=>openCreator(Number(b.dataset.id)))}
+function renderApps(){q('#appsGrid').innerHTML=appList.map(a=>'<div class="simple-card"><div class="simple-icon">'+logo(a)+'</div><div><b>'+a+'</b><small>App</small></div></div>').join('')}
+function updateDisplay(){let html='';if(draft.mode==='tv'){draft.display='Solo TV';html='<div class="display-box big primary"><span class="num">2</span>TV</div>'}else if(draft.mode==='monitor'){draft.display='Solo Monitor';html='<div class="display-box big primary"><span class="num">1</span>Monitor</div>'}else{draft.display='TV + Monitor';html='<div class="display-box big primary"><span class="num">2</span>TV</div><div class="display-box small"><span class="num">1</span>Monitor</div>'}q('#displayPreview').innerHTML=html;q('#displayShort').textContent=draft.display;q('#sumDisplays').textContent=draft.display}
+function updateApp(){qa('#appChoices .app-choice').forEach(b=>b.classList.toggle('selected',b.dataset.app===draft.app));q('#sumApp').textContent=draft.app;q('#sumAppLogo').textContent=logo(draft.app);const a=autoFor(draft.app);draft.name=a.name;draft.icon=a.icon;q('#autoName').textContent=draft.name;q('#autoIcon').textContent=draft.icon}
+function updateShortcut(){q('#shortcutBox').innerHTML=shortcutMarkup(draft.shortcut);q('#sumShortcut').innerHTML=shortcutMarkup(draft.shortcut)}
+function openCreator(id){editingId=id||null;if(id){const s=byId(id);draft={id:s.id,name:s.name,icon:s.icon,display:s.display,mode:s.mode,app:s.app,shortcut:s.shortcut,active:s.active}}else{draft={id:null,name:'Gaming',icon:'🎮',display:'TV + Monitor',mode:'both',app:'Steam',shortcut:'Manual',active:false}}selectedMode=draft.mode;updateDisplay();updateApp();updateShortcut();show('creator')}
+function persistDraft(forcedId){if(editingId){Object.assign(byId(editingId),{name:draft.name,icon:draft.icon,display:draft.display,mode:draft.mode,app:draft.app,shortcut:draft.shortcut});return editingId}const id=forcedId||Date.now();sets.push({id:id,name:draft.name,icon:draft.icon,display:draft.display,mode:draft.mode,app:draft.app,shortcut:draft.shortcut,active:false});return id}
+function startActivation(id,fromDraft){const target=fromDraft?{id:id||Date.now(),name:draft.name,icon:draft.icon,display:draft.display,mode:draft.mode,app:draft.app,shortcut:draft.shortcut}:byId(id);q('#activationTitle').textContent='Probando '+target.name;clearInterval(runTimer);clearInterval(countdownTimer);q('#activationOverlay').classList.add('open');q('#confirm').classList.remove('show');q('#progress').style.width='0%';qa('.step').forEach(s=>{s.classList.remove('active','done');s.querySelector('em').textContent='Pendiente'});let step=0;const paint=()=>{qa('.step').forEach((s,i)=>{if(i<step){s.classList.add('done');s.classList.remove('active');s.querySelector('em').textContent='Listo'}else if(i===step){s.classList.add('active');s.querySelector('em').textContent='En curso'}});q('#progress').style.width=((step+1)*25)+'%'};paint();runTimer=setInterval(()=>{step++;if(step>=4){clearInterval(runTimer);qa('.step').forEach(s=>{s.classList.remove('active');s.classList.add('done');s.querySelector('em').textContent='Listo'});q('#progress').style.width='100%';q('#confirm').classList.add('show');let left=15;q('#count').textContent=left;countdownTimer=setInterval(()=>{left--;q('#count').textContent=left;if(left<=0){clearInterval(countdownTimer);q('#activationOverlay').classList.remove('open');toast('Restaurado','Sin cambios')}},1000);return}paint()},500);q('#keep').onclick=()=>{clearInterval(countdownTimer);let realId=id;if(fromDraft)realId=persistDraft(target.id);sets.forEach(x=>x.active=x.id===realId);renderHome();renderCards();q('#activationOverlay').classList.remove('open');show('home');toast(target.name,'Activo')};q('#revert').onclick=()=>{clearInterval(countdownTimer);q('#activationOverlay').classList.remove('open');toast('Restaurado','Sin cambios')}}
+qa('.nav').forEach(b=>b.onclick=()=>show(b.dataset.page));q('#newBtn').onclick=q('#newBtn2').onclick=()=>openCreator(null);q('#editActive').onclick=()=>openCreator(active().id);q('#testActive').onclick=()=>startActivation(active().id,false);q('#hopBtn').onclick=()=>toast('Hop','Abriría Hop');q('#closeCreator').onclick=()=>show('home');qa('#appChoices .app-choice').forEach(b=>b.onclick=()=>{draft.app=b.dataset.app;updateApp()});q('#changeDisplays').onclick=()=>{selectedMode=draft.mode;qa('.preset').forEach(p=>p.classList.toggle('selected',p.dataset.mode===selectedMode));q('#displayOverlay').classList.add('open')};const closeDisplay=()=>q('#displayOverlay').classList.remove('open');q('#closeDisplay').onclick=closeDisplay;q('#cancelDisplay').onclick=closeDisplay;qa('.preset').forEach(p=>p.onclick=()=>{selectedMode=p.dataset.mode;qa('.preset').forEach(x=>x.classList.toggle('selected',x===p))});q('#useDisplay').onclick=()=>{draft.mode=selectedMode;updateDisplay();closeDisplay()};q('#assignShortcut').onclick=()=>{captured=null;q('#captureResult').innerHTML='<span style="color:var(--muted)">Pulsa A · X · Y</span>';q('#captureUse').style.display='none';q('#captureOverlay').classList.add('open')};function captureButton(v){captured='Guide + '+v;q('#captureResult').innerHTML=shortcutMarkup(captured);q('#captureUse').style.display='inline-flex'}q('#capA').onclick=()=>captureButton('A');q('#capX').onclick=()=>captureButton('X');q('#capY').onclick=()=>captureButton('Y');q('#captureCancel').onclick=()=>q('#captureOverlay').classList.remove('open');q('#captureNone').onclick=()=>{draft.shortcut='Manual';updateShortcut();q('#captureOverlay').classList.remove('open')};q('#captureUse').onclick=()=>{if(captured){draft.shortcut=captured;updateShortcut();q('#captureOverlay').classList.remove('open')}};q('#tryBtn').onclick=()=>startActivation(editingId||Date.now(),true);renderHome();renderCards();renderApps();
 })();
 </script>
 </body>
