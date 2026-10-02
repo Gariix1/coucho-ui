@@ -3,65 +3,260 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Coucho · Minimal Baseline V6</title>
+<title>Coucho · Direct Manipulation V7</title>
 <style>
 :root{
-  --bg:#0a0d14;--surface:#151c28;--surface2:#1b2433;--line:rgba(255,255,255,.085);
-  --line2:rgba(255,255,255,.15);--text:#f6f8fc;--muted:#8f9bae;--accent:#7888ff;--accent2:#9b70ff;
-  --ok:#63d6a6;--shadow:0 24px 70px rgba(0,0,0,.34)
+  --bg:#090d14;--surface:#151c28;--surface2:#1b2433;--line:rgba(255,255,255,.085);
+  --line2:rgba(255,255,255,.15);--text:#f6f8fc;--muted:#8d9aae;
+  --accent:#7888ff;--accent2:#9b70ff;--ok:#63d6a6;--shadow:0 24px 70px rgba(0,0,0,.34)
 }
-*{box-sizing:border-box}html,body{height:100%}
-body{margin:0;overflow:hidden;color:var(--text);font:14px/1.35 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;
-background:radial-gradient(900px 520px at 78% -15%,rgba(118,131,255,.17),transparent 65%),var(--bg)}
-button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:2px solid #91a0ff;outline-offset:2px}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;overflow:hidden;color:var(--text);
+  font:14px/1.35 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;
+  background:
+    radial-gradient(900px 540px at 75% -18%,rgba(118,131,255,.17),transparent 65%),
+    var(--bg)
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid #91a0ff;outline-offset:2px}
 .window{height:100%;display:grid;grid-template-rows:42px 1fr}
-.titlebar{display:flex;align-items:center;justify-content:space-between;background:#090c12ef;border-bottom:1px solid rgba(255,255,255,.035)}
-.brand{display:flex;align-items:center;gap:8px;padding-left:14px;color:#c9d1de;font-size:12px}
-.logo{width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:800;font-size:10px}
-.win{display:flex;height:100%}.win span{width:46px;display:grid;place-items:center;color:#aeb8c8}.win span:hover{background:rgba(255,255,255,.05)}.win span:last-child:hover{background:#c42b1c;color:#fff}
+.titlebar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:#090c12ee;border-bottom:1px solid rgba(255,255,255,.035)
+}
+.brand{display:flex;align-items:center;gap:8px;padding-left:14px;color:#cad2de;font-size:12px}
+.logo{
+  width:20px;height:20px;border-radius:6px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:grid;place-items:center;font-size:10px;font-weight:800
+}
+.win{display:flex;height:100%}
+.win span{width:46px;display:grid;place-items:center;color:#aeb8c8}
+.win span:hover{background:rgba(255,255,255,.05)}
+.win span:last-child:hover{background:#c42b1c;color:#fff}
 .main{height:100%;overflow:auto}
-.screen{display:none;max-width:1040px;margin:0 auto;padding:26px 28px 48px}.screen.active{display:block}
+.wrap{max-width:1040px;margin:0 auto;padding:25px 28px 48px}
 .header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
-.header-left{display:flex;align-items:center;gap:11px}.header-logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:800;font-size:18px;box-shadow:0 8px 24px rgba(118,132,255,.22)}
-.header h1{margin:0;font-size:26px;letter-spacing:-.6px}.header small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
-.actions{display:flex;gap:8px;align-items:center}.btn{min-height:38px;border:1px solid var(--line2);background:rgba(255,255,255,.045);border-radius:10px;padding:8px 13px}
-.btn:hover{background:rgba(255,255,255,.075)}.btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:700;box-shadow:0 8px 24px rgba(118,132,255,.18)}
-.btn.icon{width:38px;padding:0;font-size:17px}.btn.ghost{border-color:transparent;background:transparent;color:#abb6c7}
-.hero{border:1px solid var(--line2);border-radius:20px;background:linear-gradient(145deg,rgba(27,35,50,.96),rgba(16,22,32,.97));box-shadow:var(--shadow);padding:20px}
+.header-left{display:flex;align-items:center;gap:11px}
+.header-logo{
+  width:42px;height:42px;border-radius:13px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:grid;place-items:center;font-size:18px;font-weight:800;
+  box-shadow:0 8px 24px rgba(118,132,255,.22)
+}
+.header h1{margin:0;font-size:26px;letter-spacing:-.6px}
+.header small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.actions{display:flex;align-items:center;gap:8px}
+.btn{
+  min-height:38px;border:1px solid var(--line2);background:rgba(255,255,255,.045);
+  border-radius:10px;padding:8px 13px
+}
+.btn:hover{background:rgba(255,255,255,.075)}
+.btn.primary{
+  border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  font-weight:700;box-shadow:0 8px 24px rgba(118,132,255,.18)
+}
+.btn.icon{width:38px;padding:0;font-size:17px}
+.btn.ghost{background:transparent;border-color:transparent;color:#aeb8c8}
+.hero{
+  border:1px solid var(--line2);border-radius:20px;
+  background:linear-gradient(145deg,rgba(27,35,50,.96),rgba(16,22,32,.97));
+  box-shadow:var(--shadow);padding:20px
+}
 .hero-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
-.hero-name{display:flex;align-items:center;gap:11px}.hero-icon{width:46px;height:46px;border-radius:14px;background:rgba(120,136,255,.13);display:grid;place-items:center;font-size:24px}
-.hero h2{margin:0;font-size:25px}.active-mark{font-size:9px;color:#ade9ca;margin-bottom:2px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:5px}
-.flow{display:grid;grid-template-columns:1fr 28px 1.35fr 28px 1fr;align-items:center;margin-top:20px}
-.flow-box{min-height:100px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025);display:grid;place-items:center;text-align:center;padding:10px}
-.flow-box .big{font-size:27px;margin-bottom:5px}.flow-box b{font-size:12px}.link{height:2px;background:linear-gradient(90deg,#58647b,#8391ff);position:relative}.link:after{content:"";position:absolute;right:-1px;top:-4px;width:8px;height:8px;border-top:1px solid #8996ff;border-right:1px solid #8996ff;transform:rotate(45deg)}
-.displays{display:flex;align-items:flex-end;justify-content:center;gap:8px}.monitor{position:relative;border:1px solid #59667c;border-radius:6px;background:linear-gradient(145deg,#101724,#202c43)}.monitor:after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:15px;height:6px;border-left:1px solid #59667c;border-right:1px solid #59667c}.monitor.tv{width:76px;height:44px}.monitor.pc{width:54px;height:34px}.monitor.primary{border-color:#8a97ff}
-.app-logo{width:32px;height:32px;border-radius:9px;background:#283349;display:grid;place-items:center;font-weight:700;margin:0 auto 5px}
-.section{display:flex;align-items:center;justify-content:space-between;margin:24px 2px 10px}.section h3{margin:0;font-size:15px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:11px}.card{border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,rgba(24,31,45,.94),rgba(17,23,34,.95));padding:14px}
-.card-head{display:flex;align-items:center;justify-content:space-between}.card-name{display:flex;align-items:center;gap:9px}.card-icon{width:38px;height:38px;border-radius:11px;background:rgba(120,136,255,.12);display:grid;place-items:center;font-size:19px}.card b{font-size:14px}
-.card-flow{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:13px 0}.card-chip{min-height:58px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02);display:grid;place-items:center;text-align:center;font-size:9px;padding:6px}
-.card-actions{display:grid;grid-template-columns:1fr 1fr 38px;gap:7px}.card-actions .btn{min-height:32px;font-size:10px;padding:6px 8px}.shortcut-mini{font-size:15px}
-.creator-wrap{min-height:calc(100vh - 130px);display:grid;place-items:center}.creator{width:min(840px,100%);border:1px solid var(--line2);border-radius:22px;background:linear-gradient(145deg,rgba(26,34,48,.97),rgba(14,20,29,.98));box-shadow:var(--shadow);overflow:hidden}
-.creator-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-.auto-name{display:flex;align-items:center;gap:11px}.auto-icon{width:44px;height:44px;border-radius:13px;background:rgba(120,136,255,.13);display:grid;place-items:center;font-size:23px}.auto-name h2{margin:0;font-size:24px}
-.creator-body{padding:12px 20px 6px}.pick{padding:16px 0;border-bottom:1px solid rgba(255,255,255,.055)}.pick:last-child{border-bottom:0}.pick-title{font-size:11px;color:#b9c3d2;margin-bottom:10px}
-.display-button{width:100%;min-height:142px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025);display:grid;place-items:center;gap:8px;padding:14px}
-.display-button:hover{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.14)}.display-button b{font-size:11px}
-.app-choices{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.app-choice{min-height:92px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);display:grid;place-items:center;padding:10px}.app-choice:hover{background:rgba(255,255,255,.05)}.app-choice.selected{border-color:rgba(120,136,255,.55);background:rgba(120,136,255,.08)}.app-choice .app-logo{width:36px;height:36px;margin:0}.app-choice b{font-size:10px}
-.creator-foot{padding:14px 20px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}.creator-foot .btn{min-width:140px}
-.overlay{display:none;position:fixed;inset:42px 0 0 0;z-index:50;background:rgba(4,7,12,.68);backdrop-filter:blur(10px)}.overlay.open{display:block}
-.drawer{position:absolute;right:0;top:0;bottom:0;width:min(500px,94vw);background:#121822;border-left:1px solid var(--line2);box-shadow:-20px 0 60px rgba(0,0,0,.28);display:flex;flex-direction:column}
-.drawer-head{padding:18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.drawer-head h3{margin:0;font-size:20px}.drawer-body{padding:18px;overflow:auto}.presets{display:grid;gap:10px}
-.preset{min-height:118px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025);display:grid;grid-template-columns:140px 1fr;align-items:center;gap:14px;padding:12px;text-align:left}.preset:hover{background:rgba(255,255,255,.05)}.preset.selected{border-color:rgba(120,136,255,.55);background:rgba(120,136,255,.08)}.preset b{font-size:13px}.preset small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.drawer-foot{padding:16px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
-.capture-wrap{display:none;position:fixed;inset:42px 0 0 0;z-index:60;background:rgba(4,7,12,.74);backdrop-filter:blur(12px);place-items:center}.capture-wrap.open{display:grid}.capture{width:min(450px,92vw);border:1px solid var(--line2);border-radius:20px;background:linear-gradient(145deg,#182131,#101620);box-shadow:var(--shadow);padding:22px;text-align:center}.capture h3{margin:0;font-size:20px}
-.controller{width:210px;height:116px;margin:20px auto 16px;border:1px solid var(--line);border-radius:70px;background:#141b27;position:relative}.guide{position:absolute;left:50%;top:20px;transform:translateX(-50%);min-width:58px;height:28px;border-radius:999px;background:#253154;border:1px solid #5365be;display:grid;place-items:center;font-size:9px;font-weight:700}.stick{position:absolute;width:28px;height:28px;border-radius:50%;background:#202838;border:1px solid #465267;top:56px}.stick.left{left:35px}.stick.right{right:38px}.cbtn{position:absolute;width:30px;height:30px;border-radius:50%;border:1px solid #5466bd;background:#28345c;font-size:10px;font-weight:700}.cbtn.a{right:26px;top:49px}.cbtn.x{right:62px;top:24px}.cbtn.y{right:28px;top:14px}.capture-result{min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:13px}.key{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:25px;padding:0 7px;border:1px solid #4e5a72;border-radius:7px;background:#141c29;font-size:9px;font-weight:700}.key.round{min-width:24px;width:24px;border-radius:50%;background:#28345d;border-color:#5669c2}.capture-actions{display:flex;justify-content:center;gap:8px}
-.activation-wrap{display:none;position:fixed;inset:42px 0 0 0;z-index:70;background:rgba(4,7,12,.74);backdrop-filter:blur(10px);place-items:center}.activation-wrap.open{display:grid}.activation{width:min(560px,92vw);border:1px solid var(--line2);border-radius:18px;background:linear-gradient(145deg,#182131,#101620);box-shadow:var(--shadow);overflow:hidden}
-.activation-main{padding:24px;display:grid;place-items:center;text-align:center}.activation-flow{display:flex;align-items:center;gap:12px}.activation-node{width:76px;height:76px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025);display:grid;place-items:center;font-size:24px}.activation-arrow{color:#8794ff;font-size:18px}.loading{margin-top:16px;color:var(--muted);font-size:10px}
-.progress{height:3px;background:#273143}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .45s}
-.confirm{display:none;padding:15px 20px;border-top:1px solid var(--line);align-items:center;justify-content:space-between;gap:12px}.confirm.show{display:flex}.confirm b{font-size:11px}.confirm small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.count{color:#efd37f}
-.settings-pop{display:none;position:fixed;inset:0;z-index:80;place-items:center;background:rgba(4,7,12,.6);backdrop-filter:blur(8px)}.settings-pop.open{display:grid}.settings-card{width:min(430px,92vw);border:1px solid var(--line2);border-radius:18px;background:#151c28;box-shadow:var(--shadow);padding:18px}.settings-card h3{margin:0 0 14px}.setting{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.setting:last-child{border-bottom:0}.setting b{font-size:10px}.setting span{font-size:10px;color:var(--muted)}
-.toast{display:none;position:fixed;right:20px;bottom:20px;z-index:90;min-width:230px;border:1px solid var(--line2);border-radius:12px;background:#18202e;box-shadow:var(--shadow);padding:11px 13px}.toast.show{display:block}.toast b{display:block;font-size:10px}.toast span{display:block;color:var(--muted);font-size:9px;margin-top:2px}
-@media(max-width:760px){.screen{padding:18px 16px 40px}.flow{grid-template-columns:1fr;gap:8px}.link{width:2px;height:18px;margin:auto}.app-choices{grid-template-columns:repeat(2,1fr)}.preset{grid-template-columns:1fr}.header{align-items:flex-start}}
+.namebox{display:flex;align-items:center;gap:11px}
+.mode-icon{
+  width:46px;height:46px;border-radius:14px;background:rgba(120,136,255,.13);
+  display:grid;place-items:center;font-size:24px
+}
+.hero h2{margin:0;font-size:25px}
+.active-mark{font-size:9px;color:#ade9ca;margin-bottom:2px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:5px}
+.flow{
+  display:grid;grid-template-columns:1.35fr 28px 1fr;align-items:center;
+  margin-top:20px
+}
+.editable{
+  border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025);
+  min-height:112px;display:grid;place-items:center;text-align:center;padding:12px
+}
+.editable:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.15)}
+.editable small{display:block;color:var(--muted);font-size:9px;margin-top:7px}
+.link{height:2px;background:linear-gradient(90deg,#58647b,#8391ff);position:relative}
+.link:after{
+  content:"";position:absolute;right:-1px;top:-4px;width:8px;height:8px;
+  border-top:1px solid #8996ff;border-right:1px solid #8996ff;transform:rotate(45deg)
+}
+.displays{display:flex;align-items:flex-end;justify-content:center;gap:8px}
+.monitor{
+  position:relative;border:1px solid #59667c;border-radius:6px;
+  background:linear-gradient(145deg,#101724,#202c43)
+}
+.monitor:after{
+  content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
+  width:15px;height:6px;border-left:1px solid #59667c;border-right:1px solid #59667c
+}
+.monitor.tv{width:82px;height:47px}
+.monitor.pc{width:58px;height:36px}
+.monitor.primary{border-color:#8a97ff}
+.app-logo{
+  width:38px;height:38px;border-radius:10px;background:#283349;
+  display:grid;place-items:center;font-weight:700;margin:0 auto 6px
+}
+.hero-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.shortcut-button{
+  min-height:36px;border:1px solid var(--line);background:rgba(255,255,255,.025);
+  border-radius:10px;padding:7px 10px;display:flex;align-items:center;gap:7px
+}
+.shortcut-button:hover{background:rgba(255,255,255,.05)}
+.section{display:flex;align-items:center;justify-content:space-between;margin:24px 2px 10px}
+.section h3{margin:0;font-size:15px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:11px}
+.card{
+  border:1px solid var(--line);border-radius:15px;
+  background:linear-gradient(145deg,rgba(24,31,45,.94),rgba(17,23,34,.95));padding:14px
+}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-name{display:flex;align-items:center;gap:9px}
+.card-icon{
+  width:38px;height:38px;border-radius:11px;background:rgba(120,136,255,.12);
+  display:grid;place-items:center;font-size:19px
+}
+.card b{font-size:14px}
+.card-flow{display:grid;grid-template-columns:1.2fr 22px 1fr;align-items:center}
+.card-edit{
+  min-height:78px;border:1px solid var(--line);border-radius:11px;
+  background:rgba(255,255,255,.02);display:grid;place-items:center;text-align:center;padding:7px
+}
+.card-edit:hover{background:rgba(255,255,255,.05)}
+.card-link{height:1px;background:#59667c}
+.card-actions{display:grid;grid-template-columns:1fr 38px;gap:7px;margin-top:11px}
+.card-actions .btn{min-height:32px;font-size:10px;padding:6px 8px}
+.key{
+  display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:25px;padding:0 7px;
+  border:1px solid #4e5a72;border-radius:7px;background:#141c29;font-size:9px;font-weight:700
+}
+.key.round{min-width:24px;width:24px;border-radius:50%;background:#28345d;border-color:#5669c2}
+
+/* Popovers */
+.pop{
+  display:none;position:fixed;z-index:50;border:1px solid var(--line2);border-radius:16px;
+  background:#151c28;box-shadow:var(--shadow);padding:12px;min-width:290px
+}
+.pop.open{display:block}
+.pop-title{font-size:10px;color:var(--muted);margin:2px 4px 9px}
+.display-options{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.display-option{
+  min-height:105px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025);
+  display:grid;place-items:center;padding:8px;text-align:center
+}
+.display-option:hover{background:rgba(255,255,255,.055)}
+.display-option.selected{border-color:rgba(120,136,255,.55);background:rgba(120,136,255,.08)}
+.display-option b{font-size:9px;margin-top:8px}
+.app-options{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.app-option{
+  min-height:80px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025);
+  display:grid;place-items:center;padding:8px;text-align:center
+}
+.app-option:hover{background:rgba(255,255,255,.055)}
+.app-option.selected{border-color:rgba(120,136,255,.55);background:rgba(120,136,255,.08)}
+.app-option b{font-size:9px}
+
+/* New */
+.sheet-wrap{
+  display:none;position:fixed;inset:42px 0 0 0;z-index:55;background:rgba(4,7,12,.66);
+  backdrop-filter:blur(10px);place-items:center;padding:22px
+}
+.sheet-wrap.open{display:grid}
+.sheet{
+  width:min(720px,94vw);border:1px solid var(--line2);border-radius:20px;
+  background:linear-gradient(145deg,#192131,#101620);box-shadow:var(--shadow);overflow:hidden
+}
+.sheet-head{padding:17px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.sheet-head h2{margin:0;font-size:20px}
+.new-body{padding:16px 18px}
+.new-display{
+  width:100%;min-height:118px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);
+  display:grid;place-items:center;margin-bottom:12px
+}
+.new-display:hover{background:rgba(255,255,255,.05)}
+.new-apps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.new-app{
+  min-height:90px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.025);
+  display:grid;place-items:center;padding:9px
+}
+.new-app:hover{background:rgba(255,255,255,.055)}
+.new-app.selected{border-color:rgba(120,136,255,.55);background:rgba(120,136,255,.08)}
+.new-app b{font-size:9px}
+.sheet-foot{padding:14px 18px 17px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
+.sheet-foot .btn{min-width:130px}
+
+/* Shortcut */
+.capture-wrap{
+  display:none;position:fixed;inset:42px 0 0 0;z-index:60;background:rgba(4,7,12,.74);
+  backdrop-filter:blur(12px);place-items:center
+}
+.capture-wrap.open{display:grid}
+.capture{
+  width:min(440px,92vw);border:1px solid var(--line2);border-radius:20px;
+  background:linear-gradient(145deg,#182131,#101620);box-shadow:var(--shadow);padding:22px;text-align:center
+}
+.capture h3{margin:0;font-size:20px}
+.controller{
+  width:210px;height:116px;margin:20px auto 16px;border:1px solid var(--line);
+  border-radius:70px;background:#141b27;position:relative
+}
+.guide{
+  position:absolute;left:50%;top:20px;transform:translateX(-50%);
+  min-width:58px;height:28px;border-radius:999px;background:#253154;border:1px solid #5365be;
+  display:grid;place-items:center;font-size:9px;font-weight:700
+}
+.stick{position:absolute;width:28px;height:28px;border-radius:50%;background:#202838;border:1px solid #465267;top:56px}
+.stick.left{left:35px}.stick.right{right:38px}
+.cbtn{
+  position:absolute;width:30px;height:30px;border-radius:50%;border:1px solid #5466bd;
+  background:#28345c;font-size:10px;font-weight:700
+}
+.cbtn.a{right:26px;top:49px}.cbtn.x{right:62px;top:24px}.cbtn.y{right:28px;top:14px}
+.capture-result{min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:13px}
+.capture-actions{display:flex;justify-content:center;gap:8px}
+
+/* Test */
+.test-wrap{
+  display:none;position:fixed;inset:42px 0 0 0;z-index:70;background:rgba(4,7,12,.74);
+  backdrop-filter:blur(10px);place-items:center
+}
+.test-wrap.open{display:grid}
+.test{
+  width:min(540px,92vw);border:1px solid var(--line2);border-radius:18px;
+  background:linear-gradient(145deg,#182131,#101620);box-shadow:var(--shadow);overflow:hidden
+}
+.test-main{padding:26px;display:grid;place-items:center;text-align:center}
+.test-flow{display:flex;align-items:center;gap:12px}
+.test-node{
+  width:78px;height:78px;border:1px solid var(--line);border-radius:15px;
+  background:rgba(255,255,255,.025);display:grid;place-items:center;font-size:24px
+}
+.test-arrow{color:#8794ff;font-size:18px}
+.testing{margin-top:15px;color:var(--muted);font-size:10px}
+.progress{height:3px;background:#273143}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s}
+.confirm{display:none;padding:15px 18px;border-top:1px solid var(--line);align-items:center;justify-content:space-between;gap:12px}
+.confirm.show{display:flex}.confirm b{font-size:11px}.confirm small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.count{color:#efd37f}
+.toast{
+  display:none;position:fixed;right:20px;bottom:20px;z-index:90;min-width:230px;
+  border:1px solid var(--line2);border-radius:12px;background:#18202e;box-shadow:var(--shadow);padding:11px 13px
+}
+.toast.show{display:block}.toast b{display:block;font-size:10px}.toast span{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+@media(max-width:760px){
+  .wrap{padding:18px 16px 40px}
+  .flow{grid-template-columns:1fr;gap:8px}
+  .link{width:2px;height:18px;margin:auto}
+  .new-apps,.app-options{grid-template-columns:repeat(2,1fr)}
+  .display-options{grid-template-columns:1fr}
+  .hero-top{align-items:flex-start}
+}
 </style>
 </head>
 <body>
@@ -72,88 +267,99 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:2p
   </div>
 
   <main class="main">
-    <section class="screen active" id="home">
+    <div class="wrap">
       <div class="header">
-        <div class="header-left"><div class="header-logo">C</div><div><h1>Coucho</h1><small>2 pantallas · 🎮 conectado</small></div></div>
-        <div class="actions"><button class="btn icon" id="settingsBtn">⚙</button><button class="btn icon" id="newBtn">＋</button><button class="btn primary" id="hopBtn">Hop</button></div>
+        <div class="header-left">
+          <div class="header-logo">C</div>
+          <div><h1>Coucho</h1><small>2 pantallas · 🎮 conectado</small></div>
+        </div>
+        <div class="actions">
+          <button class="btn icon" id="newBtn">＋</button>
+          <button class="btn primary" id="hopBtn">Hop</button>
+        </div>
       </div>
 
-      <div class="hero">
+      <section class="hero">
         <div class="hero-top">
-          <div class="hero-name"><div class="hero-icon" id="heroIcon">🎮</div><div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName">Gaming</h2></div></div>
-          <div class="actions"><button class="btn" id="editActive">Editar</button><button class="btn primary" id="runActive">Probar</button></div>
+          <div class="namebox">
+            <div class="mode-icon" id="heroIcon">🎮</div>
+            <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName">Gaming</h2></div>
+          </div>
+          <button class="btn primary" id="heroRun">Activar</button>
         </div>
+
         <div class="flow">
-          <div class="flow-box"><div><div class="big">🎮</div><b id="heroShortcut">Guide + A</b></div></div>
+          <button class="editable display-trigger" data-id="active">
+            <div>
+              <div class="displays" id="heroDisplays"></div>
+              <small id="heroDisplayName">TV + Monitor</small>
+            </div>
+          </button>
           <div class="link"></div>
-          <div class="flow-box"><div class="displays" id="heroDisplays"><div class="monitor tv primary"></div><div class="monitor pc"></div></div></div>
-          <div class="link"></div>
-          <div class="flow-box"><div><div class="app-logo" id="heroAppLogo">S</div><b id="heroApp">Steam</b></div></div>
+          <button class="editable app-trigger" data-id="active">
+            <div>
+              <div class="app-logo" id="heroAppLogo">S</div>
+              <b id="heroApp">Steam</b>
+              <small>Cambiar</small>
+            </div>
+          </button>
         </div>
-      </div>
+
+        <div class="hero-bottom">
+          <button class="shortcut-button shortcut-trigger" data-id="active" id="heroShortcut">🎮+ Guide + A</button>
+          <span style="color:var(--muted);font-size:9px">Toca para editar</span>
+        </div>
+      </section>
 
       <div class="section"><h3>Couchsets</h3><button class="btn icon" id="newBtn2">＋</button></div>
       <div class="cards" id="cards"></div>
-    </section>
-
-    <section class="screen" id="creator">
-      <div class="header">
-        <div class="header-left"><button class="btn icon" id="backBtn">←</button><div><h1>Nuevo</h1></div></div>
-      </div>
-
-      <div class="creator-wrap">
-        <div class="creator">
-          <div class="creator-head">
-            <div class="auto-name"><div class="auto-icon" id="autoIcon">🎮</div><div><h2 id="autoName">Gaming</h2></div></div>
-          </div>
-
-          <div class="creator-body">
-            <div class="pick">
-              <div class="pick-title">Pantallas</div>
-              <button class="display-button" id="displayButton">
-                <div class="displays" id="creatorDisplays"><div class="monitor tv primary"></div><div class="monitor pc"></div></div>
-                <b id="creatorDisplayName">TV + Monitor</b>
-              </button>
-            </div>
-
-            <div class="pick">
-              <div class="pick-title">App</div>
-              <div class="app-choices" id="appChoices">
-                <button class="app-choice selected" data-app="Steam"><div class="app-logo">S</div><b>Steam</b></button>
-                <button class="app-choice" data-app="Playnite"><div class="app-logo">P</div><b>Playnite</b></button>
-                <button class="app-choice" data-app="Plex"><div class="app-logo">P</div><b>Plex</b></button>
-                <button class="app-choice" data-app="Ninguna"><div class="app-logo">—</div><b>Ninguna</b></button>
-              </div>
-            </div>
-          </div>
-
-          <div class="creator-foot"><button class="btn primary" id="tryBtn">Probar</button></div>
-        </div>
-      </div>
-    </section>
+    </div>
   </main>
 </div>
 
-<div class="overlay" id="displayOverlay">
-  <div class="drawer">
-    <div class="drawer-head"><h3>Pantallas</h3><button class="btn icon" id="closeDisplay">✕</button></div>
-    <div class="drawer-body">
-      <div class="presets">
-        <button class="preset selected" data-mode="both">
-          <div class="displays"><div class="monitor tv primary"></div><div class="monitor pc"></div></div>
-          <div><b>TV + Monitor</b><small>TV principal</small></div>
-        </button>
-        <button class="preset" data-mode="tv">
-          <div class="displays"><div class="monitor tv primary"></div></div>
-          <div><b>Solo TV</b><small>sofá</small></div>
-        </button>
-        <button class="preset" data-mode="monitor">
-          <div class="displays"><div class="monitor tv primary" style="width:68px;height:41px"></div></div>
-          <div><b>Solo Monitor</b><small>escritorio</small></div>
-        </button>
+<div class="pop" id="displayPop">
+  <div class="pop-title">Pantallas</div>
+  <div class="display-options">
+    <button class="display-option" data-mode="both">
+      <div><div class="displays"><div class="monitor tv primary" style="width:55px;height:32px"></div><div class="monitor pc" style="width:38px;height:25px"></div></div><b>TV + PC</b></div>
+    </button>
+    <button class="display-option" data-mode="tv">
+      <div><div class="displays"><div class="monitor tv primary" style="width:60px;height:35px"></div></div><b>TV</b></div>
+    </button>
+    <button class="display-option" data-mode="monitor">
+      <div><div class="displays"><div class="monitor tv primary" style="width:60px;height:35px"></div></div><b>PC</b></div>
+    </button>
+  </div>
+</div>
+
+<div class="pop" id="appPop">
+  <div class="pop-title">App</div>
+  <div class="app-options">
+    <button class="app-option" data-app="Steam"><div><div class="app-logo">S</div><b>Steam</b></div></button>
+    <button class="app-option" data-app="Playnite"><div><div class="app-logo">P</div><b>Playnite</b></div></button>
+    <button class="app-option" data-app="Plex"><div><div class="app-logo">P</div><b>Plex</b></div></button>
+    <button class="app-option" data-app="Ninguna"><div><div class="app-logo">—</div><b>Nada</b></div></button>
+  </div>
+</div>
+
+<div class="sheet-wrap" id="newSheet">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="newName">Gaming</h2><button class="btn icon" id="closeNew">✕</button></div>
+    <div class="new-body">
+      <button class="new-display" id="newDisplay">
+        <div>
+          <div class="displays" id="newDisplays"></div>
+          <div style="margin-top:9px;font-size:10px" id="newDisplayName">TV + Monitor</div>
+        </div>
+      </button>
+      <div class="new-apps" id="newApps">
+        <button class="new-app selected" data-app="Steam"><div><div class="app-logo">S</div><b>Steam</b></div></button>
+        <button class="new-app" data-app="Playnite"><div><div class="app-logo">P</div><b>Playnite</b></div></button>
+        <button class="new-app" data-app="Plex"><div><div class="app-logo">P</div><b>Plex</b></div></button>
+        <button class="new-app" data-app="Ninguna"><div><div class="app-logo">—</div><b>Nada</b></div></button>
       </div>
     </div>
-    <div class="drawer-foot"><button class="btn" id="cancelDisplay">Cancelar</button><button class="btn primary" id="useDisplay">Usar</button></div>
+    <div class="sheet-foot"><button class="btn primary" id="newTry">Probar</button></div>
   </div>
 </div>
 
@@ -162,35 +368,34 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:2p
     <h3>Atajo</h3>
     <div class="controller">
       <div class="guide">Guide</div><div class="stick left"></div><div class="stick right"></div>
-      <button class="cbtn a" id="capA">A</button><button class="cbtn x" id="capX">X</button><button class="cbtn y" id="capY">Y</button>
+      <button class="cbtn a" id="capA">A</button>
+      <button class="cbtn x" id="capX">X</button>
+      <button class="cbtn y" id="capY">Y</button>
     </div>
     <div class="capture-result" id="captureResult"><span style="color:var(--muted)">A · X · Y</span></div>
-    <div class="capture-actions"><button class="btn" id="capCancel">Cancelar</button><button class="btn" id="capNone">Manual</button><button class="btn primary" id="capUse" style="display:none">Usar</button></div>
+    <div class="capture-actions">
+      <button class="btn" id="capCancel">Cancelar</button>
+      <button class="btn" id="capManual">Manual</button>
+      <button class="btn primary" id="capUse" style="display:none">Usar</button>
+    </div>
   </div>
 </div>
 
-<div class="activation-wrap" id="activationOverlay">
-  <div class="activation">
-    <div class="activation-main">
-      <div class="activation-flow">
-        <div class="activation-node">▣</div><div class="activation-arrow">→</div><div class="activation-node" id="activationAppLogo">S</div>
+<div class="test-wrap" id="testOverlay">
+  <div class="test">
+    <div class="test-main">
+      <div class="test-flow">
+        <div class="test-node" id="testDisplay">▣</div>
+        <div class="test-arrow">→</div>
+        <div class="test-node" id="testApp">S</div>
       </div>
-      <div class="loading" id="loadingText">Probando…</div>
+      <div class="testing" id="testText">Probando…</div>
     </div>
     <div class="progress"><div id="progress"></div></div>
-    <div class="confirm" id="confirmBox">
+    <div class="confirm" id="confirm">
       <div><b>¿Se ve bien?</b><small>Restaurar en <span class="count" id="count">15</span> s</small></div>
-      <div class="actions"><button class="btn" id="revertBtn">Restaurar</button><button class="btn primary" id="keepBtn">Conservar</button></div>
+      <div class="actions"><button class="btn" id="revert">Restaurar</button><button class="btn primary" id="keep">Conservar</button></div>
     </div>
-  </div>
-</div>
-
-<div class="settings-pop" id="settingsPop">
-  <div class="settings-card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><h3>Ajustes</h3><button class="btn icon" id="closeSettings">✕</button></div>
-    <div class="setting"><b>Inicio</b><span>Control</span></div>
-    <div class="setting"><b>Tema</b><span>Sistema</span></div>
-    <div class="setting"><b>Recovery</b><span>Activo</span></div>
   </div>
 </div>
 
@@ -199,162 +404,197 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:2p
 <script>
 (function(){
   var sets=[
-    {id:1,name:'Gaming',icon:'🎮',display:'TV + Monitor',mode:'both',app:'Steam',shortcut:'Guide + A',active:true},
-    {id:2,name:'Películas',icon:'🎬',display:'Solo TV',mode:'tv',app:'Plex',shortcut:'Manual',active:false},
-    {id:3,name:'Escritorio',icon:'🖥️',display:'Solo Monitor',mode:'monitor',app:'Ninguna',shortcut:'Manual',active:false}
+    {id:1,name:'Gaming',icon:'🎮',mode:'both',display:'TV + Monitor',app:'Steam',shortcut:'Guide + A',active:true},
+    {id:2,name:'Películas',icon:'🎬',mode:'tv',display:'Solo TV',app:'Plex',shortcut:'Manual',active:false},
+    {id:3,name:'Escritorio',icon:'🖥️',mode:'monitor',display:'Solo Monitor',app:'Ninguna',shortcut:'Manual',active:false}
   ];
-  var draft=null;
-  var editingId=null;
-  var selectedMode='both';
+
+  var editTarget=null;
+  var proposedMode=null;
   var shortcutTarget=null;
   var captured=null;
-  var testTimer=null;
-  var countTimer=null;
+  var newDraft={mode:'both',display:'TV + Monitor',app:'Steam',name:'Gaming',icon:'🎮'};
+  var testContext=null;
+  var progressTimer=null;
+  var countdownTimer=null;
 
   function q(s){return document.querySelector(s)}
   function qa(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
-  function active(){return sets.find(function(x){return x.active})||sets[0]}
   function byId(id){return sets.find(function(x){return x.id===id})}
-  function logo(app){return app==='Ninguna'?'—':app.charAt(0).toUpperCase()}
+  function active(){return sets.find(function(x){return x.active})||sets[0]}
+  function appLogo(app){return app==='Ninguna'?'—':app.charAt(0).toUpperCase()}
   function autoMeta(app){
     if(app==='Plex') return {name:'Películas',icon:'🎬'};
     if(app==='Ninguna') return {name:'Escritorio',icon:'🖥️'};
     return {name:'Gaming',icon:'🎮'};
   }
-  function show(id){
-    qa('.screen').forEach(function(s){s.classList.toggle('active',s.id===id)});
-    q('.main').scrollTop=0;
-  }
+  function modeName(mode){return mode==='tv'?'Solo TV':mode==='monitor'?'Solo Monitor':'TV + Monitor'}
   function displayMarkup(mode,small){
-    var tv='<div class="monitor tv primary"'+(small?' style="width:60px;height:35px"':'')+'></div>';
-    var pc='<div class="monitor pc"'+(small?' style="width:43px;height:27px"':'')+'></div>';
+    var tv='<div class="monitor tv primary"'+(small?' style="width:55px;height:32px"':'')+'></div>';
+    var pc='<div class="monitor pc"'+(small?' style="width:38px;height:25px"':'')+'></div>';
     if(mode==='tv') return tv;
-    if(mode==='monitor') return '<div class="monitor tv primary"'+(small?' style="width:60px;height:35px"':' style="width:70px;height:42px"')+'></div>';
+    if(mode==='monitor') return '<div class="monitor tv primary"'+(small?' style="width:55px;height:32px"':' style="width:70px;height:42px"')+'></div>';
     return tv+pc;
   }
-  function shortcutHtml(value){
-    if(!value||value==='Manual') return '<span style="color:var(--muted)">Manual</span>';
-    var p=value.split(' + ');
+  function shortcutText(v){return v==='Manual'?'🎮+':('🎮+ '+v)}
+  function shortcutMarkup(v){
+    if(v==='Manual') return '<span style="color:var(--muted)">Manual</span>';
+    var p=v.split(' + ');
     return '<span class="key">'+p[0]+'</span><span>+</span><span class="key round">'+p[1]+'</span>';
   }
   function toast(title,text){
     q('#toastTitle').textContent=title;q('#toastText').textContent=text;q('#toast').classList.add('show');
-    clearTimeout(window._toast);window._toast=setTimeout(function(){q('#toast').classList.remove('show')},2200);
+    clearTimeout(window._toast);window._toast=setTimeout(function(){q('#toast').classList.remove('show')},2100);
   }
-  function renderHero(){
-    var s=active();
-    q('#heroName').textContent=s.name;q('#heroIcon').textContent=s.icon;q('#heroShortcut').textContent=s.shortcut;
-    q('#heroApp').textContent=s.app;q('#heroAppLogo').textContent=logo(s.app);q('#heroDisplays').innerHTML=displayMarkup(s.mode,false);
-  }
-  function renderCards(){
+  function render(){
+    var a=active();
+    q('#heroName').textContent=a.name;q('#heroIcon').textContent=a.icon;
+    q('#heroDisplays').innerHTML=displayMarkup(a.mode,false);q('#heroDisplayName').textContent=a.display;
+    q('#heroAppLogo').textContent=appLogo(a.app);q('#heroApp').textContent=a.app;
+    q('#heroShortcut').textContent=shortcutText(a.shortcut);
+
     q('#cards').innerHTML=sets.filter(function(s){return !s.active}).map(function(s){
       return '<article class="card">'+
         '<div class="card-head"><div class="card-name"><div class="card-icon">'+s.icon+'</div><b>'+s.name+'</b></div></div>'+
-        '<div class="card-flow"><div class="card-chip">▣<br>'+s.display+'</div><div class="card-chip"><div class="app-logo">'+logo(s.app)+'</div>'+s.app+'</div></div>'+
-        '<div class="card-actions"><button class="btn primary run" data-id="'+s.id+'">Activar</button><button class="btn edit" data-id="'+s.id+'">Editar</button><button class="btn icon shortcut" data-id="'+s.id+'" title="Atajo">🎮+</button></div>'+
+        '<div class="card-flow">'+
+          '<button class="card-edit display-trigger" data-id="'+s.id+'"><div><div class="displays">'+displayMarkup(s.mode,true)+'</div><div style="margin-top:7px;font-size:8px">'+s.display+'</div></div></button>'+
+          '<div class="card-link"></div>'+
+          '<button class="card-edit app-trigger" data-id="'+s.id+'"><div><div class="app-logo">'+appLogo(s.app)+'</div><div style="font-size:9px">'+s.app+'</div></div></button>'+
+        '</div>'+
+        '<div class="card-actions"><button class="btn primary activate-btn" data-id="'+s.id+'">Activar</button><button class="btn icon shortcut-trigger" data-id="'+s.id+'" title="Atajo">🎮+</button></div>'+
       '</article>';
     }).join('');
-    qa('.run').forEach(function(b){b.onclick=function(){startTest(Number(b.dataset.id),false)}});
-    qa('.edit').forEach(function(b){b.onclick=function(){openCreator(Number(b.dataset.id))}});
-    qa('.shortcut').forEach(function(b){b.onclick=function(){openShortcut(Number(b.dataset.id))}});
+    bindCardActions();
   }
-  function openCreator(id){
-    editingId=id||null;
-    if(id){
-      var s=byId(id);
-      draft={id:s.id,name:s.name,icon:s.icon,display:s.display,mode:s.mode,app:s.app,shortcut:s.shortcut,active:s.active};
-    }else{
-      draft={id:null,name:'Gaming',icon:'🎮',display:'TV + Monitor',mode:'both',app:'Steam',shortcut:'Manual',active:false};
-    }
-    selectedMode=draft.mode;
-    updateCreator();
-    show('creator');
+  function bindCardActions(){
+    qa('.display-trigger').forEach(function(b){b.onclick=function(e){openDisplayPop(e.currentTarget,b.dataset.id)}});
+    qa('.app-trigger').forEach(function(b){b.onclick=function(e){openAppPop(e.currentTarget,b.dataset.id)}});
+    qa('.shortcut-trigger').forEach(function(b){b.onclick=function(){openShortcut(b.dataset.id)}});
+    qa('.activate-btn').forEach(function(b){b.onclick=function(){activateSet(Number(b.dataset.id))}});
   }
-  function updateCreator(){
-    var auto=autoMeta(draft.app);
-    if(!editingId){draft.name=auto.name;draft.icon=auto.icon}
-    q('#autoName').textContent=draft.name;q('#autoIcon').textContent=draft.icon;
-    q('#creatorDisplays').innerHTML=displayMarkup(draft.mode,false);
-    q('#creatorDisplayName').textContent=draft.display;
-    qa('#appChoices .app-choice').forEach(function(b){b.classList.toggle('selected',b.dataset.app===draft.app)});
+  function resolveId(raw){return raw==='active'?active().id:Number(raw)}
+  function positionPop(pop,anchor){
+    var r=anchor.getBoundingClientRect();
+    var top=Math.min(window.innerHeight-pop.offsetHeight-14,r.bottom+8);
+    var left=Math.max(12,Math.min(window.innerWidth-pop.offsetWidth-12,r.left+r.width/2-pop.offsetWidth/2));
+    pop.style.top=top+'px';pop.style.left=left+'px';
   }
-  function persistDraft(tempId){
-    if(editingId){
-      Object.assign(byId(editingId),{name:draft.name,icon:draft.icon,display:draft.display,mode:draft.mode,app:draft.app});
-      return editingId;
-    }
-    var id=tempId||Date.now();
-    sets.push({id:id,name:draft.name,icon:draft.icon,display:draft.display,mode:draft.mode,app:draft.app,shortcut:'Manual',active:false});
-    return id;
+  function closePops(){
+    q('#displayPop').classList.remove('open');q('#appPop').classList.remove('open');
   }
-  function startTest(id,fromDraft){
-    var target=fromDraft?{id:id||Date.now(),name:draft.name,icon:draft.icon,display:draft.display,mode:draft.mode,app:draft.app,shortcut:draft.shortcut}:byId(id);
-    clearInterval(testTimer);clearInterval(countTimer);
-    q('#activationAppLogo').textContent=logo(target.app);
-    q('#loadingText').textContent='Probando '+target.name+'…';
-    q('#confirmBox').classList.remove('show');q('#progress').style.width='0%';q('#activationOverlay').classList.add('open');
+  function openDisplayPop(anchor,rawId){
+    closePops();editTarget=resolveId(rawId);var s=byId(editTarget);
+    qa('#displayPop .display-option').forEach(function(x){x.classList.toggle('selected',x.dataset.mode===s.mode)});
+    q('#displayPop').classList.add('open');positionPop(q('#displayPop'),anchor);
+  }
+  function openAppPop(anchor,rawId){
+    closePops();editTarget=resolveId(rawId);var s=byId(editTarget);
+    qa('#appPop .app-option').forEach(function(x){x.classList.toggle('selected',x.dataset.app===s.app)});
+    q('#appPop').classList.add('open');positionPop(q('#appPop'),anchor);
+  }
+
+  qa('#displayPop .display-option').forEach(function(b){
+    b.onclick=function(){
+      var s=byId(editTarget);proposedMode=b.dataset.mode;closePops();
+      startDisplayTest({kind:'existing',id:s.id,mode:proposedMode,app:s.app,name:s.name,icon:s.icon});
+    };
+  });
+
+  qa('#appPop .app-option').forEach(function(b){
+    b.onclick=function(){
+      var s=byId(editTarget);s.app=b.dataset.app;
+      var meta=autoMeta(s.app);s.name=meta.name;s.icon=meta.icon;
+      closePops();render();toast('Listo',s.app);
+    };
+  });
+
+  function activateSet(id){
+    sets.forEach(function(s){s.active=s.id===id});render();toast(byId(id).name,'Activo');
+  }
+
+  function openNew(){
+    newDraft={mode:'both',display:'TV + Monitor',app:'Steam',name:'Gaming',icon:'🎮'};
+    renderNew();q('#newSheet').classList.add('open');
+  }
+  function renderNew(){
+    q('#newName').textContent=newDraft.name;
+    q('#newDisplays').innerHTML=displayMarkup(newDraft.mode,false);q('#newDisplayName').textContent=newDraft.display;
+    qa('#newApps .new-app').forEach(function(b){b.classList.toggle('selected',b.dataset.app===newDraft.app)});
+  }
+  q('#newBtn').onclick=q('#newBtn2').onclick=openNew;
+  q('#closeNew').onclick=function(){q('#newSheet').classList.remove('open')};
+
+  q('#newDisplay').onclick=function(e){
+    editTarget='new';
+    qa('#displayPop .display-option').forEach(function(x){x.classList.toggle('selected',x.dataset.mode===newDraft.mode)});
+    q('#displayPop').classList.add('open');positionPop(q('#displayPop'),e.currentTarget);
+  };
+
+  qa('#newApps .new-app').forEach(function(b){
+    b.onclick=function(){
+      newDraft.app=b.dataset.app;var m=autoMeta(newDraft.app);newDraft.name=m.name;newDraft.icon=m.icon;renderNew();
+    };
+  });
+
+  q('#newTry').onclick=function(){
+    q('#newSheet').classList.remove('open');
+    startDisplayTest({kind:'new',id:Date.now(),mode:newDraft.mode,app:newDraft.app,name:newDraft.name,icon:newDraft.icon});
+  };
+
+  function startDisplayTest(ctx){
+    testContext=ctx;clearInterval(progressTimer);clearInterval(countdownTimer);
+    q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx.mode,true)+'</div>';
+    q('#testApp').textContent=appLogo(ctx.app);q('#testText').textContent='Probando '+ctx.name+'…';
+    q('#progress').style.width='0%';q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
     var pct=0;
-    testTimer=setInterval(function(){
+    progressTimer=setInterval(function(){
       pct+=25;q('#progress').style.width=pct+'%';
       if(pct>=100){
-        clearInterval(testTimer);
-        q('#loadingText').textContent='Listo';
-        q('#confirmBox').classList.add('show');
+        clearInterval(progressTimer);q('#testText').textContent='Listo';q('#confirm').classList.add('show');
         var left=15;q('#count').textContent=left;
-        countTimer=setInterval(function(){
+        countdownTimer=setInterval(function(){
           left--;q('#count').textContent=left;
-          if(left<=0){clearInterval(countTimer);q('#activationOverlay').classList.remove('open');toast('Restaurado','Sin cambios')}
+          if(left<=0){clearInterval(countdownTimer);q('#testOverlay').classList.remove('open');toast('Restaurado','Sin cambios')}
         },1000);
       }
-    },360);
-    q('#keepBtn').onclick=function(){
-      clearInterval(countTimer);
-      var realId=id;
-      if(fromDraft) realId=persistDraft(target.id);
-      sets.forEach(function(s){s.active=s.id===realId});
-      q('#activationOverlay').classList.remove('open');renderHero();renderCards();show('home');toast(target.name,'Activo');
-    };
-    q('#revertBtn').onclick=function(){clearInterval(countTimer);q('#activationOverlay').classList.remove('open');toast('Restaurado','Sin cambios')};
-  }
-  function openShortcut(id){
-    shortcutTarget=id;captured=null;
-    q('#captureResult').innerHTML='<span style="color:var(--muted)">A · X · Y</span>';q('#capUse').style.display='none';q('#shortcutOverlay').classList.add('open');
-  }
-  function captureButton(v){
-    captured='Guide + '+v;
-    q('#captureResult').innerHTML=shortcutHtml(captured);
-    q('#capUse').style.display='inline-flex';
+    },340);
   }
 
-  q('#newBtn').onclick=q('#newBtn2').onclick=function(){openCreator(null)};
-  q('#editActive').onclick=function(){openCreator(active().id)};
-  q('#runActive').onclick=function(){startTest(active().id,false)};
-  q('#hopBtn').onclick=function(){toast('Hop','Abriría Hop')};
-  q('#backBtn').onclick=function(){show('home')};
-
-  qa('#appChoices .app-choice').forEach(function(b){b.onclick=function(){draft.app=b.dataset.app;updateCreator()}});
-  q('#displayButton').onclick=function(){
-    selectedMode=draft.mode;qa('.preset').forEach(function(p){p.classList.toggle('selected',p.dataset.mode===selectedMode)});
-    q('#displayOverlay').classList.add('open');
+  q('#keep').onclick=function(){
+    clearInterval(countdownTimer);
+    if(testContext.kind==='existing'){
+      var s=byId(testContext.id);s.mode=testContext.mode;s.display=modeName(testContext.mode);
+    }else{
+      sets.push({
+        id:testContext.id,name:testContext.name,icon:testContext.icon,mode:testContext.mode,
+        display:modeName(testContext.mode),app:testContext.app,shortcut:'Manual',active:false
+      });
+      sets.forEach(function(s){s.active=s.id===testContext.id});
+    }
+    q('#testOverlay').classList.remove('open');render();toast(testContext.name,'Guardado');
   };
-  qa('.preset').forEach(function(p){p.onclick=function(){selectedMode=p.dataset.mode;qa('.preset').forEach(function(x){x.classList.toggle('selected',x===p)})}});
-  q('#closeDisplay').onclick=q('#cancelDisplay').onclick=function(){q('#displayOverlay').classList.remove('open')};
-  q('#useDisplay').onclick=function(){
-    draft.mode=selectedMode;
-    draft.display=selectedMode==='tv'?'Solo TV':selectedMode==='monitor'?'Solo Monitor':'TV + Monitor';
-    updateCreator();q('#displayOverlay').classList.remove('open');
-  };
-  q('#tryBtn').onclick=function(){startTest(editingId||Date.now(),true)};
+  q('#revert').onclick=function(){clearInterval(countdownTimer);q('#testOverlay').classList.remove('open');toast('Restaurado','Sin cambios')};
 
-  q('#capA').onclick=function(){captureButton('A')};q('#capX').onclick=function(){captureButton('X')};q('#capY').onclick=function(){captureButton('Y')};
+  function openShortcut(rawId){
+    shortcutTarget=resolveId(rawId);captured=null;q('#captureResult').innerHTML='<span style="color:var(--muted)">A · X · Y</span>';
+    q('#capUse').style.display='none';q('#shortcutOverlay').classList.add('open');
+  }
+  function capture(v){
+    captured='Guide + '+v;q('#captureResult').innerHTML=shortcutMarkup(captured);q('#capUse').style.display='inline-flex';
+  }
+  q('#capA').onclick=function(){capture('A')};q('#capX').onclick=function(){capture('X')};q('#capY').onclick=function(){capture('Y')};
   q('#capCancel').onclick=function(){q('#shortcutOverlay').classList.remove('open')};
-  q('#capNone').onclick=function(){byId(shortcutTarget).shortcut='Manual';q('#shortcutOverlay').classList.remove('open');renderHero();renderCards();toast('Atajo','Manual')};
-  q('#capUse').onclick=function(){if(captured){byId(shortcutTarget).shortcut=captured;q('#shortcutOverlay').classList.remove('open');renderHero();renderCards();toast('Atajo',captured)}};
+  q('#capManual').onclick=function(){byId(shortcutTarget).shortcut='Manual';q('#shortcutOverlay').classList.remove('open');render();toast('Atajo','Manual')};
+  q('#capUse').onclick=function(){if(captured){byId(shortcutTarget).shortcut=captured;q('#shortcutOverlay').classList.remove('open');render();toast('Atajo',captured)}};
 
-  q('#settingsBtn').onclick=function(){q('#settingsPop').classList.add('open')};
-  q('#closeSettings').onclick=function(){q('#settingsPop').classList.remove('open')};
+  q('#heroRun').onclick=function(){activateSet(active().id)};
+  q('#hopBtn').onclick=function(){toast('Hop','Abriría Hop')};
 
-  renderHero();renderCards();
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.pop')&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('#newDisplay')) closePops();
+  });
+
+  render();
 })();
 </script>
 </body>
