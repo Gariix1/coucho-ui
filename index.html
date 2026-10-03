@@ -349,14 +349,14 @@ body.test-mode .test-tools{display:flex}
   .rail-util .rail-icon{font-size:clamp(17px,1.05vw,20px)}
 
   .wrap{
-    width:min(1480px,calc(100% - 56px));
+    width:min(1180px,calc(100% - 48px));
     max-width:none;
     margin:0 auto;
     padding:clamp(28px,2vw,36px) 0 64px
   }
   .mode-status{
-    width:min(1080px,100%);
-    margin:0 auto 16px;
+    width:100%;
+    margin:0 0 16px;
     font-size:clamp(12px,.72vw,13px)
   }
 
@@ -364,8 +364,8 @@ body.test-mode .test-tools{display:flex}
   .btn.icon{width:clamp(42px,2.7vw,48px);height:clamp(42px,2.7vw,48px);font-size:18px}
 
   .hero{
-    width:min(clamp(820px,58vw,1080px),100%);
-    margin-inline:auto;
+    width:100%;
+    margin:0;
     padding:clamp(18px,1.2vw,22px)
   }
   .hero-top{gap:14px}
@@ -389,19 +389,24 @@ body.test-mode .test-tools{display:flex}
   .meta-action b{font-size:clamp(13px,.8vw,15px)}
 
   .section{
-    width:min(1408px,100%);
-    margin:24px auto 14px;
+    width:100%;
+    margin:24px 0 14px;
     justify-content:flex-start;
     gap:14px
   }
   .section h3{font-size:clamp(20px,1.3vw,22px)}
 
   .cards{
-    width:min(1408px,100%);
-    margin-inline:auto;
-    grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),340px));
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
     justify-content:center;
     gap:16px
+  }
+  .cards > .card{
+    flex:0 1 calc((100% - 32px)/3);
+    min-width:320px;
+    max-width:382px
   }
   .card{padding:clamp(16px,1.05vw,19px)}
   .card-head{gap:14px}
@@ -423,7 +428,7 @@ body.test-mode .test-tools{display:flex}
   .card-fact b{font-size:clamp(14px,.84vw,15px)}
 
   .shell-placeholder{
-    width:min(1480px,calc(100% - 56px));
+    width:min(1180px,calc(100% - 48px));
     max-width:none;
     margin:0 auto;
     padding:32px 0 60px
@@ -440,7 +445,11 @@ body.test-mode .test-tools{display:flex}
 }
 
 @media(min-width:1680px){
-  .hero,.mode-status{width:min(1080px,100%)}
+  .hero,.mode-status{width:100%}
+}
+
+@media(min-width:761px) and (max-width:1120px){
+  .cards > .card{flex-basis:calc((100% - 16px)/2);max-width:none}
 }
 
 @media(max-width:760px){
@@ -449,7 +458,7 @@ body.test-mode .test-tools{display:flex}
   .rail-item{min-height:52px;border-radius:10px}
   .rail-item.active:before{left:-5px}
   .rail-item span:last-child{font-size:8px}
-  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.card-facts{grid-template-columns:1fr 1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
+  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.recipe-meta{grid-template-columns:1fr}.card-facts{grid-template-columns:1fr 1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 @media(max-width:380px){
   .cards{grid-template-columns:1fr}
