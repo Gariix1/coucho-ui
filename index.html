@@ -159,7 +159,23 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .brand{display:flex;align-items:center;gap:8px;padding-left:12px;color:var(--text2);font-size:12px}
 .logo{width:18px;height:18px;border-radius:5px;background:var(--logo-bg);border:1px solid var(--logo-border);color:var(--accent);display:grid;place-items:center;font-size:10px;font-weight:800}
 .win{display:flex;height:100%}.win span{width:46px;display:grid;place-items:center;color:var(--win-fg);font-size:11px}.win span:hover{background:var(--win-hover)}.win span:last-child:hover{background:#c42b1c;color:#fff}
-.main{height:100%;overflow:auto}.wrap{max-width:1000px;margin:0 auto;padding:24px 24px 48px}
+.app-shell{height:100%;min-height:0;display:grid;grid-template-columns:56px minmax(0,1fr)}
+.nav-rail{min-height:0;border-right:1px solid var(--divider);background:var(--glass-surface);display:flex;flex-direction:column;padding:8px 6px;overflow:hidden;transition:width .16s ease,background .16s ease;z-index:10}
+.app-shell.nav-expanded{grid-template-columns:176px minmax(0,1fr)}
+.nav-top{display:flex;align-items:center;margin-bottom:10px}
+.nav-toggle,.nav-item{width:44px;height:44px;min-height:44px;border:1px solid transparent;border-radius:var(--r-control);background:transparent;color:var(--text2);display:flex;align-items:center;gap:12px;padding:0 12px;overflow:hidden;white-space:nowrap}
+.nav-toggle:hover,.nav-item:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
+.nav-item.active{background:var(--selected-bg);border-color:var(--selected-border);color:var(--accent)}
+.nav-icon{width:18px;min-width:18px;text-align:center;font-size:16px;line-height:1}
+.nav-label{font-size:12px;font-weight:600;opacity:0;transform:translateX(-3px);transition:opacity .12s ease,transform .12s ease}
+.app-shell.nav-expanded .nav-toggle,.app-shell.nav-expanded .nav-item{width:164px}
+.app-shell.nav-expanded .nav-label{opacity:1;transform:none}
+.nav-main{display:flex;flex-direction:column;gap:4px}
+.nav-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px}
+.main{height:100%;min-width:0;overflow:auto}
+.shell-view{display:none;min-height:100%}
+.shell-view.active{display:block}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 24px 48px}
 .header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
 .header-left{display:flex;align-items:center;gap:11px}
 .header-logo{width:42px;height:42px;border-radius:13px;background:var(--logo-bg);border:1px solid var(--logo-border);color:var(--accent);display:grid;place-items:center;font-size:18px;font-weight:800}
@@ -207,6 +223,21 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .card .activate[disabled]{opacity:.82;cursor:wait}
 .app-logo{width:46px;height:46px;border-radius:13px;background:var(--glass-control);border:1px solid var(--glass-soft-border);color:var(--text2);display:grid;place-items:center;font-weight:700}
 .key{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:25px;padding:0 7px;border:1px solid var(--key-border);border-radius:7px;background:var(--key-bg);font-size:9px;font-weight:700}.key.round{min-width:24px;width:24px;border-radius:50%;background:var(--key-round-bg);border-color:var(--key-round-border)}
+
+
+.shell-placeholder{max-width:900px;margin:0 auto;padding:24px 24px 48px}
+.shell-page-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
+.shell-page-head h1{margin:0;font-size:28px;font-weight:600}
+.shell-page-head p{margin:5px 0 0;color:var(--text2);font-size:12px}
+.shell-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,320px));gap:12px;align-items:start}
+.shell-card{border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);padding:14px}
+.shell-card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.shell-card-icon{width:36px;height:36px;border-radius:var(--r-control);background:var(--glass-control);border:1px solid var(--glass-soft-border);display:grid;place-items:center;color:var(--accent)}
+.shell-card h3{margin:0;font-size:14px;font-weight:600}
+.shell-card small{display:block;color:var(--text2);font-size:11px;margin-top:2px}
+.shell-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px;border-top:1px solid var(--divider);font-size:12px}
+.shell-row:first-of-type{border-top:0}
+.shell-muted{color:var(--text2)}
 
 /* popovers */
 .pop{display:none;position:fixed;z-index:50;border:1px solid var(--glass-border);border-radius:var(--r-compact);background:var(--floating-bg);box-shadow:var(--shadow);padding:12px;min-width:300px;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)}
@@ -304,7 +335,9 @@ body.test-mode .test-tools{display:flex}
 #testBtn.active{border-color:var(--accent);color:var(--accent);background:var(--selected-bg)}
 
 @media(max-width:760px){
-  .wrap{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.card-facts{grid-template-columns:1fr 1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
+  .app-shell,.app-shell.nav-expanded{grid-template-columns:52px minmax(0,1fr)}
+  .nav-rail{padding-inline:4px}.nav-toggle,.nav-item,.app-shell.nav-expanded .nav-toggle,.app-shell.nav-expanded .nav-item{width:44px}.nav-label{display:none}
+  .wrap,.shell-placeholder{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.card-facts{grid-template-columns:1fr 1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 @media(max-width:380px){
   .cards{grid-template-columns:1fr}
@@ -318,7 +351,34 @@ body.test-mode .test-tools{display:flex}
     <div class="win"><span>—</span><span>□</span><span>✕</span></div>
   </div>
 
+  <div class="app-shell" id="appShell">
+  <aside class="nav-rail" aria-label="Navegación de Coucho">
+    <div class="nav-top">
+      <button class="nav-toggle" id="navToggle" title="Expandir navegación" aria-label="Expandir navegación">
+        <span class="nav-icon">☰</span><span class="nav-label">Coucho</span>
+      </button>
+    </div>
+    <nav class="nav-main">
+      <button class="nav-item active" data-view="modes" title="Modos">
+        <span class="nav-icon">▣</span><span class="nav-label">Modos</span>
+      </button>
+      <button class="nav-item" data-view="library" title="Biblioteca">
+        <span class="nav-icon">▶</span><span class="nav-label">Biblioteca</span>
+      </button>
+      <button class="nav-item" data-view="devices" title="Dispositivos">
+        <span class="nav-icon">▦</span><span class="nav-label">Dispositivos</span>
+      </button>
+    </nav>
+    <div class="nav-bottom">
+      <button class="nav-item" data-view="settings" title="Ajustes">
+        <span class="nav-icon">⚙</span><span class="nav-label">Ajustes</span>
+      </button>
+    </div>
+  </aside>
+
   <main class="main">
+    <section class="shell-view active" data-shell-view="modes">
+
     <div class="wrap">
       <div class="header">
         <div class="header-left">
@@ -373,7 +433,71 @@ body.test-mode .test-tools{display:flex}
       <div class="section"><h3>Tus modos</h3><button class="btn icon" id="newBtn2" title="Nuevo">＋</button></div>
       <div class="cards" id="cards"></div>
     </div>
+  
+    </section>
+
+    <section class="shell-view" data-shell-view="library">
+      <div class="shell-placeholder">
+        <div class="shell-page-head">
+          <div><h1>Biblioteca</h1><p>Apps disponibles para Coucho y Hop.</p></div>
+        </div>
+        <div class="shell-grid">
+          <div class="shell-card">
+            <div class="shell-card-head"><div class="shell-card-icon">S</div><div><h3>Steam</h3><small>Disponible</small></div></div>
+            <div class="shell-row"><span class="shell-muted">En modos</span><b>Gaming</b></div>
+          </div>
+          <div class="shell-card">
+            <div class="shell-card-head"><div class="shell-card-icon">P</div><div><h3>Playnite</h3><small>Disponible</small></div></div>
+            <div class="shell-row"><span class="shell-muted">En modos</span><b>—</b></div>
+          </div>
+          <div class="shell-card">
+            <div class="shell-card-head"><div class="shell-card-icon">P</div><div><h3>Plex</h3><small>Disponible</small></div></div>
+            <div class="shell-row"><span class="shell-muted">En modos</span><b>Películas</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell-view" data-shell-view="devices">
+      <div class="shell-placeholder">
+        <div class="shell-page-head">
+          <div><h1>Dispositivos</h1><p>Gestión global. Los modos se siguen editando directamente.</p></div>
+        </div>
+        <div class="shell-grid">
+          <div class="shell-card">
+            <div class="shell-card-head"><div class="shell-card-icon">▦</div><div><h3>Pantallas</h3><small>3 detectadas</small></div></div>
+            <div class="shell-row"><span>Identificar</span><span class="shell-muted">›</span></div>
+            <div class="shell-row"><span>Configuración avanzada</span><span class="shell-muted">›</span></div>
+            <div class="shell-row"><span>Restaurar última configuración</span><span class="shell-muted">›</span></div>
+          </div>
+          <div class="shell-card">
+            <div class="shell-card-head"><div class="shell-card-icon">🎮</div><div><h3>Mando</h3><small>Conectado</small></div></div>
+            <div class="shell-row"><span>Atajo de Hop</span><b>Guide</b></div>
+            <div class="shell-row"><span>Detalles</span><span class="shell-muted">›</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell-view" data-shell-view="settings">
+      <div class="shell-placeholder">
+        <div class="shell-page-head">
+          <div><h1>Ajustes</h1><p>Preferencias y herramientas menos frecuentes.</p></div>
+        </div>
+        <div class="shell-grid">
+          <div class="shell-card">
+            <div class="shell-card-head"><div class="shell-card-icon">◐</div><div><h3>Apariencia</h3><small>Usa el tema de Coucho</small></div></div>
+            <div class="shell-row"><span>Tema</span><span class="shell-muted">Claro / oscuro</span></div>
+          </div>
+          <div class="shell-card">
+            <div class="shell-card-head"><div class="shell-card-icon">⋯</div><div><h3>Avanzado</h3><small>Diagnóstico y recuperación</small></div></div>
+            <div class="shell-row"><span>Estado de configuración</span><span class="shell-muted">›</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
+</div>
 </div>
 
 <div class="pop display-editor" id="displayPop">
@@ -1089,6 +1213,36 @@ body.test-mode .test-tools{display:flex}
     }
   });
 
+  var shellView='modes';
+  var navExpanded=localStorage.getItem('coucho-nav-expanded')==='1';
+
+  function syncNavigationShell(){
+    q('#appShell').classList.toggle('nav-expanded',navExpanded);
+    q('#navToggle').title=navExpanded?'Contraer navegación':'Expandir navegación';
+    q('#navToggle').setAttribute('aria-label',q('#navToggle').title);
+    qa('.nav-item').forEach(function(item){
+      item.classList.toggle('active',item.dataset.view===shellView);
+    });
+    qa('.shell-view').forEach(function(view){
+      view.classList.toggle('active',view.dataset.shellView===shellView);
+    });
+  }
+
+  q('#navToggle').onclick=function(){
+    navExpanded=!navExpanded;
+    localStorage.setItem('coucho-nav-expanded',navExpanded?'1':'0');
+    syncNavigationShell();
+  };
+
+  qa('.nav-item').forEach(function(item){
+    item.onclick=function(){
+      shellView=item.dataset.view;
+      closePops();
+      syncNavigationShell();
+    };
+  });
+
+  syncNavigationShell();
   syncThemeButton();
   syncTestMode();
   render();
