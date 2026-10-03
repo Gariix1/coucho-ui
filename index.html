@@ -153,6 +153,7 @@ body:after{
   -webkit-backdrop-filter:blur(28px) saturate(1.18)
 }
 button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,[tabindex="0"]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .window{height:100%;display:grid;grid-template-rows:32px 1fr}
 .titlebar{display:flex;align-items:center;justify-content:space-between;background:rgba(17,24,40,.10);border-bottom:1px solid var(--divider);backdrop-filter:blur(26px) saturate(1.15);-webkit-backdrop-filter:blur(26px) saturate(1.15)}
@@ -574,7 +575,7 @@ body.test-mode .test-tools{display:flex}
           <div class="hero-top">
             <div class="namebox">
               <div class="mode-icon" id="heroIcon">🎮</div>
-              <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName" class="mode-name-edit" data-id="active" title="Doble clic para renombrar">Gaming</h2></div>
+              <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName" class="mode-name-edit" data-id="active" tabindex="0" title="Doble clic o F2 para renombrar">Gaming</h2></div>
             </div>
             <div class="hero-tools">
               <button class="trash-mode" data-id="active" title="Eliminar modo" aria-label="Eliminar modo activo">🗑</button>
@@ -723,7 +724,7 @@ body.test-mode .test-tools{display:flex}
   </div>
 </div>
 
-<div class="pop delete-confirm" id="deletePop" aria-label="Confirmar eliminación">
+<div class="pop delete-confirm" id="deletePop" role="dialog" aria-label="Confirmar eliminación">
   <div class="pop-title delete-title">Eliminar modo</div>
   <div class="delete-copy" id="deleteText"></div>
   <div class="delete-actions">
@@ -732,9 +733,9 @@ body.test-mode .test-tools{display:flex}
   </div>
 </div>
 
-<div class="sheet-wrap" id="newSheet">
+<div class="sheet-wrap" id="newSheet" role="dialog" aria-modal="true" aria-label="Crear modo">
   <div class="sheet">
-    <div class="sheet-head"><h2 id="newName" class="mode-name-edit" title="Doble clic para renombrar">Gaming</h2><button class="btn icon" id="closeNew">✕</button></div>
+    <div class="sheet-head"><h2 id="newName" class="mode-name-edit" tabindex="0" title="Doble clic o F2 para renombrar">Gaming</h2><button class="btn icon" id="closeNew">✕</button></div>
     <div class="new-body">
       <div class="new-recipe">
         <button class="new-display" id="newDisplay" title="Editar pantallas">
@@ -758,7 +759,7 @@ body.test-mode .test-tools{display:flex}
   </div>
 </div>
 
-<div class="capture-wrap" id="shortcutOverlay">
+<div class="capture-wrap" id="shortcutOverlay" role="dialog" aria-modal="true" aria-label="Configurar atajo">
   <div class="capture">
     <h3>Activar con</h3>
     <div class="controller">
@@ -776,7 +777,7 @@ body.test-mode .test-tools{display:flex}
   </div>
 </div>
 
-<div class="test-wrap" id="testOverlay">
+<div class="test-wrap" id="testOverlay" role="dialog" aria-modal="true" aria-label="Prueba segura">
   <div class="test">
     <div class="test-main">
       <div class="test-flow">
@@ -849,6 +850,7 @@ body.test-mode .test-tools{display:flex}
   var countdownTimer=null;
   var activationTimer=null;
   var activatingId=null;
+  var appliedSession=null;
 
   var savedTheme=localStorage.getItem('coucho-theme');
   var initialTheme=savedTheme==='light'||savedTheme==='dark'?savedTheme:'dark';
@@ -897,6 +899,33 @@ body.test-mode .test-tools{display:flex}
       displayIds:Array.isArray(source.displayIds)?source.displayIds.slice():[],
       primaryDisplayId:source.primaryDisplayId||null
     };
+  }
+
+  function sessionFromMode(mode){
+    if(!mode)return null;
+    return {
+      modeId:mode.id,
+      name:mode.name,
+      icon:mode.icon,
+      app:mode.app,
+      preserve:!!mode.preserve,
+      displayIds:Array.isArray(mode.displayIds)?mode.displayIds.slice():[],
+      primaryDisplayId:mode.primaryDisplayId||null
+    };
+  }
+
+  function ensureAppliedSession(){
+    if(appliedSession)return;
+    var mode=active();
+    if(mode)appliedSession=sessionFromMode(mode);
+  }
+
+  function sessionMatchesMode(session,mode){
+    if(!session||!mode||session.modeId!==mode.id)return false;
+    if(session.app!==mode.app||session.preserve!==!!mode.preserve||session.primaryDisplayId!==(mode.primaryDisplayId||null))return false;
+    var a=session.displayIds.slice().sort().join('|');
+    var b=(mode.displayIds||[]).slice().sort().join('|');
+    return a===b;
   }
   function displaySummary(source){
     if(source.preserve)return 'No cambiar pantallas';
@@ -1034,6 +1063,7 @@ body.test-mode .test-tools{display:flex}
 
   function render(){
     normalizeActive();
+    ensureAppliedSession();
     renderResourceViews();
     renderDisplayOverview();
 
@@ -1056,7 +1086,16 @@ body.test-mode .test-tools{display:flex}
     qa('.activate').forEach(function(b){b.onclick=function(){activate(Number(b.dataset.id))}});
     qa('.preview-mode').forEach(function(b){b.onclick=function(){previewMode(Number(b.dataset.id))}});
     qa('.trash-mode').forEach(function(b){b.onclick=function(e){openDeletePop(e.currentTarget,b.dataset.id)}});
-    qa('.mode-name-edit[data-id]').forEach(function(el){el.ondblclick=function(e){e.preventDefault();beginModeRename(el,el.dataset.id)}});
+    qa('.mode-name-edit[data-id]').forEach(function(el){
+      el.ondblclick=function(e){e.preventDefault();beginModeRename(el,el.dataset.id)};
+      el.onkeydown=function(e){
+        if(el.isContentEditable)return;
+        if(e.key==='F2'||e.key==='Enter'){
+          e.preventDefault();
+          beginModeRename(el,el.dataset.id);
+        }
+      };
+    });
   }
 
   function removeSet(id){
@@ -1064,7 +1103,17 @@ body.test-mode .test-tools{display:flex}
     if(!removed)return;
     var wasActive=!!removed.active;
     sets=sets.filter(function(s){return s.id!==id});
-    if(wasActive&&sets.length)sets[0].active=true;
+
+    if(wasActive){
+      sets.forEach(function(s){s.active=false});
+      if(sets.length){
+        sets[0].active=true;
+        appliedSession=sessionFromMode(sets[0]);
+      }else{
+        appliedSession=null;
+      }
+    }
+
     render();
     toast('Modo eliminado',removed.name);
   }
@@ -1079,6 +1128,7 @@ body.test-mode .test-tools{display:flex}
 
     activationTimer=setTimeout(function(){
       sets.forEach(function(s){s.active=s.id===id});
+      appliedSession=sessionFromMode(target);
       activatingId=null;
       render();
       toast(target.name,'Activo');
@@ -1181,9 +1231,11 @@ body.test-mode .test-tools{display:flex}
     function onKey(e){
       if(e.key==='Enter'){
         e.preventDefault();
+        e.stopPropagation();
         finish(true);
       }else if(e.key==='Escape'){
         e.preventDefault();
+        e.stopPropagation();
         finish(false);
       }
     }
@@ -1200,18 +1252,31 @@ body.test-mode .test-tools{display:flex}
     var original=mode.name;
     editInlineText(el,original,function(next){
       mode.name=next;
-      render();
+      if(appliedSession&&appliedSession.modeId===mode.id)appliedSession.name=next;
+      saveSets();
+      renderResourceViews();
+      renderDisplayOverview();
       if(next!==original)toast(next,'Nombre actualizado');
     });
   }
 
-  q('#newName').ondblclick=function(e){
-    e.preventDefault();
+  function beginNewModeRename(){
+    var el=q('#newName');
+    if(el.isContentEditable)return;
     var original=newDraft.name;
-    editInlineText(q('#newName'),original,function(next){
+    editInlineText(el,original,function(next){
       newDraft.name=next;
       renderNew();
     });
+  }
+
+  q('#newName').ondblclick=function(e){e.preventDefault();beginNewModeRename()};
+  q('#newName').onkeydown=function(e){
+    if(q('#newName').isContentEditable)return;
+    if(e.key==='F2'||e.key==='Enter'){
+      e.preventDefault();
+      beginNewModeRename();
+    }
   };
 
   function openDeletePop(anchor,rawId){
@@ -1221,8 +1286,12 @@ body.test-mode .test-tools{display:flex}
 
     closePops();
     deleteTarget=id;
-    q('#deleteText').textContent='¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.';
+    var fallback=mode.active?sets.find(function(s){return s.id!==mode.id}):null;
+    q('#deleteText').textContent=mode.active&&fallback
+      ?'¿Eliminar “'+mode.name+'”? Se activará “'+fallback.name+'”.'
+      :'¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.';
     openAnchoredPop(q('#deletePop'),anchor);
+    requestAnimationFrame(function(){q('#deleteCancel').focus()});
   }
 
   q('#deleteCancel').onclick=closePops;
@@ -1252,29 +1321,31 @@ body.test-mode .test-tools{display:flex}
   }
 
   function renderDisplayOverview(){
+    var session=appliedSession;
     var mode=active();
     var stage=q('#displayOverviewStage');
     if(!stage)return;
 
-    if(!mode){
-      stage.innerHTML='<div class="empty-state"><div><div class="empty-icon">▦</div><h3>Sin modo activo</h3><p>Crea un modo para ver el estado de tus pantallas.</p></div></div>';
+    if(!session){
+      stage.innerHTML='<div class="empty-state"><div><div class="empty-icon">▦</div><h3>Sin sesión aplicada</h3><p>Activa o prueba un modo para ver el estado de tus pantallas.</p></div></div>';
       q('#displayStateMode').textContent='—';
       q('#displayStateIcon').textContent='▦';
-      q('#displayStateApp').textContent='Sin modo';
+      q('#displayStateApp').textContent='Sin sesión';
       q('#displayStateCount').textContent='0';
       q('#displayStatePrimary').textContent='—';
-      q('#displayTopologyStatus').textContent='Sin configuración activa';
+      q('#displayTopologyStatus').textContent='Sin configuración aplicada';
       return;
     }
 
-    var ids=mode.preserve?[]:mode.displayIds;
-    var primary=mode.preserve?null:getDisplay(mode.primaryDisplayId);
+    var ids=session.preserve?[]:session.displayIds;
+    var primary=session.preserve?null:getDisplay(session.primaryDisplayId);
+    var hasPending=mode&&mode.id===session.modeId&&!sessionMatchesMode(session,mode);
 
     stage.innerHTML=simulatedDisplays.map(function(d){
-      var on=mode.preserve||ids.indexOf(d.id)>=0;
-      var isPrimary=!mode.preserve&&mode.primaryDisplayId===d.id;
+      var on=session.preserve||ids.indexOf(d.id)>=0;
+      var isPrimary=!session.preserve&&session.primaryDisplayId===d.id;
       var cls=d.kind==='tv'?'tv':'pc';
-      var badge=mode.preserve?'Sin cambios':isPrimary?'★ Principal':on?'Activa':'Apagada';
+      var badge=session.preserve?'Sin cambios':isPrimary?'★ Principal':on?'Activa':'Apagada';
       return '<div class="overview-display '+(on?'on':'off')+(isPrimary?' primary':'')+'">'+
         '<span class="overview-badge">'+badge+'</span>'+
         '<div class="monitor '+cls+(isPrimary?' primary':'')+'"></div>'+
@@ -1282,12 +1353,14 @@ body.test-mode .test-tools{display:flex}
       '</div>';
     }).join('');
 
-    q('#displayStateMode').textContent=mode.name;
-    q('#displayStateIcon').textContent=mode.icon;
-    q('#displayStateApp').textContent=mode.app;
-    q('#displayStateCount').textContent=mode.preserve?'Sin cambios':String(mode.displayIds.length);
-    q('#displayStatePrimary').textContent=mode.preserve?'Actual':primary?primary.name:'—';
-    q('#displayTopologyStatus').textContent=mode.preserve?'El modo conserva el escritorio actual':displaySummary(mode);
+    q('#displayStateMode').textContent=session.name;
+    q('#displayStateIcon').textContent=session.icon;
+    q('#displayStateApp').textContent=session.app;
+    q('#displayStateCount').textContent=session.preserve?'Sin cambios':String(session.displayIds.length);
+    q('#displayStatePrimary').textContent=session.preserve?'Actual':primary?primary.name:'—';
+    q('#displayTopologyStatus').textContent=hasPending
+      ?'Cambios guardados pendientes de aplicar'
+      :session.preserve?'Conservando el escritorio actual':displaySummary(session);
   }
 
   function openDisplayPop(anchor,rawId,isNew){
@@ -1315,12 +1388,12 @@ body.test-mode .test-tools{display:flex}
       var selected=displayDraft.displayIds.indexOf(d.id)>=0;
       var primary=selected&&displayDraft.primaryDisplayId===d.id;
       return '<div class="screen-device '+d.kind+(selected?' selected':' off')+(primary?' primary':'')+'" data-display="'+d.id+'">'+
-        '<button class="screen-face screen-toggle" data-display="'+d.id+'">'+
+        '<button class="screen-face screen-toggle" data-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'">'+
           '<span class="screen-number">'+d.number+'</span>'+
           '<span class="screen-shape"></span>'+
           '<span class="screen-copy"><b>'+d.name+'</b><small>'+d.detail+'</small></span>'+
         '</button>'+
-        '<button class="primary-screen-btn" data-primary="'+d.id+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es la pantalla principal':'Hacer '+d.name+' principal')+'">'+(primary?'★':'☆')+'</button>'+
+        '<button class="primary-screen-btn" data-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es la pantalla principal':'Hacer '+d.name+' principal')+'">'+(primary?'★':'☆')+'</button>'+
       '</div>';
     }).join('');
 
@@ -1373,7 +1446,11 @@ body.test-mode .test-tools{display:flex}
     var mode=isNew?null:byId(editTarget);
     if(!isNew&&!mode)return;
     var app=isNew?newDraft.app:mode.app;
-    qa('#appPop .app-option').forEach(function(x){x.classList.toggle('selected',x.dataset.app===app)});
+    qa('#appPop .app-option').forEach(function(x){
+      var selected=x.dataset.app===app;
+      x.classList.toggle('selected',selected);
+      x.setAttribute('aria-pressed',selected?'true':'false');
+    });
     openAnchoredPop(q('#appPop'),anchor);
   }
 
@@ -1453,6 +1530,7 @@ body.test-mode .test-tools{display:flex}
     newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',name:'Gaming',icon:'🎮'};
     renderNew();
     q('#newSheet').classList.add('open');
+    requestAnimationFrame(function(){q('#newDisplay').focus()});
   }
 
   function renderNew(){
@@ -1503,7 +1581,11 @@ body.test-mode .test-tools{display:flex}
   };
 
   q('#newBtn2').onclick=openNew;
-  q('#closeNew').onclick=function(){closePops();q('#newSheet').classList.remove('open')};
+  q('#closeNew').onclick=function(){
+    closePops();
+    q('#newSheet').classList.remove('open');
+    if(!q('#newBtn2').hidden)q('#newBtn2').focus();
+  };
   q('#newDisplay').onclick=function(e){openDisplayPop(e.currentTarget,null,true)};
   q('#newApp').onclick=function(e){openAppPop(e.currentTarget,null,true)};
 
@@ -1605,6 +1687,7 @@ body.test-mode .test-tools{display:flex}
         s.preserve=testContext.preserve;
         s.displayIds=testContext.displayIds.slice();
         s.primaryDisplayId=testContext.primaryDisplayId;
+        if(s.active)appliedSession=sessionFromMode(s);
       }
       q('#testOverlay').classList.remove('open');
       render();
@@ -1624,6 +1707,7 @@ body.test-mode .test-tools{display:flex}
 
     if(kind==='mode-preview'){
       sets.forEach(function(s){s.active=s.id===testContext.existingId});
+      appliedSession=sessionFromMode(byId(testContext.existingId));
       q('#testOverlay').classList.remove('open');
       render();
       toast(testContext.name,'Activo después de probar');
@@ -1638,6 +1722,7 @@ body.test-mode .test-tools{display:flex}
         shortcut:'Manual',active:false
       });
       sets.forEach(function(s){s.active=s.id===testContext.id});
+      appliedSession=sessionFromMode(byId(testContext.id));
       q('#testOverlay').classList.remove('open');
       render();
       toast(testContext.name,'Guardado');
@@ -1711,7 +1796,10 @@ body.test-mode .test-tools{display:flex}
       if(selected)item.setAttribute('aria-current','page');
       else item.removeAttribute('aria-current');
     });
-    q('#settingsBtn').classList.toggle('active',shellView==='settings');
+    var settingsActive=shellView==='settings';
+    q('#settingsBtn').classList.toggle('active',settingsActive);
+    if(settingsActive)q('#settingsBtn').setAttribute('aria-current','page');
+    else q('#settingsBtn').removeAttribute('aria-current');
 
     q('.main').scrollTo({top:0,behavior:'auto'});
   }
