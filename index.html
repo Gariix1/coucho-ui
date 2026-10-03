@@ -199,9 +199,10 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .display-editor{width:min(620px,calc(100vw - 24px));padding:14px;max-height:calc(100vh - 24px);overflow:hidden}
 .display-editor.open{display:flex;flex-direction:column}
 .display-editor-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex:0 0 auto}
-.display-editor-head-actions{display:flex;align-items:center;gap:8px}
 .display-editor-head .pop-title{margin:0}
 .display-editor-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.preserve-btn{min-height:28px;padding:3px 8px;border-color:transparent;background:transparent;color:var(--muted);font-size:10px}
+.preserve-btn:hover{background:var(--glass-command);color:var(--text2)}
 .preserve-btn.selected{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
 .screen-map{display:grid;grid-template-columns:1.22fr 1fr 1fr;gap:10px;padding:12px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);overflow:auto;min-height:0}
 .screen-device{position:relative;min-width:0}
@@ -309,7 +310,6 @@ body.test-mode .test-tools{display:flex}
         <div style="display:flex;gap:8px">
           <button class="btn icon" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">☀</button>
           <button class="btn icon" id="testBtn" title="Modo de prueba" aria-label="Modo de prueba">🧪</button>
-          <button class="btn icon" id="newBtn" title="Nuevo">＋</button>
         </div>
       </div>
 
@@ -336,7 +336,7 @@ body.test-mode .test-tools{display:flex}
           <div>
             <div class="kicker">Pantallas</div>
             <div class="displays" id="heroDisplays"></div>
-            <div class="display-name" id="heroDisplayName">TV + Monitor</div>
+            <div class="display-name" id="heroDisplayName">—</div>
           </div>
         </button>
 
@@ -364,14 +364,14 @@ body.test-mode .test-tools{display:flex}
       <div class="pop-title">Pantallas</div>
       <div class="display-editor-sub">Clic: activar · ☆: principal</div>
     </div>
-    <div class="display-editor-head-actions">
-      <button class="btn preserve-btn" id="preserveDisplays">↔ Sin cambios</button>
-      <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar">✕</button>
-    </div>
+    <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar">✕</button>
   </div>
   <div class="screen-map" id="screenMap"></div>
   <div class="display-editor-foot">
-    <div class="display-editor-summary" id="displayEditorSummary"></div>
+    <div>
+      <div class="display-editor-summary" id="displayEditorSummary"></div>
+      <button class="btn preserve-btn" id="preserveDisplays">↔ No cambiar pantallas</button>
+    </div>
     <div class="display-editor-actions">
       <button class="btn" id="tryDisplays">Probar</button>
       <button class="btn primary" id="saveDisplays">Guardar</button>
@@ -397,7 +397,7 @@ body.test-mode .test-tools{display:flex}
         <div>
           <div class="new-kicker">Pantallas</div>
           <div class="displays" id="newDisplays"></div>
-          <div class="display-name" id="newDisplayName">TV + Monitor</div>
+          <div class="display-name" id="newDisplayName">—</div>
         </div>
       </button>
 
@@ -408,7 +408,10 @@ body.test-mode .test-tools{display:flex}
         <button class="new-app" data-app="Ninguna"><div><div class="app-logo">—</div><b>Ninguna</b></div></button>
       </div>
     </div>
-    <div class="sheet-foot"><button class="btn primary" id="newTry">Probar</button></div>
+    <div class="sheet-foot" style="gap:8px">
+      <button class="btn" id="newTry">Probar</button>
+      <button class="btn primary" id="newSave">Guardar</button>
+    </div>
   </div>
 </div>
 
@@ -508,7 +511,7 @@ body.test-mode .test-tools{display:flex}
   function q(s){return document.querySelector(s)}
   function qa(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
   function byId(id){return sets.find(function(x){return x.id===id})}
-  function active(){return sets.find(function(x){return x.active})||sets[0]}
+  function active(){return sets.find(function(x){return x.active})||null}
   function resolveId(raw){
     var a=active();
     return raw==='active'?(a?a.id:null):Number(raw);
@@ -518,8 +521,6 @@ body.test-mode .test-tools{display:flex}
   }
   function normalizeActive(){
     if(sets.length===0)return;
-    var current=sets.find(function(x){return x.active});
-    if(!current)sets[0].active=true;
     var kept=false;
     sets.forEach(function(s){
       if(s.active&&!kept){kept=true;return}
@@ -543,7 +544,7 @@ body.test-mode .test-tools{display:flex}
     };
   }
   function displaySummary(source){
-    if(source.preserve)return 'Sin cambios';
+    if(source.preserve)return 'No cambiar pantallas';
     var ids=Array.isArray(source.displayIds)?source.displayIds:[];
     var names=ids.map(function(id){var d=getDisplay(id);return d?d.name:id});
     if(names.length===0)return 'Sin pantallas';
@@ -594,11 +595,15 @@ body.test-mode .test-tools{display:flex}
       return;
     }
 
-    hero.style.display='';
     var a=active();
-    q('#heroName').textContent=a.name;q('#heroIcon').textContent=a.icon;
-    q('#heroDisplays').innerHTML=displayMarkup(a,false);q('#heroDisplayName').textContent=displaySummary(a);
-    q('#heroApp').textContent=a.app;q('#heroShortcut').textContent=shortcutLabel(a.shortcut);
+    if(a){
+      hero.style.display='';
+      q('#heroName').textContent=a.name;q('#heroIcon').textContent=a.icon;
+      q('#heroDisplays').innerHTML=displayMarkup(a,false);q('#heroDisplayName').textContent=displaySummary(a);
+      q('#heroApp').textContent=a.app;q('#heroShortcut').textContent=shortcutLabel(a.shortcut);
+    }else{
+      hero.style.display='none';
+    }
 
     q('#cards').innerHTML=sets.filter(function(s){return !s.active}).map(function(s){
       return '<article class="card">'+
@@ -693,7 +698,7 @@ body.test-mode .test-tools{display:flex}
     var summary=displayDraft.preserve?'No cambiar las pantallas al activar':displaySummary(displayDraft);
     var primary=getDisplay(displayDraft.primaryDisplayId);
     q('#displayEditorSummary').innerHTML=displayDraft.preserve
-      ?'<b>Sin cambios</b>'
+      ?'<b>Las pantallas quedan como están</b>'
       :'<b>'+summary+'</b>'+(primary?' · ★ '+primary.name:'');
   }
 
@@ -858,7 +863,7 @@ body.test-mode .test-tools{display:flex}
     toast('Demo restaurada','3 modos');
   };
 
-  q('#newBtn').onclick=q('#newBtn2').onclick=openNew;
+  q('#newBtn2').onclick=openNew;
   q('#closeNew').onclick=function(){q('#newSheet').classList.remove('open')};
   q('#newDisplay').onclick=function(e){openDisplayPop(e.currentTarget,null,true)};
 
@@ -869,6 +874,22 @@ body.test-mode .test-tools{display:flex}
       renderNew();
     };
   });
+
+  function buildNewMode(id,activeState){
+    return {
+      id:id,name:newDraft.name,icon:newDraft.icon,
+      preserve:newDraft.preserve,displayIds:newDraft.displayIds.slice(),
+      primaryDisplayId:newDraft.primaryDisplayId,app:newDraft.app,
+      shortcut:'Manual',active:!!activeState
+    };
+  }
+
+  q('#newSave').onclick=function(){
+    sets.push(buildNewMode(Date.now(),false));
+    q('#newSheet').classList.remove('open');
+    render();
+    toast(newDraft.name,'Guardado');
+  };
 
   q('#newTry').onclick=function(){
     q('#newSheet').classList.remove('open');
@@ -922,7 +943,9 @@ body.test-mode .test-tools{display:flex}
         countdownTimer=setInterval(function(){
           left--;q('#count').textContent=left;
           if(left<=0){
-            clearInterval(countdownTimer);q('#testOverlay').classList.remove('open');toast('Restaurado','Sin cambios');
+            clearInterval(countdownTimer);q('#testOverlay').classList.remove('open');
+            if(testContext&&testContext.kind==='new')q('#newSheet').classList.add('open');
+            toast('Restaurado','Configuración anterior');
           }
         },1000);
       }
@@ -961,7 +984,10 @@ body.test-mode .test-tools{display:flex}
   };
 
   q('#revert').onclick=function(){
-    clearInterval(countdownTimer);q('#testOverlay').classList.remove('open');toast('Restaurado','Sin cambios');
+    clearInterval(countdownTimer);
+    q('#testOverlay').classList.remove('open');
+    if(testContext&&testContext.kind==='new')q('#newSheet').classList.add('open');
+    toast('Restaurado','Configuración anterior');
   };
 
   document.addEventListener('click',function(e){
