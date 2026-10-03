@@ -673,7 +673,10 @@ body.test-mode .test-tools{display:flex}
     }).join('');
 
     qa('.screen-toggle').forEach(function(b){
-      b.onclick=function(){toggleDisplay(b.dataset.display)};
+      b.onclick=function(e){
+        e.stopPropagation();
+        toggleDisplay(b.dataset.display);
+      };
     });
     qa('.primary-screen-btn').forEach(function(b){
       b.onclick=function(e){e.stopPropagation();makePrimary(b.dataset.primary)};
@@ -917,7 +920,12 @@ body.test-mode .test-tools{display:flex}
   };
 
   document.addEventListener('click',function(e){
-    if(!e.target.closest('.pop')&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('#newDisplay')) closePops();
+    var path=typeof e.composedPath==='function'?e.composedPath():[];
+    var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
+    var insideAppPop=path.indexOf(q('#appPop'))>=0;
+    if(!insideDisplayPop&&!insideAppPop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('#newDisplay')){
+      closePops();
+    }
   });
 
   syncThemeButton();
