@@ -242,19 +242,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--success);margin-right:5px}
 .usage-chip{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid var(--selected-border);border-radius:999px;background:var(--selected-bg);color:var(--accent);padding:5px 8px;font-size:10px;font-weight:600}
 .muted-chip{border-color:var(--glass-soft-border);background:var(--glass-command);color:var(--muted)}
-.device-panel{padding:16px}
-.device-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-.device-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.device-tile{min-height:150px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;padding:14px}
-.device-tile b{font-size:12px}.device-tile small{margin:0;font-size:9px}
-.device-tile .monitor{margin-bottom:5px}.device-tile .monitor.tv{width:88px;height:51px}.device-tile .monitor.pc{width:62px;height:40px}
-.device-panel-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)}
-.quiet-action{min-height:34px;border:1px solid transparent;border-radius:var(--r-control);background:transparent;color:var(--text2);padding:6px 9px;font-size:11px;font-weight:600}
-.quiet-action:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
-.device-secondary{margin-top:12px;grid-template-columns:minmax(260px,380px)}
-.controller-card{display:flex;align-items:center;gap:14px}
-.controller-mark{width:72px;height:72px;flex:0 0 auto;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:grid;place-items:center;font-size:30px}
-.controller-card .resource-copy{flex:1}
+
 .settings-stack{overflow:hidden}
 .settings-row{width:100%;min-height:68px;border:0;border-top:1px solid var(--divider);background:transparent;color:var(--text);display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 14px;text-align:left}
 .settings-row:first-child{border-top:0}.settings-row:is(button){cursor:pointer}.settings-row:is(button):hover{background:var(--glass-command)}
@@ -336,41 +324,68 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 body.test-mode .test-tools{display:flex}
 .test-tools-actions{display:flex;gap:8px}
 .hero-tools{display:flex;align-items:center;gap:8px}
-.mode-menu-trigger{
-  width:36px;height:36px;min-height:36px;padding:0;border:1px solid transparent;
+.trash-mode{
+  width:34px;height:34px;min-height:34px;padding:0;border:1px solid transparent;
   border-radius:var(--r-control);background:transparent;color:var(--muted);
-  display:grid;place-items:center;font-size:18px;line-height:1
+  display:grid;place-items:center;font-size:14px;line-height:1;opacity:.72
 }
-.mode-menu-trigger:hover,.mode-menu-trigger:focus-visible{
-  background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)
+.trash-mode:hover,.trash-mode:focus-visible{
+  opacity:1;background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.26);color:#fca5a5
 }
-@media(hover:hover) and (pointer:fine){
-  .card .mode-menu-trigger{opacity:0;transform:translateX(3px);transition:opacity .12s ease,transform .12s ease,background .12s ease,border-color .12s ease}
-  .card:hover .mode-menu-trigger,.card:focus-within .mode-menu-trigger,.card .mode-menu-trigger:focus-visible{opacity:1;transform:none}
+.mode-name-edit{
+  display:inline-block;max-width:100%;border-radius:6px;cursor:text;
+  transition:background .12s ease,box-shadow .12s ease
 }
-.hero .mode-menu-trigger{opacity:.72}
-.hero .mode-menu-trigger:hover,.hero .mode-menu-trigger:focus-visible{opacity:1}
-.mode-menu{width:240px;min-width:240px;padding:8px}
-.mode-menu-list{display:grid;gap:2px}
-.mode-menu-item{
-  width:100%;min-height:38px;border:1px solid transparent;border-radius:var(--r-control);
-  background:transparent;color:var(--text2);padding:8px 10px;text-align:left;font-size:12px;font-weight:600
+.mode-name-edit:hover{background:var(--glass-command)}
+.mode-name-edit[contenteditable="true"]{
+  min-width:72px;padding:1px 4px;margin:-1px -4px;background:var(--glass-control);
+  box-shadow:0 0 0 1px var(--selected-border);outline:none;white-space:nowrap
 }
-.mode-menu-item:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
-.mode-menu-item.danger{color:#fca5a5}
-.mode-menu-item.danger:hover{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.28);color:#fecaca}
-.mode-menu-panel[hidden]{display:none}
-.mode-menu-panel{padding:4px}
-.mode-menu-panel .pop-title{margin:2px 0 8px;color:var(--text)}
-.mode-menu-input{
-  width:100%;height:38px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);
-  background:var(--glass-control);color:var(--text);padding:0 10px;font:inherit;outline:none
+.split-action{display:inline-flex;align-items:stretch;border:1px solid var(--primary-border);border-radius:var(--r-control);overflow:hidden;background:var(--primary-bg)}
+.split-action button{min-height:34px;border:0;border-radius:0;color:var(--primary-fg);font-weight:600;padding:6px 10px}
+.split-action .activate{background:transparent;min-width:72px}
+.split-action .preview-mode{background:rgba(255,255,255,.06);border-left:1px solid var(--primary-border);min-width:58px}
+.split-action button:hover{background:rgba(255,255,255,.10)}
+.split-action button:disabled{opacity:.72;cursor:wait}
+.delete-confirm{width:270px;min-width:270px;padding:12px}
+.delete-title{color:#fecaca}
+.delete-copy{color:var(--text2);font-size:11px;line-height:1.45;padding:0 4px 4px}
+.delete-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}
+
+/* Dedicated screen-state page */
+.display-page{max-width:none}
+.display-overview{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(270px,.72fr);gap:14px;align-items:stretch}
+.display-topology,.display-state-card{
+  border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card)
 }
-.mode-menu-input:focus{border-color:var(--selected-border);box-shadow:0 0 0 1px var(--monitor-glow)}
-.mode-menu-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}
-.mode-menu-actions .btn{min-height:34px;padding:5px 10px}
-.mode-menu-confirm{margin:2px 0 4px;color:var(--text2);font-size:11px;line-height:1.4}
-.mode-menu-delete{color:#fecaca}
+.display-topology{padding:18px}
+.display-overview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.display-overview-head h3{margin:0;font-size:16px}.display-overview-head small{display:block;margin-top:3px;color:var(--text2);font-size:11px}
+.live-chip{display:inline-flex;align-items:center;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);padding:5px 9px;color:var(--text2);font-size:10px;font-weight:600}
+.display-overview-stage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;min-height:250px}
+.overview-display{
+  position:relative;min-width:0;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);
+  background:var(--glass-inset);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:16px 10px;transition:opacity .12s ease,border-color .12s ease,background .12s ease
+}
+.overview-display.off{opacity:.38;filter:saturate(.45)}
+.overview-display.on{border-color:var(--glass-border)}
+.overview-display.primary{border-color:var(--selected-border);background:var(--selected-bg)}
+.overview-display .monitor{margin:8px 0 18px}.overview-display .monitor.tv{width:116px;height:67px}.overview-display .monitor.pc{width:84px;height:54px}
+.overview-display b{font-size:13px}.overview-display small{display:block;color:var(--text2);font-size:9px;margin-top:3px}
+.overview-badge{position:absolute;left:10px;top:10px;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);padding:4px 7px;color:var(--text2);font-size:9px;font-weight:600}
+.overview-display.primary .overview-badge{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
+.display-state-card{padding:18px;display:flex;flex-direction:column}
+.state-eyebrow{text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-size:9px;font-weight:700}
+.state-mode{display:flex;align-items:center;gap:12px;margin:10px 0 16px}
+.state-mode-icon{width:48px;height:48px;border:1px solid var(--glass-soft-border);border-radius:14px;background:var(--glass-control);display:grid;place-items:center;font-size:23px}
+.state-mode h2{margin:0;font-size:20px}.state-mode small{display:block;color:var(--text2);font-size:11px;margin-top:3px}
+.state-facts{display:grid;gap:0;border-top:1px solid var(--divider);border-bottom:1px solid var(--divider)}
+.state-fact{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--divider);font-size:11px}
+.state-fact:first-child{border-top:0}.state-fact span{color:var(--text2)}.state-fact b{font-size:12px}
+.state-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto;padding-top:16px}
+.display-page-foot{display:flex;justify-content:flex-end;margin-top:10px}
+
 
 .empty-state{
   flex:1 1 100%;width:100%;min-height:230px;border:1px dashed var(--glass-border);
@@ -469,7 +484,6 @@ body.test-mode .test-tools{display:flex}
   .card-name{gap:11px}
   .card-name b{font-size:clamp(16px,1vw,18px)}
   .card-icon{width:clamp(42px,2.75vw,48px);height:clamp(42px,2.75vw,48px);font-size:22px}
-  .card-head .activate{min-width:92px}
 
   .card-display{min-height:clamp(102px,6.65vw,118px);margin:12px 0 10px;padding:13px 15px}
   .card-screen-row{gap:18px}
@@ -513,7 +527,7 @@ body.test-mode .test-tools{display:flex}
   .rail-item{min-height:52px;border-radius:10px}
   .rail-item.active:before{left:-5px}
   .rail-item span:last-child{font-size:8px}
-  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.hero-body{display:block;margin-top:0}.hero-body .display-main{margin-top:12px;height:auto;min-height:108px}.hero-body .recipe-meta{grid-template-columns:1fr;grid-template-rows:none;margin-top:8px}.hero-body .meta-action{height:auto}.card-facts{grid-template-columns:1fr 1fr}.new-recipe{grid-template-columns:1fr}.new-app-direct{min-height:82px;flex-direction:row;text-align:left}.app-options{grid-template-columns:repeat(2,1fr)}.device-strip{grid-template-columns:1fr}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
+  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.display-overview{grid-template-columns:1fr}.display-overview-stage{grid-template-columns:1fr}.display-state-card{min-height:260px}.hero-body{display:block;margin-top:0}.hero-body .display-main{margin-top:12px;height:auto;min-height:108px}.hero-body .recipe-meta{grid-template-columns:1fr;grid-template-rows:none;margin-top:8px}.hero-body .meta-action{height:auto}.card-facts{grid-template-columns:1fr 1fr}.new-recipe{grid-template-columns:1fr}.new-app-direct{min-height:82px;flex-direction:row;text-align:left}.app-options{grid-template-columns:repeat(2,1fr)}.device-strip{grid-template-columns:1fr}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 </style>
 </head>
@@ -534,7 +548,7 @@ body.test-mode .test-tools{display:flex}
         <span class="rail-icon">▶</span><span>Apps</span>
       </button>
       <button class="rail-item" data-nav-view="devices" aria-controls="view-devices" title="Dispositivos">
-        <span class="rail-icon">▦</span><span>Disp.</span>
+        <span class="rail-icon">▦</span><span>Pant.</span>
       </button>
     </nav>
 
@@ -560,10 +574,10 @@ body.test-mode .test-tools{display:flex}
           <div class="hero-top">
             <div class="namebox">
               <div class="mode-icon" id="heroIcon">🎮</div>
-              <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName">Gaming</h2></div>
+              <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName" class="mode-name-edit" data-id="active" title="Doble clic para renombrar">Gaming</h2></div>
             </div>
             <div class="hero-tools">
-              <button class="mode-menu-trigger" data-id="active" title="Más opciones" aria-label="Más opciones del modo activo">⋯</button>
+              <button class="trash-mode" data-id="active" title="Eliminar modo" aria-label="Eliminar modo activo">🗑</button>
             </div>
           </div>
 
@@ -617,26 +631,39 @@ body.test-mode .test-tools{display:flex}
     </section>
 
     <section class="shell-view" id="view-devices" data-shell-view="devices" hidden>
-      <div class="shell-placeholder">
+      <div class="shell-placeholder display-page">
         <div class="shell-page-head">
-          <div><h1>Dispositivos</h1><p>Hardware que Coucho usa para cambiar de contexto.</p></div>
+          <div><h1>Pantallas</h1><p>Estado actual del escritorio que Coucho está usando.</p></div>
         </div>
 
-        <div class="device-panel">
-          <div class="device-panel-head"><div><h3>Pantallas</h3><small>3 detectadas</small></div><button class="btn" id="identifyDisplays">Identificar</button></div>
-          <div class="device-strip">
-            <div class="device-tile"><div class="monitor tv"></div><b>TV Sala</b><small>4K · 120 Hz</small></div>
-            <div class="device-tile"><div class="monitor pc primary"></div><b>Monitor 1</b><small>1440p · 165 Hz</small></div>
-            <div class="device-tile"><div class="monitor pc"></div><b>Monitor 2</b><small>1080p · 75 Hz</small></div>
-          </div>
-          <div class="device-panel-actions"><button class="quiet-action" id="advancedDisplays">Configuración avanzada</button><button class="quiet-action" id="restoreDisplays">Restaurar última configuración</button></div>
+        <div class="display-overview">
+          <section class="display-topology">
+            <div class="display-overview-head">
+              <div><h3>Escritorio actual</h3><small id="displayTopologyStatus">Configuración activa</small></div>
+              <span class="live-chip"><span class="status-dot"></span>En uso</span>
+            </div>
+            <div class="display-overview-stage" id="displayOverviewStage"></div>
+          </section>
+
+          <aside class="display-state-card">
+            <div class="state-eyebrow">Modo activo</div>
+            <div class="state-mode">
+              <div class="state-mode-icon" id="displayStateIcon">🎮</div>
+              <div><h2 id="displayStateMode">Gaming</h2><small id="displayStateApp">Steam</small></div>
+            </div>
+            <div class="state-facts">
+              <div class="state-fact"><span>Pantallas activas</span><b id="displayStateCount">3</b></div>
+              <div class="state-fact"><span>Principal</span><b id="displayStatePrimary">Monitor 1</b></div>
+            </div>
+            <div class="state-actions">
+              <button class="btn" id="identifyDisplays">Identificar</button>
+              <button class="btn" id="restoreDisplays">Restaurar</button>
+            </div>
+          </aside>
         </div>
 
-        <div class="resource-grid device-secondary">
-          <article class="resource-card controller-card">
-            <div class="controller-mark">🎮</div>
-            <div class="resource-copy"><div><h3>Mando</h3><small><span class="status-dot"></span>Conectado</small></div><span class="usage-chip">Guide · Hop</span></div>
-          </article>
+        <div class="display-page-foot">
+          <button class="quiet-action" id="advancedDisplays">Configuración avanzada</button>
         </div>
       </div>
     </section>
@@ -696,34 +723,18 @@ body.test-mode .test-tools{display:flex}
   </div>
 </div>
 
-<div class="pop mode-menu" id="modeMenu" aria-label="Opciones del modo">
-  <div class="mode-menu-list" id="modeMenuMain">
-    <button class="mode-menu-item" id="modeRename">Renombrar</button>
-    <button class="mode-menu-item danger" id="modeDelete">Eliminar</button>
-  </div>
-
-  <div class="mode-menu-panel" id="modeRenamePanel" hidden>
-    <div class="pop-title">Renombrar modo</div>
-    <input class="mode-menu-input" id="modeNameInput" maxlength="40" autocomplete="off" />
-    <div class="mode-menu-actions">
-      <button class="btn" id="modeRenameCancel">Cancelar</button>
-      <button class="btn primary" id="modeRenameSave">Guardar</button>
-    </div>
-  </div>
-
-  <div class="mode-menu-panel" id="modeDeletePanel" hidden>
-    <div class="pop-title mode-menu-delete">Eliminar modo</div>
-    <div class="mode-menu-confirm" id="modeDeleteText"></div>
-    <div class="mode-menu-actions">
-      <button class="btn" id="modeDeleteCancel">Cancelar</button>
-      <button class="btn danger" id="modeDeleteConfirm">Eliminar</button>
-    </div>
+<div class="pop delete-confirm" id="deletePop" aria-label="Confirmar eliminación">
+  <div class="pop-title delete-title">Eliminar modo</div>
+  <div class="delete-copy" id="deleteText"></div>
+  <div class="delete-actions">
+    <button class="btn" id="deleteCancel">Cancelar</button>
+    <button class="btn danger" id="deleteConfirm">Eliminar</button>
   </div>
 </div>
 
 <div class="sheet-wrap" id="newSheet">
   <div class="sheet">
-    <div class="sheet-head"><h2 id="newName">Gaming</h2><button class="btn icon" id="closeNew">✕</button></div>
+    <div class="sheet-head"><h2 id="newName" class="mode-name-edit" title="Doble clic para renombrar">Gaming</h2><button class="btn icon" id="closeNew">✕</button></div>
     <div class="new-body">
       <div class="new-recipe">
         <button class="new-display" id="newDisplay" title="Editar pantallas">
@@ -828,7 +839,7 @@ body.test-mode .test-tools{display:flex}
 
   var editTarget=null;
   var shortcutTarget=null;
-  var modeMenuTarget=null;
+  var deleteTarget=null;
   var captured=null;
   var displayDraft=null;
   var displayDraftIsNew=false;
@@ -950,6 +961,7 @@ body.test-mode .test-tools{display:flex}
     }
     hero.style.display='';
     q('#heroName').textContent=mode.name;
+    q('#heroName').dataset.id='active';
     q('#heroIcon').textContent=mode.icon;
     q('#heroDisplays').innerHTML=displayMarkup(mode,false);
     q('#heroDisplayName').textContent=displaySummary(mode);
@@ -965,10 +977,13 @@ body.test-mode .test-tools{display:flex}
     var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
     return '<article class="card'+(applying?' applying':'')+'">'+
       '<div class="card-head">'+
-        '<div class="card-name"><div class="card-icon">'+safeIcon+'</div><b>'+safeName+'</b></div>'+
+        '<div class="card-name"><div class="card-icon">'+safeIcon+'</div><b class="mode-name-edit" data-id="'+mode.id+'" title="Doble clic para renombrar">'+safeName+'</b></div>'+
         '<div class="card-head-actions">'+
-          '<button class="btn primary activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'Aplicando…':'Activar')+'</button>'+
-          '<button class="mode-menu-trigger" data-id="'+mode.id+'" title="Más opciones" aria-label="Más opciones de '+safeName+'">⋯</button>'+
+          '<div class="split-action">'+
+            '<button class="activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'Aplicando…':'Activar')+'</button>'+
+            '<button class="preview-mode" data-id="'+mode.id+'"'+(applying?' disabled':'')+' title="Probar temporalmente">Probar</button>'+
+          '</div>'+
+          '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar modo" aria-label="Eliminar '+safeName+'">🗑</button>'+
         '</div>'+
       '</div>'+
       '<button class="card-display display-trigger" data-id="'+mode.id+'" title="Editar pantallas">'+
@@ -1020,6 +1035,7 @@ body.test-mode .test-tools{display:flex}
   function render(){
     normalizeActive();
     renderResourceViews();
+    renderDisplayOverview();
 
     if(sets.length===0){
       renderEmptyState();
@@ -1038,7 +1054,9 @@ body.test-mode .test-tools{display:flex}
     qa('.app-trigger').forEach(function(b){b.onclick=function(e){openAppPop(e.currentTarget,b.dataset.id,false)}});
     qa('.shortcut-trigger').forEach(function(b){b.onclick=function(){openShortcut(b.dataset.id)}});
     qa('.activate').forEach(function(b){b.onclick=function(){activate(Number(b.dataset.id))}});
-    qa('.mode-menu-trigger').forEach(function(b){b.onclick=function(e){openModeMenu(e.currentTarget,b.dataset.id)}});
+    qa('.preview-mode').forEach(function(b){b.onclick=function(){previewMode(Number(b.dataset.id))}});
+    qa('.trash-mode').forEach(function(b){b.onclick=function(e){openDeletePop(e.currentTarget,b.dataset.id)}});
+    qa('.mode-name-edit[data-id]').forEach(function(el){el.ondblclick=function(e){e.preventDefault();beginModeRename(el,el.dataset.id)}});
   }
 
   function removeSet(id){
@@ -1115,8 +1133,8 @@ body.test-mode .test-tools{display:flex}
   function closePops(){
     q('#displayPop').classList.remove('open');
     q('#appPop').classList.remove('open');
-    q('#modeMenu').classList.remove('open');
-    modeMenuTarget=null;
+    q('#deletePop').classList.remove('open');
+    deleteTarget=null;
     currentPop=null;
     currentPopAnchor=null;
   }
@@ -1130,89 +1148,147 @@ body.test-mode .test-tools{display:flex}
   window.addEventListener('resize',syncOpenPopPosition);
   q('.main').addEventListener('scroll',syncOpenPopPosition,{passive:true});
 
-  function resetModeMenu(){
-    q('#modeMenuMain').hidden=false;
-    q('#modeRenamePanel').hidden=true;
-    q('#modeDeletePanel').hidden=true;
-    q('#modeNameInput').value='';
+  function editInlineText(el,initial,onCommit){
+    if(!el||el.isContentEditable)return;
+
+    var finished=false;
+    el.contentEditable='true';
+    el.textContent=initial;
+    el.focus();
+
+    var range=document.createRange();
+    range.selectNodeContents(el);
+    var selection=window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    function finish(commit){
+      if(finished)return;
+      finished=true;
+      var next=el.textContent.trim();
+      el.contentEditable='false';
+      el.removeEventListener('blur',onBlur);
+      el.removeEventListener('keydown',onKey);
+
+      if(commit&&next){
+        onCommit(next);
+      }else{
+        el.textContent=initial;
+      }
+    }
+
+    function onBlur(){finish(true)}
+    function onKey(e){
+      if(e.key==='Enter'){
+        e.preventDefault();
+        finish(true);
+      }else if(e.key==='Escape'){
+        e.preventDefault();
+        finish(false);
+      }
+    }
+
+    el.addEventListener('blur',onBlur);
+    el.addEventListener('keydown',onKey);
   }
 
-  function openModeMenu(anchor,rawId){
+  function beginModeRename(el,rawId){
+    var id=resolveId(rawId);
+    var mode=byId(id);
+    if(!mode)return;
+
+    var original=mode.name;
+    editInlineText(el,original,function(next){
+      mode.name=next;
+      render();
+      if(next!==original)toast(next,'Nombre actualizado');
+    });
+  }
+
+  q('#newName').ondblclick=function(e){
+    e.preventDefault();
+    var original=newDraft.name;
+    editInlineText(q('#newName'),original,function(next){
+      newDraft.name=next;
+      renderNew();
+    });
+  };
+
+  function openDeletePop(anchor,rawId){
     var id=resolveId(rawId);
     var mode=byId(id);
     if(!mode)return;
 
     closePops();
-    modeMenuTarget=id;
-    resetModeMenu();
-    openAnchoredPop(q('#modeMenu'),anchor);
+    deleteTarget=id;
+    q('#deleteText').textContent='¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.';
+    openAnchoredPop(q('#deletePop'),anchor);
   }
 
-  function syncModeMenuSize(){
-    requestAnimationFrame(syncOpenPopPosition);
-  }
-
-  q('#modeRename').onclick=function(){
-    var mode=byId(modeMenuTarget);
-    if(!mode)return;
-    q('#modeMenuMain').hidden=true;
-    q('#modeRenamePanel').hidden=false;
-    q('#modeNameInput').value=mode.name;
-    syncModeMenuSize();
-    requestAnimationFrame(function(){
-      q('#modeNameInput').focus();
-      q('#modeNameInput').select();
-    });
-  };
-
-  q('#modeRenameCancel').onclick=function(){
-    resetModeMenu();
-    syncModeMenuSize();
-  };
-
-  function saveModeName(){
-    var mode=byId(modeMenuTarget);
-    if(!mode)return;
-    var next=q('#modeNameInput').value.trim();
-    if(!next){
-      q('#modeNameInput').focus();
-      return;
-    }
-    var old=mode.name;
-    closePops();
-    mode.name=next;
-    render();
-    if(old!==next)toast(next,'Nombre actualizado');
-  }
-
-  q('#modeRenameSave').onclick=saveModeName;
-  q('#modeNameInput').addEventListener('keydown',function(e){
-    if(e.key==='Enter'){
-      e.preventDefault();
-      saveModeName();
-    }
-  });
-
-  q('#modeDelete').onclick=function(){
-    var mode=byId(modeMenuTarget);
-    if(!mode)return;
-    q('#modeMenuMain').hidden=true;
-    q('#modeDeletePanel').hidden=false;
-    q('#modeDeleteText').textContent='¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.';
-    syncModeMenuSize();
-  };
-
-  q('#modeDeleteCancel').onclick=function(){
-    resetModeMenu();
-    syncModeMenuSize();
-  };
-
-  q('#modeDeleteConfirm').onclick=function(){
-    var id=modeMenuTarget;
+  q('#deleteCancel').onclick=closePops;
+  q('#deleteConfirm').onclick=function(){
+    var id=deleteTarget;
     if(id===null)return;
     closePops();
     removeSet(id);
   };
+
+  function previewMode(id){
+    var mode=byId(id);
+    if(!mode||mode.active)return;
+
+    closePops();
+    startTest({
+      kind:'mode-preview',
+      existingId:mode.id,
+      preserve:mode.preserve,
+      displayIds:mode.displayIds.slice(),
+      primaryDisplayId:mode.primaryDisplayId,
+      app:mode.app,
+      shortcut:mode.shortcut,
+      name:mode.name,
+      icon:mode.icon
+    });
+  }
+
+  function renderDisplayOverview(){
+    var mode=active();
+    var stage=q('#displayOverviewStage');
+    if(!stage)return;
+
+    if(!mode){
+      stage.innerHTML='<div class="empty-state"><div><div class="empty-icon">▦</div><h3>Sin modo activo</h3><p>Crea un modo para ver el estado de tus pantallas.</p></div></div>';
+      q('#displayStateMode').textContent='—';
+      q('#displayStateIcon').textContent='▦';
+      q('#displayStateApp').textContent='Sin modo';
+      q('#displayStateCount').textContent='0';
+      q('#displayStatePrimary').textContent='—';
+      q('#displayTopologyStatus').textContent='Sin configuración activa';
+      return;
+    }
+
+    var ids=mode.preserve?[]:mode.displayIds;
+    var primary=mode.preserve?null:getDisplay(mode.primaryDisplayId);
+
+    stage.innerHTML=simulatedDisplays.map(function(d){
+      var on=mode.preserve||ids.indexOf(d.id)>=0;
+      var isPrimary=!mode.preserve&&mode.primaryDisplayId===d.id;
+      var cls=d.kind==='tv'?'tv':'pc';
+      var badge=mode.preserve?'Sin cambios':isPrimary?'★ Principal':on?'Activa':'Apagada';
+      return '<div class="overview-display '+(on?'on':'off')+(isPrimary?' primary':'')+'">'+
+        '<span class="overview-badge">'+badge+'</span>'+
+        '<div class="monitor '+cls+(isPrimary?' primary':'')+'"></div>'+
+        '<b>'+esc(d.name)+'</b><small>'+esc(d.detail)+'</small>'+
+      '</div>';
+    }).join('');
+
+    q('#displayStateMode').textContent=mode.name;
+    q('#displayStateIcon').textContent=mode.icon;
+    q('#displayStateApp').textContent=mode.app;
+    q('#displayStateCount').textContent=mode.preserve?'Sin cambios':String(mode.displayIds.length);
+    q('#displayStatePrimary').textContent=mode.preserve?'Actual':primary?primary.name:'—';
+    q('#displayTopologyStatus').textContent=mode.preserve?'El modo conserva el escritorio actual':displaySummary(mode);
+  }
 
   function openDisplayPop(anchor,rawId,isNew){
     closePops();
@@ -1496,6 +1572,7 @@ body.test-mode .test-tools{display:flex}
     q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx,true)+'</div>';
     q('#testApp').textContent=logo(ctx.app);
     q('#testText').textContent='Probando '+ctx.name+'…';
+    q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':'Guardar';
     q('#progress').style.width='0%';q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
 
     var pct=0;
@@ -1520,19 +1597,40 @@ body.test-mode .test-tools{display:flex}
 
   q('#keep').onclick=function(){
     clearInterval(countdownTimer);
-    if(testContext.kind==='display'){
+    var kind=testContext&&testContext.kind;
+
+    if(kind==='display'){
       var s=byId(testContext.id);
       if(s){
         s.preserve=testContext.preserve;
         s.displayIds=testContext.displayIds.slice();
         s.primaryDisplayId=testContext.primaryDisplayId;
       }
-    }else if(testContext.kind==='display-draft'){
+      q('#testOverlay').classList.remove('open');
+      render();
+      toast(testContext.name,'Pantallas guardadas');
+      return;
+    }
+
+    if(kind==='display-draft'){
       newDraft.preserve=testContext.preserve;
       newDraft.displayIds=testContext.displayIds.slice();
       newDraft.primaryDisplayId=testContext.primaryDisplayId;
+      q('#testOverlay').classList.remove('open');
       renderNew();
-    }else{
+      toast('Pantallas','Probadas y guardadas');
+      return;
+    }
+
+    if(kind==='mode-preview'){
+      sets.forEach(function(s){s.active=s.id===testContext.existingId});
+      q('#testOverlay').classList.remove('open');
+      render();
+      toast(testContext.name,'Activo después de probar');
+      return;
+    }
+
+    if(kind==='new'){
       sets.push({
         id:testContext.id,name:testContext.name,icon:testContext.icon,
         preserve:testContext.preserve,displayIds:testContext.displayIds.slice(),
@@ -1540,12 +1638,9 @@ body.test-mode .test-tools{display:flex}
         shortcut:'Manual',active:false
       });
       sets.forEach(function(s){s.active=s.id===testContext.id});
-    }
-    q('#testOverlay').classList.remove('open');
-    if(testContext.kind==='display-draft'){
-      toast('Pantallas','Probadas y guardadas');
-    }else{
-      render();toast(testContext.name,'Guardado');
+      q('#testOverlay').classList.remove('open');
+      render();
+      toast(testContext.name,'Guardado');
     }
   };
 
@@ -1570,8 +1665,8 @@ body.test-mode .test-tools{display:flex}
     var path=typeof e.composedPath==='function'?e.composedPath():[];
     var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
-    var insideModeMenu=path.indexOf(q('#modeMenu'))>=0;
-    if(!insideDisplayPop&&!insideAppPop&&!insideModeMenu&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.mode-menu-trigger')&&!e.target.closest('#newDisplay')&&!e.target.closest('#newApp')){
+    var insideDeletePop=path.indexOf(q('#deletePop'))>=0;
+    if(!insideDisplayPop&&!insideAppPop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.trash-mode')&&!e.target.closest('#newDisplay')&&!e.target.closest('#newApp')){
       closePops();
     }
   });
@@ -1579,7 +1674,7 @@ body.test-mode .test-tools{display:flex}
   document.addEventListener('keydown',function(e){
     if(e.key!=='Escape')return;
 
-    if(q('#displayPop').classList.contains('open')||q('#appPop').classList.contains('open')||q('#modeMenu').classList.contains('open')){
+    if(q('#displayPop').classList.contains('open')||q('#appPop').classList.contains('open')||q('#deletePop').classList.contains('open')){
       displayDraft=null;
       closePops();
       return;
