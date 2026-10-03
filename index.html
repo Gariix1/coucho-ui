@@ -647,7 +647,7 @@ body.test-mode .test-tools{display:flex}
           </section>
 
           <aside class="display-state-card">
-            <div class="state-eyebrow">Modo activo</div>
+            <div class="state-eyebrow">Sesión aplicada</div>
             <div class="state-mode">
               <div class="state-mode-icon" id="displayStateIcon">🎮</div>
               <div><h2 id="displayStateMode">Gaming</h2><small id="displayStateApp">Steam</small></div>
@@ -735,7 +735,7 @@ body.test-mode .test-tools{display:flex}
 
 <div class="sheet-wrap" id="newSheet" role="dialog" aria-modal="true" aria-label="Crear modo">
   <div class="sheet">
-    <div class="sheet-head"><h2 id="newName" class="mode-name-edit" tabindex="0" title="Doble clic o F2 para renombrar">Gaming</h2><button class="btn icon" id="closeNew">✕</button></div>
+    <div class="sheet-head"><h2 id="newName" class="mode-name-edit" tabindex="0" title="Doble clic o F2 para renombrar">Gaming</h2><button class="btn icon" id="closeNew" title="Cerrar" aria-label="Cerrar">✕</button></div>
     <div class="new-body">
       <div class="new-recipe">
         <button class="new-display" id="newDisplay" title="Editar pantallas">
@@ -903,14 +903,26 @@ body.test-mode .test-tools{display:flex}
 
   function sessionFromMode(mode){
     if(!mode)return null;
+
+    var preservedIds=appliedSession&&appliedSession.displayIds.length
+      ?appliedSession.displayIds.slice()
+      :['main','aux'];
+    var preservedPrimary=appliedSession&&appliedSession.primaryDisplayId
+      ?appliedSession.primaryDisplayId
+      :'main';
+
     return {
       modeId:mode.id,
       name:mode.name,
       icon:mode.icon,
       app:mode.app,
       preserve:!!mode.preserve,
-      displayIds:Array.isArray(mode.displayIds)?mode.displayIds.slice():[],
-      primaryDisplayId:mode.primaryDisplayId||null
+      displayIds:mode.preserve
+        ?preservedIds
+        :(Array.isArray(mode.displayIds)?mode.displayIds.slice():[]),
+      primaryDisplayId:mode.preserve
+        ?preservedPrimary
+        :(mode.primaryDisplayId||null)
     };
   }
 
@@ -922,7 +934,9 @@ body.test-mode .test-tools{display:flex}
 
   function sessionMatchesMode(session,mode){
     if(!session||!mode||session.modeId!==mode.id)return false;
-    if(session.app!==mode.app||session.preserve!==!!mode.preserve||session.primaryDisplayId!==(mode.primaryDisplayId||null))return false;
+    if(session.app!==mode.app||session.preserve!==!!mode.preserve)return false;
+    if(mode.preserve)return true;
+    if(session.primaryDisplayId!==(mode.primaryDisplayId||null))return false;
     var a=session.displayIds.slice().sort().join('|');
     var b=(mode.displayIds||[]).slice().sort().join('|');
     return a===b;
@@ -1008,7 +1022,7 @@ body.test-mode .test-tools{display:flex}
       '<div class="card-head">'+
         '<div class="card-name"><div class="card-icon">'+safeIcon+'</div><b class="mode-name-edit" data-id="'+mode.id+'" title="Doble clic para renombrar">'+safeName+'</b></div>'+
         '<div class="card-head-actions">'+
-          '<div class="split-action">'+
+          '<div class="split-action" role="group" aria-label="Acciones de '+safeName+'">'+
             '<button class="activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'Aplicando…':'Activar')+'</button>'+
             '<button class="preview-mode" data-id="'+mode.id+'"'+(applying?' disabled':'')+' title="Probar temporalmente">Probar</button>'+
           '</div>'+
@@ -1221,6 +1235,7 @@ body.test-mode .test-tools{display:flex}
       el.removeEventListener('keydown',onKey);
 
       if(commit&&next){
+        el.textContent=next;
         onCommit(next);
       }else{
         el.textContent=initial;
@@ -1337,15 +1352,15 @@ body.test-mode .test-tools{display:flex}
       return;
     }
 
-    var ids=session.preserve?[]:session.displayIds;
-    var primary=session.preserve?null:getDisplay(session.primaryDisplayId);
+    var ids=session.displayIds;
+    var primary=getDisplay(session.primaryDisplayId);
     var hasPending=mode&&mode.id===session.modeId&&!sessionMatchesMode(session,mode);
 
     stage.innerHTML=simulatedDisplays.map(function(d){
-      var on=session.preserve||ids.indexOf(d.id)>=0;
-      var isPrimary=!session.preserve&&session.primaryDisplayId===d.id;
+      var on=ids.indexOf(d.id)>=0;
+      var isPrimary=session.primaryDisplayId===d.id;
       var cls=d.kind==='tv'?'tv':'pc';
-      var badge=session.preserve?'Sin cambios':isPrimary?'★ Principal':on?'Activa':'Apagada';
+      var badge=isPrimary?'★ Principal':on?(session.preserve?'Conservada':'Activa'):'Apagada';
       return '<div class="overview-display '+(on?'on':'off')+(isPrimary?' primary':'')+'">'+
         '<span class="overview-badge">'+badge+'</span>'+
         '<div class="monitor '+cls+(isPrimary?' primary':'')+'"></div>'+
@@ -1356,11 +1371,11 @@ body.test-mode .test-tools{display:flex}
     q('#displayStateMode').textContent=session.name;
     q('#displayStateIcon').textContent=session.icon;
     q('#displayStateApp').textContent=session.app;
-    q('#displayStateCount').textContent=session.preserve?'Sin cambios':String(session.displayIds.length);
-    q('#displayStatePrimary').textContent=session.preserve?'Actual':primary?primary.name:'—';
+    q('#displayStateCount').textContent=String(session.displayIds.length);
+    q('#displayStatePrimary').textContent=primary?primary.name:'—';
     q('#displayTopologyStatus').textContent=hasPending
       ?'Cambios guardados pendientes de aplicar'
-      :session.preserve?'Conservando el escritorio actual':displaySummary(session);
+      :session.preserve?'Se conservó la configuración existente':displaySummary(session);
   }
 
   function openDisplayPop(anchor,rawId,isNew){
@@ -1570,12 +1585,14 @@ body.test-mode .test-tools{display:flex}
 
   q('#clearModes').onclick=function(){
     sets=[];
+    appliedSession=null;
     render();
     toast('Modos vaciados','Ya puedes probar el flujo desde cero');
   };
 
   q('#restoreDemo').onclick=function(){
     sets=demoSets();
+    appliedSession=null;
     render();
     toast('Demo restaurada','3 modos');
   };
@@ -1692,6 +1709,7 @@ body.test-mode .test-tools{display:flex}
       q('#testOverlay').classList.remove('open');
       render();
       toast(testContext.name,'Pantallas guardadas');
+      testContext=null;
       return;
     }
 
@@ -1702,6 +1720,7 @@ body.test-mode .test-tools{display:flex}
       q('#testOverlay').classList.remove('open');
       renderNew();
       toast('Pantallas','Probadas y guardadas');
+      testContext=null;
       return;
     }
 
@@ -1711,6 +1730,7 @@ body.test-mode .test-tools{display:flex}
       q('#testOverlay').classList.remove('open');
       render();
       toast(testContext.name,'Activo después de probar');
+      testContext=null;
       return;
     }
 
@@ -1726,12 +1746,15 @@ body.test-mode .test-tools{display:flex}
       q('#testOverlay').classList.remove('open');
       render();
       toast(testContext.name,'Guardado');
+      testContext=null;
     }
   };
 
   function finishRestore(){
     q('#testOverlay').classList.remove('open');
-    if(testContext&&testContext.kind==='new')q('#newSheet').classList.add('open');
+    var reopenNew=!!(testContext&&testContext.kind==='new');
+    testContext=null;
+    if(reopenNew)q('#newSheet').classList.add('open');
     toast('Restaurado','Configuración anterior');
   }
 
