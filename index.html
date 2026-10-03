@@ -350,7 +350,7 @@ body.test-mode .test-tools{display:flex}
 
   .wrap{
     width:auto;
-    max-width:1150px;
+    max-width:1480px;
     margin-left:clamp(40px,3vw,56px);
     margin-right:clamp(40px,3vw,56px);
     padding:clamp(28px,2vw,36px) 0 64px
@@ -360,7 +360,7 @@ body.test-mode .test-tools{display:flex}
   .btn{min-height:clamp(38px,2.5vw,44px);padding:7px 16px}
   .btn.icon{width:clamp(42px,2.7vw,48px);height:clamp(42px,2.7vw,48px);font-size:18px}
 
-  .hero{width:min(clamp(760px,50vw,860px),100%);padding:clamp(18px,1.2vw,22px)}
+  .hero{width:min(clamp(820px,58vw,1080px),100%);padding:clamp(18px,1.2vw,22px)}
   .hero-top{gap:14px}
   .namebox{gap:12px}
   .mode-icon{width:clamp(46px,3vw,52px);height:clamp(46px,3vw,52px);border-radius:14px;font-size:clamp(23px,1.55vw,27px)}
@@ -381,10 +381,10 @@ body.test-mode .test-tools{display:flex}
   .meta-action small{font-size:clamp(10px,.66vw,12px);margin-bottom:3px}
   .meta-action b{font-size:clamp(13px,.8vw,15px)}
 
-  .section{width:min(920px,100%);margin:24px 0 14px}
+  .section{width:100%;max-width:1380px;margin:24px 0 14px}
   .section h3{font-size:clamp(20px,1.3vw,22px)}
 
-  .cards{width:min(920px,100%);grid-template-columns:repeat(auto-fit,minmax(410px,450px));gap:16px}
+  .cards{width:100%;max-width:1380px;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
   .card{padding:clamp(16px,1.05vw,19px)}
   .card-head{gap:14px}
   .card-name{gap:11px}
@@ -423,9 +423,13 @@ body.test-mode .test-tools{display:flex}
 }
 
 @media(min-width:1680px){
-  .hero{width:min(900px,100%)}
-  .section,.cards{width:min(920px,100%)}
-  .cards{grid-template-columns:repeat(2,minmax(0,450px))}
+  .hero{width:min(1080px,100%)}
+  .section,.cards{max-width:1380px}
+  .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+@media(min-width:1280px) and (max-width:1679px){
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 @media(max-width:760px){
