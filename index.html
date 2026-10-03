@@ -198,6 +198,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .pop.open{display:block}.pop-title{font-size:12px;font-weight:600;color:var(--text2);margin:2px 4px 10px}
 .display-editor{width:min(620px,calc(100vw - 24px));padding:14px}
 .display-editor-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.display-editor-head-actions{display:flex;align-items:center;gap:8px}
 .display-editor-head .pop-title{margin:0}
 .display-editor-sub{font-size:10px;color:var(--muted);margin-top:2px}
 .preserve-btn.selected{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
@@ -362,14 +363,17 @@ body.test-mode .test-tools{display:flex}
       <div class="pop-title">Pantallas</div>
       <div class="display-editor-sub">Clic: activar · ☆: principal</div>
     </div>
-    <button class="btn preserve-btn" id="preserveDisplays">↔ Sin cambios</button>
+    <div class="display-editor-head-actions">
+      <button class="btn preserve-btn" id="preserveDisplays">↔ Sin cambios</button>
+      <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar">✕</button>
+    </div>
   </div>
   <div class="screen-map" id="screenMap"></div>
   <div class="display-editor-foot">
     <div class="display-editor-summary" id="displayEditorSummary"></div>
     <div class="display-editor-actions">
-      <button class="btn" id="cancelDisplays">Cancelar</button>
-      <button class="btn primary" id="applyDisplays">Probar</button>
+      <button class="btn" id="tryDisplays">Probar</button>
+      <button class="btn primary" id="saveDisplays">Guardar</button>
     </div>
   </div>
 </div>
@@ -654,7 +658,6 @@ body.test-mode .test-tools{display:flex}
       displayDraft.primaryDisplayId='main';
     }
     renderDisplayEditor();
-    q('#applyDisplays').textContent=isNew?'Usar':'Probar';
     q('#displayPop').classList.add('open');
     positionPop(q('#displayPop'),anchor);
   }
@@ -731,37 +734,57 @@ body.test-mode .test-tools{display:flex}
     renderDisplayEditor();
   };
 
-  q('#cancelDisplays').onclick=function(){
+  function isValidDisplayDraft(){
+    if(!displayDraft)return false;
+    if(!displayDraft.preserve&&displayDraft.displayIds.length===0){
+      toast('Pantallas','Elige al menos una pantalla');
+      return false;
+    }
+    return true;
+  }
+
+  function copyDisplayDraft(target){
+    target.preserve=displayDraft.preserve;
+    target.displayIds=displayDraft.displayIds.slice();
+    target.primaryDisplayId=displayDraft.primaryDisplayId;
+  }
+
+  q('#closeDisplays').onclick=function(){
     displayDraft=null;
     closePops();
   };
 
-  q('#applyDisplays').onclick=function(){
-    if(!displayDraft)return;
-    if(!displayDraft.preserve&&displayDraft.displayIds.length===0){
-      toast('Pantallas','Elige al menos una pantalla');
-      return;
-    }
-    closePops();
+  q('#saveDisplays').onclick=function(){
+    if(!isValidDisplayDraft())return;
     if(displayDraftIsNew){
-      newDraft.preserve=displayDraft.preserve;
-      newDraft.displayIds=displayDraft.displayIds.slice();
-      newDraft.primaryDisplayId=displayDraft.primaryDisplayId;
+      copyDisplayDraft(newDraft);
+      closePops();
       renderNew();
+      toast('Pantallas','Guardadas');
       return;
     }
     var s=byId(editTarget);
     if(!s)return;
-    startTest({
-      kind:'display',
-      id:s.id,
+    copyDisplayDraft(s);
+    closePops();
+    render();
+    toast('Pantallas','Guardadas sin probar');
+  };
+
+  q('#tryDisplays').onclick=function(){
+    if(!isValidDisplayDraft())return;
+    var ctx={
+      kind:displayDraftIsNew?'display-draft':'display',
+      id:displayDraftIsNew?null:editTarget,
       preserve:displayDraft.preserve,
       displayIds:displayDraft.displayIds.slice(),
       primaryDisplayId:displayDraft.primaryDisplayId,
-      app:s.app,
-      name:s.name,
-      icon:s.icon
-    });
+      app:displayDraftIsNew?newDraft.app:byId(editTarget).app,
+      name:displayDraftIsNew?newDraft.name:byId(editTarget).name,
+      icon:displayDraftIsNew?newDraft.icon:byId(editTarget).icon
+    };
+    closePops();
+    startTest(ctx);
   };
 
   qa('#appPop .app-option').forEach(function(b){
@@ -909,9 +932,16 @@ body.test-mode .test-tools{display:flex}
     clearInterval(countdownTimer);
     if(testContext.kind==='display'){
       var s=byId(testContext.id);
-      s.preserve=testContext.preserve;
-      s.displayIds=testContext.displayIds.slice();
-      s.primaryDisplayId=testContext.primaryDisplayId;
+      if(s){
+        s.preserve=testContext.preserve;
+        s.displayIds=testContext.displayIds.slice();
+        s.primaryDisplayId=testContext.primaryDisplayId;
+      }
+    }else if(testContext.kind==='display-draft'){
+      newDraft.preserve=testContext.preserve;
+      newDraft.displayIds=testContext.displayIds.slice();
+      newDraft.primaryDisplayId=testContext.primaryDisplayId;
+      renderNew();
     }else{
       sets.push({
         id:testContext.id,name:testContext.name,icon:testContext.icon,
@@ -921,7 +951,12 @@ body.test-mode .test-tools{display:flex}
       });
       sets.forEach(function(s){s.active=s.id===testContext.id});
     }
-    q('#testOverlay').classList.remove('open');render();toast(testContext.name,'Guardado');
+    q('#testOverlay').classList.remove('open');
+    if(testContext.kind==='display-draft'){
+      toast('Pantallas','Probadas y guardadas');
+    }else{
+      render();toast(testContext.name,'Guardado');
+    }
   };
 
   q('#revert').onclick=function(){
@@ -933,6 +968,13 @@ body.test-mode .test-tools{display:flex}
     var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
     if(!insideDisplayPop&&!insideAppPop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('#newDisplay')){
+      closePops();
+    }
+  });
+
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      displayDraft=null;
       closePops();
     }
   });
