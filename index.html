@@ -159,13 +159,16 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .brand{display:flex;align-items:center;gap:8px;padding-left:12px;color:var(--text2);font-size:12px}
 .logo{width:18px;height:18px;border-radius:5px;background:var(--logo-bg);border:1px solid var(--logo-border);color:var(--accent);display:grid;place-items:center;font-size:10px;font-weight:800}
 .win{display:flex;height:100%}.win span{width:46px;display:grid;place-items:center;color:var(--win-fg);font-size:11px}.win span:hover{background:var(--win-hover)}.win span:last-child:hover{background:#c42b1c;color:#fff}
-.app-shell{height:100%;min-height:0;display:grid;grid-template-columns:56px minmax(0,1fr)}
-.nav-rail{min-height:0;border-right:1px solid var(--divider);background:var(--glass-surface);display:flex;flex-direction:column;padding:8px 6px;overflow:hidden;transition:width .16s ease,background .16s ease;z-index:10}
+.app-shell{height:100%;min-height:0;display:grid;grid-template-columns:56px minmax(0,1fr);transition:grid-template-columns .16s ease}
+.nav-rail{min-height:0;border-right:1px solid var(--divider);background:var(--glass-surface);display:flex;flex-direction:column;padding:8px 6px;overflow-x:hidden;overflow-y:auto;scrollbar-width:none;z-index:10}
+.nav-rail::-webkit-scrollbar{display:none}
 .app-shell.nav-expanded{grid-template-columns:176px minmax(0,1fr)}
 .nav-top{display:flex;align-items:center;margin-bottom:10px}
 .nav-toggle,.nav-item{width:44px;height:44px;min-height:44px;border:1px solid transparent;border-radius:var(--r-control);background:transparent;color:var(--text2);display:flex;align-items:center;gap:12px;padding:0 12px;overflow:hidden;white-space:nowrap}
 .nav-toggle:hover,.nav-item:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
+.nav-toggle:active,.nav-item:active{background:var(--glass-control)}
 .nav-item.active{background:var(--selected-bg);border-color:var(--selected-border);color:var(--accent)}
+.nav-item.active .nav-icon{transform:scale(1.04)}
 .nav-icon{width:18px;min-width:18px;text-align:center;font-size:16px;line-height:1}
 .nav-label{font-size:12px;font-weight:600;opacity:0;transform:translateX(-3px);transition:opacity .12s ease,transform .12s ease}
 .app-shell.nav-expanded .nav-toggle,.app-shell.nav-expanded .nav-item{width:164px}
@@ -336,7 +339,7 @@ body.test-mode .test-tools{display:flex}
 
 @media(max-width:760px){
   .app-shell,.app-shell.nav-expanded{grid-template-columns:52px minmax(0,1fr)}
-  .nav-rail{padding-inline:4px}.nav-toggle,.nav-item,.app-shell.nav-expanded .nav-toggle,.app-shell.nav-expanded .nav-item{width:44px}.nav-label{display:none}
+  .nav-rail{padding-inline:4px}.nav-top{display:none}.nav-item,.app-shell.nav-expanded .nav-item{width:44px}.nav-label{display:none}
   .wrap,.shell-placeholder{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.card-facts{grid-template-columns:1fr 1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 @media(max-width:380px){
@@ -359,25 +362,25 @@ body.test-mode .test-tools{display:flex}
       </button>
     </div>
     <nav class="nav-main">
-      <button class="nav-item active" data-view="modes" title="Modos">
+      <button class="nav-item active" data-view="modes" title="Modos" aria-current="page" aria-controls="view-modes">
         <span class="nav-icon">▣</span><span class="nav-label">Modos</span>
       </button>
-      <button class="nav-item" data-view="library" title="Biblioteca">
+      <button class="nav-item" data-view="library" title="Biblioteca" aria-controls="view-library">
         <span class="nav-icon">▶</span><span class="nav-label">Biblioteca</span>
       </button>
-      <button class="nav-item" data-view="devices" title="Dispositivos">
+      <button class="nav-item" data-view="devices" title="Dispositivos" aria-controls="view-devices">
         <span class="nav-icon">▦</span><span class="nav-label">Dispositivos</span>
       </button>
     </nav>
     <div class="nav-bottom">
-      <button class="nav-item" data-view="settings" title="Ajustes">
+      <button class="nav-item" data-view="settings" title="Ajustes" aria-controls="view-settings">
         <span class="nav-icon">⚙</span><span class="nav-label">Ajustes</span>
       </button>
     </div>
   </aside>
 
   <main class="main">
-    <section class="shell-view active" data-shell-view="modes">
+    <section class="shell-view active" id="view-modes" data-shell-view="modes">
 
     <div class="wrap">
       <div class="header">
@@ -436,7 +439,7 @@ body.test-mode .test-tools{display:flex}
   
     </section>
 
-    <section class="shell-view" data-shell-view="library">
+    <section class="shell-view" id="view-library" data-shell-view="library" hidden>
       <div class="shell-placeholder">
         <div class="shell-page-head">
           <div><h1>Biblioteca</h1><p>Apps disponibles para Coucho y Hop.</p></div>
@@ -458,7 +461,7 @@ body.test-mode .test-tools{display:flex}
       </div>
     </section>
 
-    <section class="shell-view" data-shell-view="devices">
+    <section class="shell-view" id="view-devices" data-shell-view="devices" hidden>
       <div class="shell-placeholder">
         <div class="shell-page-head">
           <div><h1>Dispositivos</h1><p>Gestión global. Los modos se siguen editando directamente.</p></div>
@@ -479,7 +482,7 @@ body.test-mode .test-tools{display:flex}
       </div>
     </section>
 
-    <section class="shell-view" data-shell-view="settings">
+    <section class="shell-view" id="view-settings" data-shell-view="settings" hidden>
       <div class="shell-placeholder">
         <div class="shell-page-head">
           <div><h1>Ajustes</h1><p>Preferencias y herramientas menos frecuentes.</p></div>
@@ -1220,11 +1223,19 @@ body.test-mode .test-tools{display:flex}
     q('#appShell').classList.toggle('nav-expanded',navExpanded);
     q('#navToggle').title=navExpanded?'Contraer navegación':'Expandir navegación';
     q('#navToggle').setAttribute('aria-label',q('#navToggle').title);
+    q('#navToggle').setAttribute('aria-expanded',navExpanded?'true':'false');
+
     qa('.nav-item').forEach(function(item){
-      item.classList.toggle('active',item.dataset.view===shellView);
+      var selected=item.dataset.view===shellView;
+      item.classList.toggle('active',selected);
+      if(selected)item.setAttribute('aria-current','page');
+      else item.removeAttribute('aria-current');
     });
+
     qa('.shell-view').forEach(function(view){
-      view.classList.toggle('active',view.dataset.shellView===shellView);
+      var selected=view.dataset.shellView===shellView;
+      view.classList.toggle('active',selected);
+      view.hidden=!selected;
     });
   }
 
@@ -1236,8 +1247,10 @@ body.test-mode .test-tools{display:flex}
 
   qa('.nav-item').forEach(function(item){
     item.onclick=function(){
+      if(shellView===item.dataset.view)return;
       shellView=item.dataset.view;
       closePops();
+      q('.main').scrollTo({top:0,behavior:'auto'});
       syncNavigationShell();
     };
   });
