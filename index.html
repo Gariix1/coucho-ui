@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Coucho · Simple V9</title>
+<title>Coucho · Control</title>
 <style>
 :root{
   --bg:#111828;
@@ -167,10 +167,12 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .rail-icon{font-size:18px;line-height:1}
 .rail-item:hover,.rail-util:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
 .rail-item:active,.rail-util:active{background:var(--glass-control)}
-.rail-item.active{color:var(--accent);background:var(--selected-bg)}
+.rail-item.active{color:var(--accent);background:transparent}
 .rail-item.active:before{content:"";position:absolute;left:-7px;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
 .rail-util{min-height:44px;font-size:0}
 .rail-util .rail-icon{font-size:16px}
+.prototype-tool{opacity:.58}
+.prototype-tool:hover,.prototype-tool.active{opacity:1}
 .main{height:100%;min-width:0;overflow:auto}
 
 .shell-view{display:none;min-height:100%}
@@ -178,10 +180,11 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .wrap{max-width:1000px;margin:0;padding:24px 24px 48px}
 .mode-status{margin:0 0 12px;color:var(--text2);font-size:11px}
 .btn{min-height:36px;border:1px solid var(--glass-soft-border);background:var(--glass-command);border-radius:var(--r-control);padding:6px 14px}
-.btn:hover{background:var(--glass-pill);border-color:var(--glass-border)}.btn:active{background:var(--glass-control);color:var(--text2)}.btn.primary{border-color:var(--primary-border);background:var(--primary-bg);color:var(--primary-fg);font-weight:600;box-shadow:none}.btn.primary:hover{background:var(--primary-hover)}.btn.primary:active{filter:brightness(.94);color:var(--primary-fg)}.btn.icon{width:40px;height:40px;padding:0;font-size:16px}
+.btn:hover{background:var(--glass-pill);border-color:var(--glass-border)}.btn:active{background:var(--glass-control);color:var(--text2)}.btn.primary{border-color:var(--primary-border);background:var(--primary-bg);color:var(--primary-fg);font-weight:600;box-shadow:none}.btn.primary:hover{background:var(--primary-hover)}.btn.primary:active{filter:brightness(.94);color:var(--primary-fg)}.btn.danger{border-color:rgba(248,113,113,.32);background:rgba(185,28,28,.76);color:#fff;font-weight:600}.btn.danger:hover{background:rgba(220,38,38,.86);border-color:rgba(254,202,202,.38)}.btn.icon{width:40px;height:40px;padding:0;font-size:16px}
 .hero{width:min(700px,100%);border:1px solid var(--glass-border);border-radius:var(--r-panel);background:var(--glass-panel);padding:16px}
 .hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.namebox{display:flex;align-items:center;gap:10px}.mode-icon{width:40px;height:40px;border-radius:12px;background:var(--glass-control);border:1px solid var(--glass-soft-border);display:grid;place-items:center;font-size:21px}
 .hero h2{margin:0;font-size:18px;font-weight:600}.active-mark{font-size:10px;font-weight:600;color:#a7f3d0;margin-bottom:4px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--success);margin-right:5px}
+.hero-body{display:block}
 .display-main{margin-top:12px;width:100%;min-height:108px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);display:grid;place-items:center;padding:12px}
 .display-main:hover{background:var(--display-hover);border-color:var(--glass-border)}
 .kicker{text-transform:none;letter-spacing:0;font-size:10px;font-weight:600;color:var(--text2);margin-bottom:8px}
@@ -226,15 +229,36 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .shell-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:20px}
 .shell-page-head h1{margin:0;font-size:28px;font-weight:600}
 .shell-page-head p{margin:5px 0 0;color:var(--text2);font-size:12px}
-.shell-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,320px));gap:12px;align-items:start}
-.shell-card{border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);padding:14px}
-.shell-card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.shell-card-icon{width:36px;height:36px;border-radius:var(--r-control);background:var(--glass-control);border:1px solid var(--glass-soft-border);display:grid;place-items:center;color:var(--accent)}
-.shell-card h3{margin:0;font-size:14px;font-weight:600}
-.shell-card small{display:block;color:var(--text2);font-size:11px;margin-top:2px}
-.shell-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px;border-top:1px solid var(--divider);font-size:12px}
-.shell-row:first-of-type{border-top:0}
-.shell-muted{color:var(--text2)}
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;align-items:stretch}
+.resource-card,.device-panel,.settings-stack{border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card)}
+.resource-card{padding:14px;min-width:0}
+.resource-visual{min-height:112px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:grid;place-items:center;margin-bottom:12px}
+.app-logo-large{width:58px;height:58px;border-radius:17px;font-size:20px}
+.resource-copy{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.resource-copy h3,.device-panel h3{margin:0;font-size:15px;font-weight:600}
+.resource-copy small,.device-panel small{display:block;color:var(--text2);font-size:11px;margin-top:3px}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--success);margin-right:5px}
+.usage-chip{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid var(--selected-border);border-radius:999px;background:var(--selected-bg);color:var(--accent);padding:5px 8px;font-size:10px;font-weight:600}
+.muted-chip{border-color:var(--glass-soft-border);background:var(--glass-command);color:var(--muted)}
+.device-panel{padding:16px}
+.device-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.device-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.device-tile{min-height:150px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;padding:14px}
+.device-tile b{font-size:12px}.device-tile small{margin:0;font-size:9px}
+.device-tile .monitor{margin-bottom:5px}.device-tile .monitor.tv{width:88px;height:51px}.device-tile .monitor.pc{width:62px;height:40px}
+.device-panel-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)}
+.quiet-action{min-height:34px;border:1px solid transparent;border-radius:var(--r-control);background:transparent;color:var(--text2);padding:6px 9px;font-size:11px;font-weight:600}
+.quiet-action:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
+.device-secondary{margin-top:12px;grid-template-columns:minmax(260px,380px)}
+.controller-card{display:flex;align-items:center;gap:14px}
+.controller-mark{width:72px;height:72px;flex:0 0 auto;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:grid;place-items:center;font-size:30px}
+.controller-card .resource-copy{flex:1}
+.settings-stack{overflow:hidden}
+.settings-row{width:100%;min-height:68px;border:0;border-top:1px solid var(--divider);background:transparent;color:var(--text);display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 14px;text-align:left}
+.settings-row:first-child{border-top:0}.settings-row:is(button){cursor:pointer}.settings-row:is(button):hover{background:var(--glass-command)}
+.settings-row-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-control);color:var(--accent);display:grid;place-items:center}
+.settings-row-copy b{display:block;font-size:13px}.settings-row-copy small{display:block;color:var(--text2);font-size:10px;margin-top:2px}
+.settings-row-value{color:var(--muted);font-size:11px;font-weight:600}
 
 /* popovers */
 .pop{display:none;position:fixed;z-index:60;border:1px solid var(--glass-border);border-radius:var(--r-compact);background:var(--floating-bg);box-shadow:var(--shadow);padding:12px;min-width:300px;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)}
@@ -277,11 +301,12 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sheet-wrap{display:none;position:fixed;inset:32px 0 0 0;z-index:50;background:var(--scrim);backdrop-filter:blur(10px);place-items:center;padding:22px}
 .sheet-wrap.open{display:grid}.sheet{width:min(740px,94vw);border:1px solid var(--glass-border);border-radius:var(--r-panel);background:var(--floating-bg);box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)}
 .sheet-head{padding:22px 24px 18px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between}.sheet-head h2{margin:0;font-size:28px;font-weight:600}
-.new-body{padding:0 24px 20px}.new-display{width:100%;min-height:150px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);display:grid;place-items:center;padding:12px}
+.new-body{padding:0 24px 20px}.new-recipe{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:10px;align-items:stretch}
+.new-display{width:100%;min-height:150px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);display:grid;place-items:center;padding:12px}
 .new-display:hover{background:var(--display-hover);border-color:var(--glass-border)}.new-kicker{font-size:12px;font-weight:600;color:var(--text2);text-transform:none;letter-spacing:0;margin-bottom:12px}
-.new-apps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-.new-app{min-height:90px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:grid;place-items:center;padding:9px}
-.new-app:hover{background:var(--glass-pill)}.new-app.selected{border-color:var(--selected-border);background:var(--selected-bg)}.new-app b{font-size:9px}
+.new-app-direct{min-height:150px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-control);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;text-align:center}
+.new-app-direct:hover{background:var(--glass-pill);border-color:var(--selected-border);transform:translateY(-1px)}
+.new-app-direct small{display:block;color:var(--text2);font-size:10px;font-weight:600;margin-bottom:3px}.new-app-direct b{font-size:14px}
 .sheet-foot{padding:16px 24px 20px;border-top:1px solid var(--divider);display:flex;justify-content:flex-end}.sheet-foot .btn{min-width:130px}
 
 /* shortcut */
@@ -319,6 +344,12 @@ body.test-mode .test-tools{display:flex}
 .mode-menu-trigger:hover,.mode-menu-trigger:focus-visible{
   background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)
 }
+@media(hover:hover) and (pointer:fine){
+  .card .mode-menu-trigger{opacity:0;transform:translateX(3px);transition:opacity .12s ease,transform .12s ease,background .12s ease,border-color .12s ease}
+  .card:hover .mode-menu-trigger,.card:focus-within .mode-menu-trigger,.card .mode-menu-trigger:focus-visible{opacity:1;transform:none}
+}
+.hero .mode-menu-trigger{opacity:.72}
+.hero .mode-menu-trigger:hover,.hero .mode-menu-trigger:focus-visible{opacity:1}
 .mode-menu{width:240px;min-width:240px;padding:8px}
 .mode-menu-list{display:grid;gap:2px}
 .mode-menu-item{
@@ -396,6 +427,10 @@ body.test-mode .test-tools{display:flex}
   .hero h2{font-size:clamp(20px,1.25vw,22px)}
   .active-mark{font-size:clamp(10px,.67vw,12px);margin-bottom:5px}
 
+  .hero-body{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(280px,.85fr);gap:10px;margin-top:14px;align-items:stretch}
+  .hero-body .display-main{margin-top:0;height:100%;min-height:clamp(132px,8vw,148px);padding:15px}
+  .hero-body .recipe-meta{grid-template-columns:1fr;grid-template-rows:1fr 1fr;margin-top:0;gap:10px}
+  .hero-body .meta-action{height:100%}
   .display-main{margin-top:14px;min-height:clamp(118px,7.4vw,134px);padding:15px}
   .kicker{font-size:clamp(11px,.68vw,12px);margin-bottom:11px}
   .displays{gap:12px}
@@ -458,12 +493,11 @@ body.test-mode .test-tools{display:flex}
   .shell-page-head{margin-bottom:24px}
   .shell-page-head h1{font-size:clamp(30px,1.9vw,34px)}
   .shell-page-head p{font-size:clamp(13px,.8vw,14px)}
-  .shell-grid{grid-template-columns:repeat(auto-fit,minmax(280px,360px));gap:16px}
-  .shell-card{padding:18px}
-  .shell-card-icon{width:42px;height:42px;font-size:17px}
-  .shell-card h3{font-size:16px}
-  .shell-card small,.shell-row{font-size:13px}
-  .shell-row{min-height:44px}
+  .resource-grid{gap:16px}
+  .resource-card,.device-panel{padding:18px}
+  .resource-copy h3,.device-panel h3{font-size:16px}
+  .settings-row{min-height:76px;padding:12px 16px}
+  .settings-row-copy b{font-size:14px}
 }
 
 @media(min-width:1680px){
@@ -480,7 +514,7 @@ body.test-mode .test-tools{display:flex}
   .rail-item{min-height:52px;border-radius:10px}
   .rail-item.active:before{left:-5px}
   .rail-item span:last-child{font-size:8px}
-  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.recipe-meta{grid-template-columns:1fr}.card-facts{grid-template-columns:1fr 1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
+  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.hero-body{display:block;margin-top:0}.hero-body .display-main{margin-top:12px;height:auto;min-height:108px}.hero-body .recipe-meta{grid-template-columns:1fr;grid-template-rows:none;margin-top:8px}.hero-body .meta-action{height:auto}.card-facts{grid-template-columns:1fr 1fr}.new-recipe{grid-template-columns:1fr}.new-app-direct{min-height:82px;flex-direction:row;text-align:left}.app-options{grid-template-columns:repeat(2,1fr)}.device-strip{grid-template-columns:1fr}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 @media(max-width:380px){
   .cards{grid-template-columns:1fr}
@@ -509,9 +543,8 @@ body.test-mode .test-tools{display:flex}
     </nav>
 
     <div class="rail-bottom">
-      <button class="rail-util" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema"><span class="rail-icon">☀</span></button>
       <button class="rail-util" id="settingsBtn" title="Ajustes" aria-label="Ajustes"><span class="rail-icon">⚙</span></button>
-      <button class="rail-util" id="testBtn" title="Modo de prueba" aria-label="Modo de prueba"><span class="rail-icon">🧪</span></button>
+      <button class="rail-util prototype-tool" id="testBtn" title="Pruebas del mockup" aria-label="Pruebas del mockup"><span class="rail-icon">🧪</span></button>
     </div>
   </aside>
 
@@ -538,27 +571,29 @@ body.test-mode .test-tools{display:flex}
             </div>
           </div>
 
-          <button class="display-main display-trigger" data-id="active">
-            <div>
-              <div class="kicker">Pantallas</div>
-              <div class="displays" id="heroDisplays"></div>
-              <div class="display-name" id="heroDisplayName">—</div>
-            </div>
-          </button>
+          <div class="hero-body">
+            <button class="display-main display-trigger" data-id="active" title="Editar pantallas">
+              <div>
+                <div class="kicker">Pantallas</div>
+                <div class="displays" id="heroDisplays"></div>
+                <div class="display-name" id="heroDisplayName">—</div>
+              </div>
+            </button>
 
-          <div class="recipe-meta">
-            <button class="meta-action app-trigger" data-id="active">
-              <div class="meta-icon">▶</div>
-              <div><small>Apps</small><b id="heroApp">Steam</b></div>
-            </button>
-            <button class="meta-action shortcut-trigger" data-id="active">
-              <div class="meta-icon">🎮</div>
-              <div><small>Activar con</small><b id="heroShortcut">Guide + A</b></div>
-            </button>
+            <div class="recipe-meta">
+              <button class="meta-action app-trigger" data-id="active" title="Cambiar app">
+                <div class="meta-icon">▶</div>
+                <div><small>Apps</small><b id="heroApp">Steam</b></div>
+              </button>
+              <button class="meta-action shortcut-trigger" data-id="active" title="Cambiar atajo">
+                <div class="meta-icon">🎮</div>
+                <div><small>Activar con</small><b id="heroShortcut">Guide + A</b></div>
+              </button>
+            </div>
           </div>
         </section>
 
-        <div class="section"><h3>Tus modos</h3><button class="btn icon" id="newBtn2" title="Crear modo" aria-label="Crear modo">＋</button></div>
+        <div class="section" id="modesSection"><h3>Tus modos</h3><button class="btn icon" id="newBtn2" title="Crear modo" aria-label="Crear modo">＋</button></div>
         <div class="cards" id="cards"></div>
       </div>
     </section>
@@ -566,21 +601,21 @@ body.test-mode .test-tools{display:flex}
     <section class="shell-view" id="view-library" data-shell-view="library" hidden>
       <div class="shell-placeholder">
         <div class="shell-page-head">
-          <div><h1>Biblioteca</h1><p>Apps disponibles para Coucho y Hop.</p></div>
+          <div><h1>Apps</h1><p>Lo que Coucho puede abrir al activar un modo.</p></div>
         </div>
-        <div class="shell-grid">
-          <div class="shell-card">
-            <div class="shell-card-head"><div class="shell-card-icon">S</div><div><h3>Steam</h3><small>Disponible</small></div></div>
-            <div class="shell-row"><span class="shell-muted">En modos</span><b>Gaming</b></div>
-          </div>
-          <div class="shell-card">
-            <div class="shell-card-head"><div class="shell-card-icon">P</div><div><h3>Playnite</h3><small>Disponible</small></div></div>
-            <div class="shell-row"><span class="shell-muted">En modos</span><b>—</b></div>
-          </div>
-          <div class="shell-card">
-            <div class="shell-card-head"><div class="shell-card-icon">P</div><div><h3>Plex</h3><small>Disponible</small></div></div>
-            <div class="shell-row"><span class="shell-muted">En modos</span><b>Películas</b></div>
-          </div>
+        <div class="resource-grid app-library">
+          <article class="resource-card">
+            <div class="resource-visual"><div class="app-logo app-logo-large">S</div></div>
+            <div class="resource-copy"><div><h3>Steam</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip">Gaming</span></div>
+          </article>
+          <article class="resource-card">
+            <div class="resource-visual"><div class="app-logo app-logo-large">P</div></div>
+            <div class="resource-copy"><div><h3>Playnite</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip muted-chip">Sin usar</span></div>
+          </article>
+          <article class="resource-card">
+            <div class="resource-visual"><div class="app-logo app-logo-large">P</div></div>
+            <div class="resource-copy"><div><h3>Plex</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip">Películas</span></div>
+          </article>
         </div>
       </div>
     </section>
@@ -588,20 +623,24 @@ body.test-mode .test-tools{display:flex}
     <section class="shell-view" id="view-devices" data-shell-view="devices" hidden>
       <div class="shell-placeholder">
         <div class="shell-page-head">
-          <div><h1>Dispositivos</h1><p>Administración global de pantallas y mando.</p></div>
+          <div><h1>Dispositivos</h1><p>Hardware que Coucho usa para cambiar de contexto.</p></div>
         </div>
-        <div class="shell-grid">
-          <div class="shell-card">
-            <div class="shell-card-head"><div class="shell-card-icon">▦</div><div><h3>Pantallas</h3><small>3 detectadas</small></div></div>
-            <div class="shell-row"><span>Identificar</span><span class="shell-muted">›</span></div>
-            <div class="shell-row"><span>Configuración avanzada</span><span class="shell-muted">›</span></div>
-            <div class="shell-row"><span>Restaurar última configuración</span><span class="shell-muted">›</span></div>
+
+        <div class="device-panel">
+          <div class="device-panel-head"><div><h3>Pantallas</h3><small>3 detectadas</small></div><button class="btn">Identificar</button></div>
+          <div class="device-strip">
+            <div class="device-tile"><div class="monitor tv"></div><b>TV Sala</b><small>4K · 120 Hz</small></div>
+            <div class="device-tile"><div class="monitor pc primary"></div><b>Monitor 1</b><small>1440p · 165 Hz</small></div>
+            <div class="device-tile"><div class="monitor pc"></div><b>Monitor 2</b><small>1080p · 75 Hz</small></div>
           </div>
-          <div class="shell-card">
-            <div class="shell-card-head"><div class="shell-card-icon">🎮</div><div><h3>Mando</h3><small>Conectado</small></div></div>
-            <div class="shell-row"><span>Atajo de Hop</span><b>Guide</b></div>
-            <div class="shell-row"><span>Detalles</span><span class="shell-muted">›</span></div>
-          </div>
+          <div class="device-panel-actions"><button class="quiet-action">Configuración avanzada</button><button class="quiet-action">Restaurar última configuración</button></div>
+        </div>
+
+        <div class="resource-grid device-secondary">
+          <article class="resource-card controller-card">
+            <div class="controller-mark">🎮</div>
+            <div class="resource-copy"><div><h3>Mando</h3><small><span class="status-dot"></span>Conectado</small></div><span class="usage-chip">Guide · Hop</span></div>
+          </article>
         </div>
       </div>
     </section>
@@ -609,16 +648,18 @@ body.test-mode .test-tools{display:flex}
     <section class="shell-view" id="view-settings" data-shell-view="settings" hidden>
       <div class="shell-placeholder">
         <div class="shell-page-head">
-          <div><h1>Ajustes</h1><p>Preferencias y herramientas menos frecuentes.</p></div>
+          <div><h1>Ajustes</h1><p>Preferencias y herramientas poco frecuentes.</p></div>
         </div>
-        <div class="shell-grid">
-          <div class="shell-card">
-            <div class="shell-card-head"><div class="shell-card-icon">◐</div><div><h3>Apariencia</h3><small>Usa el tema de Coucho</small></div></div>
-            <div class="shell-row"><span>Tema</span><span class="shell-muted">Claro / oscuro</span></div>
-          </div>
-          <div class="shell-card">
-            <div class="shell-card-head"><div class="shell-card-icon">⋯</div><div><h3>Avanzado</h3><small>Diagnóstico y recuperación</small></div></div>
-            <div class="shell-row"><span>Estado de configuración</span><span class="shell-muted">›</span></div>
+        <div class="settings-stack">
+          <button class="settings-row" id="settingsTheme">
+            <span class="settings-row-icon">◐</span>
+            <span class="settings-row-copy"><b>Tema</b><small>Cambia la apariencia de Coucho</small></span>
+            <span class="settings-row-value" id="themeValue">Oscuro</span>
+          </button>
+          <div class="settings-row">
+            <span class="settings-row-icon">⋯</span>
+            <span class="settings-row-copy"><b>Avanzado</b><small>Diagnóstico y recuperación</small></span>
+            <span class="settings-row-value">›</span>
           </div>
         </div>
       </div>
@@ -679,7 +720,7 @@ body.test-mode .test-tools{display:flex}
     <div class="mode-menu-confirm" id="modeDeleteText"></div>
     <div class="mode-menu-actions">
       <button class="btn" id="modeDeleteCancel">Cancelar</button>
-      <button class="btn primary" id="modeDeleteConfirm">Eliminar</button>
+      <button class="btn danger" id="modeDeleteConfirm">Eliminar</button>
     </div>
   </div>
 </div>
@@ -688,19 +729,19 @@ body.test-mode .test-tools{display:flex}
   <div class="sheet">
     <div class="sheet-head"><h2 id="newName">Gaming</h2><button class="btn icon" id="closeNew">✕</button></div>
     <div class="new-body">
-      <button class="new-display" id="newDisplay">
-        <div>
-          <div class="new-kicker">Pantallas</div>
-          <div class="displays" id="newDisplays"></div>
-          <div class="display-name" id="newDisplayName">—</div>
-        </div>
-      </button>
+      <div class="new-recipe">
+        <button class="new-display" id="newDisplay" title="Editar pantallas">
+          <div>
+            <div class="new-kicker">Pantallas</div>
+            <div class="displays" id="newDisplays"></div>
+            <div class="display-name" id="newDisplayName">—</div>
+          </div>
+        </button>
 
-      <div class="new-apps" id="newApps">
-        <button class="new-app selected" data-app="Steam"><div><div class="app-logo">S</div><b>Steam</b></div></button>
-        <button class="new-app" data-app="Playnite"><div><div class="app-logo">P</div><b>Playnite</b></div></button>
-        <button class="new-app" data-app="Plex"><div><div class="app-logo">P</div><b>Plex</b></div></button>
-        <button class="new-app" data-app="Ninguna"><div><div class="app-logo">—</div><b>Ninguna</b></div></button>
+        <button class="new-app-direct" id="newApp" title="Cambiar app">
+          <span class="meta-icon" id="newAppIcon">▶</span>
+          <span><small>Apps</small><b id="newAppName">Steam</b></span>
+        </button>
       </div>
     </div>
     <div class="sheet-foot" style="gap:8px">
