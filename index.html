@@ -159,25 +159,24 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .brand{display:flex;align-items:center;gap:8px;padding-left:12px;color:var(--text2);font-size:12px}
 .logo{width:18px;height:18px;border-radius:5px;background:var(--logo-bg);border:1px solid var(--logo-border);color:var(--accent);display:grid;place-items:center;font-size:10px;font-weight:800}
 .win{display:flex;height:100%}.win span{width:46px;display:grid;place-items:center;color:var(--win-fg);font-size:11px}.win span:hover{background:var(--win-hover)}.win span:last-child:hover{background:#c42b1c;color:#fff}
-.app-shell{height:100%;min-height:0;display:grid;grid-template-rows:76px minmax(0,1fr)}
-.app-header{border-bottom:1px solid var(--divider);background:var(--glass-surface);backdrop-filter:blur(22px) saturate(1.12);-webkit-backdrop-filter:blur(22px) saturate(1.12)}
-.app-header-inner{height:100%;max-width:1048px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:24px}
-.app-brand{display:flex;align-items:center;gap:10px;min-width:0}
-.header-logo{width:40px;height:40px;border-radius:12px;background:var(--logo-bg);border:1px solid var(--logo-border);color:var(--accent);display:grid;place-items:center;font-size:17px;font-weight:800;flex:0 0 auto}
-.app-brand-copy{min-width:0}
-.app-brand-copy h1{margin:0;font-size:20px;line-height:1.1;font-weight:600}
-.app-status{margin-top:4px;color:var(--text2);font-size:11px;white-space:nowrap}
-.app-nav{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-width:0}
-.app-nav-item{height:38px;border:1px solid transparent;border-radius:var(--r-control);background:transparent;color:var(--text2);display:inline-flex;align-items:center;gap:7px;padding:0 12px;font-size:12px;font-weight:600;white-space:nowrap}
-.app-nav-item:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
-.app-nav-item:active{background:var(--glass-control)}
-.app-nav-item.active{background:var(--selected-bg);border-color:var(--selected-border);color:var(--accent)}
-.app-nav-icon{font-size:14px;line-height:1}
-.app-actions{display:flex;align-items:center;gap:8px}
+.app-shell{height:100%;min-height:0;display:grid;grid-template-columns:72px minmax(0,1fr)}
+.nav-rail{min-height:0;border-right:1px solid var(--divider);background:var(--glass-surface);display:flex;flex-direction:column;align-items:stretch;padding:8px 7px 10px;overflow:hidden}
+.rail-main{display:flex;flex-direction:column;gap:5px}
+.rail-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid var(--divider)}
+.rail-item,.rail-util{position:relative;width:100%;min-height:56px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px 3px;font-size:9px;font-weight:600;line-height:1}
+.rail-icon{font-size:18px;line-height:1}
+.rail-item:hover,.rail-util:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
+.rail-item:active,.rail-util:active{background:var(--glass-control)}
+.rail-item.active{color:var(--accent);background:var(--selected-bg)}
+.rail-item.active:before{content:"";position:absolute;left:-7px;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
+.rail-util{min-height:44px;font-size:0}
+.rail-util .rail-icon{font-size:16px}
 .main{height:100%;min-width:0;overflow:auto}
+
 .shell-view{display:none;min-height:100%}
 .shell-view.active{display:block}
 .wrap{max-width:1000px;margin:0 auto;padding:24px 24px 48px}
+.mode-status{margin:0 0 12px;color:var(--text2);font-size:11px}
 .btn{min-height:36px;border:1px solid var(--glass-soft-border);background:var(--glass-command);border-radius:var(--r-control);padding:6px 14px}
 .btn:hover{background:var(--glass-pill);border-color:var(--glass-border)}.btn:active{background:var(--glass-control);color:var(--text2)}.btn.primary{border-color:var(--primary-border);background:var(--primary-bg);color:var(--primary-fg);font-weight:600;box-shadow:none}.btn.primary:hover{background:var(--primary-hover)}.btn.primary:active{filter:brightness(.94);color:var(--primary-fg)}.btn.icon{width:40px;height:40px;padding:0;font-size:16px}
 .hero{width:min(700px,100%);border:1px solid var(--glass-border);border-radius:var(--r-panel);background:var(--glass-panel);padding:16px}
@@ -336,10 +335,11 @@ body.test-mode .test-tools{display:flex}
 #testBtn.active{border-color:var(--accent);color:var(--accent);background:var(--selected-bg)}
 
 @media(max-width:760px){
-  .app-shell{grid-template-rows:auto minmax(0,1fr)}
-  .app-header-inner{min-height:92px;padding:10px 14px;grid-template-columns:1fr auto;grid-template-areas:"brand actions" "nav nav";gap:8px 12px}
-  .app-brand{grid-area:brand}.app-actions{grid-area:actions}.app-nav{grid-area:nav;overflow-x:auto;padding-bottom:1px;scrollbar-width:none}.app-nav::-webkit-scrollbar{display:none}
-  .app-nav-item{height:34px;padding:0 10px}
+  .app-shell{grid-template-columns:60px minmax(0,1fr)}
+  .nav-rail{padding-inline:5px}
+  .rail-item{min-height:52px;border-radius:10px}
+  .rail-item.active:before{left:-5px}
+  .rail-item span:last-child{font-size:8px}
   .wrap,.shell-placeholder{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.card-facts{grid-template-columns:1fr 1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 @media(max-width:380px){
@@ -355,39 +355,30 @@ body.test-mode .test-tools{display:flex}
   </div>
 
   <div class="app-shell" id="appShell">
-  <header class="app-header">
-    <div class="app-header-inner">
-      <div class="app-brand">
-        <div class="header-logo">C</div>
-        <div class="app-brand-copy">
-          <h1>Coucho</h1>
-          <div class="app-status">3 pantallas · 🎮 conectado</div>
-        </div>
-      </div>
+  <aside class="nav-rail" aria-label="Navegación de Coucho">
+    <nav class="rail-main">
+      <button class="rail-item active" data-nav-view="modes" aria-current="page" aria-controls="view-modes" title="Modos">
+        <span class="rail-icon">▣</span><span>Modos</span>
+      </button>
+      <button class="rail-item" data-nav-view="library" aria-controls="view-library" title="Biblioteca">
+        <span class="rail-icon">▶</span><span>Apps</span>
+      </button>
+      <button class="rail-item" data-nav-view="devices" aria-controls="view-devices" title="Dispositivos">
+        <span class="rail-icon">▦</span><span>Disp.</span>
+      </button>
+    </nav>
 
-      <nav class="app-nav" aria-label="Navegación de Coucho">
-        <button class="app-nav-item active" data-nav-view="modes" aria-current="page" aria-controls="view-modes">
-          <span class="app-nav-icon">▣</span><span>Modos</span>
-        </button>
-        <button class="app-nav-item" data-nav-view="library" aria-controls="view-library">
-          <span class="app-nav-icon">▶</span><span>Biblioteca</span>
-        </button>
-        <button class="app-nav-item" data-nav-view="devices" aria-controls="view-devices">
-          <span class="app-nav-icon">▦</span><span>Dispositivos</span>
-        </button>
-      </nav>
-
-      <div class="app-actions">
-        <button class="btn icon" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">☀</button>
-        <button class="btn icon" id="settingsBtn" title="Ajustes" aria-label="Ajustes">⚙</button>
-        <button class="btn icon" id="testBtn" title="Modo de prueba" aria-label="Modo de prueba">🧪</button>
-      </div>
+    <div class="rail-bottom">
+      <button class="rail-util" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema"><span class="rail-icon">☀</span></button>
+      <button class="rail-util" id="settingsBtn" title="Ajustes" aria-label="Ajustes"><span class="rail-icon">⚙</span></button>
+      <button class="rail-util" id="testBtn" title="Modo de prueba" aria-label="Modo de prueba"><span class="rail-icon">🧪</span></button>
     </div>
-  </header>
+  </aside>
 
   <main class="main">
     <section class="shell-view active" id="view-modes" data-shell-view="modes">
       <div class="wrap">
+        <div class="mode-status">3 pantallas · 🎮 conectado</div>
         <div class="test-tools">
           <span>Modo de prueba · datos locales</span>
           <div class="test-tools-actions">
@@ -1014,7 +1005,7 @@ body.test-mode .test-tools{display:flex}
 
   function syncThemeButton(){
     var light=document.documentElement.dataset.theme==='light';
-    q('#themeBtn').textContent=light?'☾':'☀';
+    q('#themeBtn .rail-icon').textContent=light?'☾':'☀';
     q('#themeBtn').title=light?'Modo oscuro':'Modo claro';
     q('#themeBtn').setAttribute('aria-label',q('#themeBtn').title);
   }
@@ -1224,7 +1215,7 @@ body.test-mode .test-tools{display:flex}
       view.hidden=!selected;
     });
 
-    qa('.app-nav-item').forEach(function(item){
+    qa('.rail-item').forEach(function(item){
       var selected=item.dataset.navView===shellView;
       item.classList.toggle('active',selected);
       if(selected)item.setAttribute('aria-current','page');
@@ -1234,7 +1225,7 @@ body.test-mode .test-tools{display:flex}
     q('.main').scrollTo({top:0,behavior:'auto'});
   }
 
-  qa('.app-nav-item').forEach(function(item){
+  qa('.rail-item').forEach(function(item){
     item.onclick=function(){openShellView(item.dataset.navView)};
   });
 
