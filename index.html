@@ -220,6 +220,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .screen-map.preserve .screen-device{pointer-events:none}
 .screen-map.preserve .screen-device{opacity:.38}
 .display-editor-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.display-editor-actions{display:flex;gap:8px;flex:0 0 auto}
 .display-editor-summary{min-width:0;color:var(--text2);font-size:11px}
 .display-editor-summary b{color:var(--text);font-weight:600}
 .app-options{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
@@ -285,7 +286,7 @@ body.test-mode .test-tools{display:flex}
 #testBtn.active{border-color:var(--accent);color:var(--accent);background:var(--selected-bg)}
 
 @media(max-width:760px){
-  .wrap{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-foot .btn{width:100%}
+  .wrap{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 </style>
 </head>
@@ -366,7 +367,10 @@ body.test-mode .test-tools{display:flex}
   <div class="screen-map" id="screenMap"></div>
   <div class="display-editor-foot">
     <div class="display-editor-summary" id="displayEditorSummary"></div>
-    <button class="btn primary" id="applyDisplays">Probar</button>
+    <div class="display-editor-actions">
+      <button class="btn" id="cancelDisplays">Cancelar</button>
+      <button class="btn primary" id="applyDisplays">Probar</button>
+    </div>
   </div>
 </div>
 
@@ -434,7 +438,7 @@ body.test-mode .test-tools{display:flex}
     <div class="progress"><div id="progress"></div></div>
     <div class="confirm" id="confirm">
       <div><b>¿Se ve bien?</b><small>Restaurar en <span class="count" id="count">15</span> s</small></div>
-      <div style="display:flex;gap:8px"><button class="btn" id="revert">Restaurar</button><button class="btn primary" id="keep">Conservar</button></div>
+      <div style="display:flex;gap:8px"><button class="btn" id="revert">Restaurar</button><button class="btn primary" id="keep">Guardar</button></div>
     </div>
   </div>
 </div>
@@ -725,6 +729,11 @@ body.test-mode .test-tools{display:flex}
   q('#preserveDisplays').onclick=function(){
     displayDraft.preserve=!displayDraft.preserve;
     renderDisplayEditor();
+  };
+
+  q('#cancelDisplays').onclick=function(){
+    displayDraft=null;
+    closePops();
   };
 
   q('#applyDisplays').onclick=function(){
