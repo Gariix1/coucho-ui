@@ -182,14 +182,26 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .meta-action:hover{background:var(--glass-pill);border-color:var(--glass-border)}.meta-icon{width:36px;height:36px;border-radius:var(--r-control);background:var(--meta-tile-bg);border:1px solid var(--meta-tile-border);color:var(--accent);display:grid;place-items:center;font-size:18px}
 .meta-action small{display:block;font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px}.meta-action b{font-size:12px;font-weight:600}
 .section{display:flex;align-items:center;justify-content:space-between;margin:24px 0 12px}.section h3{margin:0;font-size:18px;font-weight:600}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:11px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
 .card{border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);padding:16px}
-.card-head{display:flex;align-items:center;justify-content:space-between}.card-name{display:flex;align-items:center;gap:9px}.card-icon{width:38px;height:38px;border-radius:var(--r-control);background:var(--glass-control);border:1px solid var(--glass-soft-border);display:grid;place-items:center;font-size:19px}.card b{font-size:15px;font-weight:600}
-.card-display{width:100%;min-height:102px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:grid;place-items:center;margin:12px 0 8px;padding:16px}
-.card-display:hover{background:var(--glass-control);border-color:var(--glass-border)}.card-display .monitor.tv{width:64px;height:37px}.card-display .monitor.pc{width:45px;height:29px}.card-display-name{font-size:12px;color:var(--text2);margin-top:10px}
-.card-meta{display:grid;grid-template-columns:1fr 1fr;gap:7px}.card-meta button{min-height:54px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-control);display:flex;align-items:center;gap:8px;padding:8px 10px;text-align:left}
-.card-meta button:hover{background:var(--glass-pill);border-color:var(--glass-border)}.card-meta .mi{font-size:14px}.card-meta small{display:block;color:var(--text2);font-size:10px}.card-meta b{font-size:12px;font-weight:600}
-.card-actions{margin-top:12px}.card-actions .btn{width:100%;min-height:36px;font-size:12px;padding:6px 14px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-name{display:flex;align-items:center;gap:9px;min-width:0}
+.card-name b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-icon{width:38px;height:38px;flex:0 0 auto;border-radius:var(--r-control);background:var(--glass-control);border:1px solid var(--glass-soft-border);display:grid;place-items:center;font-size:19px}
+.card-head-actions{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.card-head .activate{min-width:82px}
+.card-display{width:100%;min-height:106px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);margin:14px 0 10px;padding:14px 16px;text-align:left}
+.card-display:hover{background:var(--glass-control);border-color:var(--glass-border)}
+.card-screen-row{height:100%;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.card-displays{justify-content:flex-start;min-width:0}
+.card-display .monitor.tv{width:64px;height:37px}.card-display .monitor.pc{width:45px;height:29px}
+.monitor-star{position:absolute;right:3px;top:1px;color:var(--accent);font-size:8px;line-height:1;text-shadow:0 1px 4px rgba(0,0,0,.3)}
+.screen-count{flex:0 0 auto;color:var(--text2);font-size:11px;font-weight:600}
+.card-facts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.card-fact{min-height:42px;border:1px solid transparent;border-radius:var(--r-control);background:transparent;display:flex;align-items:center;gap:8px;padding:7px 9px;text-align:left;min-width:0}
+.card-fact:hover{background:var(--glass-control);border-color:var(--glass-soft-border)}
+.card-fact .fact-icon{flex:0 0 auto;color:var(--accent);font-size:14px}
+.card-fact b{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .app-logo{width:46px;height:46px;border-radius:13px;background:var(--glass-control);border:1px solid var(--glass-soft-border);color:var(--text2);display:grid;place-items:center;font-weight:700}
 .key{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:25px;padding:0 7px;border:1px solid var(--key-border);border-radius:7px;background:var(--key-bg);font-size:9px;font-weight:700}.key.round{min-width:24px;width:24px;border-radius:50%;background:var(--key-round-bg);border-color:var(--key-round-border)}
 
@@ -289,7 +301,7 @@ body.test-mode .test-tools{display:flex}
 #testBtn.active{border-color:var(--accent);color:var(--accent);background:var(--selected-bg)}
 
 @media(max-width:760px){
-  .wrap{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
+  .wrap{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.card-facts{grid-template-columns:1fr 1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 </style>
 </head>
@@ -564,10 +576,17 @@ body.test-mode .test-tools{display:flex}
       var style=small
         ?(d.kind==='tv'?' style="width:55px;height:32px"':' style="width:38px;height:25px"')
         :'';
-      return '<div class="monitor '+cls+primary+'"'+style+' title="'+d.name+'"></div>';
+      var star=small&&id===source.primaryDisplayId?'<span class="monitor-star">★</span>':'';
+      return '<div class="monitor '+cls+primary+'"'+style+' title="'+d.name+'">'+star+'</div>';
     }).join('');
   }
   function shortcutLabel(v){return v==='Manual'?'Añadir':v}
+  function shortcutCardLabel(v){return v==='Manual'?'Sin atajo':v}
+  function displayCountLabel(source){
+    if(source.preserve)return 'No cambia pantallas';
+    var count=Array.isArray(source.displayIds)?source.displayIds.length:0;
+    return count===1?'1 pantalla':count+' pantallas';
+  }
   function shortcutMarkup(v){
     if(v==='Manual') return '<span style="color:var(--muted)">Sin atajo</span>';
     var p=v.split(' + ');
@@ -578,47 +597,78 @@ body.test-mode .test-tools{display:flex}
     clearTimeout(window._toast);window._toast=setTimeout(function(){q('#toast').classList.remove('show')},2100);
   }
 
+  function renderEmptyState(){
+    q('.hero').style.display='none';
+    q('#cards').innerHTML=
+      '<div class="empty-state">'+
+        '<div><div class="empty-icon">＋</div>'+
+        '<h3>Crea tu primer modo</h3>'+
+        '<p>Elige tus pantallas y, si quieres, una app.</p>'+
+        '<button class="btn primary" id="emptyCreate">Crear modo</button></div>'+
+      '</div>';
+    q('#emptyCreate').onclick=openNew;
+  }
+
+  function renderHero(mode){
+    var hero=q('.hero');
+    if(!mode){
+      hero.style.display='none';
+      return;
+    }
+    hero.style.display='';
+    q('#heroName').textContent=mode.name;
+    q('#heroIcon').textContent=mode.icon;
+    q('#heroDisplays').innerHTML=displayMarkup(mode,false);
+    q('#heroDisplayName').textContent=displaySummary(mode);
+    q('#heroApp').textContent=mode.app;
+    q('#heroShortcut').textContent=shortcutLabel(mode.shortcut);
+  }
+
+  function renderModeCard(mode){
+    return '<article class="card">'+
+      '<div class="card-head">'+
+        '<div class="card-name"><div class="card-icon">'+mode.icon+'</div><b>'+mode.name+'</b></div>'+
+        '<div class="card-head-actions">'+
+          '<button class="delete-mode test-only delete-card" data-id="'+mode.id+'" title="Eliminar este modo" aria-label="Eliminar '+mode.name+'">✕</button>'+
+          '<button class="btn primary activate" data-id="'+mode.id+'">Activar</button>'+
+        '</div>'+
+      '</div>'+
+      '<button class="card-display display-trigger" data-id="'+mode.id+'" title="Editar pantallas">'+
+        '<span class="card-screen-row">'+
+          '<span class="displays card-displays">'+displayMarkup(mode,true)+'</span>'+
+          '<span class="screen-count">'+displayCountLabel(mode)+'</span>'+
+        '</span>'+
+      '</button>'+
+      '<div class="card-facts">'+
+        '<button class="card-fact app-trigger" data-id="'+mode.id+'" title="Cambiar app">'+
+          '<span class="fact-icon">▶</span><b>'+mode.app+'</b>'+
+        '</button>'+
+        '<button class="card-fact shortcut-trigger" data-id="'+mode.id+'" title="Cambiar atajo">'+
+          '<span class="fact-icon">🎮</span><b>'+shortcutCardLabel(mode.shortcut)+'</b>'+
+        '</button>'+
+      '</div>'+
+    '</article>';
+  }
+
+  function renderCards(){
+    q('#cards').innerHTML=sets
+      .filter(function(mode){return !mode.active})
+      .map(renderModeCard)
+      .join('');
+    bindDynamic();
+  }
+
   function render(){
     normalizeActive();
-    var hero=q('.hero');
+
     if(sets.length===0){
-      hero.style.display='none';
-      q('#cards').innerHTML=
-        '<div class="empty-state">'+
-          '<div><div class="empty-icon">＋</div>'+
-          '<h3>Crea tu primer modo</h3>'+
-          '<p>Elige tus pantallas y, si quieres, una app.</p>'+
-          '<button class="btn primary" id="emptyCreate">Crear modo</button></div>'+
-        '</div>';
-      q('#emptyCreate').onclick=openNew;
+      renderEmptyState();
       saveSets();
       return;
     }
 
-    var a=active();
-    if(a){
-      hero.style.display='';
-      q('#heroName').textContent=a.name;q('#heroIcon').textContent=a.icon;
-      q('#heroDisplays').innerHTML=displayMarkup(a,false);q('#heroDisplayName').textContent=displaySummary(a);
-      q('#heroApp').textContent=a.app;q('#heroShortcut').textContent=shortcutLabel(a.shortcut);
-    }else{
-      hero.style.display='none';
-    }
-
-    q('#cards').innerHTML=sets.filter(function(s){return !s.active}).map(function(s){
-      return '<article class="card">'+
-        '<div class="card-head"><div class="card-name"><div class="card-icon">'+s.icon+'</div><b>'+s.name+'</b></div>'+
-          '<button class="delete-mode test-only delete-card" data-id="'+s.id+'" title="Eliminar este modo" aria-label="Eliminar '+s.name+'">✕</button>'+
-        '</div>'+
-        '<button class="card-display display-trigger" data-id="'+s.id+'"><div><div class="displays">'+displayMarkup(s,true)+'</div><div class="card-display-name">'+displaySummary(s)+'</div></div></button>'+
-        '<div class="card-meta">'+
-          '<button class="app-trigger" data-id="'+s.id+'"><span class="mi">▶</span><div><small>Apps</small><b>'+s.app+'</b></div></button>'+
-          '<button class="shortcut-trigger" data-id="'+s.id+'"><span class="mi">🎮</span><div><small>Activar con</small><b>'+shortcutLabel(s.shortcut)+'</b></div></button>'+
-        '</div>'+
-        '<div class="card-actions"><button class="btn primary activate" data-id="'+s.id+'">Activar</button></div>'+
-      '</article>';
-    }).join('');
-    bindDynamic();
+    renderHero(active());
+    renderCards();
     saveSets();
   }
 
