@@ -269,9 +269,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .display-editor-actions{display:flex;gap:8px;flex:0 0 auto}
 .display-editor-summary{min-width:0;color:var(--text2);font-size:11px}
 .display-editor-summary b{color:var(--text);font-weight:600}
-.context-link{min-height:28px;border:0;background:transparent;color:var(--text2);padding:4px 0;font-size:10px;font-weight:600;text-align:left}
-.context-link:hover{color:var(--accent)}
-.app-context-link{width:100%;margin-top:9px;padding-top:10px;border-top:1px solid var(--divider);font-size:11px}
 .app-options{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 .app-option{min-height:82px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-control);display:grid;place-items:center;padding:8px;text-align:center}
 .app-option:hover{background:var(--glass-pill)}.app-option.selected{border-color:var(--selected-border);background:var(--selected-bg)}.app-option b{font-size:9px}
@@ -313,13 +310,38 @@ body.test-mode .test-only{display:inline-flex}
 }
 body.test-mode .test-tools{display:flex}
 .test-tools-actions{display:flex;gap:8px}
-.delete-mode{
-  width:36px;height:36px;padding:0;align-items:center;justify-content:center;
-  border:1px solid var(--glass-soft-border);border-radius:var(--r-control);
-  background:var(--glass-command);color:var(--muted);font-size:14px
-}
-.delete-mode:hover{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.38);color:#f87171}
 .hero-tools{display:flex;align-items:center;gap:8px}
+.mode-menu-trigger{
+  width:36px;height:36px;min-height:36px;padding:0;border:1px solid transparent;
+  border-radius:var(--r-control);background:transparent;color:var(--muted);
+  display:grid;place-items:center;font-size:18px;line-height:1
+}
+.mode-menu-trigger:hover,.mode-menu-trigger:focus-visible{
+  background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)
+}
+.mode-menu{width:240px;min-width:240px;padding:8px}
+.mode-menu-list{display:grid;gap:2px}
+.mode-menu-item{
+  width:100%;min-height:38px;border:1px solid transparent;border-radius:var(--r-control);
+  background:transparent;color:var(--text2);padding:8px 10px;text-align:left;font-size:12px;font-weight:600
+}
+.mode-menu-item:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
+.mode-menu-item.danger{color:#fca5a5}
+.mode-menu-item.danger:hover{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.28);color:#fecaca}
+.mode-menu-panel[hidden]{display:none}
+.mode-menu-panel{padding:4px}
+.mode-menu-panel .pop-title{margin:2px 0 8px;color:var(--text)}
+.mode-menu-input{
+  width:100%;height:38px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);
+  background:var(--glass-control);color:var(--text);padding:0 10px;font:inherit;outline:none
+}
+.mode-menu-input:focus{border-color:var(--selected-border);box-shadow:0 0 0 1px var(--monitor-glow)}
+.mode-menu-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}
+.mode-menu-actions .btn{min-height:34px;padding:5px 10px}
+.mode-menu-confirm{margin:2px 0 4px;color:var(--text2);font-size:11px;line-height:1.4}
+.mode-menu-confirm b{color:var(--text)}
+.mode-menu-delete{color:#fecaca}
+
 .empty-state{
   grid-column:1/-1;min-height:230px;border:1px dashed var(--glass-border);
   border-radius:var(--r-panel);background:var(--glass-panel);
@@ -512,7 +534,7 @@ body.test-mode .test-tools{display:flex}
               <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName">Gaming</h2></div>
             </div>
             <div class="hero-tools">
-              <button class="delete-mode test-only" id="deleteActive" title="Eliminar este modo" aria-label="Eliminar este modo">✕</button>
+              <button class="mode-menu-trigger" data-id="active" title="Más opciones" aria-label="Más opciones del modo activo">⋯</button>
             </div>
           </div>
 
@@ -536,7 +558,7 @@ body.test-mode .test-tools{display:flex}
           </div>
         </section>
 
-        <div class="section"><h3>Tus modos</h3><button class="btn icon" id="newBtn2" title="Nuevo">＋</button></div>
+        <div class="section"><h3>Tus modos</h3><button class="btn icon" id="newBtn2" title="Crear modo" aria-label="Crear modo">＋</button></div>
         <div class="cards" id="cards"></div>
       </div>
     </section>
@@ -619,7 +641,6 @@ body.test-mode .test-tools{display:flex}
     <div>
       <div class="display-editor-summary" id="displayEditorSummary"></div>
       <button class="btn preserve-btn" id="preserveDisplays">↔ No cambiar pantallas</button>
-      <button class="context-link" id="manageDisplays">Administrar pantallas…</button>
     </div>
     <div class="display-editor-actions">
       <button class="btn" id="tryDisplays">Probar</button>
@@ -636,7 +657,31 @@ body.test-mode .test-tools{display:flex}
     <button class="app-option" data-app="Playnite"><div><div class="app-logo">P</div><b>Playnite</b></div></button>
     <button class="app-option" data-app="Plex"><div><div class="app-logo">P</div><b>Plex</b></div></button>
   </div>
-  <button class="context-link app-context-link" id="manageApps">Biblioteca…</button>
+</div>
+
+<div class="pop mode-menu" id="modeMenu" aria-label="Opciones del modo">
+  <div class="mode-menu-list" id="modeMenuMain">
+    <button class="mode-menu-item" id="modeRename">Renombrar</button>
+    <button class="mode-menu-item danger" id="modeDelete">Eliminar</button>
+  </div>
+
+  <div class="mode-menu-panel" id="modeRenamePanel" hidden>
+    <div class="pop-title">Renombrar modo</div>
+    <input class="mode-menu-input" id="modeNameInput" maxlength="40" autocomplete="off" />
+    <div class="mode-menu-actions">
+      <button class="btn" id="modeRenameCancel">Cancelar</button>
+      <button class="btn primary" id="modeRenameSave">Guardar</button>
+    </div>
+  </div>
+
+  <div class="mode-menu-panel" id="modeDeletePanel" hidden>
+    <div class="pop-title mode-menu-delete">Eliminar modo</div>
+    <div class="mode-menu-confirm" id="modeDeleteText"></div>
+    <div class="mode-menu-actions">
+      <button class="btn" id="modeDeleteCancel">Cancelar</button>
+      <button class="btn primary" id="modeDeleteConfirm">Eliminar</button>
+    </div>
+  </div>
 </div>
 
 <div class="sheet-wrap" id="newSheet">
@@ -746,6 +791,7 @@ body.test-mode .test-tools{display:flex}
 
   var editTarget=null;
   var shortcutTarget=null;
+  var modeMenuTarget=null;
   var captured=null;
   var displayDraft=null;
   var displayDraftIsNew=false;
@@ -870,8 +916,8 @@ body.test-mode .test-tools{display:flex}
       '<div class="card-head">'+
         '<div class="card-name"><div class="card-icon">'+mode.icon+'</div><b>'+mode.name+'</b></div>'+
         '<div class="card-head-actions">'+
-          '<button class="delete-mode test-only delete-card" data-id="'+mode.id+'" title="Eliminar este modo" aria-label="Eliminar '+mode.name+'">✕</button>'+
           '<button class="btn primary activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'Aplicando…':'Activar')+'</button>'+
+          '<button class="mode-menu-trigger" data-id="'+mode.id+'" title="Más opciones" aria-label="Más opciones de '+mode.name+'">⋯</button>'+
         '</div>'+
       '</div>'+
       '<button class="card-display display-trigger" data-id="'+mode.id+'" title="Editar pantallas">'+
@@ -918,7 +964,7 @@ body.test-mode .test-tools{display:flex}
     qa('.app-trigger').forEach(function(b){b.onclick=function(e){openAppPop(e.currentTarget,b.dataset.id,false)}});
     qa('.shortcut-trigger').forEach(function(b){b.onclick=function(){openShortcut(b.dataset.id)}});
     qa('.activate').forEach(function(b){b.onclick=function(){activate(Number(b.dataset.id))}});
-    qa('.delete-card').forEach(function(b){b.onclick=function(){removeSet(Number(b.dataset.id))}});
+    qa('.mode-menu-trigger').forEach(function(b){b.onclick=function(e){openModeMenu(e.currentTarget,b.dataset.id)}});
   }
 
   function removeSet(id){
@@ -995,6 +1041,8 @@ body.test-mode .test-tools{display:flex}
   function closePops(){
     q('#displayPop').classList.remove('open');
     q('#appPop').classList.remove('open');
+    q('#modeMenu').classList.remove('open');
+    modeMenuTarget=null;
     currentPop=null;
     currentPopAnchor=null;
   }
@@ -1008,6 +1056,90 @@ body.test-mode .test-tools{display:flex}
   window.addEventListener('resize',syncOpenPopPosition);
   q('.main').addEventListener('scroll',syncOpenPopPosition,{passive:true});
 
+  function resetModeMenu(){
+    q('#modeMenuMain').hidden=false;
+    q('#modeRenamePanel').hidden=true;
+    q('#modeDeletePanel').hidden=true;
+    q('#modeNameInput').value='';
+  }
+
+  function openModeMenu(anchor,rawId){
+    var id=resolveId(rawId);
+    var mode=byId(id);
+    if(!mode)return;
+
+    closePops();
+    modeMenuTarget=id;
+    resetModeMenu();
+    openAnchoredPop(q('#modeMenu'),anchor);
+  }
+
+  function syncModeMenuSize(){
+    requestAnimationFrame(syncOpenPopPosition);
+  }
+
+  q('#modeRename').onclick=function(){
+    var mode=byId(modeMenuTarget);
+    if(!mode)return;
+    q('#modeMenuMain').hidden=true;
+    q('#modeRenamePanel').hidden=false;
+    q('#modeNameInput').value=mode.name;
+    syncModeMenuSize();
+    requestAnimationFrame(function(){
+      q('#modeNameInput').focus();
+      q('#modeNameInput').select();
+    });
+  };
+
+  q('#modeRenameCancel').onclick=function(){
+    resetModeMenu();
+    syncModeMenuSize();
+  };
+
+  function saveModeName(){
+    var mode=byId(modeMenuTarget);
+    if(!mode)return;
+    var next=q('#modeNameInput').value.trim();
+    if(!next){
+      q('#modeNameInput').focus();
+      return;
+    }
+    var old=mode.name;
+    closePops();
+    mode.name=next;
+    render();
+    if(old!==next)toast(next,'Nombre actualizado');
+  }
+
+  q('#modeRenameSave').onclick=saveModeName;
+  q('#modeNameInput').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      e.preventDefault();
+      saveModeName();
+    }
+  });
+
+  q('#modeDelete').onclick=function(){
+    var mode=byId(modeMenuTarget);
+    if(!mode)return;
+    q('#modeMenuMain').hidden=true;
+    q('#modeDeletePanel').hidden=false;
+    q('#modeDeleteText').innerHTML='¿Eliminar <b>'+mode.name+'</b>?';
+    syncModeMenuSize();
+  };
+
+  q('#modeDeleteCancel').onclick=function(){
+    resetModeMenu();
+    syncModeMenuSize();
+  };
+
+  q('#modeDeleteConfirm').onclick=function(){
+    var id=modeMenuTarget;
+    if(id===null)return;
+    closePops();
+    removeSet(id);
+  };
+
   function openDisplayPop(anchor,rawId,isNew){
     closePops();
     displayDraftIsNew=!!isNew;
@@ -1020,6 +1152,8 @@ body.test-mode .test-tools{display:flex}
       displayDraft.primaryDisplayId='main';
     }
     renderDisplayEditor();
+    q('#tryDisplays').hidden=displayDraftIsNew;
+    q('#saveDisplays').textContent=displayDraftIsNew?'Listo':'Guardar';
     openAnchoredPop(q('#displayPop'),anchor);
   }
 
@@ -1121,7 +1255,6 @@ body.test-mode .test-tools{display:flex}
       copyDisplayDraft(newDraft);
       closePops();
       renderNew();
-      toast('Pantallas','Guardadas');
       return;
     }
     var s=byId(editTarget);
@@ -1199,11 +1332,6 @@ body.test-mode .test-tools{display:flex}
     testMode=!testMode;
     localStorage.setItem('coucho-test-mode',testMode?'1':'0');
     syncTestMode();
-  };
-
-  q('#deleteActive').onclick=function(){
-    var a=active();
-    if(a)removeSet(a.id);
   };
 
   q('#clearModes').onclick=function(){
@@ -1361,7 +1489,8 @@ body.test-mode .test-tools{display:flex}
     var path=typeof e.composedPath==='function'?e.composedPath():[];
     var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
-    if(!insideDisplayPop&&!insideAppPop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('#newDisplay')){
+    var insideModeMenu=path.indexOf(q('#modeMenu'))>=0;
+    if(!insideDisplayPop&&!insideAppPop&&!insideModeMenu&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.mode-menu-trigger')&&!e.target.closest('#newDisplay')){
       closePops();
     }
   });
@@ -1400,11 +1529,6 @@ body.test-mode .test-tools{display:flex}
   });
 
   q('#settingsBtn').onclick=function(){openShellView('settings')};
-  q('#manageDisplays').onclick=function(){
-    displayDraft=null;
-    openShellView('devices');
-  };
-  q('#manageApps').onclick=function(){openShellView('library')};
 
   openShellView('modes');
   syncThemeButton();
