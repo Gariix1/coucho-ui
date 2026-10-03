@@ -203,10 +203,10 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .preserve-btn.selected{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
 .screen-map{display:grid;grid-template-columns:1.22fr 1fr 1fr;gap:10px;padding:12px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset)}
 .screen-device{position:relative;min-width:0}
-.screen-face{width:100%;min-height:150px;padding:12px 10px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-control);display:grid;grid-template-rows:auto 1fr auto;gap:8px;text-align:center}
+.screen-face{width:100%;min-height:150px;padding:12px 10px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-control);display:grid;grid-template-rows:auto 1fr auto;gap:8px;text-align:center;transition:background .12s ease,border-color .12s ease,opacity .12s ease}
 .screen-face:hover{background:var(--glass-pill);border-color:var(--glass-border)}
-.screen-device.selected .screen-face{border-color:var(--selected-border);background:var(--selected-bg)}
-.screen-device.off .screen-face{opacity:.46;filter:saturate(.55)}
+.screen-device.selected .screen-face{border-color:var(--selected-border);background:var(--selected-bg);box-shadow:inset 0 0 0 1px var(--monitor-glow)}
+.screen-device.off .screen-face{opacity:.42;filter:saturate(.45)}
 .screen-number{justify-self:start;width:25px;height:25px;border-radius:999px;display:grid;place-items:center;background:var(--glass-command);border:1px solid var(--glass-soft-border);font-size:11px;font-weight:600}
 .screen-device.selected .screen-number{background:var(--accent);border-color:var(--accent);color:var(--primary-fg)}
 .screen-shape{align-self:center;justify-self:center;position:relative;width:86%;height:58px;border:2px solid var(--monitor-border);border-radius:7px;background:linear-gradient(145deg,var(--monitor-bg-a),var(--monitor-bg-b))}
@@ -214,9 +214,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .screen-shape:after{content:"";position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);width:22px;height:7px;border-left:2px solid var(--monitor-stand);border-right:2px solid var(--monitor-stand)}
 .screen-copy b{display:block;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .screen-copy small{display:block;font-size:9px;color:var(--text2);margin-top:2px}
-.primary-screen-btn{position:absolute;right:8px;top:8px;width:30px;height:30px;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);display:grid;place-items:center;color:var(--muted);font-size:13px}
+.primary-screen-btn{position:absolute;right:8px;top:8px;width:30px;height:30px;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);display:grid;place-items:center;color:var(--muted);font-size:15px;line-height:1;z-index:2}
 .primary-screen-btn:hover{background:var(--glass-pill);color:var(--text)}
-.screen-device.primary .primary-screen-btn{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
+.screen-device.primary .primary-screen-btn{border-color:var(--accent);background:var(--selected-bg);color:var(--accent)}
 .screen-map.preserve .screen-device{pointer-events:none}
 .screen-map.preserve .screen-device{opacity:.38}
 .display-editor-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
@@ -359,7 +359,7 @@ body.test-mode .test-tools{display:flex}
   <div class="display-editor-head">
     <div>
       <div class="pop-title">Pantallas</div>
-      <div class="display-editor-sub">3 conectadas · toca para incluir o excluir</div>
+      <div class="display-editor-sub">Clic: activar · ☆: principal</div>
     </div>
     <button class="btn preserve-btn" id="preserveDisplays">↔ Sin cambios</button>
   </div>
@@ -668,7 +668,7 @@ body.test-mode .test-tools{display:flex}
           '<span class="screen-shape"></span>'+
           '<span class="screen-copy"><b>'+d.name+'</b><small>'+d.detail+'</small></span>'+
         '</button>'+
-        '<button class="primary-screen-btn" data-primary="'+d.id+'" title="Hacer principal" aria-label="Hacer '+d.name+' principal">★</button>'+
+        '<button class="primary-screen-btn" data-primary="'+d.id+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es la pantalla principal':'Hacer '+d.name+' principal')+'">'+(primary?'★':'☆')+'</button>'+
       '</div>';
     }).join('');
 
@@ -683,7 +683,7 @@ body.test-mode .test-tools{display:flex}
     var primary=getDisplay(displayDraft.primaryDisplayId);
     q('#displayEditorSummary').innerHTML=displayDraft.preserve
       ?'<b>Sin cambios</b>'
-      :'<b>'+summary+'</b>'+(primary?'<br>Principal · '+primary.name:'');
+      :'<b>'+summary+'</b>'+(primary?' · ★ '+primary.name:'');
   }
 
   function toggleDisplay(id){
@@ -695,7 +695,9 @@ body.test-mode .test-tools{display:flex}
         return;
       }
       displayDraft.displayIds.splice(index,1);
-      if(displayDraft.primaryDisplayId===id)displayDraft.primaryDisplayId=displayDraft.displayIds[0]||null;
+      if(displayDraft.primaryDisplayId===id){
+        displayDraft.primaryDisplayId=displayDraft.displayIds[0]||null;
+      }
     }else{
       displayDraft.displayIds.push(id);
       if(!displayDraft.primaryDisplayId)displayDraft.primaryDisplayId=id;
