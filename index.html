@@ -1226,19 +1226,6 @@ body.test-mode .test-tools{display:flex}
   });
 
   syncNavigationShell();
-  };
-
-  qa('.nav-item').forEach(function(item){
-    item.onclick=function(){
-      if(shellView===item.dataset.view)return;
-      shellView=item.dataset.view;
-      closePops();
-      q('.main').scrollTo({top:0,behavior:'auto'});
-      syncNavigationShell();
-    };
-  });
-
-  syncNavigationShell();
   syncThemeButton();
   syncTestMode();
   render();
