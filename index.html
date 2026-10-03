@@ -173,6 +173,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .rail-util .rail-icon{font-size:16px}
 .prototype-tool{opacity:.58}
 .prototype-tool:hover,.prototype-tool.active{opacity:1}
+#settingsBtn.active{color:var(--accent)}
 .main{height:100%;min-width:0;overflow:auto}
 
 .shell-view{display:none;min-height:100%}
@@ -198,7 +199,8 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .meta-action:hover{background:var(--glass-pill);border-color:var(--glass-border);transform:translateY(-1px)}.meta-icon{width:32px;height:32px;border-radius:var(--r-control);background:var(--meta-tile-bg);border:1px solid var(--meta-tile-border);color:var(--accent);display:grid;place-items:center;font-size:16px}
 .meta-action small{display:block;font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px}.meta-action b{font-size:12px;font-weight:600}
 .section{display:flex;align-items:center;justify-content:flex-start;gap:12px;margin:24px 0 12px}.section h3{margin:0;font-size:18px;font-weight:600}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,340px));gap:12px;justify-content:start;align-items:start}
+.cards{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:flex-start}
+.cards > .card{flex:0 1 340px;width:100%}
 .card{border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);padding:14px}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-name{display:flex;align-items:center;gap:9px;min-width:0}
@@ -516,9 +518,6 @@ body.test-mode .test-tools{display:flex}
   .rail-item span:last-child{font-size:8px}
   .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.hero-body{display:block;margin-top:0}.hero-body .display-main{margin-top:12px;height:auto;min-height:108px}.hero-body .recipe-meta{grid-template-columns:1fr;grid-template-rows:none;margin-top:8px}.hero-body .meta-action{height:auto}.card-facts{grid-template-columns:1fr 1fr}.new-recipe{grid-template-columns:1fr}.new-app-direct{min-height:82px;flex-direction:row;text-align:left}.app-options{grid-template-columns:repeat(2,1fr)}.device-strip{grid-template-columns:1fr}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
-@media(max-width:380px){
-  .cards{grid-template-columns:1fr}
-}
 </style>
 </head>
 <body>
@@ -606,15 +605,15 @@ body.test-mode .test-tools{display:flex}
         <div class="resource-grid app-library">
           <article class="resource-card">
             <div class="resource-visual"><div class="app-logo app-logo-large">S</div></div>
-            <div class="resource-copy"><div><h3>Steam</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip">Gaming</span></div>
+            <div class="resource-copy"><div><h3>Steam</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip" id="steamUsage">Gaming</span></div>
           </article>
           <article class="resource-card">
             <div class="resource-visual"><div class="app-logo app-logo-large">P</div></div>
-            <div class="resource-copy"><div><h3>Playnite</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip muted-chip">Sin usar</span></div>
+            <div class="resource-copy"><div><h3>Playnite</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip muted-chip" id="playniteUsage">Sin usar</span></div>
           </article>
           <article class="resource-card">
             <div class="resource-visual"><div class="app-logo app-logo-large">P</div></div>
-            <div class="resource-copy"><div><h3>Plex</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip">Películas</span></div>
+            <div class="resource-copy"><div><h3>Plex</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip" id="plexUsage">Películas</span></div>
           </article>
         </div>
       </div>
@@ -627,13 +626,13 @@ body.test-mode .test-tools{display:flex}
         </div>
 
         <div class="device-panel">
-          <div class="device-panel-head"><div><h3>Pantallas</h3><small>3 detectadas</small></div><button class="btn">Identificar</button></div>
+          <div class="device-panel-head"><div><h3>Pantallas</h3><small>3 detectadas</small></div><button class="btn" id="identifyDisplays">Identificar</button></div>
           <div class="device-strip">
             <div class="device-tile"><div class="monitor tv"></div><b>TV Sala</b><small>4K · 120 Hz</small></div>
             <div class="device-tile"><div class="monitor pc primary"></div><b>Monitor 1</b><small>1440p · 165 Hz</small></div>
             <div class="device-tile"><div class="monitor pc"></div><b>Monitor 2</b><small>1080p · 75 Hz</small></div>
           </div>
-          <div class="device-panel-actions"><button class="quiet-action">Configuración avanzada</button><button class="quiet-action">Restaurar última configuración</button></div>
+          <div class="device-panel-actions"><button class="quiet-action" id="advancedDisplays">Configuración avanzada</button><button class="quiet-action" id="restoreDisplays">Restaurar última configuración</button></div>
         </div>
 
         <div class="resource-grid device-secondary">
@@ -656,11 +655,11 @@ body.test-mode .test-tools{display:flex}
             <span class="settings-row-copy"><b>Tema</b><small>Cambia la apariencia de Coucho</small></span>
             <span class="settings-row-value" id="themeValue">Oscuro</span>
           </button>
-          <div class="settings-row">
+          <button class="settings-row" id="advancedSettings">
             <span class="settings-row-icon">⋯</span>
             <span class="settings-row-copy"><b>Avanzado</b><small>Diagnóstico y recuperación</small></span>
             <span class="settings-row-value">›</span>
-          </div>
+          </button>
         </div>
       </div>
     </section>
@@ -849,7 +848,15 @@ body.test-mode .test-tools{display:flex}
 
   function q(s){return document.querySelector(s)}
   function qa(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
-  function byId(id){return sets.find(function(x){return x.id===id})}
+  function esc(value){
+    return String(value==null?'':value)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+  function byId(id){return sets.find(function(x){return x.id===id})||null}
   function active(){return sets.find(function(x){return x.active})||null}
   function resolveId(raw){
     var a=active();
@@ -865,6 +872,7 @@ body.test-mode .test-tools{display:flex}
       if(s.active&&!kept){kept=true;return}
       if(s.active)s.active=false;
     });
+    if(!kept)sets[0].active=true;
   }
   function logo(app){return app==='Ninguna'?'—':app.charAt(0).toUpperCase()}
   function autoMeta(app){
@@ -926,6 +934,7 @@ body.test-mode .test-tools{display:flex}
 
   function renderEmptyState(){
     q('.hero').style.display='none';
+    q('#modesSection').hidden=true;
     q('#cards').innerHTML=
       '<div class="empty-state">'+
         '<div><div class="empty-icon">＋</div>'+
@@ -953,26 +962,30 @@ body.test-mode .test-tools{display:flex}
 
   function renderModeCard(mode){
     var applying=activatingId===mode.id;
+    var safeName=esc(mode.name);
+    var safeIcon=esc(mode.icon);
+    var safeApp=esc(mode.app);
+    var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
     return '<article class="card'+(applying?' applying':'')+'">'+
       '<div class="card-head">'+
-        '<div class="card-name"><div class="card-icon">'+mode.icon+'</div><b>'+mode.name+'</b></div>'+
+        '<div class="card-name"><div class="card-icon">'+safeIcon+'</div><b>'+safeName+'</b></div>'+
         '<div class="card-head-actions">'+
           '<button class="btn primary activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'Aplicando…':'Activar')+'</button>'+
-          '<button class="mode-menu-trigger" data-id="'+mode.id+'" title="Más opciones" aria-label="Más opciones de '+mode.name+'">⋯</button>'+
+          '<button class="mode-menu-trigger" data-id="'+mode.id+'" title="Más opciones" aria-label="Más opciones de '+safeName+'">⋯</button>'+
         '</div>'+
       '</div>'+
       '<button class="card-display display-trigger" data-id="'+mode.id+'" title="Editar pantallas">'+
         '<span class="card-screen-row">'+
           '<span class="displays card-displays">'+displayMarkup(mode,true)+'</span>'+
-          '<span class="screen-count">'+displayCountLabel(mode)+'</span>'+
+          '<span class="screen-count">'+esc(displayCountLabel(mode))+'</span>'+
         '</span>'+
       '</button>'+
       '<div class="card-facts">'+
         '<button class="card-fact app-trigger" data-id="'+mode.id+'" title="Cambiar app">'+
-          '<span class="fact-icon">▶</span><b>'+mode.app+'</b>'+
+          '<span class="fact-icon">▶</span><b>'+safeApp+'</b>'+
         '</button>'+
         '<button class="card-fact shortcut-trigger" data-id="'+mode.id+'" title="Cambiar atajo">'+
-          '<span class="fact-icon">🎮</span><b>'+shortcutCardLabel(mode.shortcut)+'</b>'+
+          '<span class="fact-icon">🎮</span><b>'+safeShortcut+'</b>'+
         '</button>'+
       '</div>'+
     '</article>';
@@ -986,8 +999,30 @@ body.test-mode .test-tools{display:flex}
     bindDynamic();
   }
 
+  function appUsage(app){
+    var matches=sets.filter(function(mode){return mode.app===app});
+    if(matches.length===0)return {text:'Sin usar',empty:true};
+    if(matches.length===1)return {text:matches[0].name,empty:false};
+    return {text:matches.length+' modos',empty:false};
+  }
+
+  function renderResourceViews(){
+    [
+      ['Steam','#steamUsage'],
+      ['Playnite','#playniteUsage'],
+      ['Plex','#plexUsage']
+    ].forEach(function(pair){
+      var el=q(pair[1]);
+      if(!el)return;
+      var usage=appUsage(pair[0]);
+      el.textContent=usage.text;
+      el.classList.toggle('muted-chip',usage.empty);
+    });
+  }
+
   function render(){
     normalizeActive();
+    renderResourceViews();
 
     if(sets.length===0){
       renderEmptyState();
@@ -995,6 +1030,7 @@ body.test-mode .test-tools{display:flex}
       return;
     }
 
+    q('#modesSection').hidden=false;
     renderHero(active());
     renderCards();
     saveSets();
@@ -1165,7 +1201,7 @@ body.test-mode .test-tools{display:flex}
     if(!mode)return;
     q('#modeMenuMain').hidden=true;
     q('#modeDeletePanel').hidden=false;
-    q('#modeDeleteText').innerHTML='¿Eliminar <b>'+mode.name+'</b>?';
+    q('#modeDeleteText').textContent='¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.';
     syncModeMenuSize();
   };
 
@@ -1259,8 +1295,11 @@ body.test-mode .test-tools{display:flex}
   }
 
   function openAppPop(anchor,rawId,isNew){
-    closePops();editTarget=isNew?'new':resolveId(rawId);
-    var app=isNew?newDraft.app:byId(editTarget).app;
+    closePops();
+    editTarget=isNew?'new':resolveId(rawId);
+    var mode=isNew?null:byId(editTarget);
+    if(!isNew&&!mode)return;
+    var app=isNew?newDraft.app:mode.app;
     qa('#appPop .app-option').forEach(function(x){x.classList.toggle('selected',x.dataset.app===app)});
     openAnchoredPop(q('#appPop'),anchor);
   }
@@ -1329,6 +1368,7 @@ body.test-mode .test-tools{display:flex}
         newDraft.app=app;var nm=autoMeta(app);newDraft.name=nm.name;newDraft.icon=nm.icon;renderNew();return;
       }
       var s=byId(editTarget);
+      if(!s)return;
       s.app=app;
       render();
       toast('Apps',app);
@@ -1336,30 +1376,32 @@ body.test-mode .test-tools{display:flex}
   });
 
   function openNew(){
+    closePops();
     newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',name:'Gaming',icon:'🎮'};
-    renderNew();q('#newSheet').classList.add('open');
+    renderNew();
+    q('#newSheet').classList.add('open');
   }
 
   function renderNew(){
     q('#newName').textContent=newDraft.name;
     q('#newDisplays').innerHTML=displayMarkup(newDraft,false);
     q('#newDisplayName').textContent=displaySummary(newDraft);
-    qa('#newApps .new-app').forEach(function(b){b.classList.toggle('selected',b.dataset.app===newDraft.app)});
+    q('#newAppName').textContent=newDraft.app;
   }
 
-  function syncThemeButton(){
+  function syncThemeControl(){
     var light=document.documentElement.dataset.theme==='light';
-    q('#themeBtn .rail-icon').textContent=light?'☾':'☀';
-    q('#themeBtn').title=light?'Modo oscuro':'Modo claro';
-    q('#themeBtn').setAttribute('aria-label',q('#themeBtn').title);
+    q('#themeValue').textContent=light?'Claro':'Oscuro';
   }
 
-  q('#themeBtn').onclick=function(){
+  function toggleTheme(){
     var next=document.documentElement.dataset.theme==='light'?'dark':'light';
     document.documentElement.dataset.theme=next;
     localStorage.setItem('coucho-theme',next);
-    syncThemeButton();
-  };
+    syncThemeControl();
+  }
+
+  q('#settingsTheme').onclick=toggleTheme;
 
   var testMode=localStorage.getItem('coucho-test-mode')==='1';
   function syncTestMode(){
@@ -1388,16 +1430,9 @@ body.test-mode .test-tools{display:flex}
   };
 
   q('#newBtn2').onclick=openNew;
-  q('#closeNew').onclick=function(){q('#newSheet').classList.remove('open')};
+  q('#closeNew').onclick=function(){closePops();q('#newSheet').classList.remove('open')};
   q('#newDisplay').onclick=function(e){openDisplayPop(e.currentTarget,null,true)};
-
-  qa('#newApps .new-app').forEach(function(b){
-    b.onclick=function(){
-      newDraft.app=b.dataset.app;
-      var m=autoMeta(newDraft.app);newDraft.name=m.name;newDraft.icon=m.icon;
-      renderNew();
-    };
-  });
+  q('#newApp').onclick=function(e){openAppPop(e.currentTarget,null,true)};
 
   function buildNewMode(id,activeState){
     return {
@@ -1409,6 +1444,7 @@ body.test-mode .test-tools{display:flex}
   }
 
   q('#newSave').onclick=function(){
+    closePops();
     sets.push(buildNewMode(Date.now(),false));
     q('#newSheet').classList.remove('open');
     render();
@@ -1416,6 +1452,7 @@ body.test-mode .test-tools{display:flex}
   };
 
   q('#newTry').onclick=function(){
+    closePops();
     q('#newSheet').classList.remove('open');
     startTest({
       kind:'new',id:Date.now(),preserve:newDraft.preserve,displayIds:newDraft.displayIds.slice(),
@@ -1424,7 +1461,9 @@ body.test-mode .test-tools{display:flex}
   };
 
   function openShortcut(rawId){
-    shortcutTarget=resolveId(rawId);captured=null;
+    shortcutTarget=resolveId(rawId);
+    if(!byId(shortcutTarget))return;
+    captured=null;
     q('#captureResult').innerHTML='<span style="color:var(--muted)">A · X · Y</span>';
     q('#capUse').style.display='none';q('#shortcutOverlay').classList.add('open');
   }
@@ -1440,13 +1479,17 @@ body.test-mode .test-tools{display:flex}
   q('#capY').onclick=function(){capture('Y')};
   q('#capCancel').onclick=function(){q('#shortcutOverlay').classList.remove('open')};
   q('#capManual').onclick=function(){
-    byId(shortcutTarget).shortcut='Manual';
+    var mode=byId(shortcutTarget);
+    if(!mode){q('#shortcutOverlay').classList.remove('open');return}
+    mode.shortcut='Manual';
     q('#shortcutOverlay').classList.remove('open');
     render();toast('Activar con','Sin atajo');
   };
   q('#capUse').onclick=function(){
     if(!captured)return;
-    byId(shortcutTarget).shortcut=captured;
+    var mode=byId(shortcutTarget);
+    if(!mode){q('#shortcutOverlay').classList.remove('open');return}
+    mode.shortcut=captured;
     q('#shortcutOverlay').classList.remove('open');
     render();toast('Activar con',captured);
   };
@@ -1531,15 +1574,30 @@ body.test-mode .test-tools{display:flex}
     var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
     var insideModeMenu=path.indexOf(q('#modeMenu'))>=0;
-    if(!insideDisplayPop&&!insideAppPop&&!insideModeMenu&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.mode-menu-trigger')&&!e.target.closest('#newDisplay')){
+    if(!insideDisplayPop&&!insideAppPop&&!insideModeMenu&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.mode-menu-trigger')&&!e.target.closest('#newDisplay')&&!e.target.closest('#newApp')){
       closePops();
     }
   });
 
   document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){
+    if(e.key!=='Escape')return;
+
+    if(q('#displayPop').classList.contains('open')||q('#appPop').classList.contains('open')||q('#modeMenu').classList.contains('open')){
       displayDraft=null;
       closePops();
+      return;
+    }
+
+    if(q('#shortcutOverlay').classList.contains('open')){
+      q('#shortcutOverlay').classList.remove('open');
+      return;
+    }
+
+    // The safe display test is intentionally not dismissible with Escape.
+    if(q('#testOverlay').classList.contains('open'))return;
+
+    if(q('#newSheet').classList.contains('open')){
+      q('#newSheet').classList.remove('open');
     }
   });
 
@@ -1561,6 +1619,7 @@ body.test-mode .test-tools{display:flex}
       if(selected)item.setAttribute('aria-current','page');
       else item.removeAttribute('aria-current');
     });
+    q('#settingsBtn').classList.toggle('active',shellView==='settings');
 
     q('.main').scrollTo({top:0,behavior:'auto'});
   }
@@ -1570,9 +1629,13 @@ body.test-mode .test-tools{display:flex}
   });
 
   q('#settingsBtn').onclick=function(){openShellView('settings')};
+  q('#identifyDisplays').onclick=function(){toast('Pantallas','Identificación simulada')};
+  q('#advancedDisplays').onclick=function(){toast('Pantallas','Configuración avanzada · prototipo')};
+  q('#restoreDisplays').onclick=function(){toast('Pantallas','Recuperación simulada')};
+  q('#advancedSettings').onclick=function(){toast('Avanzado','Diagnóstico y recuperación · prototipo')};
 
   openShellView('modes');
-  syncThemeButton();
+  syncThemeControl();
   syncTestMode();
   render();
 })();
