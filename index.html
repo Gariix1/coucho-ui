@@ -334,6 +334,88 @@ body.test-mode .test-tools{display:flex}
 .empty-state p{margin:6px 0 16px;color:var(--text2);font-size:12px}
 #testBtn.active{border-color:var(--accent);color:var(--accent);background:var(--selected-bg)}
 
+/* Scale the desktop UI with the available canvas instead of leaving large screens at laptop size. */
+@media(min-width:1280px){
+  body{font-size:clamp(14px,.86vw,16px)}
+
+  .app-shell{grid-template-columns:clamp(76px,4.8vw,88px) minmax(0,1fr)}
+  .nav-rail{padding:10px 8px 12px}
+  .rail-main{gap:7px}
+  .rail-item{min-height:clamp(60px,4vw,70px);gap:6px;border-radius:14px;font-size:clamp(10px,.62vw,11px)}
+  .rail-icon{font-size:clamp(20px,1.3vw,23px)}
+  .rail-item.active:before{left:-8px;top:16px;bottom:16px;width:4px}
+  .rail-bottom{gap:6px;padding-top:10px}
+  .rail-util{min-height:clamp(46px,3vw,54px)}
+  .rail-util .rail-icon{font-size:clamp(17px,1.05vw,20px)}
+
+  .wrap{max-width:1240px;padding:clamp(28px,2vw,36px) clamp(28px,2.2vw,40px) 64px}
+  .mode-status{margin-bottom:16px;font-size:clamp(12px,.72vw,13px)}
+
+  .btn{min-height:clamp(38px,2.5vw,44px);padding:7px 16px}
+  .btn.icon{width:clamp(42px,2.7vw,48px);height:clamp(42px,2.7vw,48px);font-size:18px}
+
+  .hero{width:min(clamp(760px,50vw,860px),100%);padding:clamp(18px,1.2vw,22px)}
+  .hero-top{gap:14px}
+  .namebox{gap:12px}
+  .mode-icon{width:clamp(46px,3vw,52px);height:clamp(46px,3vw,52px);border-radius:14px;font-size:clamp(23px,1.55vw,27px)}
+  .hero h2{font-size:clamp(20px,1.25vw,22px)}
+  .active-mark{font-size:clamp(10px,.67vw,12px);margin-bottom:5px}
+
+  .display-main{margin-top:15px;min-height:clamp(128px,8.6vw,150px);padding:16px}
+  .kicker{font-size:clamp(11px,.68vw,12px);margin-bottom:11px}
+  .displays{gap:12px}
+  .monitor.tv{width:clamp(100px,6.5vw,116px);height:clamp(58px,3.75vw,67px)}
+  .monitor.pc{width:clamp(72px,4.7vw,84px);height:clamp(46px,3vw,54px)}
+  .monitor:after{bottom:-8px;width:20px;height:7px}
+  .display-name{font-size:clamp(14px,.88vw,16px);margin-top:14px}
+
+  .recipe-meta{gap:10px;margin-top:10px}
+  .meta-action{min-height:clamp(58px,3.8vw,66px);gap:12px;padding:10px 12px}
+  .meta-icon{width:clamp(36px,2.45vw,42px);height:clamp(36px,2.45vw,42px);font-size:18px}
+  .meta-action small{font-size:clamp(10px,.66vw,12px);margin-bottom:3px}
+  .meta-action b{font-size:clamp(13px,.8vw,15px)}
+
+  .section{margin:30px 0 14px}
+  .section h3{font-size:clamp(20px,1.3vw,22px)}
+
+  .cards{grid-template-columns:repeat(auto-fill,minmax(360px,400px));gap:16px}
+  .card{padding:clamp(16px,1.05vw,19px)}
+  .card-head{gap:14px}
+  .card-name{gap:11px}
+  .card-name b{font-size:clamp(16px,1vw,18px)}
+  .card-icon{width:clamp(42px,2.75vw,48px);height:clamp(42px,2.75vw,48px);font-size:22px}
+  .card-head .activate{min-width:92px}
+
+  .card-display{min-height:clamp(96px,6.4vw,112px);margin:12px 0 10px;padding:12px 14px}
+  .card-screen-row{gap:18px}
+  .card-display .monitor.tv{width:clamp(72px,4.8vw,84px);height:clamp(42px,2.8vw,49px)}
+  .card-display .monitor.pc{width:clamp(52px,3.4vw,60px);height:clamp(33px,2.2vw,39px)}
+  .screen-count{font-size:clamp(12px,.75vw,14px)}
+  .monitor-star{font-size:10px}
+
+  .card-facts{gap:9px}
+  .card-fact{min-height:clamp(46px,3vw,52px);gap:9px;padding:8px 10px}
+  .card-fact .fact-icon{font-size:16px}
+  .card-fact b{font-size:clamp(13px,.8vw,14px)}
+
+  .shell-placeholder{max-width:1120px;padding:32px 36px 60px}
+  .shell-page-head{margin-bottom:24px}
+  .shell-page-head h1{font-size:clamp(30px,1.9vw,34px)}
+  .shell-page-head p{font-size:clamp(13px,.8vw,14px)}
+  .shell-grid{grid-template-columns:repeat(auto-fit,minmax(280px,360px));gap:16px}
+  .shell-card{padding:18px}
+  .shell-card-icon{width:42px;height:42px;font-size:17px}
+  .shell-card h3{font-size:16px}
+  .shell-card small,.shell-row{font-size:13px}
+  .shell-row{min-height:44px}
+}
+
+@media(min-width:1680px){
+  .wrap{max-width:1320px}
+  .hero{width:min(900px,100%)}
+  .cards{grid-template-columns:repeat(auto-fill,minmax(380px,420px))}
+}
+
 @media(max-width:760px){
   .app-shell{grid-template-columns:60px minmax(0,1fr)}
   .nav-rail{padding-inline:5px}
