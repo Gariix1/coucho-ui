@@ -196,9 +196,32 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 /* popovers */
 .pop{display:none;position:fixed;z-index:50;border:1px solid var(--glass-border);border-radius:var(--r-compact);background:var(--floating-bg);box-shadow:var(--shadow);padding:12px;min-width:300px;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)}
 .pop.open{display:block}.pop-title{font-size:12px;font-weight:600;color:var(--text2);margin:2px 4px 10px}
-.display-options{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
-.display-option{min-height:110px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-control);display:grid;place-items:center;padding:8px;text-align:center}
-.display-option:hover{background:var(--glass-pill)}.display-option.selected{border-color:var(--selected-border);background:var(--selected-bg)}.display-option b{font-size:9px;margin-top:8px}
+.display-editor{width:min(620px,calc(100vw - 24px));padding:14px}
+.display-editor-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.display-editor-head .pop-title{margin:0}
+.display-editor-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.preserve-btn.selected{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
+.screen-map{display:grid;grid-template-columns:1.22fr 1fr 1fr;gap:10px;padding:12px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset)}
+.screen-device{position:relative;min-width:0}
+.screen-face{width:100%;min-height:150px;padding:12px 10px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-control);display:grid;grid-template-rows:auto 1fr auto;gap:8px;text-align:center}
+.screen-face:hover{background:var(--glass-pill);border-color:var(--glass-border)}
+.screen-device.selected .screen-face{border-color:var(--selected-border);background:var(--selected-bg)}
+.screen-device.off .screen-face{opacity:.46;filter:saturate(.55)}
+.screen-number{justify-self:start;width:25px;height:25px;border-radius:999px;display:grid;place-items:center;background:var(--glass-command);border:1px solid var(--glass-soft-border);font-size:11px;font-weight:600}
+.screen-device.selected .screen-number{background:var(--accent);border-color:var(--accent);color:var(--primary-fg)}
+.screen-shape{align-self:center;justify-self:center;position:relative;width:86%;height:58px;border:2px solid var(--monitor-border);border-radius:7px;background:linear-gradient(145deg,var(--monitor-bg-a),var(--monitor-bg-b))}
+.screen-device.tv .screen-shape{width:96%;height:64px}
+.screen-shape:after{content:"";position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);width:22px;height:7px;border-left:2px solid var(--monitor-stand);border-right:2px solid var(--monitor-stand)}
+.screen-copy b{display:block;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.screen-copy small{display:block;font-size:9px;color:var(--text2);margin-top:2px}
+.primary-screen-btn{position:absolute;right:8px;top:8px;width:30px;height:30px;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);display:grid;place-items:center;color:var(--muted);font-size:13px}
+.primary-screen-btn:hover{background:var(--glass-pill);color:var(--text)}
+.screen-device.primary .primary-screen-btn{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
+.screen-map.preserve .screen-device{pointer-events:none}
+.screen-map.preserve .screen-device{opacity:.38}
+.display-editor-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.display-editor-summary{min-width:0;color:var(--text2);font-size:11px}
+.display-editor-summary b{color:var(--text);font-weight:600}
 .app-options{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 .app-option{min-height:82px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-control);display:grid;place-items:center;padding:8px;text-align:center}
 .app-option:hover{background:var(--glass-pill)}.app-option.selected{border-color:var(--selected-border);background:var(--selected-bg)}.app-option b{font-size:9px}
@@ -262,7 +285,7 @@ body.test-mode .test-tools{display:flex}
 #testBtn.active{border-color:var(--accent);color:var(--accent);background:var(--selected-bg)}
 
 @media(max-width:760px){
-  .wrap{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.display-options{grid-template-columns:1fr}
+  .wrap{padding:18px 16px 40px}.recipe-meta{grid-template-columns:1fr}.new-apps,.app-options{grid-template-columns:repeat(2,1fr)}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-foot .btn{width:100%}
 }
 </style>
 </head>
@@ -278,7 +301,7 @@ body.test-mode .test-tools{display:flex}
       <div class="header">
         <div class="header-left">
           <div class="header-logo">C</div>
-          <div><h1>Coucho</h1><small>2 pantallas · 🎮 conectado</small></div>
+          <div><h1>Coucho</h1><small>3 pantallas · 🎮 conectado</small></div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn icon" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">☀</button>
@@ -332,13 +355,18 @@ body.test-mode .test-tools{display:flex}
   </main>
 </div>
 
-<div class="pop" id="displayPop">
-  <div class="pop-title">Pantallas</div>
-  <div class="display-options">
-    <button class="display-option" data-mode="preserve"><div><div style="font-size:26px">↔</div><b>Sin cambios</b></div></button>
-    <button class="display-option" data-mode="both"><div><div class="displays"><div class="monitor tv primary" style="width:55px;height:32px"></div><div class="monitor pc" style="width:38px;height:25px"></div></div><b>TV + PC</b></div></button>
-    <button class="display-option" data-mode="tv"><div><div class="displays"><div class="monitor tv primary" style="width:60px;height:35px"></div></div><b>TV</b></div></button>
-    <button class="display-option" data-mode="monitor"><div><div class="displays"><div class="monitor tv primary" style="width:60px;height:35px"></div></div><b>PC</b></div></button>
+<div class="pop display-editor" id="displayPop">
+  <div class="display-editor-head">
+    <div>
+      <div class="pop-title">Pantallas</div>
+      <div class="display-editor-sub">3 conectadas · toca para incluir o excluir</div>
+    </div>
+    <button class="btn preserve-btn" id="preserveDisplays">↔ Sin cambios</button>
+  </div>
+  <div class="screen-map" id="screenMap"></div>
+  <div class="display-editor-foot">
+    <div class="display-editor-summary" id="displayEditorSummary"></div>
+    <button class="btn primary" id="applyDisplays">Probar</button>
   </div>
 </div>
 
@@ -415,12 +443,30 @@ body.test-mode .test-tools{display:flex}
 
 <script>
 (function(){
+  var simulatedDisplays=[
+    {id:'tv',number:1,name:'TV Sala',detail:'3840 × 2160 · 120 Hz',kind:'tv'},
+    {id:'main',number:2,name:'Monitor 1',detail:'2560 × 1440 · 165 Hz',kind:'monitor'},
+    {id:'aux',number:3,name:'Monitor 2',detail:'1920 × 1080 · 75 Hz',kind:'monitor'}
+  ];
+
   function demoSets(){
     return [
-      {id:1,name:'Gaming',icon:'🎮',mode:'both',display:'TV + Monitor',app:'Steam',shortcut:'Guide + A',active:true},
-      {id:2,name:'Películas',icon:'🎬',mode:'tv',display:'Solo TV',app:'Plex',shortcut:'Manual',active:false},
-      {id:3,name:'Escritorio',icon:'🖥️',mode:'monitor',display:'Solo Monitor',app:'Ninguna',shortcut:'Manual',active:false}
+      {id:1,name:'Gaming',icon:'🎮',preserve:false,displayIds:['tv','main'],primaryDisplayId:'tv',app:'Steam',shortcut:'Guide + A',active:true},
+      {id:2,name:'Películas',icon:'🎬',preserve:false,displayIds:['tv'],primaryDisplayId:'tv',app:'Plex',shortcut:'Manual',active:false},
+      {id:3,name:'Escritorio',icon:'🖥️',preserve:false,displayIds:['main','aux'],primaryDisplayId:'main',app:'Ninguna',shortcut:'Manual',active:false}
     ];
+  }
+
+  function migrateSet(s){
+    if(Array.isArray(s.displayIds)){
+      return Object.assign({preserve:false,primaryDisplayId:s.displayIds[0]||null},s);
+    }
+    var ids=s.mode==='tv'?['tv']:s.mode==='monitor'?['main']:s.mode==='preserve'?[]:['tv','main'];
+    return Object.assign({},s,{
+      preserve:s.mode==='preserve',
+      displayIds:ids,
+      primaryDisplayId:ids[0]||null
+    });
   }
 
   function loadSets(){
@@ -428,7 +474,7 @@ body.test-mode .test-tools{display:flex}
       var saved=localStorage.getItem('coucho-test-sets');
       if(saved!==null){
         var parsed=JSON.parse(saved);
-        if(Array.isArray(parsed)) return parsed;
+        if(Array.isArray(parsed)) return parsed.map(migrateSet);
       }
     }catch(_){}
     return demoSets();
@@ -439,7 +485,9 @@ body.test-mode .test-tools{display:flex}
   var editTarget=null;
   var shortcutTarget=null;
   var captured=null;
-  var newDraft={mode:'both',display:'TV + Monitor',app:'Steam',name:'Gaming',icon:'🎮'};
+  var displayDraft=null;
+  var displayDraftIsNew=false;
+  var newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',name:'Gaming',icon:'🎮'};
   var testContext=null;
   var progressTimer=null;
   var countdownTimer=null;
@@ -475,19 +523,39 @@ body.test-mode .test-tools{display:flex}
     if(app==='Ninguna') return {name:'Escritorio',icon:'🖥️'};
     return {name:'Gaming',icon:'🎮'};
   }
-  function modeName(mode){
-    if(mode==='preserve') return 'Sin cambios';
-    if(mode==='tv') return 'Solo TV';
-    if(mode==='monitor') return 'Solo Monitor';
-    return 'TV + Monitor';
+  function getDisplay(id){
+    return simulatedDisplays.find(function(d){return d.id===id});
   }
-  function displayMarkup(mode,small){
-    if(mode==='preserve') return '<div style="font-size:'+(small?'24':'34')+'px;color:#aab5c6">↔</div>';
-    var tv='<div class="monitor tv primary"'+(small?' style="width:55px;height:32px"':'')+'></div>';
-    var pc='<div class="monitor pc"'+(small?' style="width:38px;height:25px"':'')+'></div>';
-    if(mode==='tv') return tv;
-    if(mode==='monitor') return '<div class="monitor tv primary"'+(small?' style="width:55px;height:32px"':' style="width:74px;height:44px"')+'></div>';
-    return tv+pc;
+  function displayConfig(source){
+    return {
+      preserve:!!source.preserve,
+      displayIds:Array.isArray(source.displayIds)?source.displayIds.slice():[],
+      primaryDisplayId:source.primaryDisplayId||null
+    };
+  }
+  function displaySummary(source){
+    if(source.preserve)return 'Sin cambios';
+    var ids=Array.isArray(source.displayIds)?source.displayIds:[];
+    var names=ids.map(function(id){var d=getDisplay(id);return d?d.name:id});
+    if(names.length===0)return 'Sin pantallas';
+    if(names.length===1)return names[0];
+    if(names.length===2)return names.join(' + ');
+    return names.length+' pantallas';
+  }
+  function displayMarkup(source,small){
+    if(source.preserve)return '<div style="font-size:'+(small?'24':'34')+'px;color:var(--muted)">↔</div>';
+    var ids=Array.isArray(source.displayIds)?source.displayIds:[];
+    if(ids.length===0)return '<div style="font-size:'+(small?'20':'28')+'px;color:var(--muted)">—</div>';
+    return ids.map(function(id){
+      var d=getDisplay(id);
+      if(!d)return '';
+      var cls=d.kind==='tv'?'tv':'pc';
+      var primary=id===source.primaryDisplayId?' primary':'';
+      var style=small
+        ?(d.kind==='tv'?' style="width:55px;height:32px"':' style="width:38px;height:25px"')
+        :'';
+      return '<div class="monitor '+cls+primary+'"'+style+' title="'+d.name+'"></div>';
+    }).join('');
   }
   function shortcutLabel(v){return v==='Manual'?'Añadir':v}
   function shortcutMarkup(v){
@@ -520,7 +588,7 @@ body.test-mode .test-tools{display:flex}
     hero.style.display='';
     var a=active();
     q('#heroName').textContent=a.name;q('#heroIcon').textContent=a.icon;
-    q('#heroDisplays').innerHTML=displayMarkup(a.mode,false);q('#heroDisplayName').textContent=a.display;
+    q('#heroDisplays').innerHTML=displayMarkup(a,false);q('#heroDisplayName').textContent=displaySummary(a);
     q('#heroApp').textContent=a.app;q('#heroShortcut').textContent=shortcutLabel(a.shortcut);
 
     q('#cards').innerHTML=sets.filter(function(s){return !s.active}).map(function(s){
@@ -528,7 +596,7 @@ body.test-mode .test-tools{display:flex}
         '<div class="card-head"><div class="card-name"><div class="card-icon">'+s.icon+'</div><b>'+s.name+'</b></div>'+
           '<button class="delete-mode test-only delete-card" data-id="'+s.id+'" title="Eliminar este modo" aria-label="Eliminar '+s.name+'">✕</button>'+
         '</div>'+
-        '<button class="card-display display-trigger" data-id="'+s.id+'"><div><div class="displays">'+displayMarkup(s.mode,true)+'</div><div class="card-display-name">'+s.display+'</div></div></button>'+
+        '<button class="card-display display-trigger" data-id="'+s.id+'"><div><div class="displays">'+displayMarkup(s,true)+'</div><div class="card-display-name">'+displaySummary(s)+'</div></div></button>'+
         '<div class="card-meta">'+
           '<button class="app-trigger" data-id="'+s.id+'"><span class="mi">▶</span><div><small>Apps</small><b>'+s.app+'</b></div></button>'+
           '<button class="shortcut-trigger" data-id="'+s.id+'"><span class="mi">🎮</span><div><small>Activar con</small><b>'+shortcutLabel(s.shortcut)+'</b></div></button>'+
@@ -571,10 +639,75 @@ body.test-mode .test-tools{display:flex}
   function closePops(){q('#displayPop').classList.remove('open');q('#appPop').classList.remove('open')}
 
   function openDisplayPop(anchor,rawId,isNew){
-    closePops();editTarget=isNew?'new':resolveId(rawId);
-    var mode=isNew?newDraft.mode:byId(editTarget).mode;
-    qa('#displayPop .display-option').forEach(function(x){x.classList.toggle('selected',x.dataset.mode===mode)});
-    q('#displayPop').classList.add('open');positionPop(q('#displayPop'),anchor);
+    closePops();
+    displayDraftIsNew=!!isNew;
+    editTarget=isNew?'new':resolveId(rawId);
+    var source=isNew?newDraft:byId(editTarget);
+    if(!source)return;
+    displayDraft=displayConfig(source);
+    if(!displayDraft.preserve&&displayDraft.displayIds.length===0){
+      displayDraft.displayIds=['main'];
+      displayDraft.primaryDisplayId='main';
+    }
+    renderDisplayEditor();
+    q('#applyDisplays').textContent=isNew?'Usar':'Probar';
+    q('#displayPop').classList.add('open');
+    positionPop(q('#displayPop'),anchor);
+  }
+
+  function renderDisplayEditor(){
+    var map=q('#screenMap');
+    map.classList.toggle('preserve',displayDraft.preserve);
+    q('#preserveDisplays').classList.toggle('selected',displayDraft.preserve);
+    map.innerHTML=simulatedDisplays.map(function(d){
+      var selected=displayDraft.displayIds.indexOf(d.id)>=0;
+      var primary=selected&&displayDraft.primaryDisplayId===d.id;
+      return '<div class="screen-device '+d.kind+(selected?' selected':' off')+(primary?' primary':'')+'" data-display="'+d.id+'">'+
+        '<button class="screen-face screen-toggle" data-display="'+d.id+'">'+
+          '<span class="screen-number">'+d.number+'</span>'+
+          '<span class="screen-shape"></span>'+
+          '<span class="screen-copy"><b>'+d.name+'</b><small>'+d.detail+'</small></span>'+
+        '</button>'+
+        '<button class="primary-screen-btn" data-primary="'+d.id+'" title="Hacer principal" aria-label="Hacer '+d.name+' principal">★</button>'+
+      '</div>';
+    }).join('');
+
+    qa('.screen-toggle').forEach(function(b){
+      b.onclick=function(){toggleDisplay(b.dataset.display)};
+    });
+    qa('.primary-screen-btn').forEach(function(b){
+      b.onclick=function(e){e.stopPropagation();makePrimary(b.dataset.primary)};
+    });
+
+    var summary=displayDraft.preserve?'No cambiar las pantallas al activar':displaySummary(displayDraft);
+    var primary=getDisplay(displayDraft.primaryDisplayId);
+    q('#displayEditorSummary').innerHTML=displayDraft.preserve
+      ?'<b>Sin cambios</b>'
+      :'<b>'+summary+'</b>'+(primary?'<br>Principal · '+primary.name:'');
+  }
+
+  function toggleDisplay(id){
+    if(displayDraft.preserve)return;
+    var index=displayDraft.displayIds.indexOf(id);
+    if(index>=0){
+      if(displayDraft.displayIds.length===1){
+        toast('Pantallas','Debe quedar al menos una activa');
+        return;
+      }
+      displayDraft.displayIds.splice(index,1);
+      if(displayDraft.primaryDisplayId===id)displayDraft.primaryDisplayId=displayDraft.displayIds[0]||null;
+    }else{
+      displayDraft.displayIds.push(id);
+      if(!displayDraft.primaryDisplayId)displayDraft.primaryDisplayId=id;
+    }
+    renderDisplayEditor();
+  }
+
+  function makePrimary(id){
+    if(displayDraft.preserve)return;
+    if(displayDraft.displayIds.indexOf(id)<0)displayDraft.displayIds.push(id);
+    displayDraft.primaryDisplayId=id;
+    renderDisplayEditor();
   }
 
   function openAppPop(anchor,rawId,isNew){
@@ -584,16 +717,38 @@ body.test-mode .test-tools{display:flex}
     q('#appPop').classList.add('open');positionPop(q('#appPop'),anchor);
   }
 
-  qa('#displayPop .display-option').forEach(function(b){
-    b.onclick=function(){
-      var mode=b.dataset.mode;closePops();
-      if(editTarget==='new'){
-        newDraft.mode=mode;newDraft.display=modeName(mode);renderNew();return;
-      }
-      var s=byId(editTarget);
-      startTest({kind:'display',id:s.id,mode:mode,display:modeName(mode),app:s.app,name:s.name,icon:s.icon});
-    };
-  });
+  q('#preserveDisplays').onclick=function(){
+    displayDraft.preserve=!displayDraft.preserve;
+    renderDisplayEditor();
+  };
+
+  q('#applyDisplays').onclick=function(){
+    if(!displayDraft)return;
+    if(!displayDraft.preserve&&displayDraft.displayIds.length===0){
+      toast('Pantallas','Elige al menos una pantalla');
+      return;
+    }
+    closePops();
+    if(displayDraftIsNew){
+      newDraft.preserve=displayDraft.preserve;
+      newDraft.displayIds=displayDraft.displayIds.slice();
+      newDraft.primaryDisplayId=displayDraft.primaryDisplayId;
+      renderNew();
+      return;
+    }
+    var s=byId(editTarget);
+    if(!s)return;
+    startTest({
+      kind:'display',
+      id:s.id,
+      preserve:displayDraft.preserve,
+      displayIds:displayDraft.displayIds.slice(),
+      primaryDisplayId:displayDraft.primaryDisplayId,
+      app:s.app,
+      name:s.name,
+      icon:s.icon
+    });
+  };
 
   qa('#appPop .app-option').forEach(function(b){
     b.onclick=function(){
@@ -609,14 +764,14 @@ body.test-mode .test-tools{display:flex}
   });
 
   function openNew(){
-    newDraft={mode:'both',display:'TV + Monitor',app:'Steam',name:'Gaming',icon:'🎮'};
+    newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',name:'Gaming',icon:'🎮'};
     renderNew();q('#newSheet').classList.add('open');
   }
 
   function renderNew(){
     q('#newName').textContent=newDraft.name;
-    q('#newDisplays').innerHTML=displayMarkup(newDraft.mode,false);
-    q('#newDisplayName').textContent=newDraft.display;
+    q('#newDisplays').innerHTML=displayMarkup(newDraft,false);
+    q('#newDisplayName').textContent=displaySummary(newDraft);
     qa('#newApps .new-app').forEach(function(b){b.classList.toggle('selected',b.dataset.app===newDraft.app)});
   }
 
@@ -680,8 +835,8 @@ body.test-mode .test-tools{display:flex}
   q('#newTry').onclick=function(){
     q('#newSheet').classList.remove('open');
     startTest({
-      kind:'new',id:Date.now(),mode:newDraft.mode,display:newDraft.display,
-      app:newDraft.app,shortcut:'Manual',name:newDraft.name,icon:newDraft.icon
+      kind:'new',id:Date.now(),preserve:newDraft.preserve,displayIds:newDraft.displayIds.slice(),
+      primaryDisplayId:newDraft.primaryDisplayId,app:newDraft.app,shortcut:'Manual',name:newDraft.name,icon:newDraft.icon
     });
   };
 
@@ -715,7 +870,7 @@ body.test-mode .test-tools{display:flex}
 
   function startTest(ctx){
     testContext=ctx;clearInterval(progressTimer);clearInterval(countdownTimer);
-    q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx.mode,true)+'</div>';
+    q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx,true)+'</div>';
     q('#testApp').textContent=logo(ctx.app);
     q('#testText').textContent='Probando '+ctx.name+'…';
     q('#progress').style.width='0%';q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
@@ -739,11 +894,15 @@ body.test-mode .test-tools{display:flex}
   q('#keep').onclick=function(){
     clearInterval(countdownTimer);
     if(testContext.kind==='display'){
-      var s=byId(testContext.id);s.mode=testContext.mode;s.display=testContext.display;
+      var s=byId(testContext.id);
+      s.preserve=testContext.preserve;
+      s.displayIds=testContext.displayIds.slice();
+      s.primaryDisplayId=testContext.primaryDisplayId;
     }else{
       sets.push({
         id:testContext.id,name:testContext.name,icon:testContext.icon,
-        mode:testContext.mode,display:testContext.display,app:testContext.app,
+        preserve:testContext.preserve,displayIds:testContext.displayIds.slice(),
+        primaryDisplayId:testContext.primaryDisplayId,app:testContext.app,
         shortcut:'Manual',active:false
       });
       sets.forEach(function(s){s.active=s.id===testContext.id});
