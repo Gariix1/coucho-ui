@@ -297,51 +297,66 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .workspace-close{display:none;width:32px;height:32px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-command);color:var(--text2);place-items:center;padding:0}
 .detail-mode .workspace-close{display:grid}.workspace-close:hover{background:var(--glass-pill);border-color:var(--glass-border);color:var(--text)}
 
-/* Coucho motion primitives: compositor-friendly, mirrored by WinUI Composition */
-.coucho-motion-surface{
-  position:fixed;z-index:90;pointer-events:none;transform-origin:top left;overflow:hidden;
-  border:1px solid var(--selected-border);border-radius:var(--r-card);
-  background:linear-gradient(180deg,var(--selected-bg),var(--glass-card));
-  box-shadow:0 18px 48px rgba(0,0,0,.22);will-change:transform,opacity
+/* Coucho container transform
+   Desktop uses one shared snapshot: saved card -> detail workspace.
+   This mirrors a WinUI Composition Visual animating Offset + Size + RectangleClip. */
+:root{view-transition-name:none}
+
+::view-transition-group(coucho-mode){
+  z-index:90;
+  animation-duration:360ms;
+  animation-timing-function:cubic-bezier(.18,.82,.18,1)
 }
-.coucho-motion-surface.sheet{
-  box-shadow:8px 8px 0 -1px var(--glass-surface),8px 8px 0 0 var(--glass-border),0 22px 56px rgba(0,0,0,.24)
+::view-transition-image-pair(coucho-mode){
+  isolation:auto;
+  overflow:clip;
+  animation:coucho-container-shape 360ms cubic-bezier(.18,.82,.18,1) both;
+  box-shadow:0 20px 48px rgba(0,0,0,.20)
 }
-.coucho-motion-bridge{
-  position:fixed;z-index:89;pointer-events:none;transform-origin:left center;
-  border:1px solid var(--selected-border);border-radius:999px;
-  background:linear-gradient(90deg,var(--selected-bg),var(--glass-card));
-  box-shadow:0 14px 36px rgba(0,0,0,.16);opacity:0;will-change:transform,opacity
+::view-transition-old(coucho-mode),
+::view-transition-new(coucho-mode){
+  width:100%;
+  height:100%;
+  mix-blend-mode:normal;
+  object-fit:fill;
+  animation-duration:360ms;
+  animation-fill-mode:both
 }
+::view-transition-old(coucho-mode){
+  animation-name:coucho-old-content;
+  animation-timing-function:cubic-bezier(.4,0,1,1)
+}
+::view-transition-new(coucho-mode){
+  animation-name:coucho-new-content;
+  animation-timing-function:cubic-bezier(0,0,.2,1)
+}
+@keyframes coucho-container-shape{
+  0%{clip-path:inset(0 round 18px)}
+  46%{clip-path:inset(0 round 42px)}
+  72%{clip-path:inset(0 round 24px)}
+  100%{clip-path:inset(0 round 18px)}
+}
+@keyframes coucho-old-content{
+  0%,26%{opacity:1}
+  52%,100%{opacity:0}
+}
+@keyframes coucho-new-content{
+  0%,38%{opacity:0}
+  70%,100%{opacity:1}
+}
+
+/* Narrow Control windows intentionally do not perform a lateral container transform. */
 .visual-workspace.compact-detail-enter{animation:compactDetailIn .18s cubic-bezier(.18,.82,.18,1) both}
 .visual-workspace.compact-detail-exit{animation:compactDetailOut .14s cubic-bezier(.38,0,.20,1) both}
 @keyframes compactDetailIn{from{opacity:.25;transform:translateY(6px) scale(.992)}to{opacity:1;transform:none}}
 @keyframes compactDetailOut{from{opacity:1;transform:none}to{opacity:.2;transform:translateY(-4px) scale(.994)}}
 
-.coucho-motion-summary{position:absolute;left:10px;right:10px;bottom:10px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:6px;will-change:opacity,transform}
-.coucho-motion-summary span{height:28px;border:1px solid var(--glass-soft-border);border-radius:8px;background:var(--glass-inset)}
-.coucho-motion-fold-edge{position:absolute;left:12px;right:12px;top:calc(100% - 2px);height:2px;border-radius:999px;background:var(--selected-border);opacity:0;will-change:opacity,transform}
-
-.coucho-motion-icon,.coucho-motion-name{
-  position:fixed;z-index:91;pointer-events:none;transform-origin:top left;will-change:transform,opacity
-}
-.coucho-motion-icon{
-  display:grid;place-items:center;border:1px solid var(--selected-border);border-radius:10px;
-  background:var(--selected-bg);font-size:18px
-}
-.coucho-motion-name{
-  color:var(--text);font-size:12px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
-.morph-origin{opacity:.24!important;transform:scale(.992);transform-origin:center;transition:opacity .083s linear,transform .167s cubic-bezier(0,0,0,1)}
-.visual-workspace.motion-content-hidden .visual-workspace-head,
-.visual-workspace.motion-content-hidden .workspace-section-head,
-.visual-workspace.motion-content-hidden .workspace-screen-stage,
-.visual-workspace.motion-content-hidden .workspace-pieces,
-.visual-workspace.motion-content-hidden .workspace-footer{opacity:0;transform:translateY(5px)}
 @media(prefers-reduced-motion:reduce){
-  .coucho-motion-surface,.coucho-motion-bridge,.coucho-motion-icon,.coucho-motion-name{display:none!important}
+  ::view-transition-group(coucho-mode),
+  ::view-transition-image-pair(coucho-mode),
+  ::view-transition-old(coucho-mode),
+  ::view-transition-new(coucho-mode){animation-duration:.001ms!important}
   .visual-workspace,.visual-workspace>*{transition:none!important;animation:none!important}
-  .morph-origin{transition:none!important;transform:none!important}
 }
 .visual-workspace-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
 .workspace-title-block{min-width:0;display:flex;align-items:center;gap:11px}.workspace-profile-icon{display:none;width:48px;height:48px;flex:0 0 auto;border:1px solid var(--selected-border);border-radius:14px;background:var(--selected-bg);place-items:center;font-size:22px}.detail-mode .workspace-profile-icon{display:grid}.workspace-title-copy{min-width:0}.workspace-eyebrow{display:block;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
@@ -1220,32 +1235,10 @@ body.test-mode .test-tools{display:flex}
   }
 
   var CouchoMotion=(function(){
-    // Motion spec intentionally maps to WinUI Composition primitives:
-    // Translation + Scale + Opacity, with one delayed state handoff.
-    var spec={
-      open:{
-        duration:340,
-        easing:'cubic-bezier(.18,.82,.18,1)',
-        prepareAt:176,
-        contentDelay:22,
-        contentDuration:122
-      },
-      close:{
-        duration:280,
-        easing:'cubic-bezier(.38,0,.20,1)',
-        contentOut:78
-      },
-      identity:{open:270,close:235},
-      handoff:84,
-      desktopMin:1041
-    };
+    var spec={desktopMin:1041};
 
     function reduced(){
       return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    }
-
-    function delay(ms){
-      return new Promise(function(resolve){setTimeout(resolve,ms)});
     }
 
     function visible(rect){
@@ -1256,441 +1249,152 @@ body.test-mode .test-tools{display:flex}
       return el&&el.isConnected?el.getBoundingClientRect():null;
     }
 
-    // Contract: connected card -> workspace morph exists only in the side-by-side desktop layout.
-    // Narrow/stacked Control windows deliberately use compact detail motion.
-    function desktopMorphAvailable(source,target){
-      if(reduced()||!window.matchMedia('(min-width: '+spec.desktopMin+'px)').matches)return false;
+    function nativeContainerTransformAvailable(source,target){
+      if(reduced())return false;
+      if(typeof document.startViewTransition!=='function')return false;
+      if(!window.matchMedia('(min-width: '+spec.desktopMin+'px)').matches)return false;
+
       var s=rectOf(source),t=rectOf(target);
       if(!visible(s)||!visible(t))return false;
-      // The connected morph only makes sense when the saved card is genuinely to the left
-      // of the detail surface. Stacked/responsive layouts use compact motion instead.
-      return s.right+12<t.left&&Math.abs((s.top+s.height/2)-(t.top+t.height/2))<window.innerHeight*.72;
+
+      // Desktop contract: card is actually left of the detail surface.
+      // Stacked/responsive windows always use compact motion instead.
+      return s.right+12<t.left;
     }
 
-    function compactOpen(target,prepare,done){
+    function compactOpen(target,update,done){
       modeMorphing=true;
-      prepare();
-      target.classList.remove('motion-content-hidden');
+      update();
       target.classList.add('compact-detail-enter');
-      var finished=false;
+
       var finish=function(){
-        if(finished)return;
-        finished=true;
         target.classList.remove('compact-detail-enter');
         modeMorphing=false;
         if(done)done();
       };
+
       if(reduced()){finish();return Promise.resolve()}
       var animations=target.getAnimations();
       if(!animations.length){finish();return Promise.resolve()}
       return Promise.all(animations.map(function(a){return a.finished.catch(function(){})})).then(finish);
     }
 
-    function compactClose(source,done){
+    function compactClose(source,update,done){
       modeMorphing=true;
-      var finished=false;
+
+      if(reduced()){
+        update();
+        modeMorphing=false;
+        if(done)done();
+        return Promise.resolve();
+      }
+
+      source.classList.add('compact-detail-exit');
+      var animations=source.getAnimations();
+
       var finish=function(){
-        if(finished)return;
-        finished=true;
         source.classList.remove('compact-detail-exit');
+        update();
         modeMorphing=false;
         if(done)done();
       };
-      if(reduced()){
-        finish();
-        return Promise.resolve();
-      }
-      source.classList.add('compact-detail-exit');
-      var animations=source.getAnimations();
-      if(!animations.length){
-        finish();
-        return Promise.resolve();
-      }
+
+      if(!animations.length){finish();return Promise.resolve()}
       return Promise.all(animations.map(function(a){return a.finished.catch(function(){})})).then(finish);
-    }
-
-    function sourceIdentity(card){
-      return {
-        icon:rectOf(card&&card.querySelector('.mode-list-icon')),
-        name:rectOf(card&&card.querySelector('.mode-list-name'))
-      };
-    }
-
-    function workspaceIdentityRect(workspaceRect){
-      return {
-        icon:{
-          left:workspaceRect.left+17,top:workspaceRect.top+16,
-          width:48,height:48,
-          right:workspaceRect.left+65,bottom:workspaceRect.top+64
-        },
-        name:{
-          left:workspaceRect.left+76,top:workspaceRect.top+28,
-          width:Math.min(260,Math.max(130,workspaceRect.width-180)),height:24,
-          right:workspaceRect.left+76+Math.min(260,Math.max(130,workspaceRect.width-180)),
-          bottom:workspaceRect.top+52
-        }
-      };
-    }
-
-    function targetIdentity(workspace){
-      return {
-        icon:rectOf(workspace&&workspace.querySelector('#workspaceProfileIcon')),
-        name:rectOf(workspace&&workspace.querySelector('#workspaceName'))
-      };
-    }
-
-    function makeSurface(rect){
-      var el=document.createElement('div');
-      el.className='coucho-motion-surface sheet';
-      el.innerHTML='<div class="coucho-motion-summary"><span></span><span></span><span></span></div><span class="coucho-motion-fold-edge"></span>';
-      Object.assign(el.style,{
-        left:rect.left+'px',top:rect.top+'px',
-        width:rect.width+'px',height:rect.height+'px'
-      });
-      el.setAttribute('aria-hidden','true');
-      document.body.appendChild(el);
-      return el;
-    }
-
-    function makeBridge(from,to){
-      var startX=from.right-16;
-      var endX=to.left+18;
-      var width=Math.max(48,endX-startX);
-      var height=Math.max(42,Math.min(74,from.height*.48));
-      var top=from.top+(from.height-height)/2;
-      var el=document.createElement('div');
-      el.className='coucho-motion-bridge';
-      Object.assign(el.style,{
-        left:startX+'px',top:top+'px',width:width+'px',height:height+'px'
-      });
-      el.setAttribute('aria-hidden','true');
-      document.body.appendChild(el);
-      return el;
-    }
-
-    function makeIcon(rect,mode){
-      if(!visible(rect))return null;
-      var el=document.createElement('div');
-      el.className='coucho-motion-icon';
-      el.textContent=mode.icon;
-      Object.assign(el.style,{
-        left:rect.left+'px',top:rect.top+'px',
-        width:rect.width+'px',height:rect.height+'px'
-      });
-      el.setAttribute('aria-hidden','true');
-      document.body.appendChild(el);
-      return el;
-    }
-
-    function makeName(rect,mode){
-      if(!visible(rect))return null;
-      var el=document.createElement('div');
-      el.className='coucho-motion-name';
-      el.textContent=mode.name;
-      Object.assign(el.style,{
-        left:rect.left+'px',top:rect.top+'px',
-        width:Math.max(rect.width,72)+'px',height:rect.height+'px',
-        lineHeight:rect.height+'px'
-      });
-      el.setAttribute('aria-hidden','true');
-      document.body.appendChild(el);
-      return el;
-    }
-
-    function animateSurfaceOpen(surface,from,to){
-      var dx=to.left-from.left;
-      var dy=to.top-from.top;
-      var sx=to.width/from.width;
-      var sy=to.height/from.height;
-      var liftX=Math.max(-10,Math.min(14,dx*.055));
-      var travelY=dy;
-
-      var a=surface.animate(
-        [
-          {transform:'translate3d(0,0,0) scale(1,1)',opacity:1,borderRadius:'18px',offset:0},
-          {transform:'translate3d('+liftX+'px,-3px,0) scale(1.018,1.018)',opacity:1,borderRadius:'20px',offset:.12},
-          // The card becomes a capsule while it reaches across to the workspace.
-          {transform:'translate3d('+(dx*.78)+'px,'+(travelY*.86)+'px,0) scale('+(1+(sx-1)*.78)+',.88)',opacity:1,borderRadius:'44px',offset:.55},
-          // Once visually connected, settle over the destination at card-height first.
-          {transform:'translate3d('+dx+'px,'+travelY+'px,0) scale('+sx+',1.035)',opacity:1,borderRadius:'24px',offset:.69},
-          // Then unfold vertically into the real detail sheet.
-          {transform:'translate3d('+dx+'px,'+travelY+'px,0) scale('+sx+','+sy+')',opacity:1,borderRadius:'18px',offset:.91},
-          {transform:'translate3d('+dx+'px,'+travelY+'px,0) scale('+sx+','+sy+')',opacity:0,borderRadius:'18px',offset:1}
-        ],
-        {duration:spec.open.duration,easing:spec.open.easing,fill:'forwards'}
-      );
-
-      var summary=surface.querySelector('.coucho-motion-summary');
-      if(summary)summary.animate(
-        [{opacity:.72,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(12px,0,0)'}],
-        {duration:150,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
-      );
-
-      var edge=surface.querySelector('.coucho-motion-fold-edge');
-      if(edge)edge.animate(
-        [{opacity:0,transform:'scaleX(.35)'},{opacity:.72,transform:'scaleX(1)',offset:.55},{opacity:0,transform:'scaleX(1)'}],
-        {duration:spec.open.duration,easing:'linear',fill:'forwards'}
-      );
-
-      return a.finished.catch(function(){});
-    }
-
-    function animateSurfaceClose(surface,from,to){
-      var dx=to.left-from.left;
-      var dy=to.top-from.top;
-      var sx=to.width/from.width;
-      var sy=to.height/from.height;
-
-      var a=surface.animate(
-        [
-          {transform:'translate3d(0,0,0) scale(1,1)',opacity:1,borderRadius:'18px',offset:0},
-          // Fold the open sheet while docked.
-          {transform:'translate3d(0,0,0) scale(1,'+sy+')',opacity:1,borderRadius:'24px',offset:.38},
-          // Pass through the same rounded/capsule intermediate state.
-          {transform:'translate3d('+(dx*.76)+'px,'+(dy*.86)+'px,0) scale('+(1+(sx-1)*.76)+','+(sy*.92)+')',opacity:1,borderRadius:'44px',offset:.68},
-          // Then collapse back into the card.
-          {transform:'translate3d('+dx+'px,'+dy+'px,0) scale('+sx+','+sy+')',opacity:1,borderRadius:'18px',offset:.88},
-          {transform:'translate3d('+dx+'px,'+dy+'px,0) scale('+sx+','+sy+')',opacity:0,borderRadius:'18px',offset:1}
-        ],
-        {duration:spec.close.duration,easing:spec.close.easing,fill:'forwards'}
-      );
-
-      var summary=surface.querySelector('.coucho-motion-summary');
-      if(summary)summary.animate(
-        [
-          {opacity:0,transform:'translate3d(10px,0,0)',offset:0},
-          {opacity:0,transform:'translate3d(6px,0,0)',offset:.52},
-          {opacity:.68,transform:'translate3d(0,0,0)',offset:.82},
-          {opacity:.68,transform:'translate3d(0,0,0)',offset:1}
-        ],
-        {duration:spec.close.duration,easing:'cubic-bezier(0,0,0,1)',fill:'forwards'}
-      );
-
-      var edge=surface.querySelector('.coucho-motion-fold-edge');
-      if(edge)edge.animate(
-        [{opacity:0},{opacity:.62,offset:.22},{opacity:0,offset:.62}],
-        {duration:spec.close.duration,easing:'linear',fill:'forwards'}
-      );
-
-      return a.finished.catch(function(){});
-    }
-
-    function animateBridgeOpen(bridge){
-      if(!bridge)return Promise.resolve();
-      var a=bridge.animate(
-        [
-          {opacity:0,transform:'scaleX(.08) scaleY(.78)',offset:0},
-          {opacity:.86,transform:'scaleX(.58) scaleY(1)',offset:.30},
-          {opacity:.90,transform:'scaleX(1) scaleY(1)',offset:.56},
-          {opacity:0,transform:'scaleX(1.04) scaleY(.92)',offset:.78},
-          {opacity:0,transform:'scaleX(1.04) scaleY(.92)',offset:1}
-        ],
-        {duration:spec.open.duration,easing:spec.open.easing,fill:'forwards'}
-      );
-      return a.finished.catch(function(){});
-    }
-
-    function animateBridgeClose(bridge){
-      if(!bridge)return Promise.resolve();
-      var a=bridge.animate(
-        [
-          {opacity:0,transform:'scaleX(1.02) scaleY(.92)',offset:0},
-          {opacity:.82,transform:'scaleX(1) scaleY(1)',offset:.24},
-          {opacity:.76,transform:'scaleX(.56) scaleY(1)',offset:.55},
-          {opacity:0,transform:'scaleX(.08) scaleY(.78)',offset:.82},
-          {opacity:0,transform:'scaleX(.08) scaleY(.78)',offset:1}
-        ],
-        {duration:spec.close.duration,easing:spec.close.easing,fill:'forwards'}
-      );
-      return a.finished.catch(function(){});
-    }
-
-    function animateIdentity(el,from,to,duration,easing,opening){
-      if(!el||!visible(from)||!visible(to))return Promise.resolve();
-      var dx=to.left-from.left;
-      var dy=to.top-from.top;
-      var scale=to.height/from.height;
-      var end='translate3d('+dx+'px,'+dy+'px,0) scale('+scale+')';
-
-      var frames=opening
-        ?[
-          {transform:'translate3d(0,0,0) scale(1)',opacity:1,offset:0},
-          {transform:'translate3d(8px,-2px,0) scale(1.03)',opacity:1,offset:.13},
-          {transform:end,opacity:1,offset:.86},
-          {transform:end,opacity:0,offset:1}
-        ]
-        :[
-          {transform:'translate3d(0,0,0) scale(1)',opacity:1,offset:0},
-          {transform:end,opacity:1,offset:.84},
-          {transform:end,opacity:0,offset:1}
-        ];
-
-      var a=el.animate(frames,{duration:duration,easing:easing,fill:'forwards'});
-      return a.finished.catch(function(){});
-    }
-
-    function contentGroups(workspace){
-      return [
-        workspace.querySelector('.visual-workspace-head'),
-        workspace.querySelector('.workspace-section-head'),
-        workspace.querySelector('.workspace-screen-stage'),
-        workspace.querySelector('.workspace-pieces'),
-        workspace.querySelector('.workspace-footer')
-      ].filter(Boolean);
-    }
-
-    function revealContent(workspace){
-      return Promise.all(contentGroups(workspace).map(function(el,index){
-        var a=el.animate(
-          [
-            {opacity:0,transform:'translate3d(0,5px,0)'},
-            {opacity:1,transform:'translate3d(0,0,0)'}
-          ],
-          {
-            duration:spec.open.contentDuration,
-            delay:spec.open.contentDelay+index*10,
-            easing:'cubic-bezier(0,0,0,1)',
-            fill:'both'
-          }
-        );
-        return a.finished.catch(function(){});
-      }));
-    }
-
-    function hideContent(workspace){
-      return Promise.all(contentGroups(workspace).map(function(el,index){
-        var a=el.animate(
-          [
-            {opacity:1,transform:'translate3d(0,0,0)'},
-            {opacity:0,transform:'translate3d(0,-3px,0)'}
-          ],
-          {
-            duration:spec.close.contentOut,
-            delay:index*4,
-            easing:'cubic-bezier(.40,0,1,1)',
-            fill:'forwards'
-          }
-        );
-        return a.finished.catch(function(){});
-      }));
-    }
-
-    function cleanup(items){
-      items.forEach(function(el){if(el&&el.remove)el.remove()});
-    }
-
-    function clearContentAnimations(workspace){
-      contentGroups(workspace).forEach(function(el){
-        el.getAnimations().forEach(function(a){a.cancel()});
-      });
     }
 
     async function openProfile(args){
       if(modeMorphing)return false;
-      var source=args.source,target=args.target,mode=args.mode;
-      if(!source||!target||!mode)return false;
+      var source=args.source,target=args.target;
+      if(!source||!target)return false;
 
-      var from=rectOf(source);
-      var to=rectOf(target);
-      if(!desktopMorphAvailable(source,target)){
-        await compactOpen(target,args.prepare,args.done);
+      if(!nativeContainerTransformAvailable(source,target)){
+        await compactOpen(target,args.update,args.done);
         return true;
       }
-      if(to)to={left:to.left-2,top:to.top-2,width:to.width,height:to.height,right:to.right-2,bottom:to.bottom-2};
-      var sourceId=sourceIdentity(source);
 
       modeMorphing=true;
-      source.classList.add('morph-origin');
+      source.style.viewTransitionName='coucho-mode';
 
-      var surface=makeSurface(from);
-      var bridge=makeBridge(from,to);
-      var icon=makeIcon(sourceId.icon,mode);
-      var name=makeName(sourceId.name,mode);
-      var approxTargetId=workspaceIdentityRect(to);
+      var transition;
+      try{
+        transition=document.startViewTransition(function(){
+          // Old snapshot = the saved mode card.
+          source.style.viewTransitionName='none';
 
-      var motion=[
-        animateSurfaceOpen(surface,from,to),
-        animateBridgeOpen(bridge)
-      ];
-      if(icon)motion.push(animateIdentity(icon,sourceId.icon,approxTargetId.icon,spec.identity.open,spec.open.easing,true));
-      if(name)motion.push(animateIdentity(name,sourceId.name,approxTargetId.name,spec.identity.open,spec.open.easing,true));
+          // Mutate the real UI to its expanded detail state.
+          args.update();
 
-      // Keep the normal desktop visualizer visible while the card travels.
-      // Swap the real destination only once the sheet is already crossing/docking over it.
-      await delay(spec.open.prepareAt);
-      args.prepare();
-      target.classList.add('motion-content-hidden');
+          // New snapshot = the detail workspace.
+          target.style.viewTransitionName='coucho-mode';
+        });
 
-      var freshSource=q('[data-mode-row="'+mode.id+'"]');
-      if(freshSource)freshSource.classList.add('morph-origin');
-
-      var reveal=revealContent(target);
-      await Promise.all(motion.concat([reveal]));
-
-      target.classList.remove('motion-content-hidden');
-      clearContentAnimations(target);
-      cleanup([surface,bridge,icon,name]);
-      if(source.isConnected)source.classList.remove('morph-origin');
-      var currentSource=q('[data-mode-row="'+mode.id+'"]');
-      if(currentSource)currentSource.classList.remove('morph-origin');
-      modeMorphing=false;
-      if(args.done)args.done();
+        await transition.finished;
+      }catch(e){
+        // The DOM update still needs to happen if snapshotting was rejected.
+        if(args.ensureUpdated)args.ensureUpdated();
+      }finally{
+        source.style.viewTransitionName='none';
+        target.style.viewTransitionName='none';
+        modeMorphing=false;
+        if(args.done)args.done();
+      }
       return true;
     }
 
     async function closeProfile(args){
       if(modeMorphing)return false;
-      var source=args.source,target=args.target,mode=args.mode;
-      if(!source||!target||!mode)return false;
+      var source=args.source;
+      var beforeTarget=args.destination();
+      if(!source||!beforeTarget)return false;
 
-      var from=rectOf(source);
-      var to=rectOf(target);
-      var sourceId=targetIdentity(source);
-      var targetId=sourceIdentity(target);
-
-      if(!desktopMorphAvailable(target,source)){
-        await compactClose(source,args.done);
+      if(!nativeContainerTransformAvailable(beforeTarget,source)){
+        await compactClose(source,args.update,args.done);
         return true;
       }
 
       modeMorphing=true;
-      target.classList.add('morph-origin');
+      source.style.viewTransitionName='coucho-mode';
+      var finalTarget=null;
 
-      var surface=makeSurface(from);
-      var bridge=makeBridge(to,from);
-      var icon=makeIcon(sourceId.icon,mode);
-      var name=makeName(sourceId.name,mode);
+      try{
+        var transition=document.startViewTransition(function(){
+          // Old snapshot = expanded detail workspace.
+          source.style.viewTransitionName='none';
 
-      var motion=[
-        animateSurfaceClose(surface,from,to),
-        animateBridgeClose(bridge),
-        hideContent(source)
-      ];
-      if(icon&&visible(targetId.icon))motion.push(animateIdentity(icon,sourceId.icon,targetId.icon,spec.identity.close,spec.close.easing,false));
-      if(name&&visible(targetId.name))motion.push(animateIdentity(name,sourceId.name,targetId.name,spec.identity.close,spec.close.easing,false));
+          // Return the real UI to the normal/base workspace.
+          args.update();
 
-      await Promise.all(motion);
-      source.classList.add('motion-content-hidden');
-      clearContentAnimations(source);
-      cleanup([surface,bridge,icon,name]);
-      if(target.isConnected)target.classList.remove('morph-origin');
-      modeMorphing=false;
-      if(args.done)args.done();
+          // renderWorkbench recreates the card list; resolve the fresh destination.
+          finalTarget=args.destination();
+          if(finalTarget)finalTarget.style.viewTransitionName='coucho-mode';
+        });
+
+        await transition.finished;
+      }catch(e){
+        if(args.ensureUpdated)args.ensureUpdated();
+      }finally{
+        source.style.viewTransitionName='none';
+        if(finalTarget)finalTarget.style.viewTransitionName='none';
+        modeMorphing=false;
+        if(args.done)args.done();
+      }
       return true;
     }
 
+    // No extra visual effect between A -> base -> B.
+    // Two real container transforms in sequence are clearer than mixing a third transition.
     function handoff(){
-      if(reduced())return Promise.resolve();
-      var workspace=q('.visual-workspace');
-      if(!workspace)return Promise.resolve();
-      var a=workspace.animate(
-        [{opacity:.76,transform:'translate3d(0,1px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
-        {duration:spec.handoff,easing:'cubic-bezier(0,0,0,1)'}
-      );
-      return a.finished.catch(function(){});
+      return new Promise(function(resolve){requestAnimationFrame(resolve)});
     }
 
-    return {spec:spec,openProfile:openProfile,closeProfile:closeProfile,handoff:handoff};
+    return {
+      spec:spec,
+      openProfile:openProfile,
+      closeProfile:closeProfile,
+      handoff:handoff,
+      nativeContainerTransformAvailable:nativeContainerTransformAvailable
+    };
   })();
 
   function openModeDetail(id,source){
@@ -1729,7 +1433,10 @@ body.test-mode .test-tools{display:flex}
     var workspace=q('.visual-workspace');
     source=source||q('[data-mode-row="'+id+'"]');
 
+    var detailPrepared=false;
     function prepareDetail(){
+      if(detailPrepared)return;
+      detailPrepared=true;
       workspaceTargetId=mode.id;
       workspaceDraft=cloneModeConfig(mode);
       workspaceBase=cloneModeConfig(mode);
@@ -1741,8 +1448,8 @@ body.test-mode .test-tools{display:flex}
     CouchoMotion.openProfile({
       source:source,
       target:workspace,
-      mode:mode,
-      prepare:prepareDetail,
+      update:prepareDetail,
+      ensureUpdated:prepareDetail,
       done:function(){
         renderModeList();
         q('#workspaceClose').focus();
@@ -1754,25 +1461,32 @@ body.test-mode .test-tools{display:flex}
     if(workspaceTargetId===null||modeMorphing)return false;
 
     var closingId=workspaceTargetId;
-    var closingMode=byId(closingId);
     var workspace=q('.visual-workspace');
-    var destination=q('[data-mode-row="'+closingId+'"]');
+    var baseApplied=false;
 
-    function returnToBase(){
+    function applyBaseState(){
+      if(baseApplied)return;
+      baseApplied=true;
       workspaceTargetId=null;
       workspaceDraft=workspaceFromApplied();
       workspaceBase=cloneModeConfig(workspaceDraft);
       workspaceAutoNamed=true;
       workspace.classList.remove('detail-mode','motion-content-hidden');
       renderWorkbench();
+    }
 
+    function destination(){
+      return q('[data-mode-row="'+closingId+'"]');
+    }
+
+    function afterTransition(){
       if(typeof afterClose==='function'){
         afterClose();
         return;
       }
 
       if(restore){
-        var freshSource=q('[data-mode-row="'+closingId+'"]');
+        var freshSource=destination();
         if(freshSource){
           var view=freshSource.querySelector('.view-mode');
           if(view)view.focus();
@@ -1782,9 +1496,10 @@ body.test-mode .test-tools{display:flex}
 
     CouchoMotion.closeProfile({
       source:workspace,
-      target:destination,
-      mode:closingMode,
-      done:returnToBase
+      destination:destination,
+      update:applyBaseState,
+      ensureUpdated:applyBaseState,
+      done:afterTransition
     });
     return true;
   }
