@@ -1097,6 +1097,7 @@ body.test-mode .test-tools{display:flex}
 
     html+=sets.map(function(mode){
       var selected=workspaceTargetId===mode.id;
+      var applying=activatingId===mode.id;
       var safeName=esc(mode.name);
       return '<div class="mode-list-item'+(selected?' selected':'')+'" data-mode-row="'+mode.id+'">'+
         '<button class="mode-list-icon select-mode" data-workspace-id="'+mode.id+'" title="Ver y editar">'+esc(mode.icon)+'</button>'+
@@ -1105,7 +1106,7 @@ body.test-mode .test-tools{display:flex}
           '<small>'+(mode.active?'<span class="mode-list-badge">Activo</span> · ':'')+esc(displayCountLabel(mode))+' · '+esc(mode.app)+'</small>'+
         '</button>'+
         '<span class="mode-list-actions">'+
-          (!mode.active?'<button class="btn activate" data-id="'+mode.id+'">Activar</button>':'')+
+          (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'Aplicando…':'Activar')+'</button>':'')+
           '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">🗑</button>'+
         '</span>'+
       '</div>';
@@ -1236,7 +1237,7 @@ body.test-mode .test-tools{display:flex}
 
     activatingId=id;
     clearTimeout(activationTimer);
-    renderCards();
+    renderWorkbench();
 
     activationTimer=setTimeout(function(){
       sets.forEach(function(s){s.active=s.id===id});
@@ -1796,7 +1797,6 @@ body.test-mode .test-tools{display:flex}
 
   q('#restoreDemo').onclick=function(){
     sets=demoSets();
-    newDraftOpen=false;
     appliedSession=null;
     workspaceTargetId=null;
     workspaceDraft=null;
@@ -1952,6 +1952,7 @@ body.test-mode .test-tools{display:flex}
       testContext=null;
       return;
     }
+  };
 
   function finishRestore(){
     q('#testOverlay').classList.remove('open');
