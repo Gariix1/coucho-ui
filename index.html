@@ -275,13 +275,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .saved-mode-card .screen-count{font-size:11px}
 .saved-mode-card .view-mode{border-color:var(--glass-soft-border);background:var(--glass-command);color:var(--text2)}
 .saved-mode-card .view-mode:hover{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
-.saved-mode-card.selected .saved-mode-body{visibility:hidden}
-.saved-mode-card.selected:after{
-  content:"Editando";position:absolute;left:12px;right:12px;top:58px;bottom:12px;z-index:2;
-  display:grid;place-items:center;border:1px dashed var(--selected-border);border-radius:var(--r-compact);
-  background:var(--selected-bg);color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.02em;
-  pointer-events:none
-}
 .mode-editing-badge{color:var(--accent);font-weight:700}
 .saved-mode-card.selected .quick-display:disabled,.saved-mode-card.selected .card-fact:disabled{opacity:.48;cursor:default;transform:none}
 .saved-mode-card.selected .quick-display:disabled:hover,.saved-mode-card.selected .card-fact:disabled:hover{background:inherit;border-color:var(--glass-soft-border)}
@@ -299,13 +292,12 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .mode-list-badge:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--success)}
 
 .visual-workspace{
-  padding:16px;min-width:0;overflow:visible;position:relative;isolation:isolate;z-index:1;
-  transition:opacity .12s linear
+  padding:16px;min-width:0;overflow:visible;position:relative;isolation:isolate;z-index:1
 }
 .visual-workspace.detail-mode{
   border-color:var(--selected-border);
-  background:transparent;
-  box-shadow:none
+  background:var(--glass-card);
+  box-shadow:8px 8px 0 -1px var(--glass-surface),8px 8px 0 0 var(--glass-border),0 20px 48px rgba(0,0,0,.16)
 }
 .visual-workspace.detail-mode:before{
   content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);
@@ -315,73 +307,33 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .workspace-close{display:none;width:32px;height:32px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-command);color:var(--text2);place-items:center;padding:0}
 .detail-mode .workspace-close{display:grid}.workspace-close:hover{background:var(--glass-pill);border-color:var(--glass-border);color:var(--text)}
 
-/* Coucho container transform
-   One real surface moves between the saved card and the editor.
-   Geometry is owned only by FLIP; content fades through without browser snapshots. */
-
-.mode-morph-surface{
-  position:absolute;inset:0;z-index:0;pointer-events:none;
-  border:1px solid var(--glass-soft-border);border-radius:inherit;
-  background:var(--glass-card)
-}
-.saved-mode-card,.visual-workspace{position:relative;isolation:isolate}
-.saved-mode-card>*:not(.mode-morph-surface),
-.visual-workspace>*:not(.mode-morph-surface){position:relative;z-index:1}
-
-.saved-mode-card{background:transparent!important;border-color:transparent!important}
-.saved-mode-card .saved-morph-surface{background:var(--glass-control)}
-.saved-mode-card:hover .saved-morph-surface{background:var(--glass-pill);border-color:var(--glass-border)}
-.saved-mode-card.selected .saved-morph-surface{background:var(--selected-bg);border-color:var(--selected-border)}
-
-.visual-workspace{background:transparent!important;border-color:transparent!important}
-.visual-workspace .workspace-morph-surface{
-  background:var(--glass-card);border-color:var(--glass-soft-border);
-  box-shadow:none;
-  transition:background .36s cubic-bezier(.18,.82,.18,1),border-color .36s cubic-bezier(.18,.82,.18,1),box-shadow .36s cubic-bezier(.18,.82,.18,1)
-}
-.visual-workspace.detail-mode .workspace-morph-surface{
+/* Mode sheet transition
+   Animation is isolated from the real card/editor DOM. A temporary, non-interactive
+   sheet travels between their measured viewport rectangles and is removed afterwards. */
+.mode-flight-sheet{
+  position:fixed;z-index:120;pointer-events:none;margin:0;
+  border:1px solid var(--selected-border);border-radius:var(--r-card);
   background:var(--glass-card);
-  border-color:var(--selected-border);
-  box-shadow:8px 8px 0 -1px var(--glass-surface),8px 8px 0 0 var(--glass-border),0 20px 48px rgba(0,0,0,.16),0 0 0 1px var(--monitor-glow)
+  box-shadow:0 12px 32px rgba(0,0,0,.16);
+  transform:none;will-change:left,top,width,height,box-shadow,opacity
 }
-.visual-workspace.coucho-flip-opening .workspace-morph-surface,
-.visual-workspace.coucho-flip-closing .workspace-morph-surface{
-  background:var(--glass-control);
-  border-color:var(--glass-soft-border);
-  box-shadow:0 7px 16px rgba(0,0,0,.08)
+.mode-workbench.is-transitioning{pointer-events:none}
+.visual-workspace.mode-editor-transition-hidden{visibility:hidden}
+.visual-workspace.mode-editor-enter{animation:modeEditorEnter .13s cubic-bezier(0,0,.2,1) both}
+@keyframes modeEditorEnter{from{opacity:0}to{opacity:1}}
+
+.saved-mode-editing{
+  min-height:136px;display:grid;place-items:center;
+  border:1px dashed var(--selected-border);border-radius:var(--r-compact);
+  background:var(--selected-bg);color:var(--accent);
+  text-align:center;padding:16px
 }
-.visual-workspace.coucho-flip-active{
-  z-index:80;
-  pointer-events:none;
-  will-change:transform;
-  transform-origin:0 0;
-  overflow:hidden
-}
-.visual-workspace.detail-mode.coucho-flip-active:before{opacity:0}
-.visual-workspace.detail-mode:before{transition:opacity .12s linear}
-
-/* Only content cross-fades. The container itself never has a second CSS motion path. */
-.saved-mode-card.coucho-card-content-pending .saved-mode-head,
-.saved-mode-card.coucho-card-content-pending .saved-mode-body{opacity:0}
-
-.visual-workspace.coucho-detail-content-pending .workspace-profile-icon,
-.visual-workspace.coucho-detail-content-pending #workspaceName,
-.visual-workspace.coucho-detail-content-pending .workspace-eyebrow,
-.visual-workspace.coucho-detail-content-pending #workspaceSub,
-.visual-workspace.coucho-detail-content-pending .workspace-head-actions,
-.visual-workspace.coucho-detail-content-pending .workspace-section-head,
-.visual-workspace.coucho-detail-content-pending .workspace-screen-stage,
-.visual-workspace.coucho-detail-content-pending .workspace-pieces,
-.visual-workspace.coucho-detail-content-pending .workspace-footer{opacity:0;transform:translateY(6px)}
-
-/* Narrow Control windows intentionally use a simple fade/slide instead of a lateral FLIP. */
-.visual-workspace.compact-detail-enter{animation:compactDetailIn .18s cubic-bezier(.18,.82,.18,1) both}
-.visual-workspace.compact-detail-exit{animation:compactDetailOut .14s cubic-bezier(.38,0,.20,1) both}
-@keyframes compactDetailIn{from{opacity:.25;transform:translateY(6px) scale(.992)}to{opacity:1;transform:none}}
-@keyframes compactDetailOut{from{opacity:1;transform:none}to{opacity:.2;transform:translateY(-4px) scale(.994)}}
+.saved-mode-editing b{display:block;font-size:12px;font-weight:700}
+.saved-mode-editing small{display:block;margin-top:4px;color:var(--text2);font-size:10px;font-weight:500}
 
 @media(prefers-reduced-motion:reduce){
-  .visual-workspace,.visual-workspace>*{transition:none!important;animation:none!important}
+  .mode-flight-sheet{display:none}
+  .visual-workspace.mode-editor-enter{animation:none}
 }
 
 .visual-workspace-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
@@ -775,7 +727,6 @@ body.test-mode .test-tools{display:flex}
           </aside>
 
           <section class="visual-workspace" id="modeWorkspace" tabindex="-1" aria-label="Editor visual del modo">
-            <span class="mode-morph-surface workspace-morph-surface" aria-hidden="true"></span>
             <div class="visual-workspace-head">
               <div class="workspace-title-block">
                 <div class="workspace-profile-icon" id="workspaceProfileIcon">🖥️</div>
@@ -1038,8 +989,7 @@ body.test-mode .test-tools{display:flex}
   var workspaceDraft=null;
   var workspaceBase=null;
   var workspaceAutoNamed=true;
-  var modeMorphing=false;
-  var modeSwitchPending=null;
+  var modeTransitioning=false;
 
   var savedTheme=localStorage.getItem('coucho-theme');
   var initialTheme=savedTheme==='light'||savedTheme==='dark'?savedTheme:'dark';
@@ -1248,7 +1198,6 @@ body.test-mode .test-tools{display:flex}
     if(rawId==='current'){
       if(workspaceTargetId!==null){
         if(!guardDetailSwitch(null))return;
-        modeSwitchPending=null;
         closeModeDetail(false);
         return;
       }
@@ -1266,410 +1215,166 @@ body.test-mode .test-tools{display:flex}
     renderWorkbench();
   }
 
-  var CouchoMotion=(function(){
-    var spec={
-      desktopMin:1041,
-      container:380,
-      sourceOut:82,
-      detailRevealDelay:215,
-      detailReveal:145,
-      detailOut:92,
-      cardRevealDelay:45,
-      cardReveal:120,
-      baseReveal:130
-    };
+  var ModeSheetTransition=(function(){
+    var duration=300;
 
     function reduced(){
       return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    }
-
-    function visible(rect){
-      return rect&&rect.width>0&&rect.height>0&&rect.bottom>32&&rect.top<window.innerHeight&&rect.right>0&&rect.left<window.innerWidth;
     }
 
     function rectOf(el){
       return el&&el.isConnected?el.getBoundingClientRect():null;
     }
 
-    function containerTransformAvailable(source,target){
-      if(reduced())return false;
-      if(!window.matchMedia('(min-width: '+spec.desktopMin+'px)').matches)return false;
-      var s=rectOf(source),t=rectOf(target);
-      if(!visible(s)||!visible(t))return false;
-      return s.right+12<t.left;
+    function usable(rect){
+      return rect&&rect.width>0&&rect.height>0&&
+        rect.bottom>32&&rect.top<window.innerHeight&&rect.right>0&&rect.left<window.innerWidth;
     }
 
-    function inverseTransform(from,to){
-      var sx=from.width/to.width;
-      var sy=from.height/to.height;
-      return 'translate3d('+(from.left-to.left)+'px,'+(from.top-to.top)+'px,0) scale('+sx+','+sy+')';
+    function workbenchBusy(value){
+      var workbench=q('.mode-workbench');
+      if(workbench)workbench.classList.toggle('is-transitioning',!!value);
     }
 
-    function forwardTransform(from,to){
-      var sx=to.width/from.width;
-      var sy=to.height/from.height;
-      return 'translate3d('+(to.left-from.left)+'px,'+(to.top-from.top)+'px,0) scale('+sx+','+sy+')';
-    }
+    async function travel(from,to,direction){
+      if(reduced()||!usable(from)||!usable(to))return;
 
-    function animateElements(elements,frames,options){
-      return Promise.all(elements.filter(Boolean).map(function(el){
-        var a=el.animate(frames,options);
-        return a.finished.catch(function(){});
-      }));
-    }
+      var sheet=document.createElement('div');
+      sheet.className='mode-flight-sheet';
+      sheet.setAttribute('aria-hidden','true');
+      document.body.appendChild(sheet);
 
-    function clearElementAnimations(elements){
-      elements.filter(Boolean).forEach(function(el){
-        el.getAnimations().forEach(function(a){a.cancel()});
-      });
-    }
+      var start=direction==='close'?from:from;
+      var finish=direction==='close'?to:to;
+      var startShadow=direction==='close'
+        ?'8px 8px 0 -1px rgba(17,24,40,.12), 0 20px 48px rgba(0,0,0,.16)'
+        :'0 8px 22px rgba(0,0,0,.12)';
+      var finishShadow=direction==='close'
+        ?'0 8px 22px rgba(0,0,0,.12)'
+        :'8px 8px 0 -1px rgba(17,24,40,.12), 0 20px 48px rgba(0,0,0,.16)';
 
-    function cardContent(card){
-      return card?[card.querySelector('.saved-mode-head'),card.querySelector('.saved-mode-body')]:[];
-    }
-
-    function detailContent(surface){
-      return surface?[
-        surface.querySelector('.workspace-profile-icon'),
-        surface.querySelector('#workspaceName'),
-        surface.querySelector('.workspace-eyebrow'),
-        surface.querySelector('#workspaceSub'),
-        surface.querySelector('.workspace-head-actions'),
-        surface.querySelector('.workspace-section-head'),
-        surface.querySelector('.workspace-screen-stage'),
-        surface.querySelector('.workspace-pieces'),
-        surface.querySelector('.workspace-footer')
-      ]:[];
-    }
-
-    function fadeSourceContent(card){
-      return animateElements(
-        cardContent(card),
-        [{opacity:1,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(-4px,0,0)'}],
-        {duration:spec.sourceOut,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
-      );
-    }
-
-    function revealDetail(target){
-      target.classList.add('coucho-detail-content-pending');
-      var parts=detailContent(target).filter(Boolean);
-      var jobs=parts.map(function(el,index){
-        var a=el.animate(
-          [{opacity:0,transform:'translate3d(0,6px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
-          {
-            duration:spec.detailReveal,
-            delay:spec.detailRevealDelay+index*8,
-            easing:'cubic-bezier(0,0,.2,1)',
-            fill:'both'
-          }
-        );
-        return a.finished.catch(function(){});
+      var animation=sheet.animate([
+        {
+          left:start.left+'px',top:start.top+'px',
+          width:start.width+'px',height:start.height+'px',
+          boxShadow:startShadow,opacity:1
+        },
+        {
+          left:finish.left+'px',top:finish.top+'px',
+          width:finish.width+'px',height:finish.height+'px',
+          boxShadow:finishShadow,opacity:1
+        }
+      ],{
+        duration:duration,
+        easing:'cubic-bezier(.2,.8,.2,1)',
+        fill:'both'
       });
 
-      Promise.all(jobs).then(function(){
-        target.classList.remove('coucho-detail-content-pending');
-        parts.forEach(function(el){el.getAnimations().forEach(function(a){a.cancel()})});
-      });
-    }
-
-    function fadeDetailOut(source){
-      return animateElements(
-        detailContent(source),
-        [{opacity:1,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(0,-4px,0)'}],
-        {duration:spec.detailOut,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
-      );
-    }
-
-    function revealCard(card){
-      if(!card)return;
-      card.classList.add('coucho-card-content-pending');
-      var parts=cardContent(card).filter(Boolean);
-      parts.forEach(function(el,index){
-        var a=el.animate(
-          [{opacity:0,transform:'translate3d(4px,0,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
-          {
-            duration:spec.cardReveal,
-            delay:spec.cardRevealDelay+index*8,
-            easing:'cubic-bezier(0,0,.2,1)',
-            fill:'both'
-          }
-        );
-        a.finished.catch(function(){}).then(function(){
-          el.getAnimations().forEach(function(x){x.cancel()});
-          card.classList.remove('coucho-card-content-pending');
-        });
-      });
-    }
-
-    function revealBaseWorkspace(target){
-      if(reduced())return;
-      var a=target.animate(
-        [{opacity:0},{opacity:1}],
-        {duration:spec.baseReveal,delay:45,easing:'linear',fill:'both'}
-      );
-      a.finished.catch(function(){}).then(function(){a.cancel()});
-    }
-
-    function compactOpen(target,update,done){
-      modeMorphing=true;
-      update();
-      target.classList.add('compact-detail-enter');
-      var finish=function(){
-        target.classList.remove('compact-detail-enter');
-        modeMorphing=false;
-        if(done)done();
-      };
-      if(reduced()){finish();return Promise.resolve()}
-      var animations=target.getAnimations();
-      if(!animations.length){finish();return Promise.resolve()}
-      return Promise.all(animations.map(function(a){return a.finished.catch(function(){})})).then(finish);
-    }
-
-    function compactClose(source,update,done){
-      modeMorphing=true;
-      if(reduced()){
-        update();modeMorphing=false;if(done)done();return Promise.resolve();
-      }
-      source.classList.add('compact-detail-exit');
-      var animations=source.getAnimations();
-      var finish=function(){
-        source.classList.remove('compact-detail-exit');
-        update();modeMorphing=false;if(done)done();
-      };
-      if(!animations.length){finish();return Promise.resolve()}
-      return Promise.all(animations.map(function(a){return a.finished.catch(function(){})})).then(finish);
-    }
-
-    async function openProfile(args){
-      if(modeMorphing)return false;
-      var source=args.source,target=args.target;
-      if(!source||!target)return false;
-
-      var from=rectOf(source);
-      if(!containerTransformAvailable(source,target)){
-        await compactOpen(target,args.update,args.done);
-        return true;
-      }
-
-      modeMorphing=true;
-      try{
-        await fadeSourceContent(source);
-        args.update();
-
-        var to=rectOf(target);
-        if(!visible(from)||!visible(to))throw new Error('FLIP geometry unavailable');
-
-        target.classList.add('coucho-flip-active','coucho-flip-opening','coucho-detail-content-pending');
-
-        var move=target.animate(
-          [
-            {transform:inverseTransform(from,to)},
-            {transform:'translate3d(0,0,0) scale(1,1)'}
-          ],
-          {
-            duration:spec.container,
-            easing:'cubic-bezier(.18,.82,.18,1)',
-            fill:'both'
-          }
-        );
-
-        requestAnimationFrame(function(){
-          target.classList.remove('coucho-flip-opening');
-        });
-        revealDetail(target);
-
-        await move.finished.catch(function(){});
-        move.cancel();
-      }catch(e){
-        if(args.ensureUpdated)args.ensureUpdated();
-      }finally{
-        target.classList.remove('coucho-flip-active','coucho-flip-opening','coucho-detail-content-pending');
-        modeMorphing=false;
-        if(args.done)args.done();
-      }
-      return true;
-    }
-
-    async function closeProfile(args){
-      if(modeMorphing)return false;
-      var source=args.source;
-      var target=args.destination();
-      if(!source||!target)return false;
-
-      var from=rectOf(source);
-      var to=rectOf(target);
-      if(!containerTransformAvailable(target,source)){
-        await compactClose(source,args.update,args.done);
-        return true;
-      }
-
-      modeMorphing=true;
-      try{
-        await fadeDetailOut(source);
-
-        source.classList.add('coucho-flip-active','coucho-flip-closing','coucho-detail-content-pending');
-
-        var move=source.animate(
-          [
-            {transform:'translate3d(0,0,0) scale(1,1)'},
-            {transform:forwardTransform(from,to)}
-          ],
-          {
-            duration:spec.container,
-            easing:'cubic-bezier(.18,.82,.18,1)',
-            fill:'both'
-          }
-        );
-
-        await move.finished.catch(function(){});
-
-        source.style.opacity='0';
-        args.update();
-        clearElementAnimations(detailContent(source));
-
-        var finalTarget=args.destination();
-        if(finalTarget)revealCard(finalTarget);
-
-        move.cancel();
-        source.classList.remove('coucho-flip-active','coucho-flip-closing','coucho-detail-content-pending');
-        source.style.opacity='';
-        revealBaseWorkspace(source);
-      }catch(e){
-        if(args.ensureUpdated)args.ensureUpdated();
-      }finally{
-        source.classList.remove('coucho-flip-active','coucho-flip-closing','coucho-detail-content-pending');
-        source.style.opacity='';
-        modeMorphing=false;
-        if(args.done)args.done();
-      }
-      return true;
-    }
-
-    function handoff(){
-      return new Promise(function(resolve){requestAnimationFrame(resolve)});
+      await animation.finished.catch(function(){});
+      sheet.remove();
     }
 
     return {
-      spec:spec,
-      openProfile:openProfile,
-      closeProfile:closeProfile,
-      handoff:handoff,
-      containerTransformAvailable:containerTransformAvailable
+      rectOf:rectOf,
+      travel:travel,
+      workbenchBusy:workbenchBusy
     };
-
   })();
 
-  function openModeDetail(id,source){
+  async function openModeDetail(id,source){
     var mode=byId(id);
-    if(!mode||modeMorphing||modeSwitchPending!==null)return;
+    if(!mode||modeTransitioning)return false;
 
     if(workspaceTargetId===id){
-      closeModeDetail(true);
-      return;
+      return closeModeDetail(true);
     }
 
-    // A -> base -> B. Never keep more than one editable profile alive.
     if(workspaceTargetId!==null){
       if(detailHasUnsavedChanges()){
         toast('Cambios sin guardar','Guarda o cancela el perfil abierto antes de cambiar');
         q('.visual-workspace').focus({preventScroll:true});
-        return;
+        return false;
       }
-
-      modeSwitchPending=id;
-      closePops();
-      closeModeDetail(false,function(){
-        var nextId=modeSwitchPending;
-        if(nextId===null)return;
-
-        CouchoMotion.handoff().then(function(){
-          modeSwitchPending=null;
-          var nextSource=q('[data-mode-row="'+nextId+'"]');
-          openModeDetail(nextId,nextSource);
-        });
-      });
-      return;
+      await closeModeDetail(false);
+      source=q('[data-mode-row="'+id+'"]');
+      if(!source)return false;
     }
 
     closePops();
+    var from=ModeSheetTransition.rectOf(source);
     var workspace=q('.visual-workspace');
-    source=source||q('[data-mode-row="'+id+'"]');
 
-    var detailPrepared=false;
-    function prepareDetail(){
-      if(detailPrepared)return;
-      detailPrepared=true;
-      workspaceTargetId=mode.id;
-      workspaceDraft=cloneModeConfig(mode);
-      workspaceBase=cloneModeConfig(mode);
-      workspaceAutoNamed=false;
-      renderWorkbench();
-      workspace.classList.add('detail-mode');
-    }
+    modeTransitioning=true;
+    ModeSheetTransition.workbenchBusy(true);
 
-    CouchoMotion.openProfile({
-      id:mode.id,
-      source:source,
-      target:workspace,
-      update:prepareDetail,
-      ensureUpdated:prepareDetail,
-      done:function(){
-        renderModeList();
-        q('#workspaceClose').focus();
-      }
-    });
+    workspaceTargetId=mode.id;
+    workspaceDraft=cloneModeConfig(mode);
+    workspaceBase=cloneModeConfig(mode);
+    workspaceAutoNamed=false;
+    renderWorkbench();
+
+    workspace=q('.visual-workspace');
+    workspace.classList.add('mode-editor-transition-hidden');
+    var to=ModeSheetTransition.rectOf(workspace);
+
+    await ModeSheetTransition.travel(from,to,'open');
+
+    workspace.classList.remove('mode-editor-transition-hidden');
+    workspace.classList.add('mode-editor-enter');
+    setTimeout(function(){workspace.classList.remove('mode-editor-enter')},160);
+
+    modeTransitioning=false;
+    ModeSheetTransition.workbenchBusy(false);
+    renderModeList();
+
+    var closeButton=q('#workspaceClose');
+    if(closeButton)closeButton.focus();
+    return true;
   }
 
-  function closeModeDetail(restore,afterClose){
-    if(workspaceTargetId===null||modeMorphing)return false;
+  async function closeModeDetail(restore,afterClose){
+    if(workspaceTargetId===null||modeTransitioning)return false;
 
+    closePops();
     var closingId=workspaceTargetId;
     var workspace=q('.visual-workspace');
-    var baseApplied=false;
+    var destination=q('[data-mode-row="'+closingId+'"]');
+    var from=ModeSheetTransition.rectOf(workspace);
+    var to=ModeSheetTransition.rectOf(destination);
 
-    function applyBaseState(){
-      if(baseApplied)return;
-      baseApplied=true;
-      workspaceTargetId=null;
-      workspaceDraft=workspaceFromApplied();
-      workspaceBase=cloneModeConfig(workspaceDraft);
-      workspaceAutoNamed=true;
-      workspace.classList.remove('detail-mode','motion-content-hidden');
-      renderWorkbench();
+    modeTransitioning=true;
+    ModeSheetTransition.workbenchBusy(true);
+    workspace.classList.add('mode-editor-transition-hidden');
+
+    await ModeSheetTransition.travel(from,to,'close');
+
+    workspaceTargetId=null;
+    workspaceDraft=workspaceFromApplied();
+    workspaceBase=cloneModeConfig(workspaceDraft);
+    workspaceAutoNamed=true;
+
+    modeTransitioning=false;
+    ModeSheetTransition.workbenchBusy(false);
+    renderWorkbench();
+
+    if(typeof afterClose==='function'){
+      afterClose();
+      return true;
     }
 
-    function destination(){
-      return q('[data-mode-row="'+closingId+'"]');
+    if(restore){
+      var freshSource=q('[data-mode-row="'+closingId+'"]');
+      var view=freshSource&&freshSource.querySelector('.view-mode');
+      if(view)view.focus();
     }
-
-    function afterTransition(){
-      if(typeof afterClose==='function'){
-        afterClose();
-        return;
-      }
-
-      if(restore){
-        var freshSource=destination();
-        if(freshSource){
-          var view=freshSource.querySelector('.view-mode');
-          if(view)view.focus();
-        }
-      }
-    }
-
-    CouchoMotion.closeProfile({
-      source:workspace,
-      destination:destination,
-      update:applyBaseState,
-      ensureUpdated:applyBaseState,
-      done:afterTransition
-    });
     return true;
   }
 
   function renderModeList(){
+    var modeList=q('#modeList');
+    if(currentPopAnchor&&modeList&&modeList.contains(currentPopAnchor))closePops();
     var currentSelected=workspaceTargetId===null;
-    var transitioning=modeMorphing||modeSwitchPending!==null;
+    var transitioning=modeTransitioning;
 
     var current='<div class="mode-list-group">'+
       '<div class="mode-list-label">Crear desde</div>'+
@@ -1689,7 +1394,7 @@ body.test-mode .test-tools{display:flex}
       var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
 
       return '<article class="saved-mode-card'+(selected?' selected':'')+'" data-mode-row="'+mode.id+'">'+
-        '<span class="mode-morph-surface saved-morph-surface" aria-hidden="true"></span>'+
+
         '<div class="saved-mode-head">'+
           '<div class="saved-mode-name">'+
             '<span class="mode-list-icon">'+esc(mode.icon)+'</span>'+
@@ -1702,16 +1407,18 @@ body.test-mode .test-tools{display:flex}
             '<button class="trash-mode" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Eliminar" aria-label="Eliminar '+safeName+'"><span class="trash-glyph" aria-hidden="true">&#xE74D;</span></button>'+
           '</div>'+
         '</div>'+
-        '<div class="saved-mode-body">'+
-        '<button class="card-display quick-display" data-id="'+mode.id+'"'+((selected||transitioning)?' disabled':'')+' title="'+(selected?'Edita las pantallas desde el perfil abierto':'Editar pantallas')+'">'+
-          '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode,true)+'</span>'+
-          '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
-        '</button>'+
-        '<div class="card-facts">'+
-          '<button class="card-fact quick-app" data-id="'+mode.id+'"'+((selected||transitioning)?' disabled':'')+' title="'+(selected?'Edita la app desde el perfil abierto':'Cambiar app')+'"><span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
-          '<button class="card-fact quick-shortcut" data-id="'+mode.id+'"'+((selected||transitioning)?' disabled':'')+' title="'+(selected?'Edita el atajo desde el perfil abierto':'Cambiar atajo')+'"><span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
-        '</div>'+
-        '</div>'+
+        (selected
+          ?'<div class="saved-mode-editing"><div><b>Editando</b><small>Este modo está abierto en el visualizador</small></div></div>'
+          :'<div class="saved-mode-body">'+
+            '<button class="card-display quick-display" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Editar pantallas">'+
+              '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode,true)+'</span>'+
+              '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
+            '</button>'+
+            '<div class="card-facts">'+
+              '<button class="card-fact quick-app" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Cambiar app"><span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
+              '<button class="card-fact quick-shortcut" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Cambiar atajo"><span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
+            '</div>'+
+          '</div>')+
       '</article>';
     }).join('');
 
@@ -1874,7 +1581,7 @@ body.test-mode .test-tools{display:flex}
       workspaceDraft=workspaceFromApplied();
       workspaceBase=cloneModeConfig(workspaceDraft);
       workspaceAutoNamed=true;
-      q('.visual-workspace').classList.remove('detail-mode','motion-content-hidden');
+      q('.visual-workspace').classList.remove('detail-mode','mode-editor-transition-hidden','mode-editor-enter');
     }
     render();
     toast('Modo eliminado',removed.name);
@@ -1956,9 +1663,12 @@ body.test-mode .test-tools{display:flex}
   }
 
   function syncOpenPopPosition(){
-    if(currentPop&&currentPopAnchor){
-      positionPop(currentPop,currentPopAnchor);
+    if(!currentPop||!currentPopAnchor)return;
+    if(!currentPopAnchor.isConnected){
+      closePops();
+      return;
     }
+    positionPop(currentPop,currentPopAnchor);
   }
 
   window.addEventListener('resize',syncOpenPopPosition);
@@ -2429,7 +2139,7 @@ body.test-mode .test-tools{display:flex}
     workspaceTargetId=null;
     workspaceDraft=null;
     workspaceBase=null;
-    q('.visual-workspace').classList.remove('detail-mode','motion-content-hidden');
+    q('.visual-workspace').classList.remove('detail-mode','mode-editor-transition-hidden','mode-editor-enter');
     render();
     toast('Modos vaciados','Ya puedes probar el flujo desde cero');
   };
@@ -2440,7 +2150,7 @@ body.test-mode .test-tools{display:flex}
     workspaceTargetId=null;
     workspaceDraft=null;
     workspaceBase=null;
-    q('.visual-workspace').classList.remove('detail-mode','motion-content-hidden');
+    q('.visual-workspace').classList.remove('detail-mode','mode-editor-transition-hidden','mode-editor-enter');
     render();
     toast('Demo restaurada','3 modos');
   };
@@ -2654,7 +2364,7 @@ body.test-mode .test-tools{display:flex}
   var shellView='modes';
 
   function openShellView(viewName){
-    if(modeMorphing||modeSwitchPending!==null)return;
+    if(modeTransitioning)return;
     shellView=viewName;
     closePops();
 
