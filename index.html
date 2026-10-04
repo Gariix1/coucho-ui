@@ -361,7 +361,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 
 @keyframes coucho-surface-shape{
   0%{clip-path:inset(0 round 18px);filter:drop-shadow(0 7px 16px rgba(0,0,0,.08))}
-  42%{clip-path:inset(0 round 34px);filter:drop-shadow(0 14px 26px rgba(0,0,0,.14))}
+  42%{clip-path:inset(0 round 46px);filter:drop-shadow(0 14px 26px rgba(0,0,0,.14))}
   72%{clip-path:inset(0 round 24px)}
   100%{clip-path:inset(0 round 18px);filter:drop-shadow(0 18px 34px rgba(0,0,0,.16))}
 }
@@ -1445,7 +1445,7 @@ body.test-mode .test-tools{display:flex}
           [{opacity:0,transform:'translate3d(4px,0,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
           {
             duration:spec.cardReveal,
-            delay:Math.max(0,spec.cardRevealDelay-spec.container)+index*8,
+            delay:spec.cardRevealDelay+index*8,
             easing:'cubic-bezier(0,0,.2,1)',
             fill:'both'
           }
