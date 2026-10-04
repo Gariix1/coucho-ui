@@ -215,12 +215,12 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .card-displays{justify-content:flex-start;min-width:0}
 .card-display .monitor.tv{width:64px;height:37px}.card-display .monitor.pc{width:45px;height:29px}
 .monitor-star{position:absolute;right:3px;top:1px;color:var(--accent);font-size:8px;line-height:1;text-shadow:0 1px 4px rgba(0,0,0,.3)}
-.screen-count{flex:0 0 auto;color:var(--text2);font-size:11px;font-weight:600}
+.screen-count{flex:0 0 auto;color:var(--text2);font-size:11px;font-weight:600;text-align:right}.screen-count small{display:block;color:var(--muted);font-size:8px;font-weight:600;margin-bottom:2px}
 .card-facts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .card-fact{min-height:42px;border:1px solid transparent;border-radius:var(--r-control);background:transparent;display:flex;align-items:center;gap:8px;padding:7px 9px;text-align:left;min-width:0}
 .card-fact:hover{background:var(--glass-control);border-color:var(--selected-border);transform:translateY(-1px)}
 .card-fact .fact-icon{flex:0 0 auto;color:var(--accent);font-size:14px}
-.card-fact b{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fact-copy{min-width:0}.fact-copy small{display:block;color:var(--muted);font-size:8px;font-weight:600;margin-bottom:1px}.card-fact b{display:block;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .display-main,.meta-action,.card-display,.card-fact{cursor:pointer;transition:background .12s ease,border-color .12s ease,transform .12s ease}
 .card.applying{border-color:var(--selected-border);background:var(--selected-bg)}
 .card .activate[disabled]{opacity:.82;cursor:wait}
@@ -292,12 +292,14 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sheet-wrap{display:none;position:fixed;inset:32px 0 0 0;z-index:50;background:var(--scrim);backdrop-filter:blur(10px);place-items:center;padding:22px}
 .sheet-wrap.open{display:grid}.sheet{width:min(740px,94vw);border:1px solid var(--glass-border);border-radius:var(--r-panel);background:var(--floating-bg);box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)}
 .sheet-head{padding:22px 24px 18px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between}.sheet-head h2{margin:0;font-size:28px;font-weight:600}
-.new-body{padding:0 24px 20px}.new-recipe{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:10px;align-items:stretch}
+.new-body{padding:0 24px 20px}.new-title-block small{display:block;color:var(--muted);font-size:10px;font-weight:600;margin-bottom:3px}
+.new-recipe{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(220px,.7fr);gap:10px;align-items:stretch}
+.new-side{display:grid;grid-template-rows:1fr 1fr;gap:10px}
 .new-display{width:100%;min-height:150px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);display:grid;place-items:center;padding:12px}
 .new-display:hover{background:var(--display-hover);border-color:var(--glass-border)}.new-kicker{font-size:12px;font-weight:600;color:var(--text2);text-transform:none;letter-spacing:0;margin-bottom:12px}
-.new-app-direct{min-height:150px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-control);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;text-align:center}
-.new-app-direct:hover{background:var(--glass-pill);border-color:var(--selected-border);transform:translateY(-1px)}
-.new-app-direct small{display:block;color:var(--text2);font-size:10px;font-weight:600;margin-bottom:3px}.new-app-direct b{font-size:14px}
+.new-app-direct,.new-shortcut-direct{min-height:70px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-control);display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:14px;text-align:left}
+.new-app-direct:hover,.new-shortcut-direct:hover{background:var(--glass-pill);border-color:var(--selected-border);transform:translateY(-1px)}
+.new-app-direct small,.new-shortcut-direct small{display:block;color:var(--text2);font-size:10px;font-weight:600;margin-bottom:3px}.new-app-direct b,.new-shortcut-direct b{font-size:14px}
 .sheet-foot{padding:16px 24px 20px;border-top:1px solid var(--divider);display:flex;justify-content:flex-end}.sheet-foot .btn{min-width:130px}
 
 /* shortcut */
@@ -345,9 +347,12 @@ body.test-mode .test-tools{display:flex}
 .split-action{display:inline-flex;align-items:stretch;border:1px solid var(--primary-border);border-radius:var(--r-control);overflow:hidden;background:var(--primary-bg)}
 .split-action button{min-height:34px;border:0;border-radius:0;color:var(--primary-fg);font-weight:600;padding:6px 10px}
 .split-action .activate{background:transparent;min-width:72px}
-.split-action .preview-mode{background:rgba(255,255,255,.06);border-left:1px solid var(--primary-border);min-width:58px}
+.split-action .activate-more{width:34px;min-width:34px;padding:0;background:rgba(255,255,255,.06);border-left:1px solid var(--primary-border);font-size:11px}
 .split-action button:hover{background:rgba(255,255,255,.10)}
 .split-action button:disabled{opacity:.72;cursor:wait}
+.activate-pop{width:170px;min-width:170px;padding:7px}
+.activate-pop button{width:100%;min-height:38px;border:1px solid transparent;border-radius:var(--r-control);background:transparent;color:var(--text2);padding:8px 10px;text-align:left;font-size:11px;font-weight:600}
+.activate-pop button:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
 .delete-confirm{width:270px;min-width:270px;padding:12px}
 .delete-title{color:#fecaca}
 .delete-copy{color:var(--text2);font-size:11px;line-height:1.45;padding:0 4px 4px}
@@ -528,7 +533,7 @@ body.test-mode .test-tools{display:flex}
   .rail-item{min-height:52px;border-radius:10px}
   .rail-item.active:before{left:-5px}
   .rail-item span:last-child{font-size:8px}
-  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.display-overview{grid-template-columns:1fr}.display-overview-stage{grid-template-columns:1fr}.display-state-card{min-height:260px}.hero-body{display:block;margin-top:0}.hero-body .display-main{margin-top:12px;height:auto;min-height:108px}.hero-body .recipe-meta{grid-template-columns:1fr;grid-template-rows:none;margin-top:8px}.hero-body .meta-action{height:auto}.card-facts{grid-template-columns:1fr 1fr}.new-recipe{grid-template-columns:1fr}.new-app-direct{min-height:82px;flex-direction:row;text-align:left}.app-options{grid-template-columns:repeat(2,1fr)}.device-strip{grid-template-columns:1fr}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
+  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.display-overview{grid-template-columns:1fr}.display-overview-stage{grid-template-columns:1fr}.display-state-card{min-height:260px}.hero-body{display:block;margin-top:0}.hero-body .display-main{margin-top:12px;height:auto;min-height:108px}.hero-body .recipe-meta{grid-template-columns:1fr;grid-template-rows:none;margin-top:8px}.hero-body .meta-action{height:auto}.card-facts{grid-template-columns:1fr 1fr}.new-recipe{grid-template-columns:1fr}.new-side{grid-template-rows:none;grid-template-columns:1fr}.new-app-direct,.new-shortcut-direct{min-height:82px;flex-direction:row;text-align:left}.app-options{grid-template-columns:repeat(2,1fr)}.device-strip{grid-template-columns:1fr}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 </style>
 </head>
@@ -604,7 +609,7 @@ body.test-mode .test-tools{display:flex}
           </div>
         </section>
 
-        <div class="section" id="modesSection"><h3>Tus modos</h3><button class="btn icon" id="newBtn2" title="Crear modo" aria-label="Crear modo">＋</button></div>
+        <div class="section" id="modesSection"><h3>Tus modos</h3><button class="btn create-mode-btn" id="newBtn2" title="Crear modo">＋ <span>Nuevo modo</span></button></div>
         <div class="cards" id="cards"></div>
       </div>
     </section>
@@ -724,6 +729,10 @@ body.test-mode .test-tools{display:flex}
   </div>
 </div>
 
+<div class="pop activate-pop" id="activatePop" aria-label="Más acciones">
+  <button id="activatePreview">Probar temporalmente</button>
+</div>
+
 <div class="pop delete-confirm" id="deletePop" role="dialog" aria-label="Confirmar eliminación">
   <div class="pop-title delete-title">Eliminar modo</div>
   <div class="delete-copy" id="deleteText"></div>
@@ -735,7 +744,13 @@ body.test-mode .test-tools{display:flex}
 
 <div class="sheet-wrap" id="newSheet" role="dialog" aria-modal="true" aria-label="Crear modo">
   <div class="sheet">
-    <div class="sheet-head"><h2 id="newName" class="mode-name-edit" tabindex="0" title="Doble clic, F2 o toca para renombrar">Gaming</h2><button class="btn icon" id="closeNew" title="Cerrar" aria-label="Cerrar">✕</button></div>
+    <div class="sheet-head">
+      <div class="new-title-block">
+        <small>Nuevo modo</small>
+        <h2 id="newName" class="mode-name-edit" tabindex="0" title="Doble clic, F2 o toca para renombrar">Gaming</h2>
+      </div>
+      <button class="btn icon" id="closeNew" title="Cerrar" aria-label="Cerrar">✕</button>
+    </div>
     <div class="new-body">
       <div class="new-recipe">
         <button class="new-display" id="newDisplay" title="Editar pantallas">
@@ -746,15 +761,21 @@ body.test-mode .test-tools{display:flex}
           </div>
         </button>
 
-        <button class="new-app-direct" id="newApp" title="Cambiar app">
-          <span class="meta-icon">▶</span>
-          <span><small>Apps</small><b id="newAppName">Steam</b></span>
-        </button>
+        <div class="new-side">
+          <button class="new-app-direct" id="newApp" title="Cambiar app">
+            <span class="meta-icon">▶</span>
+            <span><small>Apps</small><b id="newAppName">Steam</b></span>
+          </button>
+          <button class="new-shortcut-direct" id="newShortcut" title="Cambiar atajo">
+            <span class="meta-icon">🎮</span>
+            <span><small>Activar con</small><b id="newShortcutName">Sin atajo</b></span>
+          </button>
+        </div>
       </div>
     </div>
     <div class="sheet-foot" style="gap:8px">
       <button class="btn" id="newTry">Probar</button>
-      <button class="btn primary" id="newSave">Guardar</button>
+      <button class="btn primary" id="newSave">Crear modo</button>
     </div>
   </div>
 </div>
@@ -841,10 +862,11 @@ body.test-mode .test-tools{display:flex}
   var editTarget=null;
   var shortcutTarget=null;
   var deleteTarget=null;
+  var activateTarget=null;
   var captured=null;
   var displayDraft=null;
   var displayDraftIsNew=false;
-  var newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',name:'Gaming',icon:'🎮'};
+  var newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',shortcut:'Manual',name:'Gaming',icon:'🎮'};
   var testContext=null;
   var newSheetReturnFocus=null;
   var progressTimer=null;
@@ -1025,7 +1047,7 @@ body.test-mode .test-tools{display:flex}
         '<div class="card-head-actions">'+
           '<div class="split-action" role="group" aria-label="Acciones de '+safeName+'">'+
             '<button class="activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'Aplicando…':'Activar')+'</button>'+
-            '<button class="preview-mode" data-id="'+mode.id+'"'+(applying?' disabled':'')+' title="Probar temporalmente">Probar</button>'+
+            '<button class="activate-more" data-id="'+mode.id+'"'+(applying?' disabled':'')+' title="Más acciones" aria-label="Más acciones de '+safeName+'">▾</button>'+
           '</div>'+
           '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar modo" aria-label="Eliminar '+safeName+'">🗑</button>'+
         '</div>'+
@@ -1033,15 +1055,15 @@ body.test-mode .test-tools{display:flex}
       '<button class="card-display display-trigger" data-id="'+mode.id+'" title="Editar pantallas">'+
         '<span class="card-screen-row">'+
           '<span class="displays card-displays">'+displayMarkup(mode,true)+'</span>'+
-          '<span class="screen-count">'+esc(displayCountLabel(mode))+'</span>'+
+          '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span>'+
         '</span>'+
       '</button>'+
       '<div class="card-facts">'+
         '<button class="card-fact app-trigger" data-id="'+mode.id+'" title="Cambiar app">'+
-          '<span class="fact-icon">▶</span><b>'+safeApp+'</b>'+
+          '<span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span>'+
         '</button>'+
         '<button class="card-fact shortcut-trigger" data-id="'+mode.id+'" title="Cambiar atajo">'+
-          '<span class="fact-icon">🎮</span><b>'+safeShortcut+'</b>'+
+          '<span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span>'+
         '</button>'+
       '</div>'+
     '</article>';
@@ -1099,7 +1121,7 @@ body.test-mode .test-tools{display:flex}
     qa('.app-trigger').forEach(function(b){b.onclick=function(e){openAppPop(e.currentTarget,b.dataset.id,false)}});
     qa('.shortcut-trigger').forEach(function(b){b.onclick=function(){openShortcut(b.dataset.id)}});
     qa('.activate').forEach(function(b){b.onclick=function(){activate(Number(b.dataset.id))}});
-    qa('.preview-mode').forEach(function(b){b.onclick=function(){previewMode(Number(b.dataset.id))}});
+    qa('.activate-more').forEach(function(b){b.onclick=function(e){openActivatePop(e.currentTarget,Number(b.dataset.id))}});
     qa('.trash-mode').forEach(function(b){b.onclick=function(e){openDeletePop(e.currentTarget,b.dataset.id)}});
     qa('.mode-name-edit[data-id]').forEach(function(el){
       el.ondblclick=function(e){e.preventDefault();beginModeRename(el,el.dataset.id)};
@@ -1199,7 +1221,9 @@ body.test-mode .test-tools{display:flex}
   function closePops(){
     q('#displayPop').classList.remove('open');
     q('#appPop').classList.remove('open');
+    q('#activatePop').classList.remove('open');
     q('#deletePop').classList.remove('open');
+    activateTarget=null;
     deleteTarget=null;
     currentPop=null;
     currentPopAnchor=null;
@@ -1330,6 +1354,20 @@ body.test-mode .test-tools{display:flex}
     }
   };
   bindTouchRename(q('#newName'),beginNewModeRename);
+
+  function openActivatePop(anchor,id){
+    var mode=byId(id);
+    if(!mode||mode.active)return;
+    closePops();
+    activateTarget=id;
+    openAnchoredPop(q('#activatePop'),anchor);
+  }
+
+  q('#activatePreview').onclick=function(){
+    var id=activateTarget;
+    closePops();
+    if(id!==null)previewMode(id);
+  };
 
   function openDeletePop(anchor,rawId){
     var id=resolveId(rawId);
@@ -1580,7 +1618,7 @@ body.test-mode .test-tools{display:flex}
   function openNew(){
     closePops();
     newSheetReturnFocus=document.activeElement;
-    newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',name:'Gaming',icon:'🎮'};
+    newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',shortcut:'Manual',name:'Gaming',icon:'🎮'};
     renderNew();
     q('#newSheet').classList.add('open');
     requestAnimationFrame(function(){q('#newDisplay').focus()});
@@ -1591,6 +1629,7 @@ body.test-mode .test-tools{display:flex}
     q('#newDisplays').innerHTML=displayMarkup(newDraft,false);
     q('#newDisplayName').textContent=displaySummary(newDraft);
     q('#newAppName').textContent=newDraft.app;
+    q('#newShortcutName').textContent=shortcutCardLabel(newDraft.shortcut);
   }
 
   function syncThemeControl(){
@@ -1647,13 +1686,14 @@ body.test-mode .test-tools{display:flex}
   q('#closeNew').onclick=function(){closeNewSheet(true)};
   q('#newDisplay').onclick=function(e){openDisplayPop(e.currentTarget,null,true)};
   q('#newApp').onclick=function(e){openAppPop(e.currentTarget,null,true)};
+  q('#newShortcut').onclick=function(){openShortcut('new')};
 
   function buildNewMode(id,activeState){
     return {
       id:id,name:newDraft.name,icon:newDraft.icon,
       preserve:newDraft.preserve,displayIds:newDraft.displayIds.slice(),
       primaryDisplayId:newDraft.primaryDisplayId,app:newDraft.app,
-      shortcut:'Manual',active:!!activeState
+      shortcut:newDraft.shortcut,active:!!activeState
     };
   }
 
@@ -1668,13 +1708,13 @@ body.test-mode .test-tools{display:flex}
     closeNewSheet(false);
     startTest({
       kind:'new',id:Date.now(),preserve:newDraft.preserve,displayIds:newDraft.displayIds.slice(),
-      primaryDisplayId:newDraft.primaryDisplayId,app:newDraft.app,shortcut:'Manual',name:newDraft.name,icon:newDraft.icon
+      primaryDisplayId:newDraft.primaryDisplayId,app:newDraft.app,shortcut:newDraft.shortcut,name:newDraft.name,icon:newDraft.icon
     });
   };
 
   function openShortcut(rawId){
-    shortcutTarget=resolveId(rawId);
-    if(!byId(shortcutTarget))return;
+    shortcutTarget=rawId==='new'?'new':resolveId(rawId);
+    if(shortcutTarget!=='new'&&!byId(shortcutTarget))return;
     captured=null;
     q('#captureResult').innerHTML='<span style="color:var(--muted)">A · X · Y</span>';
     q('#capUse').style.display='none';q('#shortcutOverlay').classList.add('open');
@@ -1691,6 +1731,12 @@ body.test-mode .test-tools{display:flex}
   q('#capY').onclick=function(){capture('Y')};
   q('#capCancel').onclick=function(){q('#shortcutOverlay').classList.remove('open')};
   q('#capManual').onclick=function(){
+    if(shortcutTarget==='new'){
+      newDraft.shortcut='Manual';
+      q('#shortcutOverlay').classList.remove('open');
+      renderNew();
+      return;
+    }
     var mode=byId(shortcutTarget);
     if(!mode){q('#shortcutOverlay').classList.remove('open');return}
     mode.shortcut='Manual';
@@ -1699,6 +1745,12 @@ body.test-mode .test-tools{display:flex}
   };
   q('#capUse').onclick=function(){
     if(!captured)return;
+    if(shortcutTarget==='new'){
+      newDraft.shortcut=captured;
+      q('#shortcutOverlay').classList.remove('open');
+      renderNew();
+      return;
+    }
     var mode=byId(shortcutTarget);
     if(!mode){q('#shortcutOverlay').classList.remove('open');return}
     mode.shortcut=captured;
@@ -1779,7 +1831,7 @@ body.test-mode .test-tools{display:flex}
         id:testContext.id,name:testContext.name,icon:testContext.icon,
         preserve:testContext.preserve,displayIds:testContext.displayIds.slice(),
         primaryDisplayId:testContext.primaryDisplayId,app:testContext.app,
-        shortcut:'Manual',active:false
+        shortcut:testContext.shortcut||'Manual',active:false
       });
       sets.forEach(function(s){s.active=s.id===testContext.id});
       appliedSession=sessionFromMode(byId(testContext.id));
@@ -1813,8 +1865,9 @@ body.test-mode .test-tools{display:flex}
     var path=typeof e.composedPath==='function'?e.composedPath():[];
     var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
+    var insideActivatePop=path.indexOf(q('#activatePop'))>=0;
     var insideDeletePop=path.indexOf(q('#deletePop'))>=0;
-    if(!insideDisplayPop&&!insideAppPop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.trash-mode')&&!e.target.closest('#newDisplay')&&!e.target.closest('#newApp')){
+    if(!insideDisplayPop&&!insideAppPop&&!insideActivatePop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.activate-more')&&!e.target.closest('.trash-mode')&&!e.target.closest('#newDisplay')&&!e.target.closest('#newApp')){
       closePops();
     }
   });
@@ -1822,7 +1875,7 @@ body.test-mode .test-tools{display:flex}
   document.addEventListener('keydown',function(e){
     if(e.key!=='Escape')return;
 
-    if(q('#displayPop').classList.contains('open')||q('#appPop').classList.contains('open')||q('#deletePop').classList.contains('open')){
+    if(q('#displayPop').classList.contains('open')||q('#appPop').classList.contains('open')||q('#activatePop').classList.contains('open')||q('#deletePop').classList.contains('open')){
       displayDraft=null;
       closePops();
       return;
