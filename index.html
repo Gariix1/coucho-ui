@@ -1355,6 +1355,9 @@ body.test-mode .test-tools{display:flex}
     ModeSheetTransition.workbenchBusy(false);
     renderWorkbench();
 
+    workspace=q('.visual-workspace');
+    workspace.classList.remove('mode-editor-transition-hidden','mode-editor-enter');
+
     if(typeof afterClose==='function'){
       afterClose();
       return true;
@@ -1493,6 +1496,12 @@ body.test-mode .test-tools{display:flex}
 
   function renderWorkbench(){
     ensureWorkspace();
+
+    var workspace=q('.visual-workspace');
+    if(!modeTransitioning){
+      workspace.classList.remove('mode-editor-transition-hidden','mode-editor-enter');
+    }
+
     renderModeList();
     renderWorkspaceScreens();
 
