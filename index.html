@@ -1244,7 +1244,7 @@ body.test-mode .test-tools{display:flex}
         '</span>'+
         '<span class="mode-list-actions">'+
           (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'…':'Activar')+'</button>':'')+
-          '<button class="btn view-mode" data-id="'+mode.id+'" title="Ver y editar">Ver</button>'+
+          '<button class="btn view-mode" data-id="'+mode.id+'" title="Ver y editar">'+(selected?'Abierto':'Ver')+'</button>'+
           '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">🗑</button>'+
         '</span>'+
       '</div>';
@@ -1914,6 +1914,7 @@ body.test-mode .test-tools{display:flex}
     mode.app=workspaceDraft.app;
     mode.shortcut=workspaceDraft.shortcut;
     workspaceBase=cloneModeConfig(mode);
+    renderModeList();
     toast(mode.name,'Cambios guardados');
     closeModeDetail(true);
   };
@@ -2090,6 +2091,7 @@ body.test-mode .test-tools{display:flex}
 
     if(kind==='workspace-edit'){
       var edited=byId(testContext.existingId);
+      var editedName=testContext.name;
       if(edited){
         edited.name=testContext.name;
         edited.icon=testContext.icon;
@@ -2105,9 +2107,10 @@ body.test-mode .test-tools{display:flex}
         workspaceBase=cloneModeConfig(edited);
       }
       q('#testOverlay').classList.remove('open');
-      render();
-      toast(testContext.name,'Guardado y activo');
+      renderModeList();
+      toast(editedName,'Guardado y activo');
       testContext=null;
+      setTimeout(function(){closeModeDetail(true)},80);
       return;
     }
 
