@@ -232,6 +232,51 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .shell-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:20px}
 .shell-page-head h1{margin:0;font-size:28px;font-weight:600}
 .shell-page-head p{margin:5px 0 0;color:var(--text2);font-size:12px}
+/* Modes workbench */
+.workbench-wrap{max-width:1500px}
+.mode-workbench{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr);gap:16px;align-items:start}
+.saved-modes-panel,.visual-workspace{border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card)}
+.saved-modes-panel{padding:14px;position:sticky;top:18px}
+.workbench-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.workbench-panel-head h2{margin:0;font-size:18px}.workbench-panel-head small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+.mode-list{display:grid;gap:7px}
+.mode-list-item{width:100%;min-height:66px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:9px;padding:9px;text-align:left}
+.mode-list-item:hover{background:var(--glass-pill);border-color:var(--glass-border)}
+.mode-list-item.selected{border-color:var(--selected-border);background:var(--selected-bg)}
+.mode-list-item.current{border-style:dashed}
+.mode-list-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:10px;background:var(--glass-inset);display:grid;place-items:center;font-size:17px}
+.mode-list-copy{min-width:0}.mode-list-copy b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mode-list-copy small{display:block;color:var(--text2);font-size:9px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mode-list-actions{display:flex;align-items:center;gap:4px}.mode-list-actions .btn{min-height:30px;padding:4px 8px;font-size:9px}.mode-list-actions .trash-mode{width:30px;height:30px;min-height:30px}
+.mode-list-badge{display:inline-flex;align-items:center;gap:4px;color:var(--success);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.mode-list-badge:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--success)}
+
+.visual-workspace{padding:18px}
+.visual-workspace-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.workspace-title-block{min-width:0}.workspace-eyebrow{display:block;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
+.workspace-title-block h2{margin:0;font-size:22px;font-weight:600}.workspace-title-block>small{display:block;color:var(--text2);font-size:10px;margin-top:4px}
+.workspace-state{flex:0 0 auto;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);color:var(--text2);padding:5px 8px;font-size:9px;font-weight:600}
+.workspace-state.dirty{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
+
+.workspace-screen-stage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;min-height:270px}
+.workspace-screen{position:relative;min-width:0;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;text-align:center;transition:opacity .12s ease,border-color .12s ease,background .12s ease}
+.workspace-screen.off{opacity:.35;filter:saturate(.45)}.workspace-screen.on{border-color:var(--glass-border)}.workspace-screen.primary{border-color:var(--selected-border);background:var(--selected-bg)}
+.workspace-screen-toggle{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;min-width:0;width:100%}
+.workspace-screen-toggle .monitor{margin:8px 0 18px}.workspace-screen-toggle .monitor.tv{width:120px;height:69px}.workspace-screen-toggle .monitor.pc{width:86px;height:55px}
+.workspace-screen-copy b{display:block;font-size:12px}.workspace-screen-copy small{display:block;color:var(--text2);font-size:9px;margin-top:3px}
+.workspace-primary{position:absolute;right:10px;top:10px;width:32px;height:32px;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);color:var(--text2);display:grid;place-items:center}
+.workspace-primary:hover,.workspace-primary[aria-pressed="true"]{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
+.workspace-screen-status{position:absolute;left:10px;top:10px;color:var(--muted);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+
+.workspace-pieces{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.workspace-piece{min-height:62px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:flex;align-items:center;gap:10px;padding:10px 12px;text-align:left}
+.workspace-piece:hover{background:var(--glass-pill);border-color:var(--selected-border)}
+.workspace-piece-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:10px;background:var(--glass-inset);display:grid;place-items:center;color:var(--accent)}
+.workspace-piece small{display:block;color:var(--muted);font-size:8px;font-weight:600;margin-bottom:2px}.workspace-piece b{display:block;font-size:12px}
+.workspace-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)}
+.workspace-help{color:var(--text2);font-size:9px}.workspace-actions{display:flex;gap:7px}.workspace-actions .btn{min-height:36px}
+@media(max-width:1050px){.mode-workbench{grid-template-columns:1fr}.saved-modes-panel{position:static}.mode-list{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}}
+@media(max-width:760px){.workspace-screen-stage{grid-template-columns:1fr}.workspace-pieces{grid-template-columns:1fr}.workspace-footer{align-items:stretch;flex-direction:column}.workspace-actions{width:100%}.workspace-actions .btn{flex:1}}
+
 .resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;align-items:stretch}
 .resource-card,.settings-stack{border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card)}
 .resource-card{padding:14px;min-width:0}
@@ -576,7 +621,7 @@ body.test-mode .test-tools{display:flex}
 
   <main class="main">
     <section class="shell-view active" id="view-modes" data-shell-view="modes">
-      <div class="wrap">
+      <div class="wrap workbench-wrap">
         <div class="mode-status">3 pantallas · 🎮 conectado</div>
         <div class="test-tools">
           <span>Modo de prueba · datos locales</span>
@@ -586,41 +631,47 @@ body.test-mode .test-tools{display:flex}
           </div>
         </div>
 
-        <section class="hero">
-          <div class="hero-top">
-            <div class="namebox">
-              <div class="mode-icon" id="heroIcon">🎮</div>
-              <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName" class="mode-name-edit" data-id="active" tabindex="0" title="Doble clic, F2 o toca para renombrar">Gaming</h2></div>
+        <div class="mode-workbench">
+          <aside class="saved-modes-panel">
+            <div class="workbench-panel-head">
+              <div><h2>Tus modos</h2><small>Guardados</small></div>
             </div>
-            <div class="hero-tools">
-              <button class="trash-mode" data-id="active" title="Eliminar modo" aria-label="Eliminar modo activo">🗑</button>
-            </div>
-          </div>
+            <div class="mode-list" id="modeList"></div>
+          </aside>
 
-          <div class="hero-body">
-            <button class="display-main display-trigger" data-id="active" title="Editar pantallas">
-              <div>
-                <div class="kicker">Pantallas</div>
-                <div class="displays" id="heroDisplays"></div>
-                <div class="display-name" id="heroDisplayName">—</div>
+          <section class="visual-workspace" aria-label="Editor visual del modo">
+            <div class="visual-workspace-head">
+              <div class="workspace-title-block">
+                <span class="workspace-eyebrow" id="workspaceEyebrow">Escritorio actual</span>
+                <h2 id="workspaceName" class="mode-name-edit" tabindex="0">Escritorio</h2>
+                <small id="workspaceSub">Manipula las pantallas y guarda el resultado como un modo.</small>
               </div>
-            </button>
+              <span class="workspace-state" id="workspaceState">Sin cambios</span>
+            </div>
 
-            <div class="recipe-meta">
-              <button class="meta-action app-trigger" data-id="active" title="Cambiar app">
-                <div class="meta-icon">▶</div>
-                <div><small>Apps</small><b id="heroApp">Steam</b></div>
+            <div class="workspace-screen-stage" id="workspaceScreens"></div>
+
+            <div class="workspace-pieces">
+              <button class="workspace-piece" id="workspaceApp" title="Cambiar app">
+                <span class="workspace-piece-icon">▶</span>
+                <span><small>App</small><b id="workspaceAppName">Ninguna</b></span>
               </button>
-              <button class="meta-action shortcut-trigger" data-id="active" title="Cambiar atajo">
-                <div class="meta-icon">🎮</div>
-                <div><small>Activar con</small><b id="heroShortcut">Guide + A</b></div>
+              <button class="workspace-piece" id="workspaceShortcut" title="Cambiar atajo">
+                <span class="workspace-piece-icon">🎮</span>
+                <span><small>Atajo</small><b id="workspaceShortcutName">Sin atajo</b></span>
               </button>
             </div>
-          </div>
-        </section>
 
-        <div class="section" id="modesSection"><h3>Tus modos</h3><button class="btn create-mode-btn" id="newBtn2" title="Crear modo">＋ <span>Nuevo modo</span></button></div>
-        <div class="cards" id="cards"></div>
+            <div class="workspace-footer">
+              <div class="workspace-help" id="workspaceHelp">Toca una pantalla para activarla o apagarla · ★ cambia la principal</div>
+              <div class="workspace-actions">
+                <button class="btn" id="workspaceReset">Restaurar</button>
+                <button class="btn" id="workspaceTest">Probar</button>
+                <button class="btn primary" id="workspaceSave">Guardar como modo</button>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     </section>
 
@@ -846,6 +897,10 @@ body.test-mode .test-tools{display:flex}
   var activationTimer=null;
   var activatingId=null;
   var appliedSession=null;
+  var workspaceTargetId=null;
+  var workspaceDraft=null;
+  var workspaceBase=null;
+  var workspaceAutoNamed=true;
 
   var savedTheme=localStorage.getItem('coucho-theme');
   var initialTheme=savedTheme==='light'||savedTheme==='dark'?savedTheme:'dark';
@@ -934,6 +989,39 @@ body.test-mode .test-tools{display:flex}
     var b=(mode.displayIds||[]).slice().sort().join('|');
     return a===b;
   }
+  function cloneModeConfig(source){
+    return {
+      id:source.id==null?null:source.id,
+      name:source.name||'Escritorio',
+      icon:source.icon||'🖥️',
+      preserve:!!source.preserve,
+      displayIds:Array.isArray(source.displayIds)?source.displayIds.slice():[],
+      primaryDisplayId:source.primaryDisplayId||null,
+      app:source.app||'Ninguna',
+      shortcut:source.shortcut||'Manual'
+    };
+  }
+
+  function workspaceFromApplied(){
+    ensureAppliedSession();
+    var ids=appliedSession&&appliedSession.displayIds.length
+      ?appliedSession.displayIds.slice()
+      :['main','aux'];
+    var primary=appliedSession&&appliedSession.primaryDisplayId
+      ?appliedSession.primaryDisplayId
+      :(ids[0]||'main');
+    return {
+      id:null,name:'Escritorio',icon:'🖥️',preserve:false,
+      displayIds:ids,primaryDisplayId:primary,app:'Ninguna',shortcut:'Manual'
+    };
+  }
+
+  function workspaceEqual(a,b){
+    if(!a||!b)return false;
+    if(a.name!==b.name||a.icon!==b.icon||a.app!==b.app||a.shortcut!==b.shortcut||!!a.preserve!==!!b.preserve||a.primaryDisplayId!==b.primaryDisplayId)return false;
+    return a.displayIds.slice().sort().join('|')===b.displayIds.slice().sort().join('|');
+  }
+
   function displaySummary(source){
     if(source.preserve)return 'No cambiar pantallas';
     var ids=Array.isArray(source.displayIds)?source.displayIds:[];
@@ -1108,29 +1196,147 @@ body.test-mode .test-tools{display:flex}
     });
   }
 
+  function ensureWorkspace(){
+    if(workspaceDraft)return;
+    workspaceTargetId=null;
+    workspaceDraft=workspaceFromApplied();
+    workspaceBase=cloneModeConfig(workspaceDraft);
+    workspaceAutoNamed=true;
+  }
+
+  function selectWorkspace(rawId){
+    if(rawId==='current'){
+      workspaceTargetId=null;
+      workspaceDraft=workspaceFromApplied();
+      workspaceBase=cloneModeConfig(workspaceDraft);
+      workspaceAutoNamed=true;
+    }else{
+      var mode=byId(Number(rawId));
+      if(!mode)return;
+      workspaceTargetId=mode.id;
+      workspaceDraft=cloneModeConfig(mode);
+      workspaceBase=cloneModeConfig(mode);
+      workspaceAutoNamed=false;
+    }
+    closePops();
+    renderWorkbench();
+  }
+
+  function renderModeList(){
+    var currentSelected=workspaceTargetId===null;
+    var html='<button class="mode-list-item current'+(currentSelected?' selected':'')+'" data-workspace-id="current">'+
+      '<span class="mode-list-icon">▦</span>'+
+      '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
+      '<span></span>'+
+    '</button>';
+
+    html+=sets.map(function(mode){
+      var selected=workspaceTargetId===mode.id;
+      var safeName=esc(mode.name);
+      return '<div class="mode-list-item'+(selected?' selected':'')+'" data-mode-row="'+mode.id+'">'+
+        '<button class="mode-list-icon select-mode" data-workspace-id="'+mode.id+'" title="Ver y editar">'+esc(mode.icon)+'</button>'+
+        '<button class="mode-list-copy select-mode" data-workspace-id="'+mode.id+'" title="Ver y editar">'+
+          '<b class="mode-list-name" data-id="'+mode.id+'">'+safeName+'</b>'+
+          '<small>'+(mode.active?'<span class="mode-list-badge">Activo</span> · ':'')+esc(displayCountLabel(mode))+' · '+esc(mode.app)+'</small>'+
+        '</button>'+
+        '<span class="mode-list-actions">'+
+          (!mode.active?'<button class="btn activate" data-id="'+mode.id+'">Activar</button>':'')+
+          '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">🗑</button>'+
+        '</span>'+
+      '</div>';
+    }).join('');
+
+    q('#modeList').innerHTML=html;
+
+    qa('[data-workspace-id]').forEach(function(el){
+      el.onclick=function(){selectWorkspace(el.dataset.workspaceId)};
+    });
+    qa('#modeList .activate').forEach(function(b){
+      b.onclick=function(e){e.stopPropagation();activate(Number(b.dataset.id))};
+    });
+    qa('#modeList .trash-mode').forEach(function(b){
+      b.onclick=function(e){e.stopPropagation();openDeletePop(e.currentTarget,b.dataset.id)};
+    });
+  }
+
+  function renderWorkspaceScreens(){
+    q('#workspaceScreens').innerHTML=simulatedDisplays.map(function(d){
+      var selected=workspaceDraft.displayIds.indexOf(d.id)>=0;
+      var primary=selected&&workspaceDraft.primaryDisplayId===d.id;
+      var cls=d.kind==='tv'?'tv':'pc';
+      return '<div class="workspace-screen '+(selected?'on':'off')+(primary?' primary':'')+'">'+
+        '<span class="workspace-screen-status">'+(selected?'Activa':'Apagada')+'</span>'+
+        '<button class="workspace-screen-toggle" data-workspace-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'">'+
+          '<span class="monitor '+cls+(primary?' primary':'')+'"></span>'+
+          '<span class="workspace-screen-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.detail)+'</small></span>'+
+        '</button>'+
+        '<button class="workspace-primary" data-workspace-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Principal':'Hacer principal')+'">'+(primary?'★':'☆')+'</button>'+
+      '</div>';
+    }).join('');
+
+    qa('[data-workspace-display]').forEach(function(b){
+      b.onclick=function(){toggleWorkspaceDisplay(b.dataset.workspaceDisplay)};
+    });
+    qa('[data-workspace-primary]').forEach(function(b){
+      b.onclick=function(){makeWorkspacePrimary(b.dataset.workspacePrimary)};
+    });
+  }
+
+  function renderWorkbench(){
+    ensureWorkspace();
+    renderModeList();
+    renderWorkspaceScreens();
+
+    var isNew=workspaceTargetId===null;
+    var dirty=!workspaceEqual(workspaceDraft,workspaceBase);
+    q('#workspaceEyebrow').textContent=isNew?'Escritorio actual':'Modo guardado';
+    q('#workspaceName').textContent=workspaceDraft.name;
+    q('#workspaceSub').textContent=isNew
+      ?'Manipula las pantallas y guarda el resultado como un modo.'
+      :'Edita visualmente este modo. Guardar no lo activa automáticamente.';
+    q('#workspaceAppName').textContent=workspaceDraft.app;
+    q('#workspaceShortcutName').textContent=shortcutCardLabel(workspaceDraft.shortcut);
+    q('#workspaceState').textContent=dirty?'Cambios sin guardar':isNew?'Punto de partida':'Guardado';
+    q('#workspaceState').classList.toggle('dirty',dirty);
+    q('#workspaceReset').disabled=!dirty;
+    q('#workspaceSave').textContent=isNew?'Guardar como modo':'Guardar cambios';
+    q('#workspaceHelp').textContent='Toca una pantalla para activarla o apagarla · ☆ cambia la principal';
+  }
+
   function render(){
     normalizeActive();
     ensureAppliedSession();
     renderResourceViews();
     renderDisplayOverview();
-
-    if(sets.length===0&&!newDraftOpen){
-      renderEmptyState();
-      saveSets();
-      return;
-    }
-
-    q('#modesSection').hidden=false;
-    var createBtn=q('#newBtn2');
-    if(createBtn){
-      createBtn.disabled=newDraftOpen;
-      var createLabel=createBtn.querySelector('span');
-      if(createLabel)createLabel.textContent=newDraftOpen?'Creando…':'Nuevo modo';
-    }
-
-    renderHero(active());
-    renderCards();
+    ensureWorkspace();
+    renderWorkbench();
     saveSets();
+  }
+
+  function toggleWorkspaceDisplay(id){
+    if(!workspaceDraft)return;
+    workspaceDraft.preserve=false;
+    var index=workspaceDraft.displayIds.indexOf(id);
+    if(index>=0){
+      if(workspaceDraft.displayIds.length===1){
+        toast('Pantallas','Debe quedar al menos una activa');
+        return;
+      }
+      workspaceDraft.displayIds.splice(index,1);
+      if(workspaceDraft.primaryDisplayId===id)workspaceDraft.primaryDisplayId=workspaceDraft.displayIds[0]||null;
+    }else{
+      workspaceDraft.displayIds.push(id);
+      if(!workspaceDraft.primaryDisplayId)workspaceDraft.primaryDisplayId=id;
+    }
+    renderWorkbench();
+  }
+
+  function makeWorkspacePrimary(id){
+    if(!workspaceDraft)return;
+    workspaceDraft.preserve=false;
+    if(workspaceDraft.displayIds.indexOf(id)<0)workspaceDraft.displayIds.push(id);
+    workspaceDraft.primaryDisplayId=id;
+    renderWorkbench();
   }
 
   function bindDynamic(){
@@ -1200,6 +1406,12 @@ body.test-mode .test-tools{display:flex}
       }
     }
 
+    if(workspaceTargetId===id){
+      workspaceTargetId=null;
+      workspaceDraft=workspaceFromApplied();
+      workspaceBase=cloneModeConfig(workspaceDraft);
+      workspaceAutoNamed=true;
+    }
     render();
     toast('Modo eliminado',removed.name);
   }
@@ -1215,6 +1427,10 @@ body.test-mode .test-tools{display:flex}
     activationTimer=setTimeout(function(){
       sets.forEach(function(s){s.active=s.id===id});
       appliedSession=sessionFromMode(target);
+      if(workspaceTargetId===null){
+        workspaceDraft=workspaceFromApplied();
+        workspaceBase=cloneModeConfig(workspaceDraft);
+      }
       activatingId=null;
       render();
       toast(target.name,'Activo');
@@ -1632,6 +1848,16 @@ body.test-mode .test-tools{display:flex}
   qa('#appPop .app-option').forEach(function(b){
     b.onclick=function(){
       var app=b.dataset.app;closePops();
+      if(editTarget==='workspace'){
+        workspaceDraft.app=app;
+        if(workspaceTargetId===null&&workspaceAutoNamed){
+          var wm=autoMeta(app);
+          workspaceDraft.name=wm.name;
+          workspaceDraft.icon=wm.icon;
+        }
+        renderWorkbench();
+        return;
+      }
       if(editTarget==='new'){
         newDraft.app=app;
         var nm=autoMeta(app);
@@ -1764,10 +1990,95 @@ body.test-mode .test-tools{display:flex}
     syncTestMode();
   };
 
+  q('#workspaceApp').onclick=function(e){
+    closePops();
+    editTarget='workspace';
+    qa('#appPop .app-option').forEach(function(x){
+      var selected=x.dataset.app===workspaceDraft.app;
+      x.classList.toggle('selected',selected);
+      x.setAttribute('aria-pressed',selected?'true':'false');
+    });
+    openAnchoredPop(q('#appPop'),e.currentTarget);
+  };
+
+  q('#workspaceShortcut').onclick=function(){openShortcut('workspace')};
+
+  q('#workspaceReset').onclick=function(){
+    workspaceDraft=cloneModeConfig(workspaceBase);
+    renderWorkbench();
+  };
+
+  q('#workspaceSave').onclick=function(){
+    if(!workspaceDraft)return;
+
+    if(workspaceTargetId===null){
+      var created=cloneModeConfig(workspaceDraft);
+      created.id=Date.now();
+      created.active=false;
+      sets.push(created);
+      workspaceTargetId=created.id;
+      workspaceDraft=cloneModeConfig(created);
+      workspaceBase=cloneModeConfig(created);
+      workspaceAutoNamed=false;
+      render();
+      toast(created.name,'Modo guardado');
+      return;
+    }
+
+    var mode=byId(workspaceTargetId);
+    if(!mode)return;
+    mode.name=workspaceDraft.name;
+    mode.icon=workspaceDraft.icon;
+    mode.preserve=workspaceDraft.preserve;
+    mode.displayIds=workspaceDraft.displayIds.slice();
+    mode.primaryDisplayId=workspaceDraft.primaryDisplayId;
+    mode.app=workspaceDraft.app;
+    mode.shortcut=workspaceDraft.shortcut;
+    workspaceBase=cloneModeConfig(mode);
+    render();
+    toast(mode.name,'Cambios guardados');
+  };
+
+  q('#workspaceTest').onclick=function(){
+    if(!workspaceDraft)return;
+    startTest({
+      kind:workspaceTargetId===null?'workspace-new':'workspace-edit',
+      existingId:workspaceTargetId,
+      preserve:workspaceDraft.preserve,
+      displayIds:workspaceDraft.displayIds.slice(),
+      primaryDisplayId:workspaceDraft.primaryDisplayId,
+      app:workspaceDraft.app,
+      shortcut:workspaceDraft.shortcut,
+      name:workspaceDraft.name,
+      icon:workspaceDraft.icon
+    });
+  };
+
+  function beginWorkspaceRename(){
+    var el=q('#workspaceName');
+    if(!el||el.isContentEditable)return;
+    var original=workspaceDraft.name;
+    editInlineText(el,original,function(next){
+      workspaceDraft.name=next;
+      workspaceAutoNamed=false;
+      renderWorkbench();
+    });
+  }
+
+  q('#workspaceName').ondblclick=function(e){e.preventDefault();beginWorkspaceRename()};
+  q('#workspaceName').onkeydown=function(e){
+    if(q('#workspaceName').isContentEditable)return;
+    if(e.key==='F2'||e.key==='Enter'){e.preventDefault();beginWorkspaceRename()}
+  };
+  bindTouchRename(q('#workspaceName'),beginWorkspaceRename);
+
   q('#clearModes').onclick=function(){
     sets=[];
     newDraftOpen=false;
     appliedSession=null;
+    workspaceTargetId=null;
+    workspaceDraft=null;
+    workspaceBase=null;
     render();
     toast('Modos vaciados','Ya puedes probar el flujo desde cero');
   };
@@ -1776,15 +2087,17 @@ body.test-mode .test-tools{display:flex}
     sets=demoSets();
     newDraftOpen=false;
     appliedSession=null;
+    workspaceTargetId=null;
+    workspaceDraft=null;
+    workspaceBase=null;
     render();
     toast('Demo restaurada','3 modos');
   };
 
-  q('#newBtn2').onclick=openNew;
 
   function openShortcut(rawId){
-    shortcutTarget=rawId==='new'?'new':resolveId(rawId);
-    if(shortcutTarget!=='new'&&!byId(shortcutTarget))return;
+    shortcutTarget=rawId==='new'||rawId==='workspace'?rawId:resolveId(rawId);
+    if(shortcutTarget!=='new'&&shortcutTarget!=='workspace'&&!byId(shortcutTarget))return;
     captured=null;
     q('#captureResult').innerHTML='<span style="color:var(--muted)">A · X · Y</span>';
     q('#capUse').style.display='none';q('#shortcutOverlay').classList.add('open');
@@ -1801,6 +2114,12 @@ body.test-mode .test-tools{display:flex}
   q('#capY').onclick=function(){capture('Y')};
   q('#capCancel').onclick=function(){q('#shortcutOverlay').classList.remove('open')};
   q('#capManual').onclick=function(){
+    if(shortcutTarget==='workspace'){
+      workspaceDraft.shortcut='Manual';
+      q('#shortcutOverlay').classList.remove('open');
+      renderWorkbench();
+      return;
+    }
     if(shortcutTarget==='new'){
       newDraft.shortcut='Manual';
       q('#shortcutOverlay').classList.remove('open');
@@ -1815,6 +2134,12 @@ body.test-mode .test-tools{display:flex}
   };
   q('#capUse').onclick=function(){
     if(!captured)return;
+    if(shortcutTarget==='workspace'){
+      workspaceDraft.shortcut=captured;
+      q('#shortcutOverlay').classList.remove('open');
+      renderWorkbench();
+      return;
+    }
     if(shortcutTarget==='new'){
       newDraft.shortcut=captured;
       q('#shortcutOverlay').classList.remove('open');
@@ -1833,7 +2158,7 @@ body.test-mode .test-tools{display:flex}
     q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx,true)+'</div>';
     q('#testApp').textContent=logo(ctx.app);
     q('#testText').textContent='Probando '+ctx.name+'…';
-    q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':ctx.kind==='new'?'Crear y activar':'Guardar';
+    q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':(ctx.kind==='new'||ctx.kind==='workspace-new')?'Guardar y activar':ctx.kind==='workspace-edit'?'Guardar y activar':'Guardar';
     q('#progress').style.width='0%';q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
 
     var pct=0;
@@ -1886,6 +2211,50 @@ body.test-mode .test-tools{display:flex}
       return;
     }
 
+    if(kind==='workspace-new'){
+      var created={
+        id:Date.now(),name:testContext.name,icon:testContext.icon,
+        preserve:testContext.preserve,displayIds:testContext.displayIds.slice(),
+        primaryDisplayId:testContext.primaryDisplayId,app:testContext.app,
+        shortcut:testContext.shortcut||'Manual',active:true
+      };
+      sets.forEach(function(s){s.active=false});
+      sets.push(created);
+      appliedSession=sessionFromMode(created);
+      workspaceTargetId=created.id;
+      workspaceDraft=cloneModeConfig(created);
+      workspaceBase=cloneModeConfig(created);
+      workspaceAutoNamed=false;
+      q('#testOverlay').classList.remove('open');
+      render();
+      toast(created.name,'Guardado y activo');
+      testContext=null;
+      return;
+    }
+
+    if(kind==='workspace-edit'){
+      var edited=byId(testContext.existingId);
+      if(edited){
+        edited.name=testContext.name;
+        edited.icon=testContext.icon;
+        edited.preserve=testContext.preserve;
+        edited.displayIds=testContext.displayIds.slice();
+        edited.primaryDisplayId=testContext.primaryDisplayId;
+        edited.app=testContext.app;
+        edited.shortcut=testContext.shortcut||'Manual';
+        sets.forEach(function(s){s.active=s.id===edited.id});
+        appliedSession=sessionFromMode(edited);
+        workspaceTargetId=edited.id;
+        workspaceDraft=cloneModeConfig(edited);
+        workspaceBase=cloneModeConfig(edited);
+      }
+      q('#testOverlay').classList.remove('open');
+      render();
+      toast(testContext.name,'Guardado y activo');
+      testContext=null;
+      return;
+    }
+
     if(kind==='mode-preview'){
       sets.forEach(function(s){s.active=s.id===testContext.existingId});
       appliedSession=sessionFromMode(byId(testContext.existingId));
@@ -1916,7 +2285,7 @@ body.test-mode .test-tools{display:flex}
   function finishRestore(){
     q('#testOverlay').classList.remove('open');
     testContext=null;
-    if(newDraftOpen)renderCards();
+    renderWorkbench();
     toast('Restaurado','Configuración anterior');
   }
 
@@ -1937,7 +2306,7 @@ body.test-mode .test-tools{display:flex}
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
     var insideActivatePop=path.indexOf(q('#activatePop'))>=0;
     var insideDeletePop=path.indexOf(q('#deletePop'))>=0;
-    if(!insideDisplayPop&&!insideAppPop&&!insideActivatePop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.draft-display')&&!e.target.closest('.draft-app')&&!e.target.closest('.activate-more')&&!e.target.closest('.trash-mode')){
+    if(!insideDisplayPop&&!insideAppPop&&!insideActivatePop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.draft-display')&&!e.target.closest('.draft-app')&&!e.target.closest('#workspaceApp')&&!e.target.closest('.activate-more')&&!e.target.closest('.trash-mode')){
       closePops();
     }
   });
@@ -1959,9 +2328,7 @@ body.test-mode .test-tools{display:flex}
     // The safe display test is intentionally not dismissible with Escape.
     if(q('#testOverlay').classList.contains('open'))return;
 
-    if(newDraftOpen&&q('.draft-card')){
-      cancelNewDraft(false);
-    }
+
   });
 
   var shellView='modes';
