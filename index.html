@@ -511,7 +511,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
             <div class="mode-list" id="modeList"></div>
           </aside>
 
-          <section class="visual-workspace" tabindex="-1" aria-label="Editor visual del modo">
+          <section class="visual-workspace" id="modeWorkspace" tabindex="-1" aria-label="Editor visual del modo">
             <div class="visual-workspace-head">
               <div class="workspace-title-block">
                 <div class="workspace-profile-icon" id="workspaceProfileIcon">🖥️</div>
@@ -522,7 +522,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
                 </div>
               </div>
               <div class="workspace-head-actions">
-                <span class="workspace-state" id="workspaceState">Sin cambios</span>
+                <span class="workspace-state" id="workspaceState" role="status" aria-live="polite">Sin cambios</span>
                 <button class="workspace-close" id="workspaceClose" title="Cerrar detalle" aria-label="Cerrar detalle">✕</button>
               </div>
             </div>
@@ -716,7 +716,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   </div>
 </div>
 
-<div class="toast" id="toast"><b id="toastTitle"></b><span id="toastText"></span></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><b id="toastTitle"></b><span id="toastText"></span></div>
 
 <script>
 (function(){
@@ -1000,6 +1000,10 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     renderWorkbench();
   }
 
+  function rectIsVisible(rect){
+    return rect&&rect.width>0&&rect.height>0&&rect.bottom>32&&rect.top<window.innerHeight&&rect.right>0&&rect.left<window.innerWidth;
+  }
+
   function runModeMorph(source,target,opening,onDone){
     if(modeMorphing)return false;
 
@@ -1008,9 +1012,14 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
       return true;
     }
 
-    modeMorphing=true;
     var from=opening?source.getBoundingClientRect():target.getBoundingClientRect();
     var to=opening?target.getBoundingClientRect():source.getBoundingClientRect();
+    if(!rectIsVisible(from)||!rectIsVisible(to)){
+      if(onDone)onDone();
+      return true;
+    }
+
+    modeMorphing=true;
     var ghost=source.cloneNode(true);
     ghost.classList.add('mode-transition-ghost');
     ghost.querySelectorAll('button').forEach(function(b){b.disabled=true});
@@ -1120,7 +1129,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
           '</div>'+
           '<div class="saved-mode-actions">'+
             (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el perfil abierto':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
-            '<button class="btn view-mode" data-id="'+mode.id+'" title="Abrir detalle">'+(selected?'Abierto':'Ver')+'</button>'+
+            '<button class="btn view-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" aria-expanded="'+(selected?'true':'false')+'" title="Abrir detalle">'+(selected?'Abierto':'Ver')+'</button>'+
             '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">🗑</button>'+
           '</div>'+
         '</div>'+
@@ -2043,7 +2052,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
     var insideDeletePop=path.indexOf(q('#deletePop'))>=0;
-    if(!insideDisplayPop&&!insideAppPop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.draft-display')&&!e.target.closest('.draft-app')&&!e.target.closest('.quick-display')&&!e.target.closest('.quick-app')&&!e.target.closest('#workspaceApp')&&!e.target.closest('.trash-mode')){
+    if(!insideDisplayPop&&!insideAppPop&&!insideDeletePop&&!e.target.closest('.quick-display')&&!e.target.closest('.quick-app')&&!e.target.closest('#workspaceApp')&&!e.target.closest('.trash-mode')){
       closePops();
     }
   });
@@ -2074,6 +2083,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   var shellView='modes';
 
   function openShellView(viewName){
+    if(modeMorphing)return;
     shellView=viewName;
     closePops();
 
