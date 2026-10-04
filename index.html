@@ -260,6 +260,8 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .saved-mode-card .screen-count{font-size:9px}
 .saved-mode-card .view-mode{border-color:var(--glass-soft-border);background:var(--glass-command);color:var(--text2)}
 .saved-mode-card .view-mode:hover{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
+.saved-mode-card.selected .quick-display:disabled,.saved-mode-card.selected .card-fact:disabled{opacity:.48;cursor:default;transform:none}
+.saved-mode-card.selected .quick-display:disabled:hover,.saved-mode-card.selected .card-fact:disabled:hover{background:inherit;border-color:var(--glass-soft-border)}
 .mode-list-item{width:100%;min-height:66px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px;text-align:left;overflow:hidden}
 .mode-list-item:hover{background:var(--glass-pill);border-color:var(--glass-border)}
 .mode-list-item.selected{border-color:var(--selected-border);background:var(--selected-bg)}
@@ -509,7 +511,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
             <div class="mode-list" id="modeList"></div>
           </aside>
 
-          <section class="visual-workspace" aria-label="Editor visual del modo">
+          <section class="visual-workspace" tabindex="-1" aria-label="Editor visual del modo">
             <div class="visual-workspace-head">
               <div class="workspace-title-block">
                 <div class="workspace-profile-icon" id="workspaceProfileIcon">🖥️</div>
@@ -669,10 +671,6 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   </div>
 </div>
 
-<div class="pop activate-pop" id="activatePop" aria-label="Más acciones">
-  <button id="activatePreview">Probar temporalmente</button>
-</div>
-
 <div class="pop delete-confirm" id="deletePop" role="dialog" aria-label="Confirmar eliminación">
   <div class="pop-title delete-title">Eliminar modo</div>
   <div class="delete-copy" id="deleteText"></div>
@@ -764,11 +762,8 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   var editTarget=null;
   var shortcutTarget=null;
   var deleteTarget=null;
-  var activateTarget=null;
   var captured=null;
   var displayDraft=null;
-  var displayDraftIsNew=false;
-  var newDraft={preserve:false,displayIds:['main','aux'],primaryDisplayId:'main',app:'Ninguna',shortcut:'Manual',name:'Escritorio',icon:'🖥️',autoNamed:true};
   var testContext=null;
   var progressTimer=null;
   var countdownTimer=null;
@@ -779,6 +774,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   var workspaceDraft=null;
   var workspaceBase=null;
   var workspaceAutoNamed=true;
+  var modeMorphing=false;
 
   var savedTheme=localStorage.getItem('coucho-theme');
   var initialTheme=savedTheme==='light'||savedTheme==='dark'?savedTheme:'dark';
@@ -900,6 +896,18 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     return a.displayIds.slice().sort().join('|')===b.displayIds.slice().sort().join('|');
   }
 
+  function detailHasUnsavedChanges(){
+    return workspaceTargetId!==null&&workspaceDraft&&workspaceBase&&!workspaceEqual(workspaceDraft,workspaceBase);
+  }
+
+  function guardDetailSwitch(nextId){
+    if(workspaceTargetId===null||workspaceTargetId===nextId)return true;
+    if(!detailHasUnsavedChanges())return true;
+    toast('Cambios sin guardar','Guarda o cancela el perfil abierto antes de cambiar');
+    q('.visual-workspace').focus({preventScroll:true});
+    return false;
+  }
+
   function displaySummary(source){
     if(source.preserve)return 'No cambiar pantallas';
     var ids=Array.isArray(source.displayIds)?source.displayIds:[];
@@ -974,6 +982,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   function selectWorkspace(rawId){
     if(rawId==='current'){
       if(workspaceTargetId!==null){
+        if(!guardDetailSwitch(null))return;
         closeModeDetail(false);
         return;
       }
@@ -992,11 +1001,14 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   }
 
   function runModeMorph(source,target,opening,onDone){
+    if(modeMorphing)return false;
+
     if(!source||!target||window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       if(onDone)onDone();
-      return;
+      return true;
     }
 
+    modeMorphing=true;
     var from=opening?source.getBoundingClientRect():target.getBoundingClientRect();
     var to=opening?target.getBoundingClientRect():source.getBoundingClientRect();
     var ghost=source.cloneNode(true);
@@ -1024,17 +1036,24 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
       finished=true;
       ghost.remove();
       target.classList.remove('transitioning');
+      modeMorphing=false;
       if(onDone)onDone();
     }
     ghost.addEventListener('transitionend',function(e){
       if(e.propertyName==='width')finish();
     });
     setTimeout(finish,380);
+    return true;
   }
 
   function openModeDetail(id,source){
     var mode=byId(id);
-    if(!mode)return;
+    if(!mode||modeMorphing)return;
+    if(workspaceTargetId===id){
+      q('#workspaceClose').focus();
+      return;
+    }
+    if(!guardDetailSwitch(id))return;
     closePops();
 
     var workspace=q('.visual-workspace');
@@ -1051,7 +1070,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   }
 
   function closeModeDetail(restore){
-    if(workspaceTargetId===null)return;
+    if(workspaceTargetId===null||modeMorphing)return;
     var closingId=workspaceTargetId;
     var workspace=q('.visual-workspace');
     var source=q('[data-mode-row="'+closingId+'"]');
@@ -1086,6 +1105,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 
     var saved=sets.map(function(mode){
       var selected=workspaceTargetId===mode.id;
+      var detailDirty=selected&&detailHasUnsavedChanges();
       var applying=activatingId===mode.id;
       var safeName=esc(mode.name);
       var safeApp=esc(mode.app);
@@ -1095,22 +1115,22 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
         '<div class="saved-mode-head">'+
           '<div class="saved-mode-name">'+
             '<span class="mode-list-icon">'+esc(mode.icon)+'</span>'+
-            '<span class="saved-mode-name-copy"><b class="mode-list-name" data-id="'+mode.id+'" tabindex="0" title="Doble clic, F2 o toca para renombrar">'+safeName+'</b>'+
+            '<span class="saved-mode-name-copy"><b class="mode-list-name" data-id="'+mode.id+'" tabindex="'+(selected?'-1':'0')+'" data-locked="'+(selected?'true':'false')+'" title="'+(selected?'Renombra desde el perfil abierto':'Doble clic, F2 o toca para renombrar')+'">'+safeName+'</b>'+
             '<small>'+(mode.active?'<span class="mode-list-badge">Activo</span>':'Guardado')+'</small></span>'+
           '</div>'+
           '<div class="saved-mode-actions">'+
-            (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'…':'Activar')+'</button>':'')+
+            (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el perfil abierto':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
             '<button class="btn view-mode" data-id="'+mode.id+'" title="Abrir detalle">'+(selected?'Abierto':'Ver')+'</button>'+
             '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">🗑</button>'+
           '</div>'+
         '</div>'+
-        '<button class="card-display quick-display" data-id="'+mode.id+'" title="Editar pantallas">'+
+        '<button class="card-display quick-display" data-id="'+mode.id+'"'+(selected?' disabled':'')+' title="'+(selected?'Edita las pantallas desde el perfil abierto':'Editar pantallas')+'">'+
           '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode,true)+'</span>'+
           '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
         '</button>'+
         '<div class="card-facts">'+
-          '<button class="card-fact quick-app" data-id="'+mode.id+'" title="Cambiar app"><span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
-          '<button class="card-fact quick-shortcut" data-id="'+mode.id+'" title="Cambiar atajo"><span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
+          '<button class="card-fact quick-app" data-id="'+mode.id+'"'+(selected?' disabled':'')+' title="'+(selected?'Edita la app desde el perfil abierto':'Cambiar app')+'"><span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
+          '<button class="card-fact quick-shortcut" data-id="'+mode.id+'"'+(selected?' disabled':'')+' title="'+(selected?'Edita el atajo desde el perfil abierto':'Cambiar atajo')+'"><span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
         '</div>'+
       '</article>';
     }).join('');
@@ -1133,15 +1153,16 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
       b.onclick=function(e){e.stopPropagation();openDeletePop(e.currentTarget,b.dataset.id)};
     });
     qa('#modeList .quick-display').forEach(function(b){
-      b.onclick=function(e){openDisplayPop(e.currentTarget,b.dataset.id,false)};
+      b.onclick=function(e){openDisplayPop(e.currentTarget,b.dataset.id)};
     });
     qa('#modeList .quick-app').forEach(function(b){
-      b.onclick=function(e){openAppPop(e.currentTarget,b.dataset.id,false)};
+      b.onclick=function(e){openAppPop(e.currentTarget,b.dataset.id)};
     });
     qa('#modeList .quick-shortcut').forEach(function(b){
       b.onclick=function(){openShortcut(b.dataset.id)};
     });
     qa('#modeList .mode-list-name').forEach(function(el){
+      if(el.dataset.locked==='true')return;
       el.ondblclick=function(e){e.preventDefault();beginModeRename(el,el.dataset.id)};
       el.onkeydown=function(e){
         if(el.isContentEditable)return;
@@ -1211,6 +1232,8 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     q('#workspaceSave').textContent=isNew?'Crear modo':'Guardar cambios';
     q('#workspaceSave').disabled=!isNew&&!dirty;
     q('#workspaceClose').hidden=isNew;
+    q('#workspaceClose').title=!isNew&&dirty?'Cancelar cambios y cerrar':'Cerrar detalle';
+    q('#workspaceClose').setAttribute('aria-label',q('#workspaceClose').title);
     q('#workspaceHelp').textContent='Toca una pantalla para activarla o apagarla · ☆ cambia la principal · Resolución y Hz son informativos';
   }
 
@@ -1346,9 +1369,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   function closePops(){
     q('#displayPop').classList.remove('open');
     q('#appPop').classList.remove('open');
-    q('#activatePop').classList.remove('open');
     q('#deletePop').classList.remove('open');
-    activateTarget=null;
     deleteTarget=null;
     currentPop=null;
     currentPopAnchor=null;
@@ -1448,6 +1469,10 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     var id=resolveId(rawId);
     var mode=byId(id);
     if(!mode)return;
+    if(workspaceTargetId===id){
+      toast('Perfil abierto','Renombra desde el editor de detalle');
+      return;
+    }
 
     var original=mode.name;
     editInlineText(el,original,function(next){
@@ -1460,20 +1485,6 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     });
   }
 
-  function openActivatePop(anchor,id){
-    var mode=byId(id);
-    if(!mode||mode.active)return;
-    closePops();
-    activateTarget=id;
-    openAnchoredPop(q('#activatePop'),anchor);
-  }
-
-  q('#activatePreview').onclick=function(){
-    var id=activateTarget;
-    closePops();
-    if(id!==null)previewMode(id);
-  };
-
   function openDeletePop(anchor,rawId){
     var id=resolveId(rawId);
     var mode=byId(id);
@@ -1482,9 +1493,10 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     closePops();
     deleteTarget=id;
     var fallback=mode.active?sets.find(function(s){return s.id!==mode.id}):null;
+    var deletingOpenDirty=workspaceTargetId===mode.id&&detailHasUnsavedChanges();
     q('#deleteText').textContent=mode.active&&fallback
-      ?'¿Eliminar “'+mode.name+'”? Se activará “'+fallback.name+'”.'
-      :'¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.';
+      ?'¿Eliminar “'+mode.name+'”? Se activará “'+fallback.name+'”.'+(deletingOpenDirty?' También se perderán los cambios sin guardar.':'')
+      :'¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.'+(deletingOpenDirty?' También se perderán los cambios sin guardar.':'');
     openAnchoredPop(q('#deletePop'),anchor);
     requestAnimationFrame(function(){q('#deleteCancel').focus()});
   }
@@ -1496,24 +1508,6 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     closePops();
     removeSet(id);
   };
-
-  function previewMode(id){
-    var mode=byId(id);
-    if(!mode||mode.active)return;
-
-    closePops();
-    startTest({
-      kind:'mode-preview',
-      existingId:mode.id,
-      preserve:mode.preserve,
-      displayIds:mode.displayIds.slice(),
-      primaryDisplayId:mode.primaryDisplayId,
-      app:mode.app,
-      shortcut:mode.shortcut,
-      name:mode.name,
-      icon:mode.icon
-    });
-  }
 
   function renderDisplayOverview(){
     var session=appliedSession;
@@ -1558,10 +1552,13 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
       :session.preserve?'Se conservó la configuración existente':displaySummary(session);
   }
 
-  function openDisplayPop(anchor,rawId,isNew){
+  function openDisplayPop(anchor,rawId){
     closePops();
-    displayDraftIsNew=false;
     editTarget=resolveId(rawId);
+    if(workspaceTargetId===editTarget){
+      toast('Perfil abierto','Edita las pantallas desde el detalle');
+      return;
+    }
     var source=byId(editTarget);
     if(!source)return;
     displayDraft=displayConfig(source);
@@ -1635,12 +1632,16 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     renderDisplayEditor();
   }
 
-  function openAppPop(anchor,rawId,isNew){
+  function openAppPop(anchor,rawId){
     closePops();
-    editTarget=isNew?'new':resolveId(rawId);
-    var mode=isNew?null:byId(editTarget);
-    if(!isNew&&!mode)return;
-    var app=isNew?newDraft.app:mode.app;
+    editTarget=resolveId(rawId);
+    if(workspaceTargetId===editTarget){
+      toast('Perfil abierto','Edita la app desde el detalle');
+      return;
+    }
+    var mode=byId(editTarget);
+    if(!mode)return;
+    var app=mode.app;
     qa('#appPop .app-option').forEach(function(x){
       var selected=x.dataset.app===app;
       x.classList.toggle('selected',selected);
@@ -1781,12 +1782,16 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
       created.id=Date.now();
       created.active=false;
       sets.push(created);
-      workspaceTargetId=created.id;
-      workspaceDraft=cloneModeConfig(created);
-      workspaceBase=cloneModeConfig(created);
-      workspaceAutoNamed=false;
+      workspaceTargetId=null;
+      workspaceDraft=workspaceFromApplied();
+      workspaceBase=cloneModeConfig(workspaceDraft);
+      workspaceAutoNamed=true;
       render();
       toast(created.name,'Modo creado');
+      requestAnimationFrame(function(){
+        var card=q('[data-mode-row="'+created.id+'"]');
+        if(card)card.scrollIntoView({behavior:'smooth',block:'nearest'});
+      });
       return;
     }
 
@@ -1863,6 +1868,10 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 
   function openShortcut(rawId){
     shortcutTarget=rawId==='workspace'?'workspace':resolveId(rawId);
+    if(shortcutTarget!=='workspace'&&workspaceTargetId===shortcutTarget){
+      toast('Perfil abierto','Edita el atajo desde el detalle');
+      return;
+    }
     if(shortcutTarget!=='workspace'&&!byId(shortcutTarget))return;
     captured=null;
     q('#captureResult').innerHTML='<span style="color:var(--muted)">A · X · Y</span>';
@@ -1964,10 +1973,10 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
       sets.forEach(function(s){s.active=false});
       sets.push(created);
       appliedSession=sessionFromMode(created);
-      workspaceTargetId=created.id;
-      workspaceDraft=cloneModeConfig(created);
-      workspaceBase=cloneModeConfig(created);
-      workspaceAutoNamed=false;
+      workspaceTargetId=null;
+      workspaceDraft=workspaceFromApplied();
+      workspaceBase=cloneModeConfig(workspaceDraft);
+      workspaceAutoNamed=true;
       q('#testOverlay').classList.remove('open');
       render();
       toast(created.name,'Guardado y activo');
@@ -2033,9 +2042,8 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
     var path=typeof e.composedPath==='function'?e.composedPath():[];
     var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
-    var insideActivatePop=path.indexOf(q('#activatePop'))>=0;
     var insideDeletePop=path.indexOf(q('#deletePop'))>=0;
-    if(!insideDisplayPop&&!insideAppPop&&!insideActivatePop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.draft-display')&&!e.target.closest('.draft-app')&&!e.target.closest('.quick-display')&&!e.target.closest('.quick-app')&&!e.target.closest('#workspaceApp')&&!e.target.closest('.activate-more')&&!e.target.closest('.trash-mode')){
+    if(!insideDisplayPop&&!insideAppPop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.draft-display')&&!e.target.closest('.draft-app')&&!e.target.closest('.quick-display')&&!e.target.closest('.quick-app')&&!e.target.closest('#workspaceApp')&&!e.target.closest('.trash-mode')){
       closePops();
     }
   });
@@ -2043,7 +2051,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   document.addEventListener('keydown',function(e){
     if(e.key!=='Escape')return;
 
-    if(q('#displayPop').classList.contains('open')||q('#appPop').classList.contains('open')||q('#activatePop').classList.contains('open')||q('#deletePop').classList.contains('open')){
+    if(q('#displayPop').classList.contains('open')||q('#appPop').classList.contains('open')||q('#deletePop').classList.contains('open')){
       displayDraft=null;
       closePops();
       return;
