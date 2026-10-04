@@ -299,98 +299,40 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .visual-workspace.morph-closing>*{opacity:.18;transition:opacity .083s linear}
 .visual-workspace.switch-handoff{animation:baseSheetBreath .10s cubic-bezier(0,0,0,1) both}
 @keyframes baseSheetBreath{from{opacity:.72}to{opacity:1}}
-.visual-workspace.detail-under-morph .visual-workspace-head,
-.visual-workspace.detail-under-morph .workspace-section-head,
-.visual-workspace.detail-under-morph .workspace-screen-stage,
-.visual-workspace.detail-under-morph .workspace-pieces,
-.visual-workspace.detail-under-morph .workspace-footer{
-  opacity:0;transform:translateY(5px)
-}
-.visual-workspace.detail-under-morph.detail-live .visual-workspace-head,
-.visual-workspace.detail-under-morph.detail-live .workspace-section-head,
-.visual-workspace.detail-under-morph.detail-live .workspace-screen-stage,
-.visual-workspace.detail-under-morph.detail-live .workspace-pieces,
-.visual-workspace.detail-under-morph.detail-live .workspace-footer{
-  opacity:1;transform:none;transition:opacity .12s linear,transform .14s cubic-bezier(0,0,0,1)
-}
-.visual-workspace.detail-reveal .visual-workspace-head,
-.visual-workspace.detail-reveal .workspace-section-head,
-.visual-workspace.detail-reveal .workspace-screen-stage,
-.visual-workspace.detail-reveal .workspace-pieces,
-.visual-workspace.detail-reveal .workspace-footer{
-  animation:detailContentIn .14s cubic-bezier(0,0,0,1) both
-}
-.visual-workspace.detail-reveal .workspace-section-head{animation-delay:.018s}
-.visual-workspace.detail-reveal .workspace-screen-stage{animation-delay:.032s}
-.visual-workspace.detail-reveal .workspace-pieces{animation-delay:.046s}
-.visual-workspace.detail-reveal .workspace-footer{animation-delay:.06s}
-@keyframes detailContentIn{
-  from{opacity:0;transform:translateY(5px)}
   to{opacity:1;transform:none}
 }
 .workspace-head-actions{display:flex;align-items:center;gap:7px}
 .workspace-close{display:none;width:32px;height:32px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-command);color:var(--text2);place-items:center;padding:0}
 .detail-mode .workspace-close{display:grid}.workspace-close:hover{background:var(--glass-pill);border-color:var(--glass-border);color:var(--text)}
 
-.mode-transition-ghost{
-  position:fixed;z-index:90;margin:0!important;pointer-events:none;overflow:hidden;
+/* Coucho motion primitives: compositor-friendly, mirrored by WinUI Composition */
+.coucho-motion-surface{
+  position:fixed;z-index:90;pointer-events:none;transform-origin:top left;
   border:1px solid var(--selected-border);border-radius:var(--r-card);
   background:linear-gradient(180deg,var(--selected-bg),var(--glass-card));
-  box-shadow:0 18px 48px rgba(0,0,0,.22);
-  transition:
-    left .30s cubic-bezier(.55,.55,0,1),
-    top .30s cubic-bezier(.55,.55,0,1),
-    width .255s cubic-bezier(.55,.55,0,1),
-    height .25s .035s cubic-bezier(.55,.55,0,1),
-    border-radius .20s cubic-bezier(0,0,0,1),
-    box-shadow .20s cubic-bezier(0,0,0,1)
+  box-shadow:0 18px 48px rgba(0,0,0,.22);will-change:transform,opacity
 }
-.mode-transition-ghost.closing{
-  transition:
-    left .26s cubic-bezier(.55,.55,0,1),
-    top .26s cubic-bezier(.55,.55,0,1),
-    height .215s cubic-bezier(.55,.55,0,1),
-    width .23s .03s cubic-bezier(.55,.55,0,1),
-    border-radius .18s cubic-bezier(0,0,0,1),
-    box-shadow .18s cubic-bezier(0,0,0,1)
+.coucho-motion-surface.sheet{
+  box-shadow:8px 8px 0 -1px var(--glass-surface),8px 8px 0 0 var(--glass-border),0 22px 56px rgba(0,0,0,.24)
 }
-.mode-transition-ghost.expanded{
-  border-radius:var(--r-card);
-  box-shadow:
-    8px 8px 0 -1px var(--glass-surface),
-    8px 8px 0 0 var(--glass-border),
-    0 22px 56px rgba(0,0,0,.24)
+.coucho-motion-icon,.coucho-motion-name{
+  position:fixed;z-index:91;pointer-events:none;transform-origin:top left;will-change:transform,opacity
 }
-.morph-shared{
-  position:absolute;left:11px;top:10px;display:flex;align-items:center;gap:9px;
-  transition:left .20s cubic-bezier(0,0,0,1),top .20s cubic-bezier(0,0,0,1)
+.coucho-motion-icon{
+  display:grid;place-items:center;border:1px solid var(--selected-border);border-radius:10px;
+  background:var(--selected-bg);font-size:18px
 }
-.mode-transition-ghost.expanded .morph-shared{left:18px;top:16px}
-.morph-icon{
-  width:36px;height:36px;border:1px solid var(--selected-border);border-radius:10px;
-  background:var(--selected-bg);display:grid;place-items:center;font-size:18px;
-  transition:width .20s cubic-bezier(0,0,0,1),height .20s cubic-bezier(0,0,0,1),border-radius .20s cubic-bezier(0,0,0,1),font-size .20s cubic-bezier(0,0,0,1)
+.coucho-motion-name{
+  color:var(--text);font-size:12px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
-.mode-transition-ghost.expanded .morph-icon{width:48px;height:48px;border-radius:14px;font-size:22px}
-.morph-copy{min-width:0;max-width:260px}
-.morph-copy small{display:block;color:var(--accent);font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;opacity:.72}
-.morph-copy b{display:block;color:var(--text);font-size:12px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:font-size .20s cubic-bezier(0,0,0,1)}
-.mode-transition-ghost.expanded .morph-copy b{font-size:18px}
-.morph-mini{
-  position:absolute;left:11px;right:11px;bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;
-  opacity:.62;transition:opacity .083s linear
-}
-.morph-mini span{height:30px;border:1px solid var(--glass-soft-border);border-radius:8px;background:var(--glass-inset)}
-.mode-transition-ghost.expanded .morph-mini{opacity:0}
-.morph-sheet-corner{
-  position:absolute;right:12px;bottom:11px;width:52px;height:4px;border-radius:999px;
-  background:var(--divider);opacity:0;transform:translateY(4px);transition:opacity .12s linear,transform .16s cubic-bezier(0,0,0,1)
-}
-.mode-transition-ghost.expanded .morph-sheet-corner{opacity:.7;transform:none}
-.morph-origin{opacity:.28!important;transform:scale(.99);transform-origin:center;transition:opacity .083s linear,transform .167s cubic-bezier(0,0,0,1)}
-
+.morph-origin{opacity:.24!important;transform:scale(.992);transform-origin:center;transition:opacity .083s linear,transform .167s cubic-bezier(0,0,0,1)}
+.visual-workspace.motion-content-hidden .visual-workspace-head,
+.visual-workspace.motion-content-hidden .workspace-section-head,
+.visual-workspace.motion-content-hidden .workspace-screen-stage,
+.visual-workspace.motion-content-hidden .workspace-pieces,
+.visual-workspace.motion-content-hidden .workspace-footer{opacity:0;transform:translateY(5px)}
 @media(prefers-reduced-motion:reduce){
-  .mode-transition-ghost{display:none!important;transition:none!important}
+  .coucho-motion-surface,.coucho-motion-icon,.coucho-motion-name{display:none!important}
   .visual-workspace,.visual-workspace>*{transition:none!important;animation:none!important}
   .morph-origin{transition:none!important;transform:none!important}
 }
@@ -1263,92 +1205,262 @@ body.test-mode .test-tools{display:flex}
     renderWorkbench();
   }
 
-  function rectIsVisible(rect){
-    return rect&&rect.width>0&&rect.height>0&&rect.bottom>32&&rect.top<window.innerHeight&&rect.right>0&&rect.left<window.innerWidth;
-  }
+  var CouchoMotion=(function(){
+    var spec={
+      open:{duration:300,easing:'cubic-bezier(.20,.80,.20,1)',revealDelay:172,revealDuration:128},
+      close:{duration:260,easing:'cubic-bezier(.40,0,.20,1)',contentOut:86},
+      identity:{open:250,close:220},
+      handoff:92
+    };
 
-  function createModeMorphGhost(mode,closing){
-    var ghost=document.createElement('div');
-    ghost.className='mode-transition-ghost'+(closing?' closing':'');
-    ghost.setAttribute('aria-hidden','true');
-    ghost.innerHTML=
-      '<div class="morph-shared">'+
-        '<span class="morph-icon">'+esc(mode.icon)+'</span>'+
-        '<span class="morph-copy"><small>Modo</small><b>'+esc(mode.name)+'</b></span>'+
-      '</div>'+
-      '<div class="morph-mini"><span></span><span></span></div>'+
-      '<span class="morph-sheet-corner"></span>';
-    return ghost;
-  }
-
-  function runModeMorph(source,target,opening,mode,onDone,onReveal){
-    if(modeMorphing)return false;
-
-    if(!source||!target||!mode||window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-      if(onReveal)onReveal();
-      if(onDone)onDone();
-      return true;
+    function reduced(){
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     }
 
-    var from=opening?source.getBoundingClientRect():target.getBoundingClientRect();
-    var to=opening?target.getBoundingClientRect():source.getBoundingClientRect();
-    if(!rectIsVisible(from)||!rectIsVisible(to)){
-      if(onDone)onDone();
-      return true;
+    function visible(rect){
+      return rect&&rect.width>0&&rect.height>0&&rect.bottom>32&&rect.top<window.innerHeight&&rect.right>0&&rect.left<window.innerWidth;
     }
 
-    modeMorphing=true;
-    var ghost=createModeMorphGhost(mode,!opening);
-    Object.assign(ghost.style,{
-      left:from.left+'px',
-      top:from.top+'px',
-      width:from.width+'px',
-      height:from.height+'px'
-    });
+    function rectOf(el){
+      return el&&el.isConnected?el.getBoundingClientRect():null;
+    }
 
-    source.classList.add('morph-origin');
-    target.classList.add(opening?'morph-opening':'morph-closing');
-    document.body.appendChild(ghost);
+    function sourceIdentity(card){
+      return {
+        icon:rectOf(card&&card.querySelector('.mode-list-icon')),
+        name:rectOf(card&&card.querySelector('.mode-list-name'))
+      };
+    }
 
-    if(!opening)ghost.classList.add('expanded');
+    function targetIdentity(workspace){
+      return {
+        icon:rectOf(workspace&&workspace.querySelector('#workspaceProfileIcon')),
+        name:rectOf(workspace&&workspace.querySelector('#workspaceName'))
+      };
+    }
 
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        ghost.classList.toggle('expanded',opening);
-        ghost.style.left=to.left+'px';
-        ghost.style.top=to.top+'px';
-        ghost.style.width=to.width+'px';
-        ghost.style.height=to.height+'px';
+    function makeSurface(rect,sheet){
+      var el=document.createElement('div');
+      el.className='coucho-motion-surface'+(sheet?' sheet':'');
+      Object.assign(el.style,{
+        left:rect.left+'px',top:rect.top+'px',
+        width:rect.width+'px',height:rect.height+'px'
       });
-    });
-
-    var revealTimer=null;
-    if(opening&&onReveal){
-      revealTimer=setTimeout(function(){
-        revealTimer=null;
-        onReveal();
-      },185);
+      el.setAttribute('aria-hidden','true');
+      document.body.appendChild(el);
+      return el;
     }
 
-    var finished=false;
-    function finish(){
-      if(finished)return;
-      finished=true;
-      if(revealTimer)clearTimeout(revealTimer);
-      ghost.remove();
-      source.classList.remove('morph-origin');
-      target.classList.remove('morph-opening','morph-closing');
+    function makeIcon(rect,mode){
+      if(!visible(rect))return null;
+      var el=document.createElement('div');
+      el.className='coucho-motion-icon';
+      el.textContent=mode.icon;
+      Object.assign(el.style,{
+        left:rect.left+'px',top:rect.top+'px',
+        width:rect.width+'px',height:rect.height+'px'
+      });
+      el.setAttribute('aria-hidden','true');
+      document.body.appendChild(el);
+      return el;
+    }
+
+    function makeName(rect,mode){
+      if(!visible(rect))return null;
+      var el=document.createElement('div');
+      el.className='coucho-motion-name';
+      el.textContent=mode.name;
+      Object.assign(el.style,{
+        left:rect.left+'px',top:rect.top+'px',
+        width:Math.max(rect.width,72)+'px',height:rect.height+'px',
+        lineHeight:rect.height+'px'
+      });
+      el.setAttribute('aria-hidden','true');
+      document.body.appendChild(el);
+      return el;
+    }
+
+    function rectTransform(from,to){
+      return 'translate3d('+(to.left-from.left)+'px,'+(to.top-from.top)+'px,0) scale('+
+        (to.width/from.width)+','+(to.height/from.height)+')';
+    }
+
+    function animateRect(el,from,to,duration,easing,fadeAtEnd){
+      if(!el||!visible(from)||!visible(to))return Promise.resolve();
+      var frames=fadeAtEnd
+        ?[
+          {transform:'translate3d(0,0,0) scale(1,1)',opacity:1,offset:0},
+          {transform:rectTransform(from,to),opacity:1,offset:.78},
+          {transform:rectTransform(from,to),opacity:0,offset:1}
+        ]
+        :[
+          {transform:'translate3d(0,0,0) scale(1,1)',opacity:1},
+          {transform:rectTransform(from,to),opacity:0}
+        ];
+      var a=el.animate(frames,{duration:duration,easing:easing,fill:'forwards'});
+      return a.finished.catch(function(){});
+    }
+
+    function contentGroups(workspace){
+      return [
+        workspace.querySelector('.visual-workspace-head'),
+        workspace.querySelector('.workspace-section-head'),
+        workspace.querySelector('.workspace-screen-stage'),
+        workspace.querySelector('.workspace-pieces'),
+        workspace.querySelector('.workspace-footer')
+      ].filter(Boolean);
+    }
+
+    function revealContent(workspace){
+      var groups=contentGroups(workspace);
+      var base=spec.open.revealDelay;
+      return Promise.all(groups.map(function(el,index){
+        var a=el.animate(
+          [
+            {opacity:0,transform:'translate3d(0,5px,0)'},
+            {opacity:1,transform:'translate3d(0,0,0)'}
+          ],
+          {
+            duration:spec.open.revealDuration,
+            delay:base+index*12,
+            easing:'cubic-bezier(0,0,0,1)',
+            fill:'forwards'
+          }
+        );
+        return a.finished.catch(function(){});
+      }));
+    }
+
+    function hideContent(workspace){
+      return Promise.all(contentGroups(workspace).map(function(el,index){
+        var a=el.animate(
+          [
+            {opacity:1,transform:'translate3d(0,0,0)'},
+            {opacity:0,transform:'translate3d(0,-3px,0)'}
+          ],
+          {
+            duration:spec.close.contentOut,
+            delay:index*5,
+            easing:'cubic-bezier(.40,0,1,1)',
+            fill:'forwards'
+          }
+        );
+        return a.finished.catch(function(){});
+      }));
+    }
+
+    function cleanup(items){
+      items.forEach(function(el){if(el&&el.remove)el.remove()});
+    }
+
+    async function openProfile(args){
+      if(modeMorphing)return false;
+      var source=args.source,target=args.target,mode=args.mode;
+      if(!source||!target||!mode)return false;
+
+      var sourceRect=rectOf(source);
+      var sourceId=sourceIdentity(source);
+      if(!visible(sourceRect)||reduced()){
+        args.prepare();
+        target.classList.remove('motion-content-hidden');
+        if(args.done)args.done();
+        return true;
+      }
+
+      modeMorphing=true;
+      source.classList.add('morph-origin');
+
+      // Render the real destination first, hidden under the travelling surface.
+      args.prepare();
+      target.classList.add('motion-content-hidden');
+
+      var targetRect=rectOf(target);
+      var targetId=targetIdentity(target);
+      if(!visible(targetRect)){
+        target.classList.remove('motion-content-hidden');
+        source.classList.remove('morph-origin');
+        modeMorphing=false;
+        if(args.done)args.done();
+        return true;
+      }
+
+      var freshSource=q('[data-mode-row="'+mode.id+'"]');
+      if(freshSource)freshSource.classList.add('morph-origin');
+
+      var surface=makeSurface(sourceRect,true);
+      var icon=makeIcon(sourceId.icon,mode);
+      var name=makeName(sourceId.name,mode);
+
+      // Reveal starts while the connected surface is still settling.
+      target.classList.remove('motion-content-hidden');
+      var revealPromise=revealContent(target);
+
+      var animations=[
+        animateRect(surface,sourceRect,targetRect,spec.open.duration,spec.open.easing,true)
+      ];
+      if(icon&&visible(targetId.icon))animations.push(animateRect(icon,sourceId.icon,targetId.icon,spec.identity.open,spec.open.easing,true));
+      if(name&&visible(targetId.name))animations.push(animateRect(name,sourceId.name,targetId.name,spec.identity.open,spec.open.easing,true));
+
+      await Promise.all(animations.concat([revealPromise]));
+      cleanup([surface,icon,name]);
+      if(source.isConnected)source.classList.remove('morph-origin');
+      var newSource=q('[data-mode-row="'+mode.id+'"]');
+      if(newSource)newSource.classList.remove('morph-origin');
       modeMorphing=false;
-      if(onDone)onDone();
+      if(args.done)args.done();
+      return true;
     }
 
-    ghost.addEventListener('transitionend',function(e){
-      if(e.target!==ghost)return;
-      if(e.propertyName==='top')finish();
-    });
-    setTimeout(finish,opening?350:315);
-    return true;
-  }
+    async function closeProfile(args){
+      if(modeMorphing)return false;
+      var source=args.source,target=args.target,mode=args.mode;
+      if(!source||!target||!mode)return false;
+
+      var sourceRect=rectOf(source);
+      var sourceId=targetIdentity(source);
+      var targetRect=rectOf(target);
+      var targetId=sourceIdentity(target);
+
+      if(!visible(sourceRect)||!visible(targetRect)||reduced()){
+        if(args.done)args.done();
+        return true;
+      }
+
+      modeMorphing=true;
+      target.classList.add('morph-origin');
+
+      var surface=makeSurface(sourceRect,true);
+      var icon=makeIcon(sourceId.icon,mode);
+      var name=makeName(sourceId.name,mode);
+
+      var animations=[
+        animateRect(surface,sourceRect,targetRect,spec.close.duration,spec.close.easing,false),
+        hideContent(source)
+      ];
+      if(icon&&visible(targetId.icon))animations.push(animateRect(icon,sourceId.icon,targetId.icon,spec.identity.close,spec.close.easing,false));
+      if(name&&visible(targetId.name))animations.push(animateRect(name,sourceId.name,targetId.name,spec.identity.close,spec.close.easing,false));
+
+      await Promise.all(animations);
+      cleanup([surface,icon,name]);
+      if(target.isConnected)target.classList.remove('morph-origin');
+      modeMorphing=false;
+      if(args.done)args.done();
+      return true;
+    }
+
+    function handoff(){
+      if(reduced())return Promise.resolve();
+      var workspace=q('.visual-workspace');
+      if(!workspace)return Promise.resolve();
+      var a=workspace.animate(
+        [{opacity:.78},{opacity:1}],
+        {duration:spec.handoff,easing:'cubic-bezier(0,0,0,1)'}
+      );
+      return a.finished.catch(function(){});
+    }
+
+    return {spec:spec,openProfile:openProfile,closeProfile:closeProfile,handoff:handoff};
+  })();
 
   function openModeDetail(id,source){
     var mode=byId(id);
@@ -1359,8 +1471,7 @@ body.test-mode .test-tools{display:flex}
       return;
     }
 
-    // Switching between two saved modes is always A -> base -> B.
-    // If A is dirty, never start the chain.
+    // A -> base -> B. Never keep more than one editable profile alive.
     if(workspaceTargetId!==null){
       if(detailHasUnsavedChanges()){
         toast('Cambios sin guardar','Guarda o cancela el perfil abierto antes de cambiar');
@@ -1375,15 +1486,10 @@ body.test-mode .test-tools{display:flex}
         modeSwitchPending=null;
         if(nextId===null)return;
 
-        var workspace=q('.visual-workspace');
-        workspace.classList.add('switch-handoff');
-        setTimeout(function(){
-          workspace.classList.remove('switch-handoff');
-          requestAnimationFrame(function(){
-            var nextSource=q('[data-mode-row="'+nextId+'"]');
-            openModeDetail(nextId,nextSource);
-          });
-        },96);
+        CouchoMotion.handoff().then(function(){
+          var nextSource=q('[data-mode-row="'+nextId+'"]');
+          openModeDetail(nextId,nextSource);
+        });
       });
       return;
     }
@@ -1392,27 +1498,25 @@ body.test-mode .test-tools{display:flex}
     var workspace=q('.visual-workspace');
     source=source||q('[data-mode-row="'+id+'"]');
 
-    var detailPrepared=false;
-    function prepareDetailUnderSheet(){
-      if(detailPrepared)return;
-      detailPrepared=true;
+    function prepareDetail(){
       workspaceTargetId=mode.id;
       workspaceDraft=cloneModeConfig(mode);
       workspaceBase=cloneModeConfig(mode);
       workspaceAutoNamed=false;
       renderWorkbench();
-      workspace.classList.add('detail-mode','detail-under-morph');
-      requestAnimationFrame(function(){
-        workspace.classList.add('detail-live');
-      });
+      workspace.classList.add('detail-mode');
     }
 
-    runModeMorph(source,workspace,true,mode,function(){
-      prepareDetailUnderSheet();
-      workspace.classList.remove('detail-under-morph','detail-live');
-      renderModeList();
-      q('#workspaceClose').focus();
-    },prepareDetailUnderSheet);
+    CouchoMotion.openProfile({
+      source:source,
+      target:workspace,
+      mode:mode,
+      prepare:prepareDetail,
+      done:function(){
+        renderModeList();
+        q('#workspaceClose').focus();
+      }
+    });
   }
 
   function closeModeDetail(restore,afterClose){
@@ -1421,14 +1525,14 @@ body.test-mode .test-tools{display:flex}
     var closingId=workspaceTargetId;
     var closingMode=byId(closingId);
     var workspace=q('.visual-workspace');
-    var source=q('[data-mode-row="'+closingId+'"]');
+    var destination=q('[data-mode-row="'+closingId+'"]');
 
     function returnToBase(){
       workspaceTargetId=null;
       workspaceDraft=workspaceFromApplied();
       workspaceBase=cloneModeConfig(workspaceDraft);
       workspaceAutoNamed=true;
-      workspace.classList.remove('detail-mode','detail-reveal','detail-under-morph','detail-live');
+      workspace.classList.remove('detail-mode','motion-content-hidden');
       renderWorkbench();
 
       if(typeof afterClose==='function'){
@@ -1445,7 +1549,12 @@ body.test-mode .test-tools{display:flex}
       }
     }
 
-    runModeMorph(source,workspace,false,closingMode,returnToBase);
+    CouchoMotion.closeProfile({
+      source:workspace,
+      target:destination,
+      mode:closingMode,
+      done:returnToBase
+    });
     return true;
   }
 
@@ -1653,7 +1762,7 @@ body.test-mode .test-tools{display:flex}
       workspaceDraft=workspaceFromApplied();
       workspaceBase=cloneModeConfig(workspaceDraft);
       workspaceAutoNamed=true;
-      q('.visual-workspace').classList.remove('detail-mode', 'detail-reveal');
+      q('.visual-workspace').classList.remove('detail-mode','motion-content-hidden');
     }
     render();
     toast('Modo eliminado',removed.name);
@@ -2208,7 +2317,7 @@ body.test-mode .test-tools{display:flex}
     workspaceTargetId=null;
     workspaceDraft=null;
     workspaceBase=null;
-    q('.visual-workspace').classList.remove('detail-mode', 'detail-reveal');
+    q('.visual-workspace').classList.remove('detail-mode','motion-content-hidden');
     render();
     toast('Modos vaciados','Ya puedes probar el flujo desde cero');
   };
@@ -2219,7 +2328,7 @@ body.test-mode .test-tools{display:flex}
     workspaceTargetId=null;
     workspaceDraft=null;
     workspaceBase=null;
-    q('.visual-workspace').classList.remove('detail-mode', 'detail-reveal');
+    q('.visual-workspace').classList.remove('detail-mode','motion-content-hidden');
     render();
     toast('Demo restaurada','3 modos');
   };
