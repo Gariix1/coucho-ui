@@ -871,13 +871,11 @@ body.test-mode .test-tools{display:flex}
     localStorage.setItem('coucho-test-sets',JSON.stringify(sets));
   }
   function normalizeActive(){
-    if(sets.length===0)return;
     var kept=false;
     sets.forEach(function(s){
       if(s.active&&!kept){kept=true;return}
       if(s.active)s.active=false;
     });
-    if(!kept)sets[0].active=true;
   }
   function logo(app){return app==='Ninguna'?'—':app.charAt(0).toUpperCase()}
   function autoMeta(app){
@@ -1123,8 +1121,14 @@ body.test-mode .test-tools{display:flex}
     }
 
     q('#modesSection').hidden=false;
-    if(sets.length)renderHero(active());
-    else q('.hero').style.display='none';
+    var createBtn=q('#newBtn2');
+    if(createBtn){
+      createBtn.disabled=newDraftOpen;
+      var createLabel=createBtn.querySelector('span');
+      if(createLabel)createLabel.textContent=newDraftOpen?'Creando…':'Nuevo modo';
+    }
+
+    renderHero(active());
     renderCards();
     saveSets();
   }
@@ -1171,7 +1175,7 @@ body.test-mode .test-tools{display:flex}
     if(draftShortcut)draftShortcut.onclick=function(){openShortcut('new')};
 
     var draftCancel=q('.draft-cancel');
-    if(draftCancel)draftCancel.onclick=cancelNewDraft;
+    if(draftCancel)draftCancel.onclick=function(){cancelNewDraft(true)};
 
     var draftTest=q('.draft-test');
     if(draftTest)draftTest.onclick=testNewDraft;
@@ -1378,26 +1382,6 @@ body.test-mode .test-tools{display:flex}
       if(next!==original)toast(next,'Nombre actualizado');
     });
   }
-
-  function beginNewModeRename(){
-    var el=q('#newName');
-    if(el.isContentEditable)return;
-    var original=newDraft.name;
-    editInlineText(el,original,function(next){
-      newDraft.name=next;
-      renderCards();
-    });
-  }
-
-  q('#newName').ondblclick=function(e){e.preventDefault();beginNewModeRename()};
-  q('#newName').onkeydown=function(e){
-    if(q('#newName').isContentEditable)return;
-    if(e.key==='F2'||e.key==='Enter'){
-      e.preventDefault();
-      beginNewModeRename();
-    }
-  };
-  bindTouchRename(q('#newName'),beginNewModeRename);
 
   function openActivatePop(anchor,id){
     var mode=byId(id);
@@ -1720,11 +1704,11 @@ body.test-mode .test-tools{display:flex}
     };
   }
 
-  function cancelNewDraft(){
+  function cancelNewDraft(showFeedback){
     closePops();
     newDraftOpen=false;
     render();
-    toast('Nuevo modo','Borrador descartado');
+    if(showFeedback!==false)toast('Nuevo modo','Borrador descartado');
   }
 
   function createNewDraft(){
@@ -1976,7 +1960,7 @@ body.test-mode .test-tools{display:flex}
     if(q('#testOverlay').classList.contains('open'))return;
 
     if(newDraftOpen&&q('.draft-card')){
-      cancelNewDraft();
+      cancelNewDraft(false);
     }
   });
 
