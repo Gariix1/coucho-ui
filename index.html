@@ -281,13 +281,9 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 }
 .visual-workspace.detail-mode{
   border-color:var(--selected-border);
-  background:linear-gradient(180deg,var(--selected-bg),var(--glass-card) 180px);
+  background:transparent;
   transform:translate(-2px,-2px);
-  box-shadow:
-    8px 8px 0 -1px var(--glass-surface),
-    8px 8px 0 0 var(--glass-border),
-    0 20px 48px rgba(0,0,0,.16),
-    0 0 0 1px var(--monitor-glow)
+  box-shadow:none
 }
 .visual-workspace.detail-mode:before{
   content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);
@@ -298,54 +294,99 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .detail-mode .workspace-close{display:grid}.workspace-close:hover{background:var(--glass-pill);border-color:var(--glass-border);color:var(--text)}
 
 /* Coucho container transform
-   Desktop uses one shared snapshot: saved card -> detail workspace.
-   This mirrors a WinUI Composition Visual animating Offset + Size + RectangleClip. */
+   Only the surface, icon and title are shared. Contents fade-through instead of stretching.
+   This maps directly to WinUI: shared container Visual + shared identity + content choreography. */
 :root{view-transition-name:none}
 
-::view-transition-group(coucho-mode){
+.mode-morph-surface{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  border:1px solid var(--glass-soft-border);border-radius:inherit;
+  background:var(--glass-card)
+}
+.saved-mode-card,.visual-workspace{position:relative;isolation:isolate}
+.saved-mode-card>*:not(.mode-morph-surface),
+.visual-workspace>*:not(.mode-morph-surface){position:relative;z-index:1}
+
+.saved-mode-card{background:transparent!important;border-color:transparent!important}
+.saved-mode-card .saved-morph-surface{background:var(--glass-control)}
+.saved-mode-card:hover .saved-morph-surface{background:var(--glass-pill);border-color:var(--glass-border)}
+.saved-mode-card.selected .saved-morph-surface{background:var(--selected-bg);border-color:var(--selected-border)}
+
+.visual-workspace{background:transparent!important;border-color:transparent!important}
+.visual-workspace .workspace-morph-surface{
+  background:var(--glass-card);border-color:var(--glass-soft-border);
+  box-shadow:none;transition:background .167s ease,border-color .167s ease,box-shadow .167s ease
+}
+.visual-workspace.detail-mode .workspace-morph-surface{
+  background:linear-gradient(180deg,var(--selected-bg),var(--glass-card) 180px);
+  border-color:var(--selected-border);
+  box-shadow:8px 8px 0 -1px var(--glass-surface),8px 8px 0 0 var(--glass-border),0 20px 48px rgba(0,0,0,.16),0 0 0 1px var(--monitor-glow)
+}
+
+/* Geometry comes from the browser's shared-element interpolation. */
+::view-transition-group(coucho-surface){
   z-index:90;
-  animation-duration:360ms;
+  animation-duration:400ms;
   animation-timing-function:cubic-bezier(.18,.82,.18,1)
 }
-::view-transition-image-pair(coucho-mode){
-  isolation:auto;
-  overflow:clip;
-  animation:coucho-container-shape 360ms cubic-bezier(.18,.82,.18,1) both;
-  box-shadow:0 20px 48px rgba(0,0,0,.20)
+::view-transition-image-pair(coucho-surface){
+  isolation:auto;overflow:clip;
+  animation:coucho-surface-shape 400ms cubic-bezier(.18,.82,.18,1) both
 }
-::view-transition-old(coucho-mode),
-::view-transition-new(coucho-mode){
-  width:100%;
-  height:100%;
+::view-transition-old(coucho-surface),
+::view-transition-new(coucho-surface){
+  width:100%;height:100%;object-fit:fill;mix-blend-mode:normal;
+  animation:none
+}
+
+/* Shared identity remains readable while the container changes around it. */
+::view-transition-group(coucho-icon),
+::view-transition-group(coucho-title){
+  z-index:92;
+  animation-duration:330ms;
+  animation-timing-function:cubic-bezier(.18,.82,.18,1)
+}
+::view-transition-old(coucho-icon),
+::view-transition-new(coucho-icon),
+::view-transition-old(coucho-title),
+::view-transition-new(coucho-title){
   mix-blend-mode:normal;
-  object-fit:fill;
-  animation-duration:360ms;
+  animation-duration:330ms;
   animation-fill-mode:both
 }
-::view-transition-old(coucho-mode){
-  animation-name:coucho-old-content;
-  animation-timing-function:cubic-bezier(.4,0,1,1)
-}
-::view-transition-new(coucho-mode){
-  animation-name:coucho-new-content;
-  animation-timing-function:cubic-bezier(0,0,.2,1)
-}
-@keyframes coucho-container-shape{
-  0%{clip-path:inset(0 round 18px)}
-  46%{clip-path:inset(0 round 42px)}
-  72%{clip-path:inset(0 round 24px)}
-  100%{clip-path:inset(0 round 18px)}
-}
-@keyframes coucho-old-content{
-  0%,26%{opacity:1}
-  52%,100%{opacity:0}
-}
-@keyframes coucho-new-content{
-  0%,38%{opacity:0}
-  70%,100%{opacity:1}
-}
-.saved-mode-card.coucho-vt-placeholder{visibility:hidden}
+::view-transition-old(coucho-icon),
+::view-transition-old(coucho-title){animation-name:coucho-identity-out}
+::view-transition-new(coucho-icon),
+::view-transition-new(coucho-title){animation-name:coucho-identity-in}
 
+@keyframes coucho-surface-shape{
+  0%{clip-path:inset(0 round 18px);filter:drop-shadow(0 7px 16px rgba(0,0,0,.08))}
+  42%{clip-path:inset(0 round 34px);filter:drop-shadow(0 14px 26px rgba(0,0,0,.14))}
+  72%{clip-path:inset(0 round 24px)}
+  100%{clip-path:inset(0 round 18px);filter:drop-shadow(0 18px 34px rgba(0,0,0,.16))}
+}
+@keyframes coucho-identity-out{
+  0%,58%{opacity:1}
+  100%{opacity:0}
+}
+@keyframes coucho-identity-in{
+  0%,34%{opacity:0}
+  72%,100%{opacity:1}
+}
+
+/* Non-shared content: Material-style fade-through. */
+.saved-mode-card.coucho-vt-placeholder{visibility:hidden}
+.saved-mode-card.coucho-card-content-pending .saved-mode-actions,
+.saved-mode-card.coucho-card-content-pending .saved-mode-body,
+.saved-mode-card.coucho-card-content-pending .saved-mode-name-copy small{opacity:0}
+
+.visual-workspace.coucho-detail-content-pending .workspace-eyebrow,
+.visual-workspace.coucho-detail-content-pending #workspaceSub,
+.visual-workspace.coucho-detail-content-pending .workspace-head-actions,
+.visual-workspace.coucho-detail-content-pending .workspace-section-head,
+.visual-workspace.coucho-detail-content-pending .workspace-screen-stage,
+.visual-workspace.coucho-detail-content-pending .workspace-pieces,
+.visual-workspace.coucho-detail-content-pending .workspace-footer{opacity:0;transform:translateY(6px)}
 
 /* Narrow Control windows intentionally do not perform a lateral container transform. */
 .visual-workspace.compact-detail-enter{animation:compactDetailIn .18s cubic-bezier(.18,.82,.18,1) both}
@@ -354,10 +395,16 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 @keyframes compactDetailOut{from{opacity:1;transform:none}to{opacity:.2;transform:translateY(-4px) scale(.994)}}
 
 @media(prefers-reduced-motion:reduce){
-  ::view-transition-group(coucho-mode),
-  ::view-transition-image-pair(coucho-mode),
-  ::view-transition-old(coucho-mode),
-  ::view-transition-new(coucho-mode){animation-duration:.001ms!important}
+  ::view-transition-group(coucho-surface),
+  ::view-transition-group(coucho-icon),
+  ::view-transition-group(coucho-title),
+  ::view-transition-image-pair(coucho-surface),
+  ::view-transition-old(coucho-surface),
+  ::view-transition-new(coucho-surface),
+  ::view-transition-old(coucho-icon),
+  ::view-transition-new(coucho-icon),
+  ::view-transition-old(coucho-title),
+  ::view-transition-new(coucho-title){animation-duration:.001ms!important}
   .visual-workspace,.visual-workspace>*{transition:none!important;animation:none!important}
 }
 .visual-workspace-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
@@ -746,6 +793,7 @@ body.test-mode .test-tools{display:flex}
           </aside>
 
           <section class="visual-workspace" id="modeWorkspace" tabindex="-1" aria-label="Editor visual del modo">
+            <span class="mode-morph-surface workspace-morph-surface" aria-hidden="true"></span>
             <div class="visual-workspace-head">
               <div class="workspace-title-block">
                 <div class="workspace-profile-icon" id="workspaceProfileIcon">🖥️</div>
@@ -1237,7 +1285,16 @@ body.test-mode .test-tools{display:flex}
   }
 
   var CouchoMotion=(function(){
-    var spec={desktopMin:1041};
+    var spec={
+      desktopMin:1041,
+      container:400,
+      sourceOut:92,
+      detailRevealDelay:155,
+      detailReveal:155,
+      detailOut:88,
+      cardRevealDelay:210,
+      cardReveal:105
+    };
 
     function reduced(){
       return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1255,12 +1312,8 @@ body.test-mode .test-tools{display:flex}
       if(reduced())return false;
       if(typeof document.startViewTransition!=='function')return false;
       if(!window.matchMedia('(min-width: '+spec.desktopMin+'px)').matches)return false;
-
       var s=rectOf(source),t=rectOf(target);
       if(!visible(s)||!visible(t))return false;
-
-      // Desktop contract: card is actually left of the detail surface.
-      // Stacked/responsive windows always use compact motion instead.
       return s.right+12<t.left;
     }
 
@@ -1268,13 +1321,11 @@ body.test-mode .test-tools{display:flex}
       modeMorphing=true;
       update();
       target.classList.add('compact-detail-enter');
-
       var finish=function(){
         target.classList.remove('compact-detail-enter');
         modeMorphing=false;
         if(done)done();
       };
-
       if(reduced()){finish();return Promise.resolve()}
       var animations=target.getAnimations();
       if(!animations.length){finish();return Promise.resolve()}
@@ -1283,26 +1334,127 @@ body.test-mode .test-tools{display:flex}
 
     function compactClose(source,update,done){
       modeMorphing=true;
-
       if(reduced()){
-        update();
-        modeMorphing=false;
-        if(done)done();
-        return Promise.resolve();
+        update();modeMorphing=false;if(done)done();return Promise.resolve();
       }
-
       source.classList.add('compact-detail-exit');
       var animations=source.getAnimations();
-
       var finish=function(){
         source.classList.remove('compact-detail-exit');
-        update();
-        modeMorphing=false;
-        if(done)done();
+        update();modeMorphing=false;if(done)done();
       };
-
       if(!animations.length){finish();return Promise.resolve()}
       return Promise.all(animations.map(function(a){return a.finished.catch(function(){})})).then(finish);
+    }
+
+    function setSharedNames(container,prefix){
+      if(!container)return;
+      var surface=container.querySelector('.mode-morph-surface');
+      var icon=container.querySelector(prefix==='card'?'.mode-list-icon':'#workspaceProfileIcon');
+      var title=container.querySelector(prefix==='card'?'.mode-list-name':'#workspaceName');
+      if(surface)surface.style.viewTransitionName='coucho-surface';
+      if(icon)icon.style.viewTransitionName='coucho-icon';
+      if(title)title.style.viewTransitionName='coucho-title';
+    }
+
+    function clearSharedNames(container,prefix){
+      if(!container)return;
+      var surface=container.querySelector('.mode-morph-surface');
+      var icon=container.querySelector(prefix==='card'?'.mode-list-icon':'#workspaceProfileIcon');
+      var title=container.querySelector(prefix==='card'?'.mode-list-name':'#workspaceName');
+      [surface,icon,title].forEach(function(el){if(el)el.style.viewTransitionName='none'});
+    }
+
+    function animateElements(elements,frames,options){
+      return Promise.all(elements.filter(Boolean).map(function(el){
+        var a=el.animate(frames,options);
+        return a.finished.catch(function(){});
+      }));
+    }
+
+    function fadeSourceContent(card){
+      return animateElements(
+        [
+          card.querySelector('.saved-mode-actions'),
+          card.querySelector('.saved-mode-body'),
+          card.querySelector('.saved-mode-name-copy small')
+        ],
+        [{opacity:1,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(-4px,0,0)'}],
+        {duration:spec.sourceOut,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
+      );
+    }
+
+    function revealDetail(target){
+      target.classList.add('coucho-detail-content-pending');
+      var parts=[
+        target.querySelector('.workspace-eyebrow'),
+        target.querySelector('#workspaceSub'),
+        target.querySelector('.workspace-head-actions'),
+        target.querySelector('.workspace-section-head'),
+        target.querySelector('.workspace-screen-stage'),
+        target.querySelector('.workspace-pieces'),
+        target.querySelector('.workspace-footer')
+      ].filter(Boolean);
+
+      var jobs=parts.map(function(el,index){
+        var a=el.animate(
+          [{opacity:0,transform:'translate3d(0,6px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
+          {
+            duration:spec.detailReveal,
+            delay:spec.detailRevealDelay+index*10,
+            easing:'cubic-bezier(0,0,.2,1)',
+            fill:'both'
+          }
+        );
+        return a.finished.catch(function(){});
+      });
+
+      Promise.all(jobs).then(function(){
+        target.classList.remove('coucho-detail-content-pending');
+        parts.forEach(function(el){el.getAnimations().forEach(function(a){a.cancel()})});
+      });
+    }
+
+    function fadeDetailOut(source){
+      var parts=[
+        source.querySelector('.workspace-eyebrow'),
+        source.querySelector('#workspaceSub'),
+        source.querySelector('.workspace-head-actions'),
+        source.querySelector('.workspace-section-head'),
+        source.querySelector('.workspace-screen-stage'),
+        source.querySelector('.workspace-pieces'),
+        source.querySelector('.workspace-footer')
+      ].filter(Boolean);
+      return animateElements(
+        parts,
+        [{opacity:1,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(0,-4px,0)'}],
+        {duration:spec.detailOut,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
+      );
+    }
+
+    function revealCard(card){
+      if(!card)return;
+      card.classList.add('coucho-card-content-pending');
+      var parts=[
+        card.querySelector('.saved-mode-actions'),
+        card.querySelector('.saved-mode-body'),
+        card.querySelector('.saved-mode-name-copy small')
+      ].filter(Boolean);
+      parts.forEach(function(el,index){
+        var a=el.animate(
+          [{opacity:0,transform:'translate3d(4px,0,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
+          {
+            duration:spec.cardReveal,
+            delay:Math.max(0,spec.cardRevealDelay-spec.container)+index*8,
+            easing:'cubic-bezier(0,0,.2,1)',
+            fill:'both'
+          }
+        );
+        a.finished.catch(function(){}).then(function(){
+          card.classList.remove('coucho-card-content-pending');
+          el.getAnimations().forEach(function(x){x.cancel()});
+        });
+      });
     }
 
     async function openProfile(args){
@@ -1316,33 +1468,30 @@ body.test-mode .test-tools{display:flex}
       }
 
       modeMorphing=true;
-      source.style.viewTransitionName='coucho-mode';
+      await fadeSourceContent(source);
+      setSharedNames(source,'card');
 
       var transition;
       try{
         transition=document.startViewTransition(function(){
-          // Old snapshot = the saved mode card.
-          source.style.viewTransitionName='none';
-
-          // Mutate the real UI to its expanded detail state.
+          clearSharedNames(source,'card');
           args.update();
 
-          // The list remains visible in Coucho. Suppress the freshly-rendered
-          // copy of the source card so the user sees exactly one shared container.
           var placeholder=q('[data-mode-row="'+args.id+'"]');
           if(placeholder)placeholder.classList.add('coucho-vt-placeholder');
 
-          // New snapshot = the detail workspace.
-          target.style.viewTransitionName='coucho-mode';
+          setSharedNames(target,'workspace');
+          target.classList.add('coucho-detail-content-pending');
         });
 
+        transition.ready.then(function(){revealDetail(target)});
         await transition.finished;
       }catch(e){
-        // The DOM update still needs to happen if snapshotting was rejected.
         if(args.ensureUpdated)args.ensureUpdated();
       }finally{
-        source.style.viewTransitionName='none';
-        target.style.viewTransitionName='none';
+        clearSharedNames(source,'card');
+        clearSharedNames(target,'workspace');
+        target.classList.remove('coucho-detail-content-pending');
         var placeholder=q('[data-mode-row="'+args.id+'"]');
         if(placeholder)placeholder.classList.remove('coucho-vt-placeholder');
         modeMorphing=false;
@@ -1363,36 +1512,40 @@ body.test-mode .test-tools{display:flex}
       }
 
       modeMorphing=true;
-      source.style.viewTransitionName='coucho-mode';
+      await fadeDetailOut(source);
+      setSharedNames(source,'workspace');
       var finalTarget=null;
 
       try{
         var transition=document.startViewTransition(function(){
-          // Old snapshot = expanded detail workspace.
-          source.style.viewTransitionName='none';
-
-          // Return the real UI to the normal/base workspace.
+          clearSharedNames(source,'workspace');
           args.update();
 
-          // renderWorkbench recreates the card list; resolve the fresh destination.
           finalTarget=args.destination();
-          if(finalTarget)finalTarget.style.viewTransitionName='coucho-mode';
+          if(finalTarget){
+            finalTarget.classList.add('coucho-card-content-pending');
+            setSharedNames(finalTarget,'card');
+          }
         });
 
+        transition.ready.then(function(){
+          if(finalTarget)revealCard(finalTarget);
+        });
         await transition.finished;
       }catch(e){
         if(args.ensureUpdated)args.ensureUpdated();
       }finally{
-        source.style.viewTransitionName='none';
-        if(finalTarget)finalTarget.style.viewTransitionName='none';
+        clearSharedNames(source,'workspace');
+        if(finalTarget){
+          clearSharedNames(finalTarget,'card');
+          finalTarget.classList.remove('coucho-card-content-pending');
+        }
         modeMorphing=false;
         if(args.done)args.done();
       }
       return true;
     }
 
-    // No extra visual effect between A -> base -> B.
-    // Two real container transforms in sequence are clearer than mixing a third transition.
     function handoff(){
       return new Promise(function(resolve){requestAnimationFrame(resolve)});
     }
@@ -1536,6 +1689,7 @@ body.test-mode .test-tools{display:flex}
       var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
 
       return '<article class="saved-mode-card'+(selected?' selected':'')+'" data-mode-row="'+mode.id+'">'+
+        '<span class="mode-morph-surface saved-morph-surface" aria-hidden="true"></span>'+
         '<div class="saved-mode-head">'+
           '<div class="saved-mode-name">'+
             '<span class="mode-list-icon">'+esc(mode.icon)+'</span>'+
@@ -1548,6 +1702,7 @@ body.test-mode .test-tools{display:flex}
             '<button class="trash-mode" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Eliminar" aria-label="Eliminar '+safeName+'">🗑</button>'+
           '</div>'+
         '</div>'+
+        '<div class="saved-mode-body">'+
         '<button class="card-display quick-display" data-id="'+mode.id+'"'+((selected||transitioning)?' disabled':'')+' title="'+(selected?'Edita las pantallas desde el perfil abierto':'Editar pantallas')+'">'+
           '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode,true)+'</span>'+
           '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
@@ -1555,6 +1710,7 @@ body.test-mode .test-tools{display:flex}
         '<div class="card-facts">'+
           '<button class="card-fact quick-app" data-id="'+mode.id+'"'+((selected||transitioning)?' disabled':'')+' title="'+(selected?'Edita la app desde el perfil abierto':'Cambiar app')+'"><span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
           '<button class="card-fact quick-shortcut" data-id="'+mode.id+'"'+((selected||transitioning)?' disabled':'')+' title="'+(selected?'Edita el atajo desde el perfil abierto':'Cambiar atajo')+'"><span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
+        '</div>'+
         '</div>'+
       '</article>';
     }).join('');
