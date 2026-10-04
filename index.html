@@ -1937,7 +1937,7 @@ body.test-mode .test-tools{display:flex}
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
     var insideActivatePop=path.indexOf(q('#activatePop'))>=0;
     var insideDeletePop=path.indexOf(q('#deletePop'))>=0;
-    if(!insideDisplayPop&&!insideAppPop&&!insideActivatePop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.activate-more')&&!e.target.closest('.trash-mode')){
+    if(!insideDisplayPop&&!insideAppPop&&!insideActivatePop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.draft-display')&&!e.target.closest('.draft-app')&&!e.target.closest('.activate-more')&&!e.target.closest('.trash-mode')){
       closePops();
     }
   });
