@@ -233,48 +233,55 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .shell-page-head h1{margin:0;font-size:28px;font-weight:600}
 .shell-page-head p{margin:5px 0 0;color:var(--text2);font-size:12px}
 /* Modes workbench */
-.workbench-wrap{max-width:1500px}
-.mode-workbench{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr);gap:16px;align-items:start}
+.workbench-wrap{max-width:1360px}
+.mode-workbench{display:grid;grid-template-columns:minmax(240px,280px) minmax(0,1fr);gap:14px;align-items:start}
+.mode-workbench>*{min-width:0}
 .saved-modes-panel,.visual-workspace{border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card)}
-.saved-modes-panel{padding:14px;position:sticky;top:18px}
+.saved-modes-panel{padding:13px;position:sticky;top:18px}
 .workbench-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .workbench-panel-head h2{margin:0;font-size:18px}.workbench-panel-head small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
-.mode-list{display:grid;gap:7px}
-.mode-list-item{width:100%;min-height:66px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:9px;padding:9px;text-align:left}
+.mode-list{display:grid;gap:12px}
+.mode-list-group{display:grid;gap:6px}
+.mode-list-group+.mode-list-group{padding-top:11px;border-top:1px solid var(--divider)}
+.mode-list-label{color:var(--muted);font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:0 2px}
+.mode-list-item{width:100%;min-height:58px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px;text-align:left;overflow:hidden}
 .mode-list-item:hover{background:var(--glass-pill);border-color:var(--glass-border)}
 .mode-list-item.selected{border-color:var(--selected-border);background:var(--selected-bg)}
 .mode-list-item.current{border-style:dashed}
-.mode-list-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:10px;background:var(--glass-inset);display:grid;place-items:center;font-size:17px}
-.mode-list-copy{min-width:0}.mode-list-copy b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mode-list-copy small{display:block;color:var(--text2);font-size:9px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mode-list-actions{display:flex;align-items:center;gap:4px}.mode-list-actions .btn{min-height:30px;padding:4px 8px;font-size:9px}.mode-list-actions .trash-mode{width:30px;height:30px;min-height:30px}
+.mode-list-icon{width:32px;height:32px;border:1px solid var(--glass-soft-border);border-radius:9px;background:var(--glass-inset);display:grid;place-items:center;font-size:15px;padding:0}
+.mode-list-copy{min-width:0;border:0;background:transparent;padding:0;color:inherit;text-align:left;border-radius:6px}
+button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:transparent}
+.mode-list-copy b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mode-list-copy small{display:block;color:var(--text2);font-size:8px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mode-list-actions{display:flex;align-items:center;gap:3px}.mode-list-actions .btn{min-height:29px;padding:4px 7px;font-size:8px}.mode-list-actions .trash-mode{width:29px;height:29px;min-height:29px;font-size:12px}
+.mode-list-empty{padding:10px 8px;color:var(--muted);font-size:9px;border:1px dashed var(--glass-soft-border);border-radius:var(--r-control)}
 .mode-list-badge{display:inline-flex;align-items:center;gap:4px;color:var(--success);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .mode-list-badge:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--success)}
 
-.visual-workspace{padding:18px}
+.visual-workspace{padding:16px;min-width:0;overflow:hidden}
 .visual-workspace-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
 .workspace-title-block{min-width:0}.workspace-eyebrow{display:block;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
-.workspace-title-block h2{margin:0;font-size:22px;font-weight:600}.workspace-title-block>small{display:block;color:var(--text2);font-size:10px;margin-top:4px}
+.workspace-title-block h2{margin:0;font-size:20px;font-weight:600}.workspace-title-block>small{display:block;color:var(--text2);font-size:9px;margin-top:4px}
 .workspace-state{flex:0 0 auto;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);color:var(--text2);padding:5px 8px;font-size:9px;font-weight:600}
 .workspace-state.dirty{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
 
-.workspace-screen-stage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;min-height:270px}
-.workspace-screen{position:relative;min-width:0;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;text-align:center;transition:opacity .12s ease,border-color .12s ease,background .12s ease}
+.workspace-screen-stage{display:grid;grid-template-columns:repeat(3,minmax(170px,220px));justify-content:center;gap:10px;min-height:220px}
+.workspace-screen{position:relative;min-width:0;min-height:220px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 10px;text-align:center;transition:opacity .12s ease,border-color .12s ease,background .12s ease}
 .workspace-screen.off{opacity:.35;filter:saturate(.45)}.workspace-screen.on{border-color:var(--glass-border)}.workspace-screen.primary{border-color:var(--selected-border);background:var(--selected-bg)}
 .workspace-screen-toggle{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;min-width:0;width:100%}
-.workspace-screen-toggle .monitor{margin:8px 0 18px}.workspace-screen-toggle .monitor.tv{width:120px;height:69px}.workspace-screen-toggle .monitor.pc{width:86px;height:55px}
+.workspace-screen-toggle .monitor{margin:6px 0 14px}.workspace-screen-toggle .monitor.tv{width:102px;height:59px}.workspace-screen-toggle .monitor.pc{width:74px;height:47px}
 .workspace-screen-copy b{display:block;font-size:12px}.workspace-screen-copy small{display:block;color:var(--text2);font-size:9px;margin-top:3px}
 .workspace-primary{position:absolute;right:10px;top:10px;width:32px;height:32px;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);color:var(--text2);display:grid;place-items:center}
 .workspace-primary:hover,.workspace-primary[aria-pressed="true"]{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
 .workspace-screen-status{position:absolute;left:10px;top:10px;color:var(--muted);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
 
-.workspace-pieces{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.workspace-piece{min-height:62px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:flex;align-items:center;gap:10px;padding:10px 12px;text-align:left}
+.workspace-pieces{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.workspace-piece{min-height:56px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:flex;align-items:center;gap:9px;padding:9px 11px;text-align:left;min-width:0}
 .workspace-piece:hover{background:var(--glass-pill);border-color:var(--selected-border)}
 .workspace-piece-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:10px;background:var(--glass-inset);display:grid;place-items:center;color:var(--accent)}
 .workspace-piece small{display:block;color:var(--muted);font-size:8px;font-weight:600;margin-bottom:2px}.workspace-piece b{display:block;font-size:12px}
-.workspace-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)}
+.workspace-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--divider)}
 .workspace-help{color:var(--text2);font-size:9px}.workspace-actions{display:flex;gap:7px}.workspace-actions .btn{min-height:36px}
-@media(max-width:1050px){.mode-workbench{grid-template-columns:1fr}.saved-modes-panel{position:static}.mode-list{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}}
+@media(max-width:980px){.mode-workbench{grid-template-columns:1fr}.saved-modes-panel{position:static}.mode-list{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.mode-list-group+.mode-list-group{padding-top:0;border-top:0}}
 @media(max-width:760px){.workspace-screen-stage{grid-template-columns:1fr}.workspace-pieces{grid-template-columns:1fr}.workspace-footer{align-items:stretch;flex-direction:column}.workspace-actions{width:100%}.workspace-actions .btn{flex:1}}
 
 .resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;align-items:stretch}
@@ -611,7 +618,7 @@ body.test-mode .test-tools{display:flex}
         <div class="mode-workbench">
           <aside class="saved-modes-panel">
             <div class="workbench-panel-head">
-              <div><h2>Tus modos</h2><small>Guardados</small></div>
+              <div><h2>Modos</h2><small>Crea desde tu escritorio o edita uno guardado</small></div>
             </div>
             <div class="mode-list" id="modeList"></div>
           </aside>
@@ -987,7 +994,7 @@ body.test-mode .test-tools{display:flex}
       ?appliedSession.primaryDisplayId
       :(ids[0]||'main');
     return {
-      id:null,name:'Escritorio',icon:'🖥️',preserve:false,
+      id:null,name:'Nuevo modo',icon:'🖥️',preserve:false,
       displayIds:ids,primaryDisplayId:primary,app:'Ninguna',shortcut:'Manual'
     };
   }
@@ -1089,13 +1096,17 @@ body.test-mode .test-tools{display:flex}
 
   function renderModeList(){
     var currentSelected=workspaceTargetId===null;
-    var html='<button class="mode-list-item current'+(currentSelected?' selected':'')+'" data-workspace-id="current">'+
-      '<span class="mode-list-icon">▦</span>'+
-      '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
-      '<span></span>'+
-    '</button>';
 
-    html+=sets.map(function(mode){
+    var current='<div class="mode-list-group">'+
+      '<div class="mode-list-label">Crear desde</div>'+
+      '<button class="mode-list-item current'+(currentSelected?' selected':'')+'" data-workspace-id="current">'+
+        '<span class="mode-list-icon">▦</span>'+
+        '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
+        '<span></span>'+
+      '</button>'+
+    '</div>';
+
+    var saved=sets.map(function(mode){
       var selected=workspaceTargetId===mode.id;
       var applying=activatingId===mode.id;
       var safeName=esc(mode.name);
@@ -1106,13 +1117,16 @@ body.test-mode .test-tools{display:flex}
           '<small>'+(mode.active?'<span class="mode-list-badge">Activo</span> · ':'')+esc(displayCountLabel(mode))+' · '+esc(mode.app)+'</small>'+
         '</button>'+
         '<span class="mode-list-actions">'+
-          (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'Aplicando…':'Activar')+'</button>':'')+
+          (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'…':'Activar')+'</button>':'')+
           '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">🗑</button>'+
         '</span>'+
       '</div>';
     }).join('');
 
-    q('#modeList').innerHTML=html;
+    q('#modeList').innerHTML=current+
+      '<div class="mode-list-group"><div class="mode-list-label">Tus modos</div>'+
+      (saved||'<div class="mode-list-empty">Aún no has guardado modos.</div>')+
+      '</div>';
 
     qa('[data-workspace-id]').forEach(function(el){
       el.onclick=function(){selectWorkspace(el.dataset.workspaceId)};
@@ -1155,17 +1169,19 @@ body.test-mode .test-tools{display:flex}
 
     var isNew=workspaceTargetId===null;
     var dirty=!workspaceEqual(workspaceDraft,workspaceBase);
-    q('#workspaceEyebrow').textContent=isNew?'Escritorio actual':'Modo guardado';
+    q('#workspaceEyebrow').textContent=isNew?'Nuevo modo':'Editando modo';
     q('#workspaceName').textContent=workspaceDraft.name;
     q('#workspaceSub').textContent=isNew
-      ?'Manipula las pantallas y guarda el resultado como un modo.'
-      :'Edita visualmente este modo. Guardar no lo activa automáticamente.';
+      ?'Partiendo de tu escritorio actual. Ajusta solo lo que quieras.'
+      :'Los cambios se guardan en este modo y no se aplican hasta activarlo o probarlo.';
     q('#workspaceAppName').textContent=workspaceDraft.app;
     q('#workspaceShortcutName').textContent=shortcutCardLabel(workspaceDraft.shortcut);
-    q('#workspaceState').textContent=dirty?'Cambios sin guardar':isNew?'Punto de partida':'Guardado';
+    q('#workspaceState').textContent=dirty?'Cambios':isNew?'Borrador':'Guardado';
     q('#workspaceState').classList.toggle('dirty',dirty);
     q('#workspaceReset').disabled=!dirty;
-    q('#workspaceSave').textContent=isNew?'Guardar como modo':'Guardar cambios';
+    q('#workspaceReset').textContent=isNew?'Restaurar':'Deshacer';
+    q('#workspaceSave').textContent=isNew?'Crear modo':'Guardar cambios';
+    q('#workspaceSave').disabled=!isNew&&!dirty;
     q('#workspaceHelp').textContent='Toca una pantalla para activarla o apagarla · ☆ cambia la principal';
   }
 
@@ -1661,7 +1677,7 @@ body.test-mode .test-tools{display:flex}
         workspaceDraft.app=app;
         if(workspaceTargetId===null&&workspaceAutoNamed){
           var wm=autoMeta(app);
-          workspaceDraft.name=wm.name;
+          workspaceDraft.name=app==='Ninguna'?'Nuevo modo':wm.name;
           workspaceDraft.icon=wm.icon;
         }
         renderWorkbench();
@@ -1734,7 +1750,7 @@ body.test-mode .test-tools{display:flex}
       workspaceBase=cloneModeConfig(created);
       workspaceAutoNamed=false;
       render();
-      toast(created.name,'Modo guardado');
+      toast(created.name,'Modo creado');
       return;
     }
 
