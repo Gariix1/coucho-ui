@@ -966,7 +966,8 @@ body.test-mode .test-tools{display:flex}
 
   var sets=loadSets();
 
-  var editTarget=null;
+  var displayEditModeId=null;
+  var appEditTarget=null;
   var shortcutTarget=null;
   var deleteTarget=null;
   var captured=null;
@@ -1623,16 +1624,22 @@ body.test-mode .test-tools{display:flex}
   }
 
   function openAnchoredPop(pop,anchor){
+    if(!pop||!anchor||!anchor.isConnected)return false;
     currentPop=pop;
     currentPopAnchor=anchor;
     pop.classList.add('open');
     positionPop(pop,anchor);
+    return true;
   }
 
   function closePops(){
     q('#displayPop').classList.remove('open');
     q('#appPop').classList.remove('open');
     q('#deletePop').classList.remove('open');
+
+    displayDraft=null;
+    displayEditModeId=null;
+    appEditTarget=null;
     deleteTarget=null;
     currentPop=null;
     currentPopAnchor=null;
@@ -1820,12 +1827,12 @@ body.test-mode .test-tools{display:flex}
 
   function openDisplayPop(anchor,rawId){
     closePops();
-    editTarget=resolveId(rawId);
-    if(workspaceTargetId===editTarget){
+    displayEditModeId=resolveId(rawId);
+    if(workspaceTargetId===displayEditModeId){
       toast('Perfil abierto','Edita las pantallas desde el detalle');
       return;
     }
-    var source=byId(editTarget);
+    var source=byId(displayEditModeId);
     if(!source)return;
     displayDraft=displayConfig(source);
     if(!displayDraft.preserve&&displayDraft.displayIds.length===0){
@@ -1839,6 +1846,7 @@ body.test-mode .test-tools{display:flex}
   }
 
   function renderDisplayEditor(){
+    if(!displayDraft)return;
     var map=q('#screenMap');
     map.classList.toggle('preserve',displayDraft.preserve);
     q('#preserveDisplays').classList.toggle('selected',displayDraft.preserve);
@@ -1900,12 +1908,12 @@ body.test-mode .test-tools{display:flex}
 
   function openAppPop(anchor,rawId){
     closePops();
-    editTarget=resolveId(rawId);
-    if(workspaceTargetId===editTarget){
+    appEditTarget={kind:'mode',id:resolveId(rawId)};
+    if(workspaceTargetId===appEditTarget.id){
       toast('Perfil abierto','Edita la app desde el detalle');
       return;
     }
-    var mode=byId(editTarget);
+    var mode=byId(appEditTarget.id);
     if(!mode)return;
     var app=mode.app;
     qa('#appPop .app-option').forEach(function(x){
@@ -1936,14 +1944,11 @@ body.test-mode .test-tools{display:flex}
     target.primaryDisplayId=displayDraft.primaryDisplayId;
   }
 
-  q('#closeDisplays').onclick=function(){
-    displayDraft=null;
-    closePops();
-  };
+  q('#closeDisplays').onclick=closePops;
 
   q('#saveDisplays').onclick=function(){
     if(!isValidDisplayDraft())return;
-    var s=byId(editTarget);
+    var s=byId(displayEditModeId);
     if(!s)return;
     copyDisplayDraft(s);
     closePops();
@@ -1953,15 +1958,17 @@ body.test-mode .test-tools{display:flex}
 
   q('#tryDisplays').onclick=function(){
     if(!isValidDisplayDraft())return;
+    var mode=byId(displayEditModeId);
+    if(!mode)return;
     var ctx={
       kind:'display',
-      id:editTarget,
+      id:displayEditModeId,
       preserve:displayDraft.preserve,
       displayIds:displayDraft.displayIds.slice(),
       primaryDisplayId:displayDraft.primaryDisplayId,
-      app:byId(editTarget).app,
-      name:byId(editTarget).name,
-      icon:byId(editTarget).icon
+      app:mode.app,
+      name:mode.name,
+      icon:mode.icon
     };
     closePops();
     startTest(ctx);
@@ -1969,8 +1976,12 @@ body.test-mode .test-tools{display:flex}
 
   qa('#appPop .app-option').forEach(function(b){
     b.onclick=function(){
-      var app=b.dataset.app;closePops();
-      if(editTarget==='workspace'){
+      var app=b.dataset.app;
+      var target=appEditTarget;
+      closePops();
+      if(!target)return;
+
+      if(target.kind==='workspace'){
         workspaceDraft.app=app;
         if(workspaceTargetId===null&&workspaceAutoNamed){
           var wm=autoMeta(app);
@@ -1980,7 +1991,8 @@ body.test-mode .test-tools{display:flex}
         renderWorkbench();
         return;
       }
-      var s=byId(editTarget);
+
+      var s=byId(target.id);
       if(!s)return;
       s.app=app;
       render();
@@ -2020,7 +2032,7 @@ body.test-mode .test-tools{display:flex}
 
   q('#workspaceApp').onclick=function(e){
     closePops();
-    editTarget='workspace';
+    appEditTarget={kind:'workspace'};
     qa('#appPop .app-option').forEach(function(x){
       var selected=x.dataset.app===workspaceDraft.app;
       x.classList.toggle('selected',selected);
