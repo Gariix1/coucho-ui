@@ -276,8 +276,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .saved-mode-card .view-mode{border-color:var(--glass-soft-border);background:var(--glass-command);color:var(--text2)}
 .saved-mode-card .view-mode:hover{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
 .mode-editing-badge{color:var(--accent);font-weight:700}
-.saved-mode-card.selected .quick-display:disabled,.saved-mode-card.selected .card-fact:disabled{opacity:.48;cursor:default;transform:none}
-.saved-mode-card.selected .quick-display:disabled:hover,.saved-mode-card.selected .card-fact:disabled:hover{background:inherit;border-color:var(--glass-soft-border)}
 .mode-list-item{width:100%;min-height:72px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px;text-align:left;overflow:hidden}
 .mode-list-item:hover{background:var(--glass-pill);border-color:var(--glass-border)}
 .mode-list-item.selected{border-color:var(--selected-border);background:var(--selected-bg)}
@@ -1244,8 +1242,8 @@ body.test-mode .test-tools{display:flex}
       sheet.setAttribute('aria-hidden','true');
       document.body.appendChild(sheet);
 
-      var start=direction==='close'?from:from;
-      var finish=direction==='close'?to:to;
+      var start=from;
+      var finish=to;
       var startShadow=direction==='close'
         ?'8px 8px 0 -1px rgba(17,24,40,.12), 0 20px 48px rgba(0,0,0,.16)'
         :'0 8px 22px rgba(0,0,0,.12)';
