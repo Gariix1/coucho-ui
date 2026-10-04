@@ -289,18 +289,28 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .app-option:hover{background:var(--glass-pill)}.app-option.selected{border-color:var(--selected-border);background:var(--selected-bg)}.app-option b{font-size:9px}
 
 /* new */
-.sheet-wrap{display:none;position:fixed;inset:32px 0 0 0;z-index:50;background:var(--scrim);backdrop-filter:blur(10px);place-items:center;padding:22px}
-.sheet-wrap.open{display:grid}.sheet{width:min(740px,94vw);border:1px solid var(--glass-border);border-radius:var(--r-panel);background:var(--floating-bg);box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)}
-.sheet-head{padding:22px 24px 18px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between}.sheet-head h2{margin:0;font-size:28px;font-weight:600}
-.new-body{padding:0 24px 20px}.new-title-block small{display:block;color:var(--muted);font-size:10px;font-weight:600;margin-bottom:3px}
-.new-recipe{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(220px,.7fr);gap:10px;align-items:stretch}
-.new-side{display:grid;grid-template-rows:1fr 1fr;gap:10px}
-.new-display{width:100%;min-height:150px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);display:grid;place-items:center;padding:12px}
-.new-display:hover{background:var(--display-hover);border-color:var(--glass-border)}.new-kicker{font-size:12px;font-weight:600;color:var(--text2);text-transform:none;letter-spacing:0;margin-bottom:12px}
-.new-app-direct,.new-shortcut-direct{min-height:70px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-control);display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:14px;text-align:left}
-.new-app-direct:hover,.new-shortcut-direct:hover{background:var(--glass-pill);border-color:var(--selected-border);transform:translateY(-1px)}
-.new-app-direct small,.new-shortcut-direct small{display:block;color:var(--text2);font-size:10px;font-weight:600;margin-bottom:3px}.new-app-direct b,.new-shortcut-direct b{font-size:14px}
-.sheet-foot{padding:16px 24px 20px;border-top:1px solid var(--divider);display:flex;justify-content:flex-end}.sheet-foot .btn{min-width:130px}
+/* inline mode builder */
+.create-mode-btn{gap:7px;width:auto;padding-inline:11px}
+.create-mode-btn span{font-size:11px;font-weight:600}
+.draft-card{
+  flex:0 1 382px;width:100%;border-color:var(--selected-border);
+  background:linear-gradient(180deg,var(--selected-bg),var(--glass-card));
+}
+.draft-card .card-head{align-items:flex-start}
+.draft-heading{min-width:0}
+.draft-kicker{display:flex;align-items:center;gap:6px;color:var(--accent);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.draft-kicker:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.draft-hint{margin:9px 0 8px;color:var(--text2);font-size:10px;line-height:1.35}
+.draft-card .card-display{margin-top:7px}
+.draft-card .card-fact.empty-piece{border-style:dashed;border-color:var(--glass-soft-border);color:var(--text2)}
+.draft-card .card-fact.empty-piece:hover{border-color:var(--selected-border);color:var(--text)}
+.draft-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--divider)}
+.draft-actions-left{display:flex;gap:6px}
+.draft-actions .btn{min-height:34px;padding:6px 10px}
+.draft-ready{display:flex;align-items:center;gap:5px;color:var(--text2);font-size:9px;font-weight:600}
+.draft-ready:before{content:"✓";color:var(--success);font-weight:800}
+.draft-cancel{border-color:transparent;background:transparent;color:var(--muted)}
+.draft-cancel:hover{color:var(--text);background:var(--glass-command)}
 
 /* shortcut */
 .capture-wrap{display:none;position:fixed;inset:32px 0 0 0;z-index:70;background:var(--scrim);backdrop-filter:blur(12px);place-items:center}
@@ -533,7 +543,7 @@ body.test-mode .test-tools{display:flex}
   .rail-item{min-height:52px;border-radius:10px}
   .rail-item.active:before{left:-5px}
   .rail-item span:last-child{font-size:8px}
-  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.display-overview{grid-template-columns:1fr}.display-overview-stage{grid-template-columns:1fr}.display-state-card{min-height:260px}.hero-body{display:block;margin-top:0}.hero-body .display-main{margin-top:12px;height:auto;min-height:108px}.hero-body .recipe-meta{grid-template-columns:1fr;grid-template-rows:none;margin-top:8px}.hero-body .meta-action{height:auto}.card-facts{grid-template-columns:1fr 1fr}.new-recipe{grid-template-columns:1fr}.new-side{grid-template-rows:none;grid-template-columns:1fr}.new-app-direct,.new-shortcut-direct{min-height:82px;flex-direction:row;text-align:left}.app-options{grid-template-columns:repeat(2,1fr)}.device-strip{grid-template-columns:1fr}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
+  .wrap,.shell-placeholder{max-width:none;margin:0;padding:18px 16px 40px}.cards > .card{flex:1 1 100%;min-width:0;max-width:none}.display-overview{grid-template-columns:1fr}.display-overview-stage{grid-template-columns:1fr}.display-state-card{min-height:260px}.hero-body{display:block;margin-top:0}.hero-body .display-main{margin-top:12px;height:auto;min-height:108px}.hero-body .recipe-meta{grid-template-columns:1fr;grid-template-rows:none;margin-top:8px}.hero-body .meta-action{height:auto}.card-facts{grid-template-columns:1fr 1fr}.app-options{grid-template-columns:repeat(2,1fr)}.device-strip{grid-template-columns:1fr}.screen-map{grid-template-columns:1fr}.screen-face{min-height:122px}.display-editor-foot{align-items:stretch;flex-direction:column}.display-editor-actions{width:100%}.display-editor-actions .btn{flex:1}
 }
 </style>
 </head>
@@ -742,44 +752,6 @@ body.test-mode .test-tools{display:flex}
   </div>
 </div>
 
-<div class="sheet-wrap" id="newSheet" role="dialog" aria-modal="true" aria-label="Crear modo">
-  <div class="sheet">
-    <div class="sheet-head">
-      <div class="new-title-block">
-        <small>Nuevo modo</small>
-        <h2 id="newName" class="mode-name-edit" tabindex="0" title="Doble clic, F2 o toca para renombrar">Gaming</h2>
-      </div>
-      <button class="btn icon" id="closeNew" title="Cerrar" aria-label="Cerrar">✕</button>
-    </div>
-    <div class="new-body">
-      <div class="new-recipe">
-        <button class="new-display" id="newDisplay" title="Editar pantallas">
-          <div>
-            <div class="new-kicker">Pantallas</div>
-            <div class="displays" id="newDisplays"></div>
-            <div class="display-name" id="newDisplayName">—</div>
-          </div>
-        </button>
-
-        <div class="new-side">
-          <button class="new-app-direct" id="newApp" title="Cambiar app">
-            <span class="meta-icon">▶</span>
-            <span><small>Apps</small><b id="newAppName">Steam</b></span>
-          </button>
-          <button class="new-shortcut-direct" id="newShortcut" title="Cambiar atajo">
-            <span class="meta-icon">🎮</span>
-            <span><small>Activar con</small><b id="newShortcutName">Sin atajo</b></span>
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="sheet-foot" style="gap:8px">
-      <button class="btn" id="newTry">Probar</button>
-      <button class="btn primary" id="newSave">Crear modo</button>
-    </div>
-  </div>
-</div>
-
 <div class="capture-wrap" id="shortcutOverlay" role="dialog" aria-modal="true" aria-label="Configurar atajo">
   <div class="capture">
     <h3>Activar con</h3>
@@ -866,9 +838,9 @@ body.test-mode .test-tools{display:flex}
   var captured=null;
   var displayDraft=null;
   var displayDraftIsNew=false;
-  var newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',shortcut:'Manual',name:'Gaming',icon:'🎮'};
+  var newDraft={preserve:false,displayIds:['main','aux'],primaryDisplayId:'main',app:'Ninguna',shortcut:'Manual',name:'Escritorio',icon:'🖥️',autoNamed:true};
   var testContext=null;
-  var newSheetReturnFocus=null;
+  var newDraftOpen=false;
   var progressTimer=null;
   var countdownTimer=null;
   var activationTimer=null;
@@ -1035,6 +1007,44 @@ body.test-mode .test-tools{display:flex}
     q('#heroShortcut').textContent=shortcutLabel(mode.shortcut);
   }
 
+  function renderDraftCard(){
+    var safeName=esc(newDraft.name);
+    var appEmpty=newDraft.app==='Ninguna';
+    var shortcutEmpty=newDraft.shortcut==='Manual';
+
+    return '<article class="card draft-card" aria-label="Nuevo modo en construcción">'+
+      '<div class="card-head">'+
+        '<div class="draft-heading">'+
+          '<div class="draft-kicker">Nuevo modo</div>'+
+          '<div class="card-name"><div class="card-icon">'+esc(newDraft.icon)+'</div><b class="draft-name-edit mode-name-edit" tabindex="0" title="Doble clic, F2 o toca para renombrar">'+safeName+'</b></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="draft-hint">Parte de tu escritorio actual. Toca una pieza para cambiarla.</div>'+
+      '<button class="card-display draft-display" title="Cambiar pantallas">'+
+        '<span class="card-screen-row">'+
+          '<span class="displays card-displays">'+displayMarkup(newDraft,true)+'</span>'+
+          '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(newDraft))+'</span>'+
+        '</span>'+
+      '</button>'+
+      '<div class="card-facts">'+
+        '<button class="card-fact draft-app'+(appEmpty?' empty-piece':'')+'" title="Cambiar app">'+
+          '<span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+(appEmpty?'＋ App':esc(newDraft.app))+'</b></span>'+
+        '</button>'+
+        '<button class="card-fact draft-shortcut'+(shortcutEmpty?' empty-piece':'')+'" title="Cambiar atajo">'+
+          '<span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+(shortcutEmpty?'＋ Atajo':esc(shortcutCardLabel(newDraft.shortcut)))+'</b></span>'+
+        '</button>'+
+      '</div>'+
+      '<div class="draft-actions">'+
+        '<div class="draft-ready">Listo para crear</div>'+
+        '<div class="draft-actions-left">'+
+          '<button class="btn draft-cancel">Cancelar</button>'+
+          '<button class="btn draft-test">Probar</button>'+
+          '<button class="btn primary draft-create">Crear modo</button>'+
+        '</div>'+
+      '</div>'+
+    '</article>';
+  }
+
   function renderModeCard(mode){
     var applying=activatingId===mode.id;
     var safeName=esc(mode.name);
@@ -1070,10 +1080,12 @@ body.test-mode .test-tools{display:flex}
   }
 
   function renderCards(){
-    q('#cards').innerHTML=sets
+    var html=newDraftOpen?renderDraftCard():'';
+    html+=sets
       .filter(function(mode){return !mode.active})
       .map(renderModeCard)
       .join('');
+    q('#cards').innerHTML=html;
     bindDynamic();
   }
 
@@ -1104,14 +1116,15 @@ body.test-mode .test-tools{display:flex}
     renderResourceViews();
     renderDisplayOverview();
 
-    if(sets.length===0){
+    if(sets.length===0&&!newDraftOpen){
       renderEmptyState();
       saveSets();
       return;
     }
 
     q('#modesSection').hidden=false;
-    renderHero(active());
+    if(sets.length)renderHero(active());
+    else q('.hero').style.display='none';
     renderCards();
     saveSets();
   }
@@ -1134,6 +1147,37 @@ body.test-mode .test-tools{display:flex}
       };
       bindTouchRename(el,function(){beginModeRename(el,el.dataset.id)});
     });
+
+    var draftName=q('.draft-name-edit');
+    if(draftName){
+      draftName.ondblclick=function(e){e.preventDefault();beginDraftRename(draftName)};
+      draftName.onkeydown=function(e){
+        if(draftName.isContentEditable)return;
+        if(e.key==='F2'||e.key==='Enter'){
+          e.preventDefault();
+          beginDraftRename(draftName);
+        }
+      };
+      bindTouchRename(draftName,function(){beginDraftRename(draftName)});
+    }
+
+    var draftDisplay=q('.draft-display');
+    if(draftDisplay)draftDisplay.onclick=function(e){openDisplayPop(e.currentTarget,null,true)};
+
+    var draftApp=q('.draft-app');
+    if(draftApp)draftApp.onclick=function(e){openAppPop(e.currentTarget,null,true)};
+
+    var draftShortcut=q('.draft-shortcut');
+    if(draftShortcut)draftShortcut.onclick=function(){openShortcut('new')};
+
+    var draftCancel=q('.draft-cancel');
+    if(draftCancel)draftCancel.onclick=cancelNewDraft;
+
+    var draftTest=q('.draft-test');
+    if(draftTest)draftTest.onclick=testNewDraft;
+
+    var draftCreate=q('.draft-create');
+    if(draftCreate)draftCreate.onclick=createNewDraft;
   }
 
   function removeSet(id){
@@ -1341,7 +1385,7 @@ body.test-mode .test-tools{display:flex}
     var original=newDraft.name;
     editInlineText(el,original,function(next){
       newDraft.name=next;
-      renderNew();
+      renderCards();
     });
   }
 
@@ -1574,7 +1618,7 @@ body.test-mode .test-tools{display:flex}
     if(displayDraftIsNew){
       copyDisplayDraft(newDraft);
       closePops();
-      renderNew();
+      renderCards();
       return;
     }
     var s=byId(editTarget);
@@ -1605,7 +1649,12 @@ body.test-mode .test-tools{display:flex}
     b.onclick=function(){
       var app=b.dataset.app;closePops();
       if(editTarget==='new'){
-        newDraft.app=app;var nm=autoMeta(app);newDraft.name=nm.name;newDraft.icon=nm.icon;renderNew();return;
+        newDraft.app=app;
+        var nm=autoMeta(app);
+        if(newDraft.autoNamed)newDraft.name=nm.name;
+        newDraft.icon=nm.icon;
+        renderCards();
+        return;
       }
       var s=byId(editTarget);
       if(!s)return;
@@ -1615,21 +1664,92 @@ body.test-mode .test-tools{display:flex}
     };
   });
 
-  function openNew(){
-    closePops();
-    newSheetReturnFocus=document.activeElement;
-    newDraft={preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main',app:'Steam',shortcut:'Manual',name:'Gaming',icon:'🎮'};
-    renderNew();
-    q('#newSheet').classList.add('open');
-    requestAnimationFrame(function(){q('#newDisplay').focus()});
+  function draftFromApplied(){
+    var ids=appliedSession&&appliedSession.displayIds.length
+      ?appliedSession.displayIds.slice()
+      :['main','aux'];
+    var primary=appliedSession&&appliedSession.primaryDisplayId
+      ?appliedSession.primaryDisplayId
+      :(ids[0]||'main');
+
+    return {
+      preserve:false,
+      displayIds:ids,
+      primaryDisplayId:primary,
+      app:'Ninguna',
+      shortcut:'Manual',
+      name:'Escritorio',
+      icon:'🖥️',
+      autoNamed:true
+    };
   }
 
-  function renderNew(){
-    q('#newName').textContent=newDraft.name;
-    q('#newDisplays').innerHTML=displayMarkup(newDraft,false);
-    q('#newDisplayName').textContent=displaySummary(newDraft);
-    q('#newAppName').textContent=newDraft.app;
-    q('#newShortcutName').textContent=shortcutCardLabel(newDraft.shortcut);
+  function openNew(){
+    closePops();
+    if(newDraftOpen){
+      var existing=q('.draft-card');
+      if(existing)existing.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+
+    newDraft=draftFromApplied();
+    newDraftOpen=true;
+    render();
+    requestAnimationFrame(function(){
+      var draft=q('.draft-card');
+      if(draft)draft.scrollIntoView({behavior:'smooth',block:'center'});
+    });
+  }
+
+  function beginDraftRename(el){
+    if(!newDraftOpen||!el||el.isContentEditable)return;
+    var original=newDraft.name;
+    editInlineText(el,original,function(next){
+      newDraft.name=next;
+      newDraft.autoNamed=false;
+      if(next!==original)toast(next,'Nombre del nuevo modo');
+    });
+  }
+
+  function buildNewMode(id,activeState){
+    return {
+      id:id,name:newDraft.name,icon:newDraft.icon,
+      preserve:newDraft.preserve,displayIds:newDraft.displayIds.slice(),
+      primaryDisplayId:newDraft.primaryDisplayId,app:newDraft.app,
+      shortcut:newDraft.shortcut,active:!!activeState
+    };
+  }
+
+  function cancelNewDraft(){
+    closePops();
+    newDraftOpen=false;
+    render();
+    toast('Nuevo modo','Borrador descartado');
+  }
+
+  function createNewDraft(){
+    if(!newDraftOpen)return;
+    var created=buildNewMode(Date.now(),false);
+    sets.push(created);
+    newDraftOpen=false;
+    render();
+    toast(created.name,'Modo creado');
+  }
+
+  function testNewDraft(){
+    if(!newDraftOpen)return;
+    closePops();
+    startTest({
+      kind:'new',
+      id:Date.now(),
+      preserve:newDraft.preserve,
+      displayIds:newDraft.displayIds.slice(),
+      primaryDisplayId:newDraft.primaryDisplayId,
+      app:newDraft.app,
+      shortcut:newDraft.shortcut,
+      name:newDraft.name,
+      icon:newDraft.icon
+    });
   }
 
   function syncThemeControl(){
@@ -1662,6 +1782,7 @@ body.test-mode .test-tools{display:flex}
 
   q('#clearModes').onclick=function(){
     sets=[];
+    newDraftOpen=false;
     appliedSession=null;
     render();
     toast('Modos vaciados','Ya puedes probar el flujo desde cero');
@@ -1669,48 +1790,13 @@ body.test-mode .test-tools{display:flex}
 
   q('#restoreDemo').onclick=function(){
     sets=demoSets();
+    newDraftOpen=false;
     appliedSession=null;
     render();
     toast('Demo restaurada','3 modos');
   };
 
   q('#newBtn2').onclick=openNew;
-  function closeNewSheet(restoreFocus){
-    closePops();
-    q('#newSheet').classList.remove('open');
-    if(restoreFocus&&newSheetReturnFocus&&newSheetReturnFocus.isConnected){
-      newSheetReturnFocus.focus();
-    }
-  }
-
-  q('#closeNew').onclick=function(){closeNewSheet(true)};
-  q('#newDisplay').onclick=function(e){openDisplayPop(e.currentTarget,null,true)};
-  q('#newApp').onclick=function(e){openAppPop(e.currentTarget,null,true)};
-  q('#newShortcut').onclick=function(){openShortcut('new')};
-
-  function buildNewMode(id,activeState){
-    return {
-      id:id,name:newDraft.name,icon:newDraft.icon,
-      preserve:newDraft.preserve,displayIds:newDraft.displayIds.slice(),
-      primaryDisplayId:newDraft.primaryDisplayId,app:newDraft.app,
-      shortcut:newDraft.shortcut,active:!!activeState
-    };
-  }
-
-  q('#newSave').onclick=function(){
-    closeNewSheet(false);
-    sets.push(buildNewMode(Date.now(),false));
-    render();
-    toast(newDraft.name,'Guardado');
-  };
-
-  q('#newTry').onclick=function(){
-    closeNewSheet(false);
-    startTest({
-      kind:'new',id:Date.now(),preserve:newDraft.preserve,displayIds:newDraft.displayIds.slice(),
-      primaryDisplayId:newDraft.primaryDisplayId,app:newDraft.app,shortcut:newDraft.shortcut,name:newDraft.name,icon:newDraft.icon
-    });
-  };
 
   function openShortcut(rawId){
     shortcutTarget=rawId==='new'?'new':resolveId(rawId);
@@ -1734,7 +1820,7 @@ body.test-mode .test-tools{display:flex}
     if(shortcutTarget==='new'){
       newDraft.shortcut='Manual';
       q('#shortcutOverlay').classList.remove('open');
-      renderNew();
+      renderCards();
       return;
     }
     var mode=byId(shortcutTarget);
@@ -1748,7 +1834,7 @@ body.test-mode .test-tools{display:flex}
     if(shortcutTarget==='new'){
       newDraft.shortcut=captured;
       q('#shortcutOverlay').classList.remove('open');
-      renderNew();
+      renderCards();
       return;
     }
     var mode=byId(shortcutTarget);
@@ -1763,7 +1849,7 @@ body.test-mode .test-tools{display:flex}
     q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx,true)+'</div>';
     q('#testApp').textContent=logo(ctx.app);
     q('#testText').textContent='Probando '+ctx.name+'…';
-    q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':'Guardar';
+    q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':ctx.kind==='new'?'Crear y activar':'Guardar';
     q('#progress').style.width='0%';q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
 
     var pct=0;
@@ -1810,7 +1896,7 @@ body.test-mode .test-tools{display:flex}
       newDraft.displayIds=testContext.displayIds.slice();
       newDraft.primaryDisplayId=testContext.primaryDisplayId;
       q('#testOverlay').classList.remove('open');
-      renderNew();
+      renderCards();
       toast('Pantallas','Probadas y guardadas');
       testContext=null;
       return;
@@ -1835,18 +1921,18 @@ body.test-mode .test-tools{display:flex}
       });
       sets.forEach(function(s){s.active=s.id===testContext.id});
       appliedSession=sessionFromMode(byId(testContext.id));
+      newDraftOpen=false;
       q('#testOverlay').classList.remove('open');
       render();
-      toast(testContext.name,'Guardado');
+      toast(testContext.name,'Creado y activo');
       testContext=null;
     }
   };
 
   function finishRestore(){
     q('#testOverlay').classList.remove('open');
-    var reopenNew=!!(testContext&&testContext.kind==='new');
     testContext=null;
-    if(reopenNew)q('#newSheet').classList.add('open');
+    if(newDraftOpen)renderCards();
     toast('Restaurado','Configuración anterior');
   }
 
@@ -1867,7 +1953,7 @@ body.test-mode .test-tools{display:flex}
     var insideAppPop=path.indexOf(q('#appPop'))>=0;
     var insideActivatePop=path.indexOf(q('#activatePop'))>=0;
     var insideDeletePop=path.indexOf(q('#deletePop'))>=0;
-    if(!insideDisplayPop&&!insideAppPop&&!insideActivatePop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.activate-more')&&!e.target.closest('.trash-mode')&&!e.target.closest('#newDisplay')&&!e.target.closest('#newApp')){
+    if(!insideDisplayPop&&!insideAppPop&&!insideActivatePop&&!insideDeletePop&&!e.target.closest('.display-trigger')&&!e.target.closest('.app-trigger')&&!e.target.closest('.activate-more')&&!e.target.closest('.trash-mode')){
       closePops();
     }
   });
@@ -1889,8 +1975,8 @@ body.test-mode .test-tools{display:flex}
     // The safe display test is intentionally not dismissible with Escape.
     if(q('#testOverlay').classList.contains('open'))return;
 
-    if(q('#newSheet').classList.contains('open')){
-      closeNewSheet(true);
+    if(newDraftOpen&&q('.draft-card')){
+      cancelNewDraft();
     }
   });
 
