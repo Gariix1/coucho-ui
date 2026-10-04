@@ -192,6 +192,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .saved-mode-card .card-screen-row{height:100%;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .saved-mode-card .card-displays{justify-content:flex-start;min-width:0}
 .saved-mode-card .card-display .monitor.tv{width:62px;height:36px}.saved-mode-card .card-display .monitor.pc{width:44px;height:29px}
+.display-placeholder{display:grid;place-items:center;color:var(--muted);line-height:1}
+.saved-mode-card .display-placeholder{font-size:24px}
+.saved-mode-card .display-placeholder.empty{font-size:20px}
 .saved-mode-card .monitor-star{position:absolute;right:3px;top:1px;color:var(--accent);font-size:8px;line-height:1;text-shadow:0 1px 4px rgba(0,0,0,.3)}
 .saved-mode-card .screen-count{flex:0 0 auto;color:var(--text2);font-size:11px;font-weight:600;text-align:right}.saved-mode-card .screen-count small{display:block;color:var(--muted);font-size:9px;font-weight:600;margin-bottom:2px}
 .saved-mode-card .card-facts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
@@ -443,6 +446,12 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .test-main{padding:26px;display:grid;place-items:center;text-align:center}
 .test-flow{display:flex;align-items:center;gap:12px}
 .test-node{width:78px;height:78px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-control);display:grid;place-items:center;font-size:24px}
+.test-node .displays{gap:5px}
+.test-node .monitor.tv{width:55px;height:32px}
+.test-node .monitor.pc{width:38px;height:25px}
+.test-node .monitor-star{position:absolute;right:2px;top:1px;color:var(--accent);font-size:7px;line-height:1}
+.test-node .display-placeholder{font-size:30px}
+.test-node .display-placeholder.empty{font-size:26px}
 .test-arrow{color:var(--accent);font-size:18px}
 .testing{margin-top:15px;color:var(--muted);font-size:10px}
 .progress{height:3px;background:var(--progress-track)}
@@ -1028,20 +1037,17 @@ body.test-mode .test-tools{display:flex}
     if(names.length===2)return names.join(' + ');
     return names.length+' pantallas';
   }
-  function displayMarkup(source,small){
-    if(source.preserve)return '<div style="font-size:'+(small?'24':'34')+'px;color:var(--muted)">↔</div>';
+  function displayMarkup(source){
+    if(source.preserve)return '<div class="display-placeholder preserve">↔</div>';
     var ids=Array.isArray(source.displayIds)?source.displayIds:[];
-    if(ids.length===0)return '<div style="font-size:'+(small?'20':'28')+'px;color:var(--muted)">—</div>';
+    if(ids.length===0)return '<div class="display-placeholder empty">—</div>';
     return ids.map(function(id){
       var d=getDisplay(id);
       if(!d)return '';
       var cls=d.kind==='tv'?'tv':'pc';
       var primary=id===source.primaryDisplayId?' primary':'';
-      var style=small
-        ?(d.kind==='tv'?' style="width:55px;height:32px"':' style="width:38px;height:25px"')
-        :'';
-      var star=small&&id===source.primaryDisplayId?'<span class="monitor-star">★</span>':'';
-      return '<div class="monitor '+cls+primary+'"'+style+' title="'+d.name+'">'+star+'</div>';
+      var star=id===source.primaryDisplayId?'<span class="monitor-star">★</span>':'';
+      return '<div class="monitor '+cls+primary+'" title="'+esc(d.name)+'">'+star+'</div>';
     }).join('');
   }
   function shortcutLabel(v){return v==='Manual'?'Añadir':v}
@@ -1309,7 +1315,7 @@ body.test-mode .test-tools{display:flex}
           ?'<div class="saved-mode-editing"><div><b>Editando</b><small>Este modo está abierto en el visualizador</small></div></div>'
           :'<div class="saved-mode-body">'+
             '<button class="card-display quick-display" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Editar pantallas">'+
-              '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode,true)+'</span>'+
+              '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode)+'</span>'+
               '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
             '</button>'+
             '<div class="card-facts">'+
@@ -2185,7 +2191,7 @@ body.test-mode .test-tools{display:flex}
     closePops();
     closeShortcutOverlay();
     testContext=ctx;clearInterval(progressTimer);clearInterval(countdownTimer);
-    q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx,true)+'</div>';
+    q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx)+'</div>';
     q('#testApp').textContent=logo(ctx.app);
     q('#testText').textContent='Probando '+ctx.name+'…';
     q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':ctx.kind==='workspace-new'?'Guardar y activar':ctx.kind==='workspace-edit'?'Guardar y activar':'Guardar';
