@@ -885,7 +885,7 @@ body.test-mode .test-tools{display:flex}
 
   var displayEditModeId=null;
   var appEditTarget=null;
-  var shortcutTarget=null;
+  var shortcutEditTarget=null;
   var deleteTarget=null;
   var captured=null;
   var displayDraft=null;
@@ -923,6 +923,10 @@ body.test-mode .test-tools{display:flex}
   }
   function saveSets(){
     localStorage.setItem('coucho-test-sets',JSON.stringify(sets));
+  }
+  function commitSets(){
+    normalizeActive();
+    saveSets();
   }
   function normalizeActive(){
     var kept=false;
@@ -1125,6 +1129,19 @@ body.test-mode .test-tools{display:flex}
     renderWorkbench();
   }
 
+  function setModeTransitioning(value){
+    modeTransitioning=!!value;
+    var workbench=q('.mode-workbench');
+    if(!workbench)return;
+    if(modeTransitioning){
+      workbench.setAttribute('inert','');
+      workbench.setAttribute('aria-busy','true');
+    }else{
+      workbench.removeAttribute('inert');
+      workbench.removeAttribute('aria-busy');
+    }
+  }
+
   var ModeSheetTransition=(function(){
     var duration=300;
 
@@ -1158,25 +1175,29 @@ body.test-mode .test-tools{display:flex}
         ?'0 8px 22px rgba(0,0,0,.12)'
         :'8px 8px 0 -1px rgba(17,24,40,.12), 0 20px 48px rgba(0,0,0,.16)';
 
-      var animation=sheet.animate([
-        {
-          left:start.left+'px',top:start.top+'px',
-          width:start.width+'px',height:start.height+'px',
-          boxShadow:startShadow,opacity:1
-        },
-        {
-          left:finish.left+'px',top:finish.top+'px',
-          width:finish.width+'px',height:finish.height+'px',
-          boxShadow:finishShadow,opacity:1
-        }
-      ],{
-        duration:duration,
-        easing:'cubic-bezier(.2,.8,.2,1)',
-        fill:'both'
-      });
+      try{
+        if(typeof sheet.animate!=='function')return;
+        var animation=sheet.animate([
+          {
+            left:start.left+'px',top:start.top+'px',
+            width:start.width+'px',height:start.height+'px',
+            boxShadow:startShadow,opacity:1
+          },
+          {
+            left:finish.left+'px',top:finish.top+'px',
+            width:finish.width+'px',height:finish.height+'px',
+            boxShadow:finishShadow,opacity:1
+          }
+        ],{
+          duration:duration,
+          easing:'cubic-bezier(.2,.8,.2,1)',
+          fill:'both'
+        });
 
-      await animation.finished.catch(function(){});
-      sheet.remove();
+        await animation.finished.catch(function(){});
+      }finally{
+        sheet.remove();
+      }
     }
 
     return {
@@ -1208,21 +1229,21 @@ body.test-mode .test-tools{display:flex}
     var from=ModeSheetTransition.rectOf(source);
     var workspace=q('.visual-workspace');
 
-    modeTransitioning=true;
+    setModeTransitioning(true);
+    try{
+      workspaceTargetId=mode.id;
+      workspaceDraft=cloneModeConfig(mode);
+      workspaceBase=cloneModeConfig(mode);
+      workspaceAutoNamed=false;
+      renderWorkbench();
 
-    workspaceTargetId=mode.id;
-    workspaceDraft=cloneModeConfig(mode);
-    workspaceBase=cloneModeConfig(mode);
-    workspaceAutoNamed=false;
-    renderWorkbench();
-
-    workspace=q('.visual-workspace');
-    var to=ModeSheetTransition.rectOf(workspace);
-
-    await ModeSheetTransition.travel(from,to,'open');
-
-    modeTransitioning=false;
-    renderModeList();
+      workspace=q('.visual-workspace');
+      var to=ModeSheetTransition.rectOf(workspace);
+      await ModeSheetTransition.travel(from,to,'open');
+    }finally{
+      setModeTransitioning(false);
+      renderModeList();
+    }
 
     var closeButton=q('#workspaceClose');
     if(closeButton)closeButton.focus();
@@ -1239,17 +1260,18 @@ body.test-mode .test-tools{display:flex}
     var from=ModeSheetTransition.rectOf(workspace);
     var to=ModeSheetTransition.rectOf(destination);
 
-    modeTransitioning=true;
+    setModeTransitioning(true);
+    try{
+      await ModeSheetTransition.travel(from,to,'close');
 
-    await ModeSheetTransition.travel(from,to,'close');
-
-    workspaceTargetId=null;
-    workspaceDraft=workspaceFromApplied();
-    workspaceBase=cloneModeConfig(workspaceDraft);
-    workspaceAutoNamed=true;
-
-    modeTransitioning=false;
-    renderWorkbench();
+      workspaceTargetId=null;
+      workspaceDraft=workspaceFromApplied();
+      workspaceBase=cloneModeConfig(workspaceDraft);
+      workspaceAutoNamed=true;
+      renderWorkbench();
+    }finally{
+      setModeTransitioning(false);
+    }
 
     if(typeof afterClose==='function'){
       afterClose();
@@ -1387,9 +1409,8 @@ body.test-mode .test-tools{display:flex}
     });
   }
 
-  function renderWorkbench(){
+  function renderWorkspaceEditor(){
     ensureWorkspace();
-    renderModeList();
     renderWorkspaceScreens();
 
     var isNew=workspaceTargetId===null;
@@ -1418,14 +1439,23 @@ body.test-mode .test-tools{display:flex}
     q('#workspaceHelp').textContent='Toca una pantalla para activarla o apagarla · ☆ cambia la principal · Resolución y Hz son informativos';
   }
 
+  function refreshWorkspaceDraft(){
+    renderWorkspaceEditor();
+    renderModeList();
+  }
+
+  function renderWorkbench(){
+    ensureWorkspace();
+    renderModeList();
+    renderWorkspaceEditor();
+  }
+
   function render(){
-    normalizeActive();
     ensureAppliedSession();
     renderResourceViews();
     renderDisplayOverview();
     ensureWorkspace();
     renderWorkbench();
-    saveSets();
   }
 
   function toggleWorkspaceDisplay(id){
@@ -1443,7 +1473,7 @@ body.test-mode .test-tools{display:flex}
       workspaceDraft.displayIds.push(id);
       if(!workspaceDraft.primaryDisplayId)workspaceDraft.primaryDisplayId=id;
     }
-    renderWorkbench();
+    refreshWorkspaceDraft();
   }
 
   function makeWorkspacePrimary(id){
@@ -1451,12 +1481,19 @@ body.test-mode .test-tools{display:flex}
     workspaceDraft.preserve=false;
     if(workspaceDraft.displayIds.indexOf(id)<0)workspaceDraft.displayIds.push(id);
     workspaceDraft.primaryDisplayId=id;
-    renderWorkbench();
+    refreshWorkspaceDraft();
   }
 
   function removeSet(id){
     var removed=byId(id);
     if(!removed)return;
+
+    if(activatingId===id){
+      clearTimeout(activationTimer);
+      activationTimer=null;
+      activatingId=null;
+    }
+
     var wasActive=!!removed.active;
     sets=sets.filter(function(s){return s.id!==id});
 
@@ -1477,6 +1514,7 @@ body.test-mode .test-tools{display:flex}
       workspaceAutoNamed=true;
       q('.visual-workspace').classList.remove('detail-mode');
     }
+    commitSets();
     render();
     toast('Modo eliminado',removed.name);
   }
@@ -1487,18 +1525,30 @@ body.test-mode .test-tools{display:flex}
 
     activatingId=id;
     clearTimeout(activationTimer);
-    renderWorkbench();
+    renderModeList();
 
     activationTimer=setTimeout(function(){
+      var current=byId(id);
+      if(!current){
+        activatingId=null;
+        activationTimer=null;
+        renderModeList();
+        return;
+      }
+
       sets.forEach(function(s){s.active=s.id===id});
-      appliedSession=sessionFromMode(target);
+      appliedSession=sessionFromMode(current);
+      commitSets();
+
       if(workspaceTargetId===null){
         workspaceDraft=workspaceFromApplied();
         workspaceBase=cloneModeConfig(workspaceDraft);
       }
+
       activatingId=null;
+      activationTimer=null;
       render();
-      toast(target.name,'Activo');
+      toast(current.name,'Activo');
     },850);
   }
 
@@ -1668,7 +1718,7 @@ body.test-mode .test-tools{display:flex}
     editInlineText(el,original,function(next){
       mode.name=next;
       if(appliedSession&&appliedSession.modeId===mode.id)appliedSession.name=next;
-      saveSets();
+      commitSets();
       renderResourceViews();
       renderDisplayOverview();
       if(next!==original)toast(next,'Nombre actualizado');
@@ -1868,6 +1918,7 @@ body.test-mode .test-tools{display:flex}
     var s=byId(displayEditModeId);
     if(!s)return;
     copyDisplayDraft(s);
+    commitSets();
     closePops();
     render();
     toast('Pantallas','Guardadas sin probar');
@@ -1905,13 +1956,14 @@ body.test-mode .test-tools{display:flex}
           workspaceDraft.name=app==='Ninguna'?'Nuevo modo':wm.name;
           workspaceDraft.icon=wm.icon;
         }
-        renderWorkbench();
+        refreshWorkspaceDraft();
         return;
       }
 
       var s=byId(target.id);
       if(!s)return;
       s.app=app;
+      commitSets();
       render();
       toast('Apps',app);
     };
@@ -1966,7 +2018,7 @@ body.test-mode .test-tools{display:flex}
       return;
     }
     workspaceDraft=cloneModeConfig(workspaceBase);
-    renderWorkbench();
+    refreshWorkspaceDraft();
   };
 
   q('#workspaceSave').onclick=function(){
@@ -1977,6 +2029,7 @@ body.test-mode .test-tools{display:flex}
       created.id=Date.now();
       created.active=false;
       sets.push(created);
+      commitSets();
       workspaceTargetId=null;
       workspaceDraft=workspaceFromApplied();
       workspaceBase=cloneModeConfig(workspaceDraft);
@@ -2000,6 +2053,7 @@ body.test-mode .test-tools{display:flex}
     mode.app=workspaceDraft.app;
     mode.shortcut=workspaceDraft.shortcut;
     workspaceBase=cloneModeConfig(mode);
+    commitSets();
     renderModeList();
     toast(mode.name,'Cambios guardados');
     closeModeDetail(true);
@@ -2027,7 +2081,7 @@ body.test-mode .test-tools{display:flex}
     editInlineText(el,original,function(next){
       workspaceDraft.name=next;
       workspaceAutoNamed=false;
-      renderWorkbench();
+      refreshWorkspaceDraft();
     });
   }
 
@@ -2045,6 +2099,7 @@ body.test-mode .test-tools{display:flex}
     workspaceDraft=null;
     workspaceBase=null;
     q('.visual-workspace').classList.remove('detail-mode');
+    commitSets();
     render();
     toast('Modos vaciados','Ya puedes probar el flujo desde cero');
   };
@@ -2056,21 +2111,39 @@ body.test-mode .test-tools{display:flex}
     workspaceDraft=null;
     workspaceBase=null;
     q('.visual-workspace').classList.remove('detail-mode');
+    commitSets();
     render();
     toast('Demo restaurada','3 modos');
   };
 
 
+  function closeShortcutOverlay(){
+    q('#shortcutOverlay').classList.remove('open');
+    shortcutEditTarget=null;
+    captured=null;
+    q('#capUse').style.display='none';
+  }
+
   function openShortcut(rawId){
-    shortcutTarget=rawId==='workspace'?'workspace':resolveId(rawId);
-    if(shortcutTarget!=='workspace'&&workspaceTargetId===shortcutTarget){
+    closePops();
+    shortcutEditTarget=rawId==='workspace'
+      ?{kind:'workspace'}
+      :{kind:'mode',id:resolveId(rawId)};
+
+    if(shortcutEditTarget.kind==='mode'&&workspaceTargetId===shortcutEditTarget.id){
+      shortcutEditTarget=null;
       toast('Perfil abierto','Edita el atajo desde el detalle');
       return;
     }
-    if(shortcutTarget!=='workspace'&&!byId(shortcutTarget))return;
+    if(shortcutEditTarget.kind==='mode'&&!byId(shortcutEditTarget.id)){
+      shortcutEditTarget=null;
+      return;
+    }
+
     captured=null;
     q('#captureResult').innerHTML='<span style="color:var(--muted)">A · X · Y</span>';
-    q('#capUse').style.display='none';q('#shortcutOverlay').classList.add('open');
+    q('#capUse').style.display='none';
+    q('#shortcutOverlay').classList.add('open');
   }
 
   function capture(v){
@@ -2082,36 +2155,53 @@ body.test-mode .test-tools{display:flex}
   q('#capA').onclick=function(){capture('A')};
   q('#capX').onclick=function(){capture('X')};
   q('#capY').onclick=function(){capture('Y')};
-  q('#capCancel').onclick=function(){q('#shortcutOverlay').classList.remove('open')};
+  q('#capCancel').onclick=closeShortcutOverlay;
+
   q('#capManual').onclick=function(){
-    if(shortcutTarget==='workspace'){
+    var target=shortcutEditTarget;
+    if(!target)return;
+
+    if(target.kind==='workspace'){
       workspaceDraft.shortcut='Manual';
-      q('#shortcutOverlay').classList.remove('open');
-      renderWorkbench();
+      closeShortcutOverlay();
+      refreshWorkspaceDraft();
       return;
     }
-    var mode=byId(shortcutTarget);
-    if(!mode){q('#shortcutOverlay').classList.remove('open');return}
+
+    var mode=byId(target.id);
+    closeShortcutOverlay();
+    if(!mode)return;
     mode.shortcut='Manual';
-    q('#shortcutOverlay').classList.remove('open');
-    render();toast('Activar con','Sin atajo');
-  };
-  q('#capUse').onclick=function(){
-    if(!captured)return;
-    if(shortcutTarget==='workspace'){
-      workspaceDraft.shortcut=captured;
-      q('#shortcutOverlay').classList.remove('open');
-      renderWorkbench();
-      return;
-    }
-    var mode=byId(shortcutTarget);
-    if(!mode){q('#shortcutOverlay').classList.remove('open');return}
-    mode.shortcut=captured;
-    q('#shortcutOverlay').classList.remove('open');
-    render();toast('Activar con',captured);
+    commitSets();
+    render();
+    toast('Activar con','Sin atajo');
   };
 
+  q('#capUse').onclick=function(){
+    if(!captured||!shortcutEditTarget)return;
+    var value=captured;
+    var target=shortcutEditTarget;
+
+    if(target.kind==='workspace'){
+      workspaceDraft.shortcut=value;
+      closeShortcutOverlay();
+      refreshWorkspaceDraft();
+      return;
+    }
+
+    var mode=byId(target.id);
+    closeShortcutOverlay();
+    if(!mode)return;
+    mode.shortcut=value;
+    commitSets();
+    render();
+    toast('Activar con',value);
+  };
+
+
   function startTest(ctx){
+    closePops();
+    closeShortcutOverlay();
     testContext=ctx;clearInterval(progressTimer);clearInterval(countdownTimer);
     q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx,true)+'</div>';
     q('#testApp').textContent=logo(ctx.app);
@@ -2152,6 +2242,7 @@ body.test-mode .test-tools{display:flex}
         if(s.active)appliedSession=sessionFromMode(s);
       }
       q('#testOverlay').classList.remove('open');
+      commitSets();
       render();
       toast(testContext.name,'Pantallas guardadas');
       testContext=null;
@@ -2173,6 +2264,7 @@ body.test-mode .test-tools{display:flex}
       workspaceBase=cloneModeConfig(workspaceDraft);
       workspaceAutoNamed=true;
       q('#testOverlay').classList.remove('open');
+      commitSets();
       render();
       toast(created.name,'Guardado y activo');
       testContext=null;
@@ -2197,6 +2289,7 @@ body.test-mode .test-tools{display:flex}
         workspaceBase=cloneModeConfig(edited);
       }
       q('#testOverlay').classList.remove('open');
+      commitSets();
       renderModeList();
       toast(editedName,'Guardado y activo');
       testContext=null;
@@ -2208,6 +2301,7 @@ body.test-mode .test-tools{display:flex}
       sets.forEach(function(s){s.active=s.id===testContext.existingId});
       appliedSession=sessionFromMode(byId(testContext.existingId));
       q('#testOverlay').classList.remove('open');
+      commitSets();
       render();
       toast(testContext.name,'Activo después de probar');
       testContext=null;
@@ -2253,7 +2347,7 @@ body.test-mode .test-tools{display:flex}
     }
 
     if(q('#shortcutOverlay').classList.contains('open')){
-      q('#shortcutOverlay').classList.remove('open');
+      closeShortcutOverlay();
       return;
     }
 
@@ -2306,6 +2400,7 @@ body.test-mode .test-tools{display:flex}
   openShellView('modes');
   syncThemeControl();
   syncTestMode();
+  commitSets();
   render();
 })();
 </script>
