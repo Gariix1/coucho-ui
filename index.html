@@ -334,7 +334,7 @@ body.test-mode .test-tools{display:flex}
   opacity:1;background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.26);color:#fca5a5
 }
 .mode-name-edit{
-  display:inline-block;max-width:100%;border-radius:6px;cursor:text;
+  display:inline-block;max-width:100%;border-radius:6px;cursor:text;touch-action:manipulation;
   transition:background .12s ease,box-shadow .12s ease
 }
 .mode-name-edit:hover{background:var(--glass-command)}
@@ -575,7 +575,7 @@ body.test-mode .test-tools{display:flex}
           <div class="hero-top">
             <div class="namebox">
               <div class="mode-icon" id="heroIcon">🎮</div>
-              <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName" class="mode-name-edit" data-id="active" tabindex="0" title="Doble clic o F2 para renombrar">Gaming</h2></div>
+              <div><div class="active-mark"><span class="dot"></span>ACTIVO</div><h2 id="heroName" class="mode-name-edit" data-id="active" tabindex="0" title="Doble clic, F2 o toca para renombrar">Gaming</h2></div>
             </div>
             <div class="hero-tools">
               <button class="trash-mode" data-id="active" title="Eliminar modo" aria-label="Eliminar modo activo">🗑</button>
@@ -735,7 +735,7 @@ body.test-mode .test-tools{display:flex}
 
 <div class="sheet-wrap" id="newSheet" role="dialog" aria-modal="true" aria-label="Crear modo">
   <div class="sheet">
-    <div class="sheet-head"><h2 id="newName" class="mode-name-edit" tabindex="0" title="Doble clic o F2 para renombrar">Gaming</h2><button class="btn icon" id="closeNew" title="Cerrar" aria-label="Cerrar">✕</button></div>
+    <div class="sheet-head"><h2 id="newName" class="mode-name-edit" tabindex="0" title="Doble clic, F2 o toca para renombrar">Gaming</h2><button class="btn icon" id="closeNew" title="Cerrar" aria-label="Cerrar">✕</button></div>
     <div class="new-body">
       <div class="new-recipe">
         <button class="new-display" id="newDisplay" title="Editar pantallas">
@@ -1110,6 +1110,7 @@ body.test-mode .test-tools{display:flex}
           beginModeRename(el,el.dataset.id);
         }
       };
+      bindTouchRename(el,function(){beginModeRename(el,el.dataset.id)});
     });
   }
 
@@ -1260,6 +1261,40 @@ body.test-mode .test-tools{display:flex}
     el.addEventListener('keydown',onKey);
   }
 
+  function bindTouchRename(el,rename){
+    if(!el)return;
+
+    var gesture=null;
+
+    el.addEventListener('pointerdown',function(e){
+      if(e.pointerType==='mouse'||el.isContentEditable)return;
+      gesture={x:e.clientX,y:e.clientY,time:Date.now(),pointerId:e.pointerId};
+    });
+
+    el.addEventListener('pointercancel',function(){
+      gesture=null;
+    });
+
+    el.addEventListener('pointerup',function(e){
+      if(!gesture||gesture.pointerId!==e.pointerId||el.isContentEditable){
+        gesture=null;
+        return;
+      }
+
+      var dx=e.clientX-gesture.x;
+      var dy=e.clientY-gesture.y;
+      var moved=Math.sqrt(dx*dx+dy*dy);
+      var elapsed=Date.now()-gesture.time;
+      gesture=null;
+
+      // A deliberate tap, not a scroll/drag or long press.
+      if(moved<=8&&elapsed<=650){
+        e.preventDefault();
+        rename();
+      }
+    });
+  }
+
   function beginModeRename(el,rawId){
     var id=resolveId(rawId);
     var mode=byId(id);
@@ -1294,6 +1329,7 @@ body.test-mode .test-tools{display:flex}
       beginNewModeRename();
     }
   };
+  bindTouchRename(q('#newName'),beginNewModeRename);
 
   function openDeletePop(anchor,rawId){
     var id=resolveId(rawId);
