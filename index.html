@@ -295,6 +295,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 }
 .visual-workspace.morph-opening{opacity:.58;transform:scale(.996)}
 .visual-workspace.morph-closing{opacity:.36;transform:scale(.996)}
+.visual-workspace.detail-mode.morph-closing{transform:translate(-2px,-2px) scale(.996)}
 .visual-workspace.morph-closing>*{opacity:.18;transition:opacity .083s linear}
 .visual-workspace.detail-reveal .visual-workspace-head,
 .visual-workspace.detail-reveal .workspace-section-head,
@@ -370,12 +371,12 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   background:var(--divider);opacity:0;transform:translateY(4px);transition:opacity .12s linear,transform .16s cubic-bezier(0,0,0,1)
 }
 .mode-transition-ghost.expanded .morph-sheet-corner{opacity:.7;transform:none}
-.morph-origin{opacity:.28!important;transform:scale(.99);transition:opacity .083s linear,transform .167s cubic-bezier(0,0,0,1)}
+.morph-origin{opacity:.28!important;transform:scale(.99);transform-origin:center;transition:opacity .083s linear,transform .167s cubic-bezier(0,0,0,1)}
 
 @media(prefers-reduced-motion:reduce){
-  .mode-transition-ghost{transition:none!important}
+  .mode-transition-ghost{display:none!important;transition:none!important}
   .visual-workspace,.visual-workspace>*{transition:none!important;animation:none!important}
-  .morph-origin{transition:none!important}
+  .morph-origin{transition:none!important;transform:none!important}
 }
 .visual-workspace-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
 .workspace-title-block{min-width:0;display:flex;align-items:center;gap:11px}.workspace-profile-icon{display:none;width:48px;height:48px;flex:0 0 auto;border:1px solid var(--selected-border);border-radius:14px;background:var(--selected-bg);place-items:center;font-size:22px}.detail-mode .workspace-profile-icon{display:grid}.workspace-title-copy{min-width:0}.workspace-eyebrow{display:block;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
