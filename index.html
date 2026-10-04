@@ -334,29 +334,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .app-option:hover{background:var(--glass-pill)}.app-option.selected{border-color:var(--selected-border);background:var(--selected-bg)}.app-option b{font-size:9px}
 
 /* new */
-/* inline mode builder */
-.create-mode-btn{gap:7px;width:auto;padding-inline:11px}
-.create-mode-btn span{font-size:11px;font-weight:600}
-.draft-card{
-  flex:0 1 382px;width:100%;border-color:var(--selected-border);
-  background:linear-gradient(180deg,var(--selected-bg),var(--glass-card));
-}
-.draft-card .card-head{align-items:flex-start}
-.draft-heading{min-width:0}
-.draft-kicker{display:flex;align-items:center;gap:6px;color:var(--accent);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
-.draft-kicker:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.draft-hint{margin:9px 0 8px;color:var(--text2);font-size:10px;line-height:1.35}
-.draft-card .card-display{margin-top:7px}
-.draft-card .card-fact.empty-piece{border-style:dashed;border-color:var(--glass-soft-border);color:var(--text2)}
-.draft-card .card-fact.empty-piece:hover{border-color:var(--selected-border);color:var(--text)}
-.draft-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--divider)}
-.draft-actions-left{display:flex;gap:6px}
-.draft-actions .btn{min-height:34px;padding:6px 10px}
-.draft-ready{display:flex;align-items:center;gap:5px;color:var(--text2);font-size:9px;font-weight:600}
-.draft-ready:before{content:"✓";color:var(--success);font-weight:800}
-.draft-cancel{border-color:transparent;background:transparent;color:var(--muted)}
-.draft-cancel:hover{color:var(--text);background:var(--glass-command)}
-
 /* shortcut */
 .capture-wrap{display:none;position:fixed;inset:32px 0 0 0;z-index:70;background:var(--scrim);backdrop-filter:blur(12px);place-items:center}
 .capture-wrap.open{display:grid}.capture{width:min(440px,92vw);border:1px solid var(--glass-border);border-radius:var(--r-panel);background:var(--floating-bg);box-shadow:var(--shadow);padding:24px;text-align:center;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)}
@@ -891,7 +868,6 @@ body.test-mode .test-tools{display:flex}
   var displayDraftIsNew=false;
   var newDraft={preserve:false,displayIds:['main','aux'],primaryDisplayId:'main',app:'Ninguna',shortcut:'Manual',name:'Escritorio',icon:'🖥️',autoNamed:true};
   var testContext=null;
-  var newDraftOpen=false;
   var progressTimer=null;
   var countdownTimer=null;
   var activationTimer=null;
@@ -1064,117 +1040,6 @@ body.test-mode .test-tools{display:flex}
     clearTimeout(window._toast);window._toast=setTimeout(function(){q('#toast').classList.remove('show')},2100);
   }
 
-  function renderEmptyState(){
-    q('.hero').style.display='none';
-    q('#modesSection').hidden=true;
-    q('#cards').innerHTML=
-      '<div class="empty-state">'+
-        '<div><div class="empty-icon">＋</div>'+
-        '<h3>Crea tu primer modo</h3>'+
-        '<p>Elige tus pantallas y, si quieres, una app.</p>'+
-        '<button class="btn primary" id="emptyCreate">Crear modo</button></div>'+
-      '</div>';
-    q('#emptyCreate').onclick=openNew;
-  }
-
-  function renderHero(mode){
-    var hero=q('.hero');
-    if(!mode){
-      hero.style.display='none';
-      return;
-    }
-    hero.style.display='';
-    q('#heroName').textContent=mode.name;
-    q('#heroName').dataset.id='active';
-    q('#heroIcon').textContent=mode.icon;
-    q('#heroDisplays').innerHTML=displayMarkup(mode,false);
-    q('#heroDisplayName').textContent=displaySummary(mode);
-    q('#heroApp').textContent=mode.app;
-    q('#heroShortcut').textContent=shortcutLabel(mode.shortcut);
-  }
-
-  function renderDraftCard(){
-    var safeName=esc(newDraft.name);
-    var appEmpty=newDraft.app==='Ninguna';
-    var shortcutEmpty=newDraft.shortcut==='Manual';
-
-    return '<article class="card draft-card" aria-label="Nuevo modo en construcción">'+
-      '<div class="card-head">'+
-        '<div class="draft-heading">'+
-          '<div class="draft-kicker">Nuevo modo</div>'+
-          '<div class="card-name"><div class="card-icon">'+esc(newDraft.icon)+'</div><b class="draft-name-edit mode-name-edit" tabindex="0" title="Doble clic, F2 o toca para renombrar">'+safeName+'</b></div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="draft-hint">Parte de tu escritorio actual. Toca una pieza para cambiarla.</div>'+
-      '<button class="card-display draft-display" title="Cambiar pantallas">'+
-        '<span class="card-screen-row">'+
-          '<span class="displays card-displays">'+displayMarkup(newDraft,true)+'</span>'+
-          '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(newDraft))+'</span>'+
-        '</span>'+
-      '</button>'+
-      '<div class="card-facts">'+
-        '<button class="card-fact draft-app'+(appEmpty?' empty-piece':'')+'" title="Cambiar app">'+
-          '<span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+(appEmpty?'＋ App':esc(newDraft.app))+'</b></span>'+
-        '</button>'+
-        '<button class="card-fact draft-shortcut'+(shortcutEmpty?' empty-piece':'')+'" title="Cambiar atajo">'+
-          '<span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+(shortcutEmpty?'＋ Atajo':esc(shortcutCardLabel(newDraft.shortcut)))+'</b></span>'+
-        '</button>'+
-      '</div>'+
-      '<div class="draft-actions">'+
-        '<div class="draft-ready">Listo para crear</div>'+
-        '<div class="draft-actions-left">'+
-          '<button class="btn draft-cancel">Cancelar</button>'+
-          '<button class="btn draft-test">Probar</button>'+
-          '<button class="btn primary draft-create">Crear modo</button>'+
-        '</div>'+
-      '</div>'+
-    '</article>';
-  }
-
-  function renderModeCard(mode){
-    var applying=activatingId===mode.id;
-    var safeName=esc(mode.name);
-    var safeIcon=esc(mode.icon);
-    var safeApp=esc(mode.app);
-    var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
-    return '<article class="card'+(applying?' applying':'')+'">'+
-      '<div class="card-head">'+
-        '<div class="card-name"><div class="card-icon">'+safeIcon+'</div><b class="mode-name-edit" data-id="'+mode.id+'" title="Doble clic para renombrar">'+safeName+'</b></div>'+
-        '<div class="card-head-actions">'+
-          '<div class="split-action" role="group" aria-label="Acciones de '+safeName+'">'+
-            '<button class="activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'Aplicando…':'Activar')+'</button>'+
-            '<button class="activate-more" data-id="'+mode.id+'"'+(applying?' disabled':'')+' title="Más acciones" aria-label="Más acciones de '+safeName+'">▾</button>'+
-          '</div>'+
-          '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar modo" aria-label="Eliminar '+safeName+'">🗑</button>'+
-        '</div>'+
-      '</div>'+
-      '<button class="card-display display-trigger" data-id="'+mode.id+'" title="Editar pantallas">'+
-        '<span class="card-screen-row">'+
-          '<span class="displays card-displays">'+displayMarkup(mode,true)+'</span>'+
-          '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span>'+
-        '</span>'+
-      '</button>'+
-      '<div class="card-facts">'+
-        '<button class="card-fact app-trigger" data-id="'+mode.id+'" title="Cambiar app">'+
-          '<span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span>'+
-        '</button>'+
-        '<button class="card-fact shortcut-trigger" data-id="'+mode.id+'" title="Cambiar atajo">'+
-          '<span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span>'+
-        '</button>'+
-      '</div>'+
-    '</article>';
-  }
-
-  function renderCards(){
-    var html=newDraftOpen?renderDraftCard():'';
-    html+=sets
-      .filter(function(mode){return !mode.active})
-      .map(renderModeCard)
-      .join('');
-    q('#cards').innerHTML=html;
-    bindDynamic();
-  }
-
   function appUsage(app){
     var matches=sets.filter(function(mode){return mode.app===app});
     if(matches.length===0)return {text:'Sin usar',empty:true};
@@ -1337,57 +1202,6 @@ body.test-mode .test-tools{display:flex}
     if(workspaceDraft.displayIds.indexOf(id)<0)workspaceDraft.displayIds.push(id);
     workspaceDraft.primaryDisplayId=id;
     renderWorkbench();
-  }
-
-  function bindDynamic(){
-    qa('.display-trigger').forEach(function(b){b.onclick=function(e){openDisplayPop(e.currentTarget,b.dataset.id,false)}});
-    qa('.app-trigger').forEach(function(b){b.onclick=function(e){openAppPop(e.currentTarget,b.dataset.id,false)}});
-    qa('.shortcut-trigger').forEach(function(b){b.onclick=function(){openShortcut(b.dataset.id)}});
-    qa('.activate').forEach(function(b){b.onclick=function(){activate(Number(b.dataset.id))}});
-    qa('.activate-more').forEach(function(b){b.onclick=function(e){openActivatePop(e.currentTarget,Number(b.dataset.id))}});
-    qa('.trash-mode').forEach(function(b){b.onclick=function(e){openDeletePop(e.currentTarget,b.dataset.id)}});
-    qa('.mode-name-edit[data-id]').forEach(function(el){
-      el.ondblclick=function(e){e.preventDefault();beginModeRename(el,el.dataset.id)};
-      el.onkeydown=function(e){
-        if(el.isContentEditable)return;
-        if(e.key==='F2'||e.key==='Enter'){
-          e.preventDefault();
-          beginModeRename(el,el.dataset.id);
-        }
-      };
-      bindTouchRename(el,function(){beginModeRename(el,el.dataset.id)});
-    });
-
-    var draftName=q('.draft-name-edit');
-    if(draftName){
-      draftName.ondblclick=function(e){e.preventDefault();beginDraftRename(draftName)};
-      draftName.onkeydown=function(e){
-        if(draftName.isContentEditable)return;
-        if(e.key==='F2'||e.key==='Enter'){
-          e.preventDefault();
-          beginDraftRename(draftName);
-        }
-      };
-      bindTouchRename(draftName,function(){beginDraftRename(draftName)});
-    }
-
-    var draftDisplay=q('.draft-display');
-    if(draftDisplay)draftDisplay.onclick=function(e){openDisplayPop(e.currentTarget,null,true)};
-
-    var draftApp=q('.draft-app');
-    if(draftApp)draftApp.onclick=function(e){openAppPop(e.currentTarget,null,true)};
-
-    var draftShortcut=q('.draft-shortcut');
-    if(draftShortcut)draftShortcut.onclick=function(){openShortcut('new')};
-
-    var draftCancel=q('.draft-cancel');
-    if(draftCancel)draftCancel.onclick=function(){cancelNewDraft(true)};
-
-    var draftTest=q('.draft-test');
-    if(draftTest)draftTest.onclick=testNewDraft;
-
-    var draftCreate=q('.draft-create');
-    if(draftCreate)draftCreate.onclick=createNewDraft;
   }
 
   function removeSet(id){
@@ -1699,9 +1513,9 @@ body.test-mode .test-tools{display:flex}
 
   function openDisplayPop(anchor,rawId,isNew){
     closePops();
-    displayDraftIsNew=!!isNew;
-    editTarget=isNew?'new':resolveId(rawId);
-    var source=isNew?newDraft:byId(editTarget);
+    displayDraftIsNew=false;
+    editTarget=resolveId(rawId);
+    var source=byId(editTarget);
     if(!source)return;
     displayDraft=displayConfig(source);
     if(!displayDraft.preserve&&displayDraft.displayIds.length===0){
@@ -1709,8 +1523,8 @@ body.test-mode .test-tools{display:flex}
       displayDraft.primaryDisplayId='main';
     }
     renderDisplayEditor();
-    q('#tryDisplays').hidden=displayDraftIsNew;
-    q('#saveDisplays').textContent=displayDraftIsNew?'Listo':'Guardar';
+    q('#tryDisplays').hidden=false;
+    q('#saveDisplays').textContent='Guardar';
     openAnchoredPop(q('#displayPop'),anchor);
   }
 
@@ -1815,12 +1629,6 @@ body.test-mode .test-tools{display:flex}
 
   q('#saveDisplays').onclick=function(){
     if(!isValidDisplayDraft())return;
-    if(displayDraftIsNew){
-      copyDisplayDraft(newDraft);
-      closePops();
-      renderCards();
-      return;
-    }
     var s=byId(editTarget);
     if(!s)return;
     copyDisplayDraft(s);
@@ -1832,14 +1640,14 @@ body.test-mode .test-tools{display:flex}
   q('#tryDisplays').onclick=function(){
     if(!isValidDisplayDraft())return;
     var ctx={
-      kind:displayDraftIsNew?'display-draft':'display',
-      id:displayDraftIsNew?null:editTarget,
+      kind:'display',
+      id:editTarget,
       preserve:displayDraft.preserve,
       displayIds:displayDraft.displayIds.slice(),
       primaryDisplayId:displayDraft.primaryDisplayId,
-      app:displayDraftIsNew?newDraft.app:byId(editTarget).app,
-      name:displayDraftIsNew?newDraft.name:byId(editTarget).name,
-      icon:displayDraftIsNew?newDraft.icon:byId(editTarget).icon
+      app:byId(editTarget).app,
+      name:byId(editTarget).name,
+      icon:byId(editTarget).icon
     };
     closePops();
     startTest(ctx);
@@ -1858,14 +1666,6 @@ body.test-mode .test-tools{display:flex}
         renderWorkbench();
         return;
       }
-      if(editTarget==='new'){
-        newDraft.app=app;
-        var nm=autoMeta(app);
-        if(newDraft.autoNamed)newDraft.name=nm.name;
-        newDraft.icon=nm.icon;
-        renderCards();
-        return;
-      }
       var s=byId(editTarget);
       if(!s)return;
       s.app=app;
@@ -1873,94 +1673,6 @@ body.test-mode .test-tools{display:flex}
       toast('Apps',app);
     };
   });
-
-  function draftFromApplied(){
-    var ids=appliedSession&&appliedSession.displayIds.length
-      ?appliedSession.displayIds.slice()
-      :['main','aux'];
-    var primary=appliedSession&&appliedSession.primaryDisplayId
-      ?appliedSession.primaryDisplayId
-      :(ids[0]||'main');
-
-    return {
-      preserve:false,
-      displayIds:ids,
-      primaryDisplayId:primary,
-      app:'Ninguna',
-      shortcut:'Manual',
-      name:'Escritorio',
-      icon:'🖥️',
-      autoNamed:true
-    };
-  }
-
-  function openNew(){
-    closePops();
-    if(newDraftOpen){
-      var existing=q('.draft-card');
-      if(existing)existing.scrollIntoView({behavior:'smooth',block:'center'});
-      return;
-    }
-
-    newDraft=draftFromApplied();
-    newDraftOpen=true;
-    render();
-    requestAnimationFrame(function(){
-      var draft=q('.draft-card');
-      if(draft)draft.scrollIntoView({behavior:'smooth',block:'center'});
-    });
-  }
-
-  function beginDraftRename(el){
-    if(!newDraftOpen||!el||el.isContentEditable)return;
-    var original=newDraft.name;
-    editInlineText(el,original,function(next){
-      newDraft.name=next;
-      newDraft.autoNamed=false;
-      if(next!==original)toast(next,'Nombre del nuevo modo');
-    });
-  }
-
-  function buildNewMode(id,activeState){
-    return {
-      id:id,name:newDraft.name,icon:newDraft.icon,
-      preserve:newDraft.preserve,displayIds:newDraft.displayIds.slice(),
-      primaryDisplayId:newDraft.primaryDisplayId,app:newDraft.app,
-      shortcut:newDraft.shortcut,active:!!activeState
-    };
-  }
-
-  function cancelNewDraft(showFeedback){
-    closePops();
-    newDraftOpen=false;
-    render();
-    if(showFeedback!==false)toast('Nuevo modo','Borrador descartado');
-  }
-
-  function createNewDraft(){
-    if(!newDraftOpen)return;
-    var created=buildNewMode(Date.now(),false);
-    sets.push(created);
-    newDraftOpen=false;
-    render();
-    toast(created.name,'Modo creado');
-  }
-
-  function testNewDraft(){
-    if(!newDraftOpen)return;
-    closePops();
-    startTest({
-      kind:'new',
-      id:Date.now(),
-      preserve:newDraft.preserve,
-      displayIds:newDraft.displayIds.slice(),
-      primaryDisplayId:newDraft.primaryDisplayId,
-      app:newDraft.app,
-      shortcut:newDraft.shortcut,
-      name:newDraft.name,
-      icon:newDraft.icon
-    });
-  }
 
   function syncThemeControl(){
     var light=document.documentElement.dataset.theme==='light';
@@ -2074,7 +1786,6 @@ body.test-mode .test-tools{display:flex}
 
   q('#clearModes').onclick=function(){
     sets=[];
-    newDraftOpen=false;
     appliedSession=null;
     workspaceTargetId=null;
     workspaceDraft=null;
@@ -2096,8 +1807,8 @@ body.test-mode .test-tools{display:flex}
 
 
   function openShortcut(rawId){
-    shortcutTarget=rawId==='new'||rawId==='workspace'?rawId:resolveId(rawId);
-    if(shortcutTarget!=='new'&&shortcutTarget!=='workspace'&&!byId(shortcutTarget))return;
+    shortcutTarget=rawId==='workspace'?'workspace':resolveId(rawId);
+    if(shortcutTarget!=='workspace'&&!byId(shortcutTarget))return;
     captured=null;
     q('#captureResult').innerHTML='<span style="color:var(--muted)">A · X · Y</span>';
     q('#capUse').style.display='none';q('#shortcutOverlay').classList.add('open');
@@ -2120,12 +1831,6 @@ body.test-mode .test-tools{display:flex}
       renderWorkbench();
       return;
     }
-    if(shortcutTarget==='new'){
-      newDraft.shortcut='Manual';
-      q('#shortcutOverlay').classList.remove('open');
-      renderCards();
-      return;
-    }
     var mode=byId(shortcutTarget);
     if(!mode){q('#shortcutOverlay').classList.remove('open');return}
     mode.shortcut='Manual';
@@ -2140,12 +1845,6 @@ body.test-mode .test-tools{display:flex}
       renderWorkbench();
       return;
     }
-    if(shortcutTarget==='new'){
-      newDraft.shortcut=captured;
-      q('#shortcutOverlay').classList.remove('open');
-      renderCards();
-      return;
-    }
     var mode=byId(shortcutTarget);
     if(!mode){q('#shortcutOverlay').classList.remove('open');return}
     mode.shortcut=captured;
@@ -2158,7 +1857,7 @@ body.test-mode .test-tools{display:flex}
     q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx,true)+'</div>';
     q('#testApp').textContent=logo(ctx.app);
     q('#testText').textContent='Probando '+ctx.name+'…';
-    q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':(ctx.kind==='new'||ctx.kind==='workspace-new')?'Guardar y activar':ctx.kind==='workspace-edit'?'Guardar y activar':'Guardar';
+    q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':ctx.kind==='workspace-new'?'Guardar y activar':ctx.kind==='workspace-edit'?'Guardar y activar':'Guardar';
     q('#progress').style.width='0%';q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
 
     var pct=0;
@@ -2196,17 +1895,6 @@ body.test-mode .test-tools{display:flex}
       q('#testOverlay').classList.remove('open');
       render();
       toast(testContext.name,'Pantallas guardadas');
-      testContext=null;
-      return;
-    }
-
-    if(kind==='display-draft'){
-      newDraft.preserve=testContext.preserve;
-      newDraft.displayIds=testContext.displayIds.slice();
-      newDraft.primaryDisplayId=testContext.primaryDisplayId;
-      q('#testOverlay').classList.remove('open');
-      renderCards();
-      toast('Pantallas','Probadas y guardadas');
       testContext=null;
       return;
     }
@@ -2264,23 +1952,6 @@ body.test-mode .test-tools{display:flex}
       testContext=null;
       return;
     }
-
-    if(kind==='new'){
-      sets.push({
-        id:testContext.id,name:testContext.name,icon:testContext.icon,
-        preserve:testContext.preserve,displayIds:testContext.displayIds.slice(),
-        primaryDisplayId:testContext.primaryDisplayId,app:testContext.app,
-        shortcut:testContext.shortcut||'Manual',active:false
-      });
-      sets.forEach(function(s){s.active=s.id===testContext.id});
-      appliedSession=sessionFromMode(byId(testContext.id));
-      newDraftOpen=false;
-      q('#testOverlay').classList.remove('open');
-      render();
-      toast(testContext.name,'Creado y activo');
-      testContext=null;
-    }
-  };
 
   function finishRestore(){
     q('#testOverlay').classList.remove('open');
