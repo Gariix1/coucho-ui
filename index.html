@@ -277,12 +277,11 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 
 .visual-workspace{
   padding:16px;min-width:0;overflow:visible;position:relative;isolation:isolate;z-index:1;
-  transition:border-color .167s cubic-bezier(0,0,0,1),background .167s cubic-bezier(0,0,0,1),box-shadow .167s cubic-bezier(0,0,0,1),transform .167s cubic-bezier(0,0,0,1),opacity .083s linear
+  transition:opacity .12s linear
 }
 .visual-workspace.detail-mode{
   border-color:var(--selected-border);
   background:transparent;
-  transform:translate(-2px,-2px);
   box-shadow:none
 }
 .visual-workspace.detail-mode:before{
@@ -294,9 +293,8 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .detail-mode .workspace-close{display:grid}.workspace-close:hover{background:var(--glass-pill);border-color:var(--glass-border);color:var(--text)}
 
 /* Coucho container transform
-   Only the surface, icon and title are shared. Contents fade-through instead of stretching.
-   This maps directly to WinUI: shared container Visual + shared identity + content choreography. */
-:root{view-transition-name:none}
+   One real surface moves between the saved card and the editor.
+   Geometry is owned only by FLIP; content fades through without browser snapshots. */
 
 .mode-morph-surface{
   position:absolute;inset:0;z-index:0;pointer-events:none;
@@ -310,76 +308,40 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .saved-mode-card{background:transparent!important;border-color:transparent!important}
 .saved-mode-card .saved-morph-surface{background:var(--glass-control)}
 .saved-mode-card:hover .saved-morph-surface{background:var(--glass-pill);border-color:var(--glass-border)}
+.saved-mode-card.selected{visibility:hidden}
 .saved-mode-card.selected .saved-morph-surface{background:var(--selected-bg);border-color:var(--selected-border)}
 
 .visual-workspace{background:transparent!important;border-color:transparent!important}
 .visual-workspace .workspace-morph-surface{
   background:var(--glass-card);border-color:var(--glass-soft-border);
-  box-shadow:none;transition:background .167s ease,border-color .167s ease,box-shadow .167s ease
+  box-shadow:none;
+  transition:background .36s cubic-bezier(.18,.82,.18,1),border-color .36s cubic-bezier(.18,.82,.18,1),box-shadow .36s cubic-bezier(.18,.82,.18,1)
 }
 .visual-workspace.detail-mode .workspace-morph-surface{
-  background:linear-gradient(180deg,var(--selected-bg),var(--glass-card) 180px);
+  background:var(--glass-card);
   border-color:var(--selected-border);
   box-shadow:8px 8px 0 -1px var(--glass-surface),8px 8px 0 0 var(--glass-border),0 20px 48px rgba(0,0,0,.16),0 0 0 1px var(--monitor-glow)
 }
+.visual-workspace.coucho-flip-opening .workspace-morph-surface,
+.visual-workspace.coucho-flip-closing .workspace-morph-surface{
+  background:var(--glass-control);
+  border-color:var(--glass-soft-border);
+  box-shadow:0 7px 16px rgba(0,0,0,.08)
+}
+.visual-workspace.coucho-flip-active{
+  z-index:80;
+  pointer-events:none;
+  will-change:transform
+}
+.visual-workspace.detail-mode.coucho-flip-active:before{opacity:0}
+.visual-workspace.detail-mode:before{transition:opacity .12s linear}
 
-/* Geometry comes from the browser's shared-element interpolation. */
-::view-transition-group(coucho-surface){
-  z-index:90;
-  animation-duration:400ms;
-  animation-timing-function:cubic-bezier(.18,.82,.18,1)
-}
-::view-transition-image-pair(coucho-surface){
-  isolation:auto;overflow:clip;
-  animation:coucho-surface-shape 400ms cubic-bezier(.18,.82,.18,1) both
-}
-::view-transition-old(coucho-surface),
-::view-transition-new(coucho-surface){
-  width:100%;height:100%;object-fit:fill;mix-blend-mode:normal;
-  animation:none
-}
+/* Only content cross-fades. The container itself never has a second CSS motion path. */
+.saved-mode-card.coucho-card-content-pending .saved-mode-head,
+.saved-mode-card.coucho-card-content-pending .saved-mode-body{opacity:0}
 
-/* Shared identity remains readable while the container changes around it. */
-::view-transition-group(coucho-icon),
-::view-transition-group(coucho-title){
-  z-index:92;
-  animation-duration:330ms;
-  animation-timing-function:cubic-bezier(.18,.82,.18,1)
-}
-::view-transition-old(coucho-icon),
-::view-transition-new(coucho-icon),
-::view-transition-old(coucho-title),
-::view-transition-new(coucho-title){
-  mix-blend-mode:normal;
-  animation-duration:330ms;
-  animation-fill-mode:both
-}
-::view-transition-old(coucho-icon),
-::view-transition-old(coucho-title){animation-name:coucho-identity-out}
-::view-transition-new(coucho-icon),
-::view-transition-new(coucho-title){animation-name:coucho-identity-in}
-
-@keyframes coucho-surface-shape{
-  0%{clip-path:inset(0 round 18px);filter:drop-shadow(0 7px 16px rgba(0,0,0,.08))}
-  42%{clip-path:inset(0 round 46px);filter:drop-shadow(0 14px 26px rgba(0,0,0,.14))}
-  72%{clip-path:inset(0 round 24px)}
-  100%{clip-path:inset(0 round 18px);filter:drop-shadow(0 18px 34px rgba(0,0,0,.16))}
-}
-@keyframes coucho-identity-out{
-  0%,58%{opacity:1}
-  100%{opacity:0}
-}
-@keyframes coucho-identity-in{
-  0%,34%{opacity:0}
-  72%,100%{opacity:1}
-}
-
-/* Non-shared content: Material-style fade-through. */
-.saved-mode-card.coucho-vt-placeholder{visibility:hidden}
-.saved-mode-card.coucho-card-content-pending .saved-mode-actions,
-.saved-mode-card.coucho-card-content-pending .saved-mode-body,
-.saved-mode-card.coucho-card-content-pending .saved-mode-name-copy small{opacity:0}
-
+.visual-workspace.coucho-detail-content-pending .workspace-profile-icon,
+.visual-workspace.coucho-detail-content-pending #workspaceName,
 .visual-workspace.coucho-detail-content-pending .workspace-eyebrow,
 .visual-workspace.coucho-detail-content-pending #workspaceSub,
 .visual-workspace.coucho-detail-content-pending .workspace-head-actions,
@@ -388,25 +350,16 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .visual-workspace.coucho-detail-content-pending .workspace-pieces,
 .visual-workspace.coucho-detail-content-pending .workspace-footer{opacity:0;transform:translateY(6px)}
 
-/* Narrow Control windows intentionally do not perform a lateral container transform. */
+/* Narrow Control windows intentionally use a simple fade/slide instead of a lateral FLIP. */
 .visual-workspace.compact-detail-enter{animation:compactDetailIn .18s cubic-bezier(.18,.82,.18,1) both}
 .visual-workspace.compact-detail-exit{animation:compactDetailOut .14s cubic-bezier(.38,0,.20,1) both}
 @keyframes compactDetailIn{from{opacity:.25;transform:translateY(6px) scale(.992)}to{opacity:1;transform:none}}
 @keyframes compactDetailOut{from{opacity:1;transform:none}to{opacity:.2;transform:translateY(-4px) scale(.994)}}
 
 @media(prefers-reduced-motion:reduce){
-  ::view-transition-group(coucho-surface),
-  ::view-transition-group(coucho-icon),
-  ::view-transition-group(coucho-title),
-  ::view-transition-image-pair(coucho-surface),
-  ::view-transition-old(coucho-surface),
-  ::view-transition-new(coucho-surface),
-  ::view-transition-old(coucho-icon),
-  ::view-transition-new(coucho-icon),
-  ::view-transition-old(coucho-title),
-  ::view-transition-new(coucho-title){animation-duration:.001ms!important}
   .visual-workspace,.visual-workspace>*{transition:none!important;animation:none!important}
 }
+
 .visual-workspace-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
 .workspace-title-block{min-width:0;display:flex;align-items:center;gap:11px}.workspace-profile-icon{display:none;width:48px;height:48px;flex:0 0 auto;border:1px solid var(--selected-border);border-radius:14px;background:var(--selected-bg);place-items:center;font-size:22px}.detail-mode .workspace-profile-icon{display:grid}.workspace-title-copy{min-width:0}.workspace-eyebrow{display:block;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
 .workspace-title-block h2{margin:0;font-size:20px;font-weight:600}.workspace-title-block>small{display:block;color:var(--text2);font-size:9px;margin-top:4px}
@@ -1287,13 +1240,14 @@ body.test-mode .test-tools{display:flex}
   var CouchoMotion=(function(){
     var spec={
       desktopMin:1041,
-      container:400,
-      sourceOut:92,
-      detailRevealDelay:155,
-      detailReveal:155,
-      detailOut:88,
-      cardRevealDelay:210,
-      cardReveal:105
+      container:380,
+      sourceOut:82,
+      detailRevealDelay:215,
+      detailReveal:145,
+      detailOut:92,
+      cardRevealDelay:45,
+      cardReveal:120,
+      baseReveal:130
     };
 
     function reduced(){
@@ -1308,13 +1262,117 @@ body.test-mode .test-tools{display:flex}
       return el&&el.isConnected?el.getBoundingClientRect():null;
     }
 
-    function nativeContainerTransformAvailable(source,target){
+    function containerTransformAvailable(source,target){
       if(reduced())return false;
-      if(typeof document.startViewTransition!=='function')return false;
       if(!window.matchMedia('(min-width: '+spec.desktopMin+'px)').matches)return false;
       var s=rectOf(source),t=rectOf(target);
       if(!visible(s)||!visible(t))return false;
       return s.right+12<t.left;
+    }
+
+    function inverseTransform(from,to){
+      var sx=from.width/to.width;
+      var sy=from.height/to.height;
+      return 'translate3d('+(from.left-to.left)+'px,'+(from.top-to.top)+'px,0) scale('+sx+','+sy+')';
+    }
+
+    function forwardTransform(from,to){
+      var sx=to.width/from.width;
+      var sy=to.height/from.height;
+      return 'translate3d('+(to.left-from.left)+'px,'+(to.top-from.top)+'px,0) scale('+sx+','+sy+')';
+    }
+
+    function animateElements(elements,frames,options){
+      return Promise.all(elements.filter(Boolean).map(function(el){
+        var a=el.animate(frames,options);
+        return a.finished.catch(function(){});
+      }));
+    }
+
+    function cardContent(card){
+      return card?[card.querySelector('.saved-mode-head'),card.querySelector('.saved-mode-body')]:[];
+    }
+
+    function detailContent(surface){
+      return surface?[
+        surface.querySelector('.workspace-profile-icon'),
+        surface.querySelector('#workspaceName'),
+        surface.querySelector('.workspace-eyebrow'),
+        surface.querySelector('#workspaceSub'),
+        surface.querySelector('.workspace-head-actions'),
+        surface.querySelector('.workspace-section-head'),
+        surface.querySelector('.workspace-screen-stage'),
+        surface.querySelector('.workspace-pieces'),
+        surface.querySelector('.workspace-footer')
+      ]:[];
+    }
+
+    function fadeSourceContent(card){
+      return animateElements(
+        cardContent(card),
+        [{opacity:1,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(-4px,0,0)'}],
+        {duration:spec.sourceOut,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
+      );
+    }
+
+    function revealDetail(target){
+      target.classList.add('coucho-detail-content-pending');
+      var parts=detailContent(target).filter(Boolean);
+      var jobs=parts.map(function(el,index){
+        var a=el.animate(
+          [{opacity:0,transform:'translate3d(0,6px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
+          {
+            duration:spec.detailReveal,
+            delay:spec.detailRevealDelay+index*8,
+            easing:'cubic-bezier(0,0,.2,1)',
+            fill:'both'
+          }
+        );
+        return a.finished.catch(function(){});
+      });
+
+      Promise.all(jobs).then(function(){
+        target.classList.remove('coucho-detail-content-pending');
+        parts.forEach(function(el){el.getAnimations().forEach(function(a){a.cancel()})});
+      });
+    }
+
+    function fadeDetailOut(source){
+      return animateElements(
+        detailContent(source),
+        [{opacity:1,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(0,-4px,0)'}],
+        {duration:spec.detailOut,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
+      );
+    }
+
+    function revealCard(card){
+      if(!card)return;
+      card.classList.add('coucho-card-content-pending');
+      var parts=cardContent(card).filter(Boolean);
+      parts.forEach(function(el,index){
+        var a=el.animate(
+          [{opacity:0,transform:'translate3d(4px,0,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
+          {
+            duration:spec.cardReveal,
+            delay:spec.cardRevealDelay+index*8,
+            easing:'cubic-bezier(0,0,.2,1)',
+            fill:'both'
+          }
+        );
+        a.finished.catch(function(){}).then(function(){
+          el.getAnimations().forEach(function(x){x.cancel()});
+          card.classList.remove('coucho-card-content-pending');
+        });
+      });
+    }
+
+    function revealBaseWorkspace(target){
+      if(reduced())return;
+      var a=target.animate(
+        [{opacity:0},{opacity:1}],
+        {duration:spec.baseReveal,delay:45,easing:'linear',fill:'both'}
+      );
+      a.finished.catch(function(){}).then(function(){a.cancel()});
     }
 
     function compactOpen(target,update,done){
@@ -1347,153 +1405,50 @@ body.test-mode .test-tools{display:flex}
       return Promise.all(animations.map(function(a){return a.finished.catch(function(){})})).then(finish);
     }
 
-    function setSharedNames(container,prefix){
-      if(!container)return;
-      var surface=container.querySelector('.mode-morph-surface');
-      var icon=container.querySelector(prefix==='card'?'.mode-list-icon':'#workspaceProfileIcon');
-      var title=container.querySelector(prefix==='card'?'.mode-list-name':'#workspaceName');
-      if(surface)surface.style.viewTransitionName='coucho-surface';
-      if(icon)icon.style.viewTransitionName='coucho-icon';
-      if(title)title.style.viewTransitionName='coucho-title';
-    }
-
-    function clearSharedNames(container,prefix){
-      if(!container)return;
-      var surface=container.querySelector('.mode-morph-surface');
-      var icon=container.querySelector(prefix==='card'?'.mode-list-icon':'#workspaceProfileIcon');
-      var title=container.querySelector(prefix==='card'?'.mode-list-name':'#workspaceName');
-      [surface,icon,title].forEach(function(el){if(el)el.style.viewTransitionName='none'});
-    }
-
-    function animateElements(elements,frames,options){
-      return Promise.all(elements.filter(Boolean).map(function(el){
-        var a=el.animate(frames,options);
-        return a.finished.catch(function(){});
-      }));
-    }
-
-    function fadeSourceContent(card){
-      return animateElements(
-        [
-          card.querySelector('.saved-mode-actions'),
-          card.querySelector('.saved-mode-body'),
-          card.querySelector('.saved-mode-name-copy small')
-        ],
-        [{opacity:1,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(-4px,0,0)'}],
-        {duration:spec.sourceOut,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
-      );
-    }
-
-    function revealDetail(target){
-      target.classList.add('coucho-detail-content-pending');
-      var parts=[
-        target.querySelector('.workspace-eyebrow'),
-        target.querySelector('#workspaceSub'),
-        target.querySelector('.workspace-head-actions'),
-        target.querySelector('.workspace-section-head'),
-        target.querySelector('.workspace-screen-stage'),
-        target.querySelector('.workspace-pieces'),
-        target.querySelector('.workspace-footer')
-      ].filter(Boolean);
-
-      var jobs=parts.map(function(el,index){
-        var a=el.animate(
-          [{opacity:0,transform:'translate3d(0,6px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
-          {
-            duration:spec.detailReveal,
-            delay:spec.detailRevealDelay+index*10,
-            easing:'cubic-bezier(0,0,.2,1)',
-            fill:'both'
-          }
-        );
-        return a.finished.catch(function(){});
-      });
-
-      Promise.all(jobs).then(function(){
-        target.classList.remove('coucho-detail-content-pending');
-        parts.forEach(function(el){el.getAnimations().forEach(function(a){a.cancel()})});
-      });
-    }
-
-    function fadeDetailOut(source){
-      var parts=[
-        source.querySelector('.workspace-eyebrow'),
-        source.querySelector('#workspaceSub'),
-        source.querySelector('.workspace-head-actions'),
-        source.querySelector('.workspace-section-head'),
-        source.querySelector('.workspace-screen-stage'),
-        source.querySelector('.workspace-pieces'),
-        source.querySelector('.workspace-footer')
-      ].filter(Boolean);
-      return animateElements(
-        parts,
-        [{opacity:1,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(0,-4px,0)'}],
-        {duration:spec.detailOut,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
-      );
-    }
-
-    function revealCard(card){
-      if(!card)return;
-      card.classList.add('coucho-card-content-pending');
-      var parts=[
-        card.querySelector('.saved-mode-actions'),
-        card.querySelector('.saved-mode-body'),
-        card.querySelector('.saved-mode-name-copy small')
-      ].filter(Boolean);
-      parts.forEach(function(el,index){
-        var a=el.animate(
-          [{opacity:0,transform:'translate3d(4px,0,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
-          {
-            duration:spec.cardReveal,
-            delay:spec.cardRevealDelay+index*8,
-            easing:'cubic-bezier(0,0,.2,1)',
-            fill:'both'
-          }
-        );
-        a.finished.catch(function(){}).then(function(){
-          card.classList.remove('coucho-card-content-pending');
-          el.getAnimations().forEach(function(x){x.cancel()});
-        });
-      });
-    }
-
     async function openProfile(args){
       if(modeMorphing)return false;
       var source=args.source,target=args.target;
       if(!source||!target)return false;
 
-      if(!nativeContainerTransformAvailable(source,target)){
+      var from=rectOf(source);
+      if(!containerTransformAvailable(source,target)){
         await compactOpen(target,args.update,args.done);
         return true;
       }
 
       modeMorphing=true;
-      await fadeSourceContent(source);
-      setSharedNames(source,'card');
-
-      var transition;
       try{
-        transition=document.startViewTransition(function(){
-          clearSharedNames(source,'card');
-          args.update();
+        await fadeSourceContent(source);
+        args.update();
 
-          var placeholder=q('[data-mode-row="'+args.id+'"]');
-          if(placeholder)placeholder.classList.add('coucho-vt-placeholder');
+        var to=rectOf(target);
+        if(!visible(from)||!visible(to))throw new Error('FLIP geometry unavailable');
 
-          setSharedNames(target,'workspace');
-          target.classList.add('coucho-detail-content-pending');
+        target.classList.add('coucho-flip-active','coucho-flip-opening','coucho-detail-content-pending');
+
+        var move=target.animate(
+          [
+            {transform:inverseTransform(from,to)},
+            {transform:'translate3d(0,0,0) scale(1,1)'}
+          ],
+          {
+            duration:spec.container,
+            easing:'cubic-bezier(.18,.82,.18,1)',
+            fill:'both'
+          }
+        );
+
+        requestAnimationFrame(function(){
+          target.classList.remove('coucho-flip-opening');
         });
+        revealDetail(target);
 
-        transition.ready.then(function(){revealDetail(target)});
-        await transition.finished;
+        await move.finished.catch(function(){});
+        move.cancel();
       }catch(e){
         if(args.ensureUpdated)args.ensureUpdated();
       }finally{
-        clearSharedNames(source,'card');
-        clearSharedNames(target,'workspace');
-        target.classList.remove('coucho-detail-content-pending');
-        var placeholder=q('[data-mode-row="'+args.id+'"]');
-        if(placeholder)placeholder.classList.remove('coucho-vt-placeholder');
+        target.classList.remove('coucho-flip-active','coucho-flip-opening','coucho-detail-content-pending');
         modeMorphing=false;
         if(args.done)args.done();
       }
@@ -1503,43 +1458,51 @@ body.test-mode .test-tools{display:flex}
     async function closeProfile(args){
       if(modeMorphing)return false;
       var source=args.source;
-      var beforeTarget=args.destination();
-      if(!source||!beforeTarget)return false;
+      var target=args.destination();
+      if(!source||!target)return false;
 
-      if(!nativeContainerTransformAvailable(beforeTarget,source)){
+      var from=rectOf(source);
+      var to=rectOf(target);
+      if(!containerTransformAvailable(target,source)){
         await compactClose(source,args.update,args.done);
         return true;
       }
 
       modeMorphing=true;
-      await fadeDetailOut(source);
-      setSharedNames(source,'workspace');
-      var finalTarget=null;
-
       try{
-        var transition=document.startViewTransition(function(){
-          clearSharedNames(source,'workspace');
-          args.update();
+        await fadeDetailOut(source);
 
-          finalTarget=args.destination();
-          if(finalTarget){
-            finalTarget.classList.add('coucho-card-content-pending');
-            setSharedNames(finalTarget,'card');
+        source.classList.add('coucho-flip-active','coucho-flip-closing','coucho-detail-content-pending');
+
+        var move=source.animate(
+          [
+            {transform:'translate3d(0,0,0) scale(1,1)'},
+            {transform:forwardTransform(from,to)}
+          ],
+          {
+            duration:spec.container,
+            easing:'cubic-bezier(.18,.82,.18,1)',
+            fill:'both'
           }
-        });
+        );
 
-        transition.ready.then(function(){
-          if(finalTarget)revealCard(finalTarget);
-        });
-        await transition.finished;
+        await move.finished.catch(function(){});
+
+        source.style.opacity='0';
+        args.update();
+
+        var finalTarget=args.destination();
+        if(finalTarget)revealCard(finalTarget);
+
+        move.cancel();
+        source.classList.remove('coucho-flip-active','coucho-flip-closing','coucho-detail-content-pending');
+        source.style.opacity='';
+        revealBaseWorkspace(source);
       }catch(e){
         if(args.ensureUpdated)args.ensureUpdated();
       }finally{
-        clearSharedNames(source,'workspace');
-        if(finalTarget){
-          clearSharedNames(finalTarget,'card');
-          finalTarget.classList.remove('coucho-card-content-pending');
-        }
+        source.classList.remove('coucho-flip-active','coucho-flip-closing','coucho-detail-content-pending');
+        source.style.opacity='';
         modeMorphing=false;
         if(args.done)args.done();
       }
@@ -1555,8 +1518,9 @@ body.test-mode .test-tools{display:flex}
       openProfile:openProfile,
       closeProfile:closeProfile,
       handoff:handoff,
-      nativeContainerTransformAvailable:nativeContainerTransformAvailable
+      containerTransformAvailable:containerTransformAvailable
     };
+
   })();
 
   function openModeDetail(id,source){
