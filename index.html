@@ -1256,6 +1256,8 @@ body.test-mode .test-tools{display:flex}
       return el&&el.isConnected?el.getBoundingClientRect():null;
     }
 
+    // Contract: connected card -> workspace morph exists only in the side-by-side desktop layout.
+    // Narrow/stacked Control windows deliberately use compact detail motion.
     function desktopMorphAvailable(source,target){
       if(reduced()||!window.matchMedia('(min-width: '+spec.desktopMin+'px)').matches)return false;
       var s=rectOf(source),t=rectOf(target);
@@ -1266,11 +1268,16 @@ body.test-mode .test-tools{display:flex}
     }
 
     function compactOpen(target,prepare,done){
+      modeMorphing=true;
       prepare();
       target.classList.remove('motion-content-hidden');
       target.classList.add('compact-detail-enter');
+      var finished=false;
       var finish=function(){
+        if(finished)return;
+        finished=true;
         target.classList.remove('compact-detail-enter');
+        modeMorphing=false;
         if(done)done();
       };
       if(reduced()){finish();return Promise.resolve()}
@@ -1280,21 +1287,26 @@ body.test-mode .test-tools{display:flex}
     }
 
     function compactClose(source,done){
-      if(reduced()){
+      modeMorphing=true;
+      var finished=false;
+      var finish=function(){
+        if(finished)return;
+        finished=true;
+        source.classList.remove('compact-detail-exit');
+        modeMorphing=false;
         if(done)done();
+      };
+      if(reduced()){
+        finish();
         return Promise.resolve();
       }
       source.classList.add('compact-detail-exit');
       var animations=source.getAnimations();
       if(!animations.length){
-        source.classList.remove('compact-detail-exit');
-        if(done)done();
+        finish();
         return Promise.resolve();
       }
-      return Promise.all(animations.map(function(a){return a.finished.catch(function(){})})).then(function(){
-        source.classList.remove('compact-detail-exit');
-        if(done)done();
-      });
+      return Promise.all(animations.map(function(a){return a.finished.catch(function(){})})).then(finish);
     }
 
     function sourceIdentity(card){
