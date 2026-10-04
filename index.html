@@ -257,7 +257,20 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .mode-list-badge{display:inline-flex;align-items:center;gap:4px;color:var(--success);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .mode-list-badge:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--success)}
 
-.visual-workspace{padding:16px;min-width:0;overflow:hidden}
+.visual-workspace{padding:16px;min-width:0;overflow:hidden;position:relative;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease,opacity .16s ease,transform .22s ease}
+.visual-workspace.detail-mode{border-color:var(--selected-border);box-shadow:0 18px 48px rgba(0,0,0,.14),0 0 0 1px var(--monitor-glow)}
+.visual-workspace.detail-mode:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:var(--r-card) 0 0 var(--r-card)}
+.visual-workspace.transitioning{opacity:.3;transform:scale(.992)}
+.visual-workspace.detail-enter{animation:detailSettle .24s cubic-bezier(.2,.8,.2,1)}
+@keyframes detailSettle{from{opacity:.35;transform:translateY(8px) scale(.992)}to{opacity:1;transform:none}}
+.workspace-head-actions{display:flex;align-items:center;gap:7px}
+.workspace-close{display:none;width:32px;height:32px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-command);color:var(--text2);place-items:center;padding:0}
+.detail-mode .workspace-close{display:grid}.workspace-close:hover{background:var(--glass-pill);border-color:var(--glass-border);color:var(--text)}
+.mode-transition-ghost{position:fixed;z-index:75;margin:0!important;pointer-events:none;overflow:hidden;border:1px solid var(--selected-border)!important;border-radius:var(--r-compact);background:var(--glass-card)!important;box-shadow:0 22px 60px rgba(0,0,0,.24);transition:left .32s cubic-bezier(.2,.8,.2,1),top .32s cubic-bezier(.2,.8,.2,1),width .32s cubic-bezier(.2,.8,.2,1),height .32s cubic-bezier(.2,.8,.2,1),border-radius .32s ease,opacity .18s ease}
+.mode-transition-ghost.expanded{border-radius:var(--r-card)}
+.mode-list-actions .view-mode{border-color:var(--glass-soft-border);background:var(--glass-command);color:var(--text2)}
+.mode-list-actions .view-mode:hover{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
+@media(prefers-reduced-motion:reduce){.mode-transition-ghost{transition:none}.visual-workspace.detail-enter{animation:none}.visual-workspace{transition:none}}
 .visual-workspace-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
 .workspace-title-block{min-width:0}.workspace-eyebrow{display:block;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
 .workspace-title-block h2{margin:0;font-size:20px;font-weight:600}.workspace-title-block>small{display:block;color:var(--text2);font-size:9px;margin-top:4px}
@@ -657,7 +670,10 @@ body.test-mode .test-tools{display:flex}
                 <h2 id="workspaceName" class="mode-name-edit" tabindex="0">Escritorio</h2>
                 <small id="workspaceSub">Manipula las pantallas y guarda el resultado como un modo.</small>
               </div>
-              <span class="workspace-state" id="workspaceState">Sin cambios</span>
+              <div class="workspace-head-actions">
+                <span class="workspace-state" id="workspaceState">Sin cambios</span>
+                <button class="workspace-close" id="workspaceClose" title="Cerrar detalle" aria-label="Cerrar detalle">✕</button>
+              </div>
             </div>
 
             <div class="workspace-screen-stage" id="workspaceScreens"></div>
@@ -1105,6 +1121,10 @@ body.test-mode .test-tools{display:flex}
 
   function selectWorkspace(rawId){
     if(rawId==='current'){
+      if(workspaceTargetId!==null){
+        closeModeDetail(false);
+        return;
+      }
       workspaceTargetId=null;
       workspaceDraft=workspaceFromApplied();
       workspaceBase=cloneModeConfig(workspaceDraft);
@@ -1112,13 +1132,92 @@ body.test-mode .test-tools{display:flex}
     }else{
       var mode=byId(Number(rawId));
       if(!mode)return;
+      openModeDetail(mode.id,q('[data-mode-row="'+mode.id+'"]'));
+      return;
+    }
+    closePops();
+    renderWorkbench();
+  }
+
+  function runModeMorph(source,target,opening,onDone){
+    if(!source||!target||window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      if(onDone)onDone();
+      return;
+    }
+
+    var from=opening?source.getBoundingClientRect():target.getBoundingClientRect();
+    var to=opening?target.getBoundingClientRect():source.getBoundingClientRect();
+    var ghost=source.cloneNode(true);
+    ghost.classList.add('mode-transition-ghost');
+    ghost.querySelectorAll('button').forEach(function(b){b.disabled=true});
+    Object.assign(ghost.style,{
+      left:from.left+'px',top:from.top+'px',width:from.width+'px',height:from.height+'px'
+    });
+    document.body.appendChild(ghost);
+    target.classList.add('transitioning');
+
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        if(opening)ghost.classList.add('expanded');
+        ghost.style.left=to.left+'px';
+        ghost.style.top=to.top+'px';
+        ghost.style.width=to.width+'px';
+        ghost.style.height=to.height+'px';
+      });
+    });
+
+    var finished=false;
+    function finish(){
+      if(finished)return;
+      finished=true;
+      ghost.remove();
+      target.classList.remove('transitioning');
+      if(onDone)onDone();
+    }
+    ghost.addEventListener('transitionend',function(e){
+      if(e.propertyName==='width')finish();
+    });
+    setTimeout(finish,380);
+  }
+
+  function openModeDetail(id,source){
+    var mode=byId(id);
+    if(!mode)return;
+    closePops();
+
+    var workspace=q('.visual-workspace');
+    runModeMorph(source,workspace,true,function(){
       workspaceTargetId=mode.id;
       workspaceDraft=cloneModeConfig(mode);
       workspaceBase=cloneModeConfig(mode);
       workspaceAutoNamed=false;
+      renderWorkbench();
+      workspace.classList.add('detail-mode','detail-enter');
+      setTimeout(function(){workspace.classList.remove('detail-enter')},260);
+      q('#workspaceClose').focus();
+    });
+  }
+
+  function closeModeDetail(restore){
+    if(workspaceTargetId===null)return;
+    var closingId=workspaceTargetId;
+    var workspace=q('.visual-workspace');
+    var source=q('[data-mode-row="'+closingId+'"]');
+
+    function returnToBase(){
+      workspaceTargetId=null;
+      workspaceDraft=workspaceFromApplied();
+      workspaceBase=cloneModeConfig(workspaceDraft);
+      workspaceAutoNamed=true;
+      workspace.classList.remove('detail-mode','detail-enter');
+      renderWorkbench();
+      if(restore&&source&&source.isConnected){
+        var view=source.querySelector('.view-mode');
+        if(view)view.focus();
+      }
     }
-    closePops();
-    renderWorkbench();
+
+    runModeMorph(source,workspace,false,returnToBase);
   }
 
   function renderModeList(){
@@ -1138,13 +1237,14 @@ body.test-mode .test-tools{display:flex}
       var applying=activatingId===mode.id;
       var safeName=esc(mode.name);
       return '<div class="mode-list-item'+(selected?' selected':'')+'" data-mode-row="'+mode.id+'">'+
-        '<button class="mode-list-icon select-mode" data-workspace-id="'+mode.id+'" title="Ver y editar">'+esc(mode.icon)+'</button>'+
-        '<button class="mode-list-copy select-mode" data-workspace-id="'+mode.id+'" title="Ver y editar">'+
-          '<b class="mode-list-name" data-id="'+mode.id+'">'+safeName+'</b>'+
+        '<span class="mode-list-icon">'+esc(mode.icon)+'</span>'+
+        '<span class="mode-list-copy">'+
+          '<b class="mode-list-name" data-id="'+mode.id+'" tabindex="0" title="Doble clic, F2 o toca para renombrar">'+safeName+'</b>'+
           '<small>'+(mode.active?'<span class="mode-list-badge">Activo</span> · ':'')+esc(displayCountLabel(mode))+' · '+esc(mode.app)+'</small>'+
-        '</button>'+
+        '</span>'+
         '<span class="mode-list-actions">'+
           (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+'>'+(applying?'…':'Activar')+'</button>':'')+
+          '<button class="btn view-mode" data-id="'+mode.id+'" title="Ver y editar">Ver</button>'+
           '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">🗑</button>'+
         '</span>'+
       '</div>';
@@ -1161,8 +1261,19 @@ body.test-mode .test-tools{display:flex}
     qa('#modeList .activate').forEach(function(b){
       b.onclick=function(e){e.stopPropagation();activate(Number(b.dataset.id))};
     });
+    qa('#modeList .view-mode').forEach(function(b){
+      b.onclick=function(e){e.stopPropagation();openModeDetail(Number(b.dataset.id),q('[data-mode-row="'+b.dataset.id+'"]'))};
+    });
     qa('#modeList .trash-mode').forEach(function(b){
       b.onclick=function(e){e.stopPropagation();openDeletePop(e.currentTarget,b.dataset.id)};
+    });
+    qa('#modeList .mode-list-name').forEach(function(el){
+      el.ondblclick=function(e){e.preventDefault();beginModeRename(el,el.dataset.id)};
+      el.onkeydown=function(e){
+        if(el.isContentEditable)return;
+        if(e.key==='F2'||e.key==='Enter'){e.preventDefault();beginModeRename(el,el.dataset.id)}
+      };
+      bindTouchRename(el,function(){beginModeRename(el,el.dataset.id)});
     });
   }
 
@@ -1202,19 +1313,22 @@ body.test-mode .test-tools{display:flex}
 
     var isNew=workspaceTargetId===null;
     var dirty=!workspaceEqual(workspaceDraft,workspaceBase);
-    q('#workspaceEyebrow').textContent=isNew?'Nuevo modo':'Editando modo';
+    q('.visual-workspace').classList.toggle('detail-mode',!isNew);
+    q('#workspaceEyebrow').textContent=isNew?'Nuevo modo':'Viendo y editando';
     q('#workspaceName').textContent=workspaceDraft.name;
     q('#workspaceSub').textContent=isNew
       ?'Partiendo de tu escritorio actual. Ajusta solo lo que quieras.'
-      :'Los cambios se guardan en este modo y no se aplican hasta activarlo o probarlo.';
+      :'Detalle del modo. Cambia piezas, prueba y guarda cuando estés listo.';
     q('#workspaceAppName').textContent=workspaceDraft.app;
     q('#workspaceShortcutName').textContent=shortcutCardLabel(workspaceDraft.shortcut);
     q('#workspaceState').textContent=dirty?'Cambios':isNew?'Borrador':'Guardado';
     q('#workspaceState').classList.toggle('dirty',dirty);
+    q('#workspaceReset').hidden=!isNew;
     q('#workspaceReset').disabled=!dirty;
-    q('#workspaceReset').textContent=isNew?'Restaurar':'Deshacer';
+    q('#workspaceReset').textContent='Restaurar';
     q('#workspaceSave').textContent=isNew?'Crear modo':'Guardar cambios';
     q('#workspaceSave').disabled=!isNew&&!dirty;
+    q('#workspaceClose').hidden=isNew;
     q('#workspaceHelp').textContent='Toca una pantalla para activarla o apagarla · ☆ cambia la principal · Resolución y Hz son informativos';
   }
 
@@ -1275,6 +1389,7 @@ body.test-mode .test-tools{display:flex}
       workspaceDraft=workspaceFromApplied();
       workspaceBase=cloneModeConfig(workspaceDraft);
       workspaceAutoNamed=true;
+      q('.visual-workspace').classList.remove('detail-mode','detail-enter');
     }
     render();
     toast('Modo eliminado',removed.name);
@@ -1752,6 +1867,8 @@ body.test-mode .test-tools{display:flex}
     syncTestMode();
   };
 
+  q('#workspaceClose').onclick=function(){closeModeDetail(true)};
+
   q('#workspaceApp').onclick=function(e){
     closePops();
     editTarget='workspace';
@@ -1797,8 +1914,8 @@ body.test-mode .test-tools{display:flex}
     mode.app=workspaceDraft.app;
     mode.shortcut=workspaceDraft.shortcut;
     workspaceBase=cloneModeConfig(mode);
-    render();
     toast(mode.name,'Cambios guardados');
+    closeModeDetail(true);
   };
 
   q('#workspaceTest').onclick=function(){
@@ -1840,6 +1957,7 @@ body.test-mode .test-tools{display:flex}
     workspaceTargetId=null;
     workspaceDraft=null;
     workspaceBase=null;
+    q('.visual-workspace').classList.remove('detail-mode','detail-enter');
     render();
     toast('Modos vaciados','Ya puedes probar el flujo desde cero');
   };
@@ -1850,6 +1968,7 @@ body.test-mode .test-tools{display:flex}
     workspaceTargetId=null;
     workspaceDraft=null;
     workspaceBase=null;
+    q('.visual-workspace').classList.remove('detail-mode','detail-enter');
     render();
     toast('Demo restaurada','3 modos');
   };
@@ -2049,7 +2168,10 @@ body.test-mode .test-tools{display:flex}
     // The safe display test is intentionally not dismissible with Escape.
     if(q('#testOverlay').classList.contains('open'))return;
 
-
+    if(workspaceTargetId!==null){
+      closeModeDetail(true);
+      return;
+    }
   });
 
   var shellView='modes';
