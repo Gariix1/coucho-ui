@@ -1289,6 +1289,12 @@ body.test-mode .test-tools{display:flex}
       }));
     }
 
+    function clearElementAnimations(elements){
+      elements.filter(Boolean).forEach(function(el){
+        el.getAnimations().forEach(function(a){a.cancel()});
+      });
+    }
+
     function cardContent(card){
       return card?[card.querySelector('.saved-mode-head'),card.querySelector('.saved-mode-body')]:[];
     }
@@ -1490,6 +1496,7 @@ body.test-mode .test-tools{display:flex}
 
         source.style.opacity='0';
         args.update();
+        clearElementAnimations(detailContent(source));
 
         var finalTarget=args.destination();
         if(finalTarget)revealCard(finalTarget);
