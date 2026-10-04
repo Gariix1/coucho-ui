@@ -293,14 +293,6 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);
   border-radius:var(--r-card) 0 0 var(--r-card)
 }
-.visual-workspace.morph-opening{opacity:.58;transform:scale(.996)}
-.visual-workspace.morph-closing{opacity:.36;transform:scale(.996)}
-.visual-workspace.detail-mode.morph-closing{transform:translate(-2px,-2px) scale(.996)}
-.visual-workspace.morph-closing>*{opacity:.18;transition:opacity .083s linear}
-.visual-workspace.switch-handoff{animation:baseSheetBreath .10s cubic-bezier(0,0,0,1) both}
-@keyframes baseSheetBreath{from{opacity:.72}to{opacity:1}}
-  to{opacity:1;transform:none}
-}
 .workspace-head-actions{display:flex;align-items:center;gap:7px}
 .workspace-close{display:none;width:32px;height:32px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-command);color:var(--text2);place-items:center;padding:0}
 .detail-mode .workspace-close{display:grid}.workspace-close:hover{background:var(--glass-pill);border-color:var(--glass-border);color:var(--text)}
@@ -1287,17 +1279,29 @@ body.test-mode .test-tools{display:flex}
 
     function animateRect(el,from,to,duration,easing,fadeAtEnd){
       if(!el||!visible(from)||!visible(to))return Promise.resolve();
-      var frames=fadeAtEnd
-        ?[
-          {transform:'translate3d(0,0,0) scale(1,1)',opacity:1,offset:0},
-          {transform:rectTransform(from,to),opacity:1,offset:.78},
-          {transform:rectTransform(from,to),opacity:0,offset:1}
-        ]
-        :[
-          {transform:'translate3d(0,0,0) scale(1,1)',opacity:1},
-          {transform:rectTransform(from,to),opacity:0}
-        ];
+      var frames=[
+        {transform:'translate3d(0,0,0) scale(1,1)',opacity:1,offset:0},
+        {transform:rectTransform(from,to),opacity:1,offset:fadeAtEnd?.78:.82},
+        {transform:rectTransform(from,to),opacity:0,offset:1}
+      ];
       var a=el.animate(frames,{duration:duration,easing:easing,fill:'forwards'});
+      return a.finished.catch(function(){});
+    }
+
+    function animateIdentity(el,from,to,duration,easing){
+      if(!el||!visible(from)||!visible(to))return Promise.resolve();
+      var dx=to.left-from.left;
+      var dy=to.top-from.top;
+      var scale=to.height/from.height;
+      var end='translate3d('+dx+'px,'+dy+'px,0) scale('+scale+')';
+      var a=el.animate(
+        [
+          {transform:'translate3d(0,0,0) scale(1)',opacity:1,offset:0},
+          {transform:end,opacity:1,offset:.78},
+          {transform:end,opacity:0,offset:1}
+        ],
+        {duration:duration,easing:easing,fill:'forwards'}
+      );
       return a.finished.catch(function(){});
     }
 
@@ -1324,7 +1328,7 @@ body.test-mode .test-tools{display:flex}
             duration:spec.open.revealDuration,
             delay:base+index*12,
             easing:'cubic-bezier(0,0,0,1)',
-            fill:'forwards'
+            fill:'both'
           }
         );
         return a.finished.catch(function(){});
@@ -1398,8 +1402,8 @@ body.test-mode .test-tools{display:flex}
       var animations=[
         animateRect(surface,sourceRect,targetRect,spec.open.duration,spec.open.easing,true)
       ];
-      if(icon&&visible(targetId.icon))animations.push(animateRect(icon,sourceId.icon,targetId.icon,spec.identity.open,spec.open.easing,true));
-      if(name&&visible(targetId.name))animations.push(animateRect(name,sourceId.name,targetId.name,spec.identity.open,spec.open.easing,true));
+      if(icon&&visible(targetId.icon))animations.push(animateIdentity(icon,sourceId.icon,targetId.icon,spec.identity.open,spec.open.easing));
+      if(name&&visible(targetId.name))animations.push(animateIdentity(name,sourceId.name,targetId.name,spec.identity.open,spec.open.easing));
 
       await Promise.all(animations.concat([revealPromise]));
       cleanup([surface,icon,name]);
@@ -1437,8 +1441,8 @@ body.test-mode .test-tools{display:flex}
         animateRect(surface,sourceRect,targetRect,spec.close.duration,spec.close.easing,false),
         hideContent(source)
       ];
-      if(icon&&visible(targetId.icon))animations.push(animateRect(icon,sourceId.icon,targetId.icon,spec.identity.close,spec.close.easing,false));
-      if(name&&visible(targetId.name))animations.push(animateRect(name,sourceId.name,targetId.name,spec.identity.close,spec.close.easing,false));
+      if(icon&&visible(targetId.icon))animations.push(animateIdentity(icon,sourceId.icon,targetId.icon,spec.identity.close,spec.close.easing));
+      if(name&&visible(targetId.name))animations.push(animateIdentity(name,sourceId.name,targetId.name,spec.identity.close,spec.close.easing));
 
       await Promise.all(animations);
       cleanup([surface,icon,name]);
@@ -1483,10 +1487,10 @@ body.test-mode .test-tools{display:flex}
       closePops();
       closeModeDetail(false,function(){
         var nextId=modeSwitchPending;
-        modeSwitchPending=null;
         if(nextId===null)return;
 
         CouchoMotion.handoff().then(function(){
+          modeSwitchPending=null;
           var nextSource=q('[data-mode-row="'+nextId+'"]');
           openModeDetail(nextId,nextSource);
         });
