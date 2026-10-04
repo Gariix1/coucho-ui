@@ -299,7 +299,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 
 /* Coucho motion primitives: compositor-friendly, mirrored by WinUI Composition */
 .coucho-motion-surface{
-  position:fixed;z-index:90;pointer-events:none;transform-origin:top left;
+  position:fixed;z-index:90;pointer-events:none;transform-origin:top left;overflow:hidden;
   border:1px solid var(--selected-border);border-radius:var(--r-card);
   background:linear-gradient(180deg,var(--selected-bg),var(--glass-card));
   box-shadow:0 18px 48px rgba(0,0,0,.22);will-change:transform,opacity
@@ -307,6 +307,10 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .coucho-motion-surface.sheet{
   box-shadow:8px 8px 0 -1px var(--glass-surface),8px 8px 0 0 var(--glass-border),0 22px 56px rgba(0,0,0,.24)
 }
+.coucho-motion-summary{position:absolute;left:10px;right:10px;bottom:10px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:6px;will-change:opacity,transform}
+.coucho-motion-summary span{height:28px;border:1px solid var(--glass-soft-border);border-radius:8px;background:var(--glass-inset)}
+.coucho-motion-fold-edge{position:absolute;left:12px;right:12px;top:calc(100% - 2px);height:2px;border-radius:999px;background:var(--selected-border);opacity:0;will-change:opacity,transform}
+
 .coucho-motion-icon,.coucho-motion-name{
   position:fixed;z-index:91;pointer-events:none;transform-origin:top left;will-change:transform,opacity
 }
@@ -1198,15 +1202,31 @@ body.test-mode .test-tools{display:flex}
   }
 
   var CouchoMotion=(function(){
+    // Motion spec intentionally maps to WinUI Composition primitives:
+    // Translation + Scale + Opacity, with one delayed state handoff.
     var spec={
-      open:{duration:300,easing:'cubic-bezier(.20,.80,.20,1)',revealDelay:172,revealDuration:128},
-      close:{duration:260,easing:'cubic-bezier(.40,0,.20,1)',contentOut:86},
-      identity:{open:250,close:220},
-      handoff:92
+      open:{
+        duration:340,
+        easing:'cubic-bezier(.18,.82,.18,1)',
+        prepareAt:176,
+        contentDelay:22,
+        contentDuration:122
+      },
+      close:{
+        duration:280,
+        easing:'cubic-bezier(.38,0,.20,1)',
+        contentOut:78
+      },
+      identity:{open:270,close:235},
+      handoff:84
     };
 
     function reduced(){
       return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    function delay(ms){
+      return new Promise(function(resolve){setTimeout(resolve,ms)});
     }
 
     function visible(rect){
@@ -1224,6 +1244,22 @@ body.test-mode .test-tools{display:flex}
       };
     }
 
+    function workspaceIdentityRect(workspaceRect){
+      return {
+        icon:{
+          left:workspaceRect.left+17,top:workspaceRect.top+16,
+          width:48,height:48,
+          right:workspaceRect.left+65,bottom:workspaceRect.top+64
+        },
+        name:{
+          left:workspaceRect.left+76,top:workspaceRect.top+28,
+          width:Math.min(260,Math.max(130,workspaceRect.width-180)),height:24,
+          right:workspaceRect.left+76+Math.min(260,Math.max(130,workspaceRect.width-180)),
+          bottom:workspaceRect.top+52
+        }
+      };
+    }
+
     function targetIdentity(workspace){
       return {
         icon:rectOf(workspace&&workspace.querySelector('#workspaceProfileIcon')),
@@ -1231,9 +1267,10 @@ body.test-mode .test-tools{display:flex}
       };
     }
 
-    function makeSurface(rect,sheet){
+    function makeSurface(rect){
       var el=document.createElement('div');
-      el.className='coucho-motion-surface'+(sheet?' sheet':'');
+      el.className='coucho-motion-surface sheet';
+      el.innerHTML='<div class="coucho-motion-summary"><span></span><span></span><span></span></div><span class="coucho-motion-fold-edge"></span>';
       Object.assign(el.style,{
         left:rect.left+'px',top:rect.top+'px',
         width:rect.width+'px',height:rect.height+'px'
@@ -1272,36 +1309,98 @@ body.test-mode .test-tools{display:flex}
       return el;
     }
 
-    function rectTransform(from,to){
-      return 'translate3d('+(to.left-from.left)+'px,'+(to.top-from.top)+'px,0) scale('+
-        (to.width/from.width)+','+(to.height/from.height)+')';
+    function transformTo(from,to,sx,sy,dx,dy){
+      var x=dx==null?to.left-from.left:dx;
+      var y=dy==null?to.top-from.top:dy;
+      var scaleX=sx==null?to.width/from.width:sx;
+      var scaleY=sy==null?to.height/from.height:sy;
+      return 'translate3d('+x+'px,'+y+'px,0) scale('+scaleX+','+scaleY+')';
     }
 
-    function animateRect(el,from,to,duration,easing,fadeAtEnd){
-      if(!el||!visible(from)||!visible(to))return Promise.resolve();
-      var frames=[
-        {transform:'translate3d(0,0,0) scale(1,1)',opacity:1,offset:0},
-        {transform:rectTransform(from,to),opacity:1,offset:fadeAtEnd?.78:.82},
-        {transform:rectTransform(from,to),opacity:0,offset:1}
-      ];
-      var a=el.animate(frames,{duration:duration,easing:easing,fill:'forwards'});
+    function animateSurfaceOpen(surface,from,to){
+      var dx=to.left-from.left;
+      var dy=to.top-from.top;
+      var sx=to.width/from.width;
+      var sy=to.height/from.height;
+      var liftX=Math.max(-10,Math.min(14,dx*.055));
+      var travelY=dy;
+
+      var a=surface.animate(
+        [
+          {transform:'translate3d(0,0,0) scale(1,1)',opacity:1,offset:0},
+          {transform:'translate3d('+liftX+'px,-3px,0) scale(1.018,1.018)',opacity:1,offset:.12},
+          // Travel right and stretch horizontally first. Height still reads as the original card.
+          {transform:'translate3d('+dx+'px,'+travelY+'px,0) scale('+sx+',1.035)',opacity:1,offset:.62},
+          // Once docked over the visualizer, unfold downward like a sheet/card being opened.
+          {transform:'translate3d('+dx+'px,'+travelY+'px,0) scale('+sx+','+sy+')',opacity:1,offset:.90},
+          {transform:'translate3d('+dx+'px,'+travelY+'px,0) scale('+sx+','+sy+')',opacity:0,offset:1}
+        ],
+        {duration:spec.open.duration,easing:spec.open.easing,fill:'forwards'}
+      );
+
+      var summary=surface.querySelector('.coucho-motion-summary');
+      if(summary)summary.animate(
+        [{opacity:.72,transform:'translate3d(0,0,0)'},{opacity:0,transform:'translate3d(12px,0,0)'}],
+        {duration:150,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
+      );
+
+      var edge=surface.querySelector('.coucho-motion-fold-edge');
+      if(edge)edge.animate(
+        [{opacity:0,transform:'scaleX(.35)'},{opacity:.72,transform:'scaleX(1)',offset:.55},{opacity:0,transform:'scaleX(1)'}],
+        {duration:spec.open.duration,easing:'linear',fill:'forwards'}
+      );
+
       return a.finished.catch(function(){});
     }
 
-    function animateIdentity(el,from,to,duration,easing){
+    function animateSurfaceClose(surface,from,to){
+      var dx=to.left-from.left;
+      var dy=to.top-from.top;
+      var sx=to.width/from.width;
+      var sy=to.height/from.height;
+
+      var a=surface.animate(
+        [
+          {transform:'translate3d(0,0,0) scale(1,1)',opacity:1,offset:0},
+          // Fold the open sheet first while it is still docked on the right.
+          {transform:'translate3d(0,0,0) scale(1,'+sy+')',opacity:1,offset:.42},
+          // Then shrink its width and send it back to the source card.
+          {transform:'translate3d('+dx+'px,'+dy+'px,0) scale('+sx+','+sy+')',opacity:1,offset:.86},
+          {transform:'translate3d('+dx+'px,'+dy+'px,0) scale('+sx+','+sy+')',opacity:0,offset:1}
+        ],
+        {duration:spec.close.duration,easing:spec.close.easing,fill:'forwards'}
+      );
+
+      var edge=surface.querySelector('.coucho-motion-fold-edge');
+      if(edge)edge.animate(
+        [{opacity:0},{opacity:.62,offset:.22},{opacity:0,offset:.62}],
+        {duration:spec.close.duration,easing:'linear',fill:'forwards'}
+      );
+
+      return a.finished.catch(function(){});
+    }
+
+    function animateIdentity(el,from,to,duration,easing,opening){
       if(!el||!visible(from)||!visible(to))return Promise.resolve();
       var dx=to.left-from.left;
       var dy=to.top-from.top;
       var scale=to.height/from.height;
       var end='translate3d('+dx+'px,'+dy+'px,0) scale('+scale+')';
-      var a=el.animate(
-        [
+
+      var frames=opening
+        ?[
           {transform:'translate3d(0,0,0) scale(1)',opacity:1,offset:0},
-          {transform:end,opacity:1,offset:.78},
+          {transform:'translate3d(8px,-2px,0) scale(1.03)',opacity:1,offset:.13},
+          {transform:end,opacity:1,offset:.86},
           {transform:end,opacity:0,offset:1}
-        ],
-        {duration:duration,easing:easing,fill:'forwards'}
-      );
+        ]
+        :[
+          {transform:'translate3d(0,0,0) scale(1)',opacity:1,offset:0},
+          {transform:end,opacity:1,offset:.84},
+          {transform:end,opacity:0,offset:1}
+        ];
+
+      var a=el.animate(frames,{duration:duration,easing:easing,fill:'forwards'});
       return a.finished.catch(function(){});
     }
 
@@ -1316,17 +1415,15 @@ body.test-mode .test-tools{display:flex}
     }
 
     function revealContent(workspace){
-      var groups=contentGroups(workspace);
-      var base=spec.open.revealDelay;
-      return Promise.all(groups.map(function(el,index){
+      return Promise.all(contentGroups(workspace).map(function(el,index){
         var a=el.animate(
           [
             {opacity:0,transform:'translate3d(0,5px,0)'},
             {opacity:1,transform:'translate3d(0,0,0)'}
           ],
           {
-            duration:spec.open.revealDuration,
-            delay:base+index*12,
+            duration:spec.open.contentDuration,
+            delay:spec.open.contentDelay+index*10,
             easing:'cubic-bezier(0,0,0,1)',
             fill:'both'
           }
@@ -1344,7 +1441,7 @@ body.test-mode .test-tools{display:flex}
           ],
           {
             duration:spec.close.contentOut,
-            delay:index*5,
+            delay:index*4,
             easing:'cubic-bezier(.40,0,1,1)',
             fill:'forwards'
           }
@@ -1362,9 +1459,10 @@ body.test-mode .test-tools{display:flex}
       var source=args.source,target=args.target,mode=args.mode;
       if(!source||!target||!mode)return false;
 
-      var sourceRect=rectOf(source);
+      var from=rectOf(source);
+      var to=rectOf(target);
       var sourceId=sourceIdentity(source);
-      if(!visible(sourceRect)||reduced()){
+      if(!visible(from)||!visible(to)||reduced()){
         args.prepare();
         target.classList.remove('motion-content-hidden');
         if(args.done)args.done();
@@ -1374,42 +1472,34 @@ body.test-mode .test-tools{display:flex}
       modeMorphing=true;
       source.classList.add('morph-origin');
 
-      // Render the real destination first, hidden under the travelling surface.
+      var surface=makeSurface(from);
+      var icon=makeIcon(sourceId.icon,mode);
+      var name=makeName(sourceId.name,mode);
+      var approxTargetId=workspaceIdentityRect(to);
+
+      var motion=[
+        animateSurfaceOpen(surface,from,to)
+      ];
+      if(icon)motion.push(animateIdentity(icon,sourceId.icon,approxTargetId.icon,spec.identity.open,spec.open.easing,true));
+      if(name)motion.push(animateIdentity(name,sourceId.name,approxTargetId.name,spec.identity.open,spec.open.easing,true));
+
+      // Keep the normal desktop visualizer visible while the card travels.
+      // Swap the real destination only once the sheet is already crossing/docking over it.
+      await delay(spec.open.prepareAt);
       args.prepare();
       target.classList.add('motion-content-hidden');
-
-      var targetRect=rectOf(target);
-      var targetId=targetIdentity(target);
-      if(!visible(targetRect)){
-        target.classList.remove('motion-content-hidden');
-        source.classList.remove('morph-origin');
-        modeMorphing=false;
-        if(args.done)args.done();
-        return true;
-      }
 
       var freshSource=q('[data-mode-row="'+mode.id+'"]');
       if(freshSource)freshSource.classList.add('morph-origin');
 
-      var surface=makeSurface(sourceRect,true);
-      var icon=makeIcon(sourceId.icon,mode);
-      var name=makeName(sourceId.name,mode);
+      var reveal=revealContent(target);
+      await Promise.all(motion.concat([reveal]));
 
-      // Reveal starts while the connected surface is still settling.
       target.classList.remove('motion-content-hidden');
-      var revealPromise=revealContent(target);
-
-      var animations=[
-        animateRect(surface,sourceRect,targetRect,spec.open.duration,spec.open.easing,true)
-      ];
-      if(icon&&visible(targetId.icon))animations.push(animateIdentity(icon,sourceId.icon,targetId.icon,spec.identity.open,spec.open.easing));
-      if(name&&visible(targetId.name))animations.push(animateIdentity(name,sourceId.name,targetId.name,spec.identity.open,spec.open.easing));
-
-      await Promise.all(animations.concat([revealPromise]));
       cleanup([surface,icon,name]);
       if(source.isConnected)source.classList.remove('morph-origin');
-      var newSource=q('[data-mode-row="'+mode.id+'"]');
-      if(newSource)newSource.classList.remove('morph-origin');
+      var currentSource=q('[data-mode-row="'+mode.id+'"]');
+      if(currentSource)currentSource.classList.remove('morph-origin');
       modeMorphing=false;
       if(args.done)args.done();
       return true;
@@ -1420,12 +1510,12 @@ body.test-mode .test-tools{display:flex}
       var source=args.source,target=args.target,mode=args.mode;
       if(!source||!target||!mode)return false;
 
-      var sourceRect=rectOf(source);
+      var from=rectOf(source);
+      var to=rectOf(target);
       var sourceId=targetIdentity(source);
-      var targetRect=rectOf(target);
       var targetId=sourceIdentity(target);
 
-      if(!visible(sourceRect)||!visible(targetRect)||reduced()){
+      if(!visible(from)||!visible(to)||reduced()){
         if(args.done)args.done();
         return true;
       }
@@ -1433,18 +1523,18 @@ body.test-mode .test-tools{display:flex}
       modeMorphing=true;
       target.classList.add('morph-origin');
 
-      var surface=makeSurface(sourceRect,true);
+      var surface=makeSurface(from);
       var icon=makeIcon(sourceId.icon,mode);
       var name=makeName(sourceId.name,mode);
 
-      var animations=[
-        animateRect(surface,sourceRect,targetRect,spec.close.duration,spec.close.easing,false),
+      var motion=[
+        animateSurfaceClose(surface,from,to),
         hideContent(source)
       ];
-      if(icon&&visible(targetId.icon))animations.push(animateIdentity(icon,sourceId.icon,targetId.icon,spec.identity.close,spec.close.easing));
-      if(name&&visible(targetId.name))animations.push(animateIdentity(name,sourceId.name,targetId.name,spec.identity.close,spec.close.easing));
+      if(icon&&visible(targetId.icon))motion.push(animateIdentity(icon,sourceId.icon,targetId.icon,spec.identity.close,spec.close.easing,false));
+      if(name&&visible(targetId.name))motion.push(animateIdentity(name,sourceId.name,targetId.name,spec.identity.close,spec.close.easing,false));
 
-      await Promise.all(animations);
+      await Promise.all(motion);
       cleanup([surface,icon,name]);
       if(target.isConnected)target.classList.remove('morph-origin');
       modeMorphing=false;
@@ -1457,7 +1547,7 @@ body.test-mode .test-tools{display:flex}
       var workspace=q('.visual-workspace');
       if(!workspace)return Promise.resolve();
       var a=workspace.animate(
-        [{opacity:.78},{opacity:1}],
+        [{opacity:.76,transform:'translate3d(0,1px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],
         {duration:spec.handoff,easing:'cubic-bezier(0,0,0,1)'}
       );
       return a.finished.catch(function(){});
