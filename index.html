@@ -344,6 +344,8 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   0%,38%{opacity:0}
   70%,100%{opacity:1}
 }
+.saved-mode-card.coucho-vt-placeholder{visibility:hidden}
+
 
 /* Narrow Control windows intentionally do not perform a lateral container transform. */
 .visual-workspace.compact-detail-enter{animation:compactDetailIn .18s cubic-bezier(.18,.82,.18,1) both}
@@ -1325,6 +1327,11 @@ body.test-mode .test-tools{display:flex}
           // Mutate the real UI to its expanded detail state.
           args.update();
 
+          // The list remains visible in Coucho. Suppress the freshly-rendered
+          // copy of the source card so the user sees exactly one shared container.
+          var placeholder=q('[data-mode-row="'+args.id+'"]');
+          if(placeholder)placeholder.classList.add('coucho-vt-placeholder');
+
           // New snapshot = the detail workspace.
           target.style.viewTransitionName='coucho-mode';
         });
@@ -1336,6 +1343,8 @@ body.test-mode .test-tools{display:flex}
       }finally{
         source.style.viewTransitionName='none';
         target.style.viewTransitionName='none';
+        var placeholder=q('[data-mode-row="'+args.id+'"]');
+        if(placeholder)placeholder.classList.remove('coucho-vt-placeholder');
         modeMorphing=false;
         if(args.done)args.done();
       }
@@ -1446,6 +1455,7 @@ body.test-mode .test-tools{display:flex}
     }
 
     CouchoMotion.openProfile({
+      id:mode.id,
       source:source,
       target:workspace,
       update:prepareDetail,
