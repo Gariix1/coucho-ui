@@ -1,7 +1,7 @@
 /* Anchored popovers, modals, test flow and toast feedback. */
 
 .pop{
-display:none;position:fixed;z-index:60;border:1px solid var(--glass-border);border-radius:var(--r-compact);background:var(--floating-bg);box-shadow:var(--shadow);padding:12px;min-width:300px;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)
+display:none;position:fixed;top:var(--popover-top,0);left:var(--popover-left,0);z-index:60;border:1px solid var(--glass-border);border-radius:var(--r-compact);background:var(--floating-bg);box-shadow:var(--shadow);padding:12px;min-width:300px;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)
 }
 
 .pop.open{
@@ -149,7 +149,7 @@ height:3px;background:var(--progress-track)
 }
 
 .progress div{
-height:100%;width:0;background:var(--accent);transition:width .4s
+height:100%;width:var(--test-progress,0%);background:var(--accent);transition:width .4s
 }
 
 .confirm{
