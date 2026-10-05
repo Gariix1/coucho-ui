@@ -29,6 +29,7 @@ import {positionPopover} from './ui/popover.js';
 import {initTheme,toggleTheme} from './features/theme.js';
 
 const TEST_MODE_KEY='coucho-test-mode';
+const CARD_DENSITY_KEY='coucho-card-density';
 const ACTIVATION_DELAY_MS=850;
 const TEST_PROGRESS_INTERVAL_MS=340;
 const TEST_COUNTDOWN_INTERVAL_MS=1000;
@@ -45,6 +46,8 @@ let activationTimer=null;
 
 // Workspace editor state.
 let workspaceTargetId=null;
+let workspaceExpanded=false;
+let cardDensity=localStorage.getItem(CARD_DENSITY_KEY)==='compact'?'compact':'detailed';
 let workspaceDraft=null;
 let workspaceBase=null;
 let workspaceAutoNamed=true;
@@ -168,7 +171,7 @@ function renderResourceViews(){
   });
 }
 
-// Modes workbench and workspace editor.
+// Modes workbench and expandable mode visualizer.
 function ensureWorkspace(){
   if(workspaceDraft)return;
   workspaceTargetId=null;
@@ -177,25 +180,21 @@ function ensureWorkspace(){
   workspaceAutoNamed=true;
 }
 
-function selectWorkspace(rawId){
-  if(rawId==='current'){
-    if(workspaceTargetId!==null){
-      if(!guardDetailSwitch(null))return;
-      closeModeDetail(false);
-      return;
-    }
-    workspaceTargetId=null;
-    workspaceDraft=workspaceFromApplied();
-    workspaceBase=cloneModeConfig(workspaceDraft);
-    workspaceAutoNamed=true;
-  }else{
-    var mode=byId(Number(rawId));
-    if(!mode)return;
-    openModeDetail(mode.id,q('[data-mode-row="'+mode.id+'"]'));
-    return;
-  }
-  closePops();
-  renderWorkbench();
+function newWorkspaceHasChanges(){
+  return workspaceTargetId===null&&workspaceDraft&&workspaceBase&&!workspaceEqual(workspaceDraft,workspaceBase);
+}
+
+function detailHasUnsavedChanges(){
+  return workspaceExpanded&&newWorkspaceHasChanges();
+}
+
+function guardDetailSwitch(nextId){
+  if(!workspaceExpanded||workspaceTargetId===nextId)return true;
+  if(!detailHasUnsavedChanges())return true;
+  toast('Nuevo modo','Crea o restablece el borrador antes de cambiar');
+  var workspace=q('.visual-workspace');
+  if(workspace)workspace.focus({preventScroll:true});
+  return false;
 }
 
 function setModeTransitioning(value){
@@ -211,44 +210,101 @@ function setModeTransitioning(value){
   }
 }
 
-async function openModeDetail(id,source){
-  var mode=byId(id);
-  if(!mode||modeTransitioning)return false;
+function workspaceMarkup(kind,id){
+  var saved=kind==='mode';
+  var rootTag=saved?'article':'section';
+  var rootClass='visual-workspace expanded-workspace '+(saved?'saved-mode-card detail-mode':'create-mode');
+  var dataAttr=saved?' data-mode-row="'+id+'"':' data-workspace-expanded="current"';
 
-  if(workspaceTargetId===id){
-    return closeModeDetail(true);
-  }
+  return '<'+rootTag+' class="'+rootClass+'" id="modeWorkspace" tabindex="-1" aria-labelledby="workspaceName"'+dataAttr+'>'+
+    '<header class="visual-workspace-head">'+
+      '<div class="workspace-title-block">'+
+        '<div class="workspace-profile-icon" id="workspaceProfileIcon"></div>'+
+        '<div class="workspace-title-copy">'+
+          '<span class="workspace-eyebrow" id="workspaceEyebrow"></span>'+
+          '<h2 id="workspaceName" class="mode-name-edit" tabindex="0"></h2>'+
+        '</div>'+
+      '</div>'+
+      '<div class="workspace-head-actions">'+
+        '<span class="workspace-state" id="workspaceState" role="status" aria-live="polite" hidden></span>'+
+        '<button class="workspace-close" id="workspaceClose" title="Compactar" aria-label="Compactar">'+iconMarkup('collapse')+'</button>'+
+      '</div>'+
+    '</header>'+
+    '<header class="workspace-section-head"><b id="workspaceScreenTitle">Pantallas</b></header>'+
+    '<div class="workspace-screen-stage" id="workspaceScreens"></div>'+
+    '<div class="workspace-pieces">'+
+      '<button class="workspace-piece" id="workspaceApp" title="Cambiar app">'+
+        '<span class="workspace-piece-icon">'+iconMarkup('play')+'</span>'+
+        '<span><small>App</small><b id="workspaceAppName"></b></span>'+
+      '</button>'+
+      '<button class="workspace-piece" id="workspaceShortcut" title="Cambiar atajo">'+
+        '<span class="workspace-piece-icon">'+iconMarkup('gamepad')+'</span>'+
+        '<span><small>Atajo</small><b id="workspaceShortcutName"></b></span>'+
+      '</button>'+
+    '</div>'+
+    '<footer class="workspace-footer">'+
+      '<div class="workspace-actions">'+
+        '<button class="btn" id="workspaceReset">Restablecer</button>'+
+        '<button class="btn" id="workspaceTest">Probar</button>'+
+        '<button class="btn primary" id="workspaceSave">Crear modo</button>'+
+      '</div>'+
+    '</footer>'+
+  '</'+rootTag+'>';
+}
 
-  if(workspaceTargetId!==null){
-    if(detailHasUnsavedChanges()){
-      toast('Cambios sin guardar','Guarda o cancela el perfil abierto antes de cambiar');
-      q('.visual-workspace').focus({preventScroll:true});
-      return false;
+function setCardDensity(next){
+  if(next!=='compact'&&next!=='detailed')return;
+  cardDensity=next;
+  localStorage.setItem(CARD_DENSITY_KEY,cardDensity);
+  renderWorkbench();
+}
+
+async function openWorkspace(targetId,source){
+  if(modeTransitioning)return false;
+
+  if(workspaceExpanded){
+    if(workspaceTargetId===targetId){
+      var current=q('.visual-workspace');
+      if(current)current.focus({preventScroll:true});
+      return true;
     }
+    if(!guardDetailSwitch(targetId))return false;
     await closeModeDetail(false);
-    source=q('[data-mode-row="'+id+'"]');
+    source=targetId===null
+      ?q('[data-workspace-id="current"]')
+      :q('[data-mode-row="'+targetId+'"]');
     if(!source)return false;
   }
 
-  closePops();
+  var mode=targetId===null?null:byId(targetId);
+  if(targetId!==null&&!mode)return false;
 
-  var workspace=q('.visual-workspace');
+  closePops();
   setModeTransitioning(true);
-  var transition=modeSheetTransition.prepare(source,{hold:workspace});
+  var transition=modeSheetTransition.prepare(source);
 
   try{
-    workspaceTargetId=mode.id;
-    workspaceDraft=cloneModeConfig(mode);
-    workspaceBase=cloneModeConfig(mode);
-    workspaceAutoNamed=false;
+    workspaceExpanded=true;
+    workspaceTargetId=targetId;
+
+    if(mode){
+      workspaceDraft=cloneModeConfig(mode);
+      workspaceBase=cloneModeConfig(mode);
+      workspaceAutoNamed=false;
+    }else{
+      workspaceDraft=workspaceFromApplied();
+      workspaceBase=cloneModeConfig(workspaceDraft);
+      workspaceAutoNamed=true;
+    }
+
     renderWorkbench();
 
-    workspace=q('.visual-workspace');
-    await transition.play(workspace,'open');
+    var destination=q('.visual-workspace');
+    await transition.play(destination,'open');
   }finally{
     transition.cancel();
     setModeTransitioning(false);
-    renderModeList();
+    renderWorkbench();
   }
 
   var closeButton=q('#workspaceClose');
@@ -256,29 +312,45 @@ async function openModeDetail(id,source){
   return true;
 }
 
+function selectWorkspace(rawId){
+  if(rawId!=='current')return;
+  openWorkspace(null,q('[data-workspace-id="current"]'));
+}
+
+function openModeDetail(id,source){
+  var mode=byId(id);
+  if(!mode)return false;
+  return openWorkspace(mode.id,source);
+}
+
 async function closeModeDetail(restore,afterClose){
-  if(workspaceTargetId===null||modeTransitioning)return false;
+  if(!workspaceExpanded||modeTransitioning)return false;
 
   closePops();
 
   var closingId=workspaceTargetId;
-  var workspace=q('.visual-workspace');
+  var source=q('.visual-workspace');
 
   setModeTransitioning(true);
-  var transition=modeSheetTransition.prepare(workspace);
+  var transition=modeSheetTransition.prepare(source);
 
   try{
+    workspaceExpanded=false;
     workspaceTargetId=null;
     workspaceDraft=workspaceFromApplied();
     workspaceBase=cloneModeConfig(workspaceDraft);
     workspaceAutoNamed=true;
     renderWorkbench();
 
-    var destination=q('[data-mode-row="'+closingId+'"]');
+    var destination=closingId===null
+      ?q('[data-workspace-id="current"]')
+      :q('[data-mode-row="'+closingId+'"]');
+
     await transition.play(destination,'close');
   }finally{
     transition.cancel();
     setModeTransitioning(false);
+    renderWorkbench();
   }
 
   if(typeof afterClose==='function'){
@@ -287,101 +359,109 @@ async function closeModeDetail(restore,afterClose){
   }
 
   if(restore){
-    var freshSource=q('[data-mode-row="'+closingId+'"]');
-    var openButton=freshSource&&freshSource.querySelector('.open-mode');
-    if(openButton)openButton.focus();
+    var focusTarget=closingId===null
+      ?q('[data-workspace-id="current"]')
+      :q('[data-mode-row="'+closingId+'"] .open-mode');
+    if(focusTarget)focusTarget.focus();
   }
   return true;
 }
 
 function focusOrOpenMode(card){
   if(!card)return;
-
   var id=Number(card.dataset.modeRow);
   if(!id)return;
-
-  if(workspaceTargetId===id){
-    q('.visual-workspace').focus({preventScroll:true});
-    return;
-  }
-
   openModeDetail(id,card);
+}
+
+function renderModeCard(mode){
+  var applying=activatingId===mode.id;
+  var safeName=esc(mode.name);
+  var safeApp=esc(mode.app);
+  var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
+  var titleId='mode-title-'+mode.id;
+
+  return '<article class="saved-mode-card" data-mode-row="'+mode.id+'" aria-labelledby="'+titleId+'">'+
+    '<div class="saved-mode-head">'+
+      '<div class="saved-mode-name">'+
+        '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
+        '<span class="saved-mode-name-copy"><b class="mode-list-name" id="'+titleId+'">'+safeName+'</b>'+
+          (mode.active?'<small><span class="mode-list-badge">Activo</span></small>':'')+
+        '</span>'+
+      '</div>'+
+      '<div class="saved-mode-actions">'+
+        (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+' title="Activar modo">'+(applying?'…':'Activar')+'</button>':'')+
+        '<button class="open-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" title="Expandir '+safeName+'" aria-label="Expandir '+safeName+'">'+iconMarkup('expand')+'</button>'+
+        '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="saved-mode-body">'+
+      '<button class="card-display quick-display" data-id="'+mode.id+'" title="Editar pantallas">'+
+        '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode)+'</span>'+
+        '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
+      '</button>'+
+      '<div class="card-facts">'+
+        '<button class="card-fact quick-app" data-id="'+mode.id+'" title="Cambiar app"><span class="fact-icon">'+iconMarkup('play')+'</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
+        '<button class="card-fact quick-shortcut" data-id="'+mode.id+'" title="Cambiar atajo"><span class="fact-icon">'+iconMarkup('gamepad')+'</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
+      '</div>'+
+    '</div>'+
+  '</article>';
 }
 
 function renderModeList(){
   var modeList=q('#modeList');
   if(currentPopAnchor&&modeList&&modeList.contains(currentPopAnchor))closePops();
-  var currentSelected=workspaceTargetId===null;
 
-  var sourceContext=appliedSession&&appliedSession.modeId
-    ?'<span class="source-context"><small>En uso</small><b>'+esc(appliedSession.name||'Modo')+'</b></span>'
-    :'';
-
-  var current='<div class="mode-list-group">'+
-    '<div class="mode-list-label">Crear desde</div>'+
-    '<button class="mode-list-item current'+(currentSelected?' selected':'')+'" data-workspace-id="current">'+
+  var currentExpanded=workspaceExpanded&&workspaceTargetId===null;
+  var current=currentExpanded
+    ?workspaceMarkup('new',null)
+    :'<button class="mode-list-item current" data-workspace-id="current" aria-controls="modeWorkspace">'+
       '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
       '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
-      sourceContext+
-    '</button>'+
-  '</div>';
+      '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
+    '</button>';
 
   var saved=sets.map(function(mode){
-    var selected=workspaceTargetId===mode.id;
-    var detailDirty=selected&&detailHasUnsavedChanges();
-    var applying=activatingId===mode.id;
-    var safeName=esc(mode.name);
-    var safeApp=esc(mode.app);
-    var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
-    var titleId='mode-title-'+mode.id;
-
-    return '<article class="saved-mode-card'+(selected?' selected':'')+'" data-mode-row="'+mode.id+'" aria-labelledby="'+titleId+'">'+
-      '<div class="saved-mode-head">'+
-        '<div class="saved-mode-name">'+
-          '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
-          '<span class="saved-mode-name-copy"><b class="mode-list-name" id="'+titleId+'">'+safeName+'</b>'+
-          (selected
-            ?'<small><span class="mode-editing-badge">'+(mode.active?'Activo · Editando':'Editando')+'</span></small>'
-            :(mode.active?'<small><span class="mode-list-badge">Activo</span></small>':''))+
-          '</span>'+
-        '</div>'+
-        '<div class="saved-mode-actions">'+
-          (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el editor':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
-          '<button class="open-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" title="'+(selected?'Ir al editor de '+safeName:'Editar '+safeName)+'" aria-label="'+(selected?'Ir al editor de '+safeName:'Editar '+safeName)+'">'+iconMarkup('arrow-right')+'</button>'+
-          '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>'+
-        '</div>'+
-      '</div>'+
-      (selected
-        ?''
-        :'<div class="saved-mode-body">'+
-          '<button class="card-display quick-display" data-id="'+mode.id+'" title="Editar pantallas">'+
-            '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode)+'</span>'+
-            '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
-          '</button>'+
-          '<div class="card-facts">'+
-            '<button class="card-fact quick-app" data-id="'+mode.id+'" title="Cambiar app"><span class="fact-icon">'+iconMarkup('play')+'</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
-            '<button class="card-fact quick-shortcut" data-id="'+mode.id+'" title="Cambiar atajo"><span class="fact-icon">'+iconMarkup('gamepad')+'</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
-          '</div>'+
-        '</div>')+
-    '</article>';
+    if(workspaceExpanded&&workspaceTargetId===mode.id){
+      return workspaceMarkup('mode',mode.id);
+    }
+    return renderModeCard(mode);
   }).join('');
 
-  q('#modeList').innerHTML=current+
-    '<div class="mode-list-group"><div class="mode-list-label">Tus modos</div>'+
-    (saved||'<div class="mode-list-empty">Aún no has guardado modos.</div>')+
+  q('#modeList').innerHTML=
+    '<div class="mode-list-group source-group">'+
+      '<div class="mode-list-label">Crear desde</div>'+
+      current+
+    '</div>'+
+    '<div class="mode-list-group saved-group">'+
+      '<div class="mode-list-group-head">'+
+        '<div class="mode-list-label">Tus modos</div>'+
+        '<div class="density-toggle" role="group" aria-label="Vista de modos">'+
+          '<button class="density-button" data-density="compact" aria-pressed="'+(cardDensity==='compact'?'true':'false')+'" title="Vista compacta" aria-label="Vista compacta">'+iconMarkup('grid')+'</button>'+
+          '<button class="density-button" data-density="detailed" aria-pressed="'+(cardDensity==='detailed'?'true':'false')+'" title="Vista detallada" aria-label="Vista detallada">'+iconMarkup('list')+'</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="mode-grid '+cardDensity+'">'+
+        (saved||'<div class="mode-list-empty">Aún no has guardado modos.</div>')+
+      '</div>'+
     '</div>';
 
-  qa('[data-workspace-id]').forEach(function(el){
-    el.onclick=function(){selectWorkspace(el.dataset.workspaceId)};
+  qa('[data-density]').forEach(function(button){
+    button.onclick=function(event){
+      event.stopPropagation();
+      setCardDensity(button.dataset.density);
+    };
   });
 
-  qa('#modeList .saved-mode-card').forEach(function(card){
+  qa('[data-workspace-id]').forEach(function(element){
+    element.onclick=function(){selectWorkspace(element.dataset.workspaceId)};
+  });
+
+  qa('#modeList .saved-mode-card:not(.expanded-workspace)').forEach(function(card){
     card.onclick=function(event){
       if(event.target.closest('button,a,input,select,textarea,[contenteditable="true"]'))return;
-
       var selection=window.getSelection&&window.getSelection();
       if(selection&&String(selection).trim())return;
-
       focusOrOpenMode(card);
     };
   });
@@ -421,13 +501,16 @@ function renderModeList(){
 }
 
 function renderWorkspaceScreens(){
+  var stage=q('#workspaceScreens');
+  if(!stage||!workspaceDraft)return;
+
   var ordered=simulatedDisplays.slice().sort(function(a,b){
     var al=a.layout&&a.layout.left!=null?a.layout.left:a.number;
     var bl=b.layout&&b.layout.left!=null?b.layout.left:b.number;
     return al-bl;
   });
 
-  q('#workspaceScreens').innerHTML=ordered.map(function(d){
+  stage.innerHTML=ordered.map(function(d){
     var selected=workspaceDraft.displayIds.indexOf(d.id)>=0;
     var primary=selected&&workspaceDraft.primaryDisplayId===d.id;
     return '<div class="workspace-display '+(selected?'on':'off')+(primary?' primary':'')+'" data-display-layout="'+d.id+'">'+
@@ -443,63 +526,89 @@ function renderWorkspaceScreens(){
     '</div>';
   }).join('');
 
-  qa('[data-display-layout]').forEach(function(el){
-    var display=getDisplay(el.dataset.displayLayout);
+  qa('[data-display-layout]').forEach(function(element){
+    var display=getDisplay(element.dataset.displayLayout);
     var layout=display&&display.layout?display.layout:{width:28,aspect:1.78};
-    setCssVars(el,{
+    setCssVars(element,{
       '--display-width':layout.width,
       '--display-aspect':layout.aspect
     });
   });
 
-  qa('[data-workspace-display]').forEach(function(b){
-    b.onclick=function(){toggleWorkspaceDisplay(b.dataset.workspaceDisplay)};
+  qa('[data-workspace-display]').forEach(function(button){
+    button.onclick=function(){toggleWorkspaceDisplay(button.dataset.workspaceDisplay)};
   });
-  qa('[data-workspace-primary]').forEach(function(b){
-    b.onclick=function(){makeWorkspacePrimary(b.dataset.workspacePrimary)};
+
+  qa('[data-workspace-primary]').forEach(function(button){
+    button.onclick=function(){makeWorkspacePrimary(button.dataset.workspacePrimary)};
   });
+}
+
+function syncWorkspaceMode(){
+  if(workspaceTargetId===null||!workspaceDraft)return;
+
+  var mode=byId(workspaceTargetId);
+  if(!mode)return;
+
+  mode.name=workspaceDraft.name;
+  mode.icon=workspaceDraft.icon;
+  mode.preserve=workspaceDraft.preserve;
+  mode.displayIds=workspaceDraft.displayIds.slice();
+  mode.primaryDisplayId=workspaceDraft.primaryDisplayId;
+  mode.app=workspaceDraft.app;
+  mode.shortcut=workspaceDraft.shortcut;
+  workspaceBase=cloneModeConfig(workspaceDraft);
+  commitSets();
 }
 
 function renderWorkspaceEditor(){
+  if(!workspaceExpanded)return;
+
   ensureWorkspace();
+  var workspace=q('.visual-workspace');
+  if(!workspace)return;
+
   renderWorkspaceScreens();
 
   var isNew=workspaceTargetId===null;
-  var changeCount=workspaceChangeCount(workspaceDraft,workspaceBase);
+  var changeCount=isNew?workspaceChangeCount(workspaceDraft,workspaceBase):0;
   var dirty=changeCount>0;
-  var changeLabel=changeCount===1?'1 cambio':changeCount+' cambios';
+  var mode=isNew?null:byId(workspaceTargetId);
+  var pending=!!(mode&&mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode));
 
-  q('.visual-workspace').classList.toggle('create-mode',isNew);
-  q('.visual-workspace').classList.toggle('detail-mode',!isNew);
   q('#workspaceProfileIcon').innerHTML=modeIconMarkup(workspaceDraft.icon);
-  q('#workspaceEyebrow').textContent=isNew?'Crear modo':'Editando';
+  q('#workspaceEyebrow').hidden=!isNew;
+  q('#workspaceEyebrow').textContent=isNew?'Crear modo':'';
   q('#workspaceName').textContent=workspaceDraft.name;
-  q('#workspaceScreenTitle').textContent='Pantallas';
   q('#workspaceAppName').textContent=workspaceDraft.app;
   q('#workspaceShortcutName').textContent=shortcutCardLabel(workspaceDraft.shortcut);
-  q('#workspaceState').hidden=!dirty;
-  q('#workspaceState').textContent=dirty?changeLabel:'';
-  q('#workspaceState').classList.toggle('dirty',dirty);
-  q('#workspaceReset').hidden=false;
-  q('#workspaceReset').disabled=isNew&&!dirty;
-  q('#workspaceReset').textContent=isNew?'Restablecer':'Cancelar';
-  q('#workspaceReset').title=isNew?'Volver al estado del escritorio actual':'Descartar cambios sin guardar';
-  q('#workspaceSave').textContent=isNew?'Crear modo':'Guardar';
-  q('#workspaceSave').disabled=!isNew&&!dirty;
-  q('#workspaceClose').hidden=isNew;
-  q('#workspaceClose').title=!isNew&&dirty?'Descartar y cerrar':'Cerrar';
-  q('#workspaceClose').setAttribute('aria-label',q('#workspaceClose').title);
+
+  var state=q('#workspaceState');
+  state.hidden=!(dirty||pending);
+  state.textContent=dirty?(changeCount===1?'1 cambio':changeCount+' cambios'):(pending?'Pendiente de activar':'');
+  state.classList.toggle('dirty',dirty||pending);
+
+  q('#workspaceReset').hidden=!isNew||!dirty;
+  q('#workspaceSave').hidden=!isNew;
+  q('#workspaceSave').disabled=isNew&&!dirty;
+  q('#workspaceTest').hidden=false;
+  q('#workspaceClose').title='Compactar';
+  q('#workspaceClose').setAttribute('aria-label','Compactar');
+
+  bindWorkspaceControls();
 }
 
 function refreshWorkspaceDraft(){
-  renderWorkspaceEditor();
-  renderModeList();
+  if(workspaceTargetId!==null)syncWorkspaceMode();
+  renderResourceViews();
+  renderDisplayOverview();
+  renderWorkbench();
 }
 
 function renderWorkbench(){
   ensureWorkspace();
   renderModeList();
-  renderWorkspaceEditor();
+  if(workspaceExpanded)renderWorkspaceEditor();
 }
 
 function render(){
@@ -512,19 +621,24 @@ function render(){
 
 function toggleWorkspaceDisplay(id){
   if(!workspaceDraft)return;
+
   workspaceDraft.preserve=false;
   var index=workspaceDraft.displayIds.indexOf(id);
+
   if(index>=0){
     if(workspaceDraft.displayIds.length===1){
       toast('Pantallas','Debe quedar al menos una activa');
       return;
     }
     workspaceDraft.displayIds.splice(index,1);
-    if(workspaceDraft.primaryDisplayId===id)workspaceDraft.primaryDisplayId=workspaceDraft.displayIds[0]||null;
+    if(workspaceDraft.primaryDisplayId===id){
+      workspaceDraft.primaryDisplayId=workspaceDraft.displayIds[0]||null;
+    }
   }else{
     workspaceDraft.displayIds.push(id);
     if(!workspaceDraft.primaryDisplayId)workspaceDraft.primaryDisplayId=id;
   }
+
   refreshWorkspaceDraft();
 }
 
