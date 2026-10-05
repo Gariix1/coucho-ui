@@ -236,10 +236,11 @@ async function openModeDetail(id,source){
   }
 
   closePops();
-  var from=modeSheetTransition.rectOf(source);
-  var workspace=q('.visual-workspace');
 
+  var workspace=q('.visual-workspace');
   setModeTransitioning(true);
+  var transition=modeSheetTransition.prepare(source,{hold:workspace});
+
   try{
     workspaceTargetId=mode.id;
     workspaceDraft=cloneModeConfig(mode);
@@ -248,9 +249,14 @@ async function openModeDetail(id,source){
     renderWorkbench();
 
     workspace=q('.visual-workspace');
-    var to=modeSheetTransition.rectOf(workspace);
-    await modeSheetTransition.travel(from,to,'open');
+    await transition.play(workspace,'open',[
+      q('.visual-workspace-head'),
+      q('.workspace-screen-stage'),
+      q('.workspace-pieces'),
+      q('.workspace-footer')
+    ]);
   }finally{
+    transition.cancel();
     setModeTransitioning(false);
     renderModeList();
   }
@@ -264,22 +270,24 @@ async function closeModeDetail(restore,afterClose){
   if(workspaceTargetId===null||modeTransitioning)return false;
 
   closePops();
+
   var closingId=workspaceTargetId;
   var workspace=q('.visual-workspace');
-  var destination=q('[data-mode-row="'+closingId+'"]');
-  var from=modeSheetTransition.rectOf(workspace);
-  var to=modeSheetTransition.rectOf(destination);
 
   setModeTransitioning(true);
-  try{
-    await modeSheetTransition.travel(from,to,'close');
+  var transition=modeSheetTransition.prepare(workspace);
 
+  try{
     workspaceTargetId=null;
     workspaceDraft=workspaceFromApplied();
     workspaceBase=cloneModeConfig(workspaceDraft);
     workspaceAutoNamed=true;
     renderWorkbench();
+
+    var destination=q('[data-mode-row="'+closingId+'"]');
+    await transition.play(destination,'close');
   }finally{
+    transition.cancel();
     setModeTransitioning(false);
   }
 
