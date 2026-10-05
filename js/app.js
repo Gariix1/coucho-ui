@@ -570,9 +570,13 @@ function renderWorkspaceEditor(){
   q('#workspaceShortcutName').textContent=shortcutCardLabel(workspaceDraft.shortcut);
 
   var state=q('#workspaceState');
-  state.hidden=!(dirty||pending);
-  state.textContent=dirty?(changeCount===1?'1 cambio':changeCount+' cambios'):(pending?'Pendiente de activar':'');
+  var activeState=!!(mode&&mode.active&&!pending);
+  state.hidden=!(dirty||pending||activeState);
+  state.textContent=dirty
+    ?(changeCount===1?'1 cambio':changeCount+' cambios')
+    :(pending?'Pendiente':activeState?'Activo':'');
   state.classList.toggle('dirty',dirty||pending);
+  state.classList.toggle('active',activeState);
 
   q('#workspaceReset').hidden=!isNew||!dirty;
   q('#workspaceSave').hidden=!isNew;
