@@ -14,3 +14,15 @@ export function esc(value){
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
 }
+
+export function setCssVars(element,values){
+  if(!element)return;
+
+  Object.entries(values).forEach(([name,value])=>{
+    if(value==null){
+      element.style.removeProperty(name);
+      return;
+    }
+    element.style.setProperty(name,String(value));
+  });
+}
