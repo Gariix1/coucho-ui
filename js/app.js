@@ -21,33 +21,49 @@ import {
   workspaceEqual
 } from './model.js';
 
-import {modeSheetTransition as ModeSheetTransition} from './motion.js';
+import {modeSheetTransition} from './motion.js';
 
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
 import {initTheme,toggleTheme} from './features/theme.js';
 
-var sets=loadSets();
+const TEST_MODE_KEY='coucho-test-mode';
+const ACTIVATION_DELAY_MS=850;
+const TEST_PROGRESS_INTERVAL_MS=340;
+const TEST_COUNTDOWN_INTERVAL_MS=1000;
+const TEST_TIMEOUT_RESTORE_MS=420;
+const DETAIL_CLOSE_DELAY_MS=80;
+const MANUAL_RESTORE_STEP_MS=380;
+const MANUAL_RESTORE_FINISH_MS=220;
 
-var displayEditModeId=null;
-var appEditTarget=null;
-var shortcutEditTarget=null;
-var deleteTarget=null;
-var captured=null;
-var displayDraft=null;
-var testContext=null;
-var progressTimer=null;
-var countdownTimer=null;
-var activationTimer=null;
-var activatingId=null;
-var appliedSession=null;
-var workspaceTargetId=null;
-var workspaceDraft=null;
-var workspaceBase=null;
-var workspaceAutoNamed=true;
-var modeTransitioning=false;
+// Persistent mode/session state.
+let sets=loadSets();
+let appliedSession=null;
+let activatingId=null;
+let activationTimer=null;
 
+// Workspace editor state.
+let workspaceTargetId=null;
+let workspaceDraft=null;
+let workspaceBase=null;
+let workspaceAutoNamed=true;
+let modeTransitioning=false;
+
+// Transient picker / overlay state.
+let displayEditModeId=null;
+let displayDraft=null;
+let appEditTarget=null;
+let shortcutEditTarget=null;
+let deleteTarget=null;
+let captured=null;
+
+// Test flow state.
+let testContext=null;
+let progressTimer=null;
+let countdownTimer=null;
+
+// Mode/session domain helpers.
 function byId(id){return sets.find(function(x){return x.id===id})||null}
 function active(){return sets.find(function(x){return x.active})||null}
 function resolveId(raw){
@@ -157,6 +173,7 @@ function renderResourceViews(){
   });
 }
 
+// Modes workbench and workspace editor.
 function ensureWorkspace(){
   if(workspaceDraft)return;
   workspaceTargetId=null;
@@ -219,7 +236,7 @@ async function openModeDetail(id,source){
   }
 
   closePops();
-  var from=ModeSheetTransition.rectOf(source);
+  var from=modeSheetTransition.rectOf(source);
   var workspace=q('.visual-workspace');
 
   setModeTransitioning(true);
@@ -231,8 +248,8 @@ async function openModeDetail(id,source){
     renderWorkbench();
 
     workspace=q('.visual-workspace');
-    var to=ModeSheetTransition.rectOf(workspace);
-    await ModeSheetTransition.travel(from,to,'open');
+    var to=modeSheetTransition.rectOf(workspace);
+    await modeSheetTransition.travel(from,to,'open');
   }finally{
     setModeTransitioning(false);
     renderModeList();
@@ -250,12 +267,12 @@ async function closeModeDetail(restore,afterClose){
   var closingId=workspaceTargetId;
   var workspace=q('.visual-workspace');
   var destination=q('[data-mode-row="'+closingId+'"]');
-  var from=ModeSheetTransition.rectOf(workspace);
-  var to=ModeSheetTransition.rectOf(destination);
+  var from=modeSheetTransition.rectOf(workspace);
+  var to=modeSheetTransition.rectOf(destination);
 
   setModeTransitioning(true);
   try{
-    await ModeSheetTransition.travel(from,to,'close');
+    await modeSheetTransition.travel(from,to,'close');
 
     workspaceTargetId=null;
     workspaceDraft=workspaceFromApplied();
@@ -545,11 +562,12 @@ function activate(id){
     activationTimer=null;
     render();
     toast(current.name,'Activo');
-  },850);
+  },ACTIVATION_DELAY_MS);
 }
 
-var currentPop=null;
-var currentPopAnchor=null;
+// Anchored popovers and inline mode actions.
+let currentPop=null;
+let currentPopAnchor=null;
 
 function openAnchoredPop(pop,anchor){
   if(!pop||!anchor||!anchor.isConnected)return false;
@@ -632,6 +650,7 @@ q('#deleteConfirm').onclick=function(){
   removeSet(id);
 };
 
+// Displays overview and display picker.
 function renderDisplayOverview(){
   var session=appliedSession;
   var mode=active();
@@ -852,9 +871,10 @@ qa('#appPop .app-option').forEach(function(b){
   };
 });
 
+// Settings and prototype test-mode controls.
 q('#settingsTheme').onclick=toggleTheme;
 
-var testMode=localStorage.getItem('coucho-test-mode')==='1';
+let testMode=localStorage.getItem(TEST_MODE_KEY)==='1';
 function syncTestMode(){
   document.body.classList.toggle('test-mode',testMode);
   q('#testBtn').classList.toggle('active',testMode);
@@ -864,7 +884,7 @@ function syncTestMode(){
 
 q('#testBtn').onclick=function(){
   testMode=!testMode;
-  localStorage.setItem('coucho-test-mode',testMode?'1':'0');
+  localStorage.setItem(TEST_MODE_KEY,testMode?'1':'0');
   syncTestMode();
 };
 
@@ -945,6 +965,7 @@ q('#workspaceTest').onclick=function(){
   });
 };
 
+// Workspace actions and shortcut capture.
 function beginWorkspaceRename(){
   var el=q('#workspaceName');
   if(!el||el.isContentEditable)return;
@@ -1070,6 +1091,7 @@ q('#capUse').onclick=function(){
 };
 
 
+// Safe test/apply flow.
 function startTest(ctx){
   closePops();
   closeShortcutOverlay();
@@ -1093,11 +1115,11 @@ function startTest(ctx){
           q('#confirm').classList.remove('show');
           q('#testText').textContent='Restaurando…';
           q('#progress').style.width='100%';
-          setTimeout(finishRestore,420);
+          setTimeout(finishRestore,TEST_TIMEOUT_RESTORE_MS);
         }
-      },1000);
+      },TEST_COUNTDOWN_INTERVAL_MS);
     }
-  },340);
+  },TEST_PROGRESS_INTERVAL_MS);
 }
 
 q('#keep').onclick=function(){
@@ -1164,7 +1186,7 @@ q('#keep').onclick=function(){
     renderModeList();
     toast(editedName,'Guardado y activo');
     testContext=null;
-    setTimeout(function(){closeModeDetail(true)},80);
+    setTimeout(function(){closeModeDetail(true)},DETAIL_CLOSE_DELAY_MS);
     return;
   }
 
@@ -1194,8 +1216,8 @@ q('#revert').onclick=function(){
   q('#progress').style.width='35%';
   setTimeout(function(){
     q('#progress').style.width='100%';
-    setTimeout(finishRestore,220);
-  },380);
+    setTimeout(finishRestore,MANUAL_RESTORE_FINISH_MS);
+  },MANUAL_RESTORE_STEP_MS);
 };
 
 document.addEventListener('click',function(e){
@@ -1232,6 +1254,7 @@ document.addEventListener('keydown',function(e){
 
 var shellView='modes';
 
+// Shell navigation and global event wiring.
 function openShellView(viewName){
   if(modeTransitioning)return;
   shellView=viewName;
