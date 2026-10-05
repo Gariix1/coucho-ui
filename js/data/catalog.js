@@ -1,5 +1,15 @@
 import {normalizeIconKey} from '../core/icons.js';
 
+const LEGACY_ICON_KEYS=new Map([
+  ['\uD83C\uDFAE','gaming'],
+  ['\uD83C\uDFAC','movies'],
+  ['\uD83D\uDDA5\uFE0F','desktop']
+]);
+
+function migrateIconKey(icon){
+  return normalizeIconKey(LEGACY_ICON_KEYS.get(icon)||icon);
+}
+
 export const simulatedDisplays=[
   {id:'tv',number:1,name:'TV Sala',model:'LG OLED42C3',resolution:'3840 × 2160',hz:'120 Hz',detail:'3840 × 2160 · 120 Hz',kind:'tv',layout:{left:4,top:34,width:31,aspect:1.78}},
   {id:'main',number:2,name:'Monitor 1',model:'LG 27GP850-B',resolution:'2560 × 1440',hz:'165 Hz',detail:'2560 × 1440 · 165 Hz',kind:'monitor',layout:{left:37,top:22,width:28,aspect:1.78}},
@@ -20,7 +30,7 @@ export function migrateSet(source){
     return Object.assign(
       {preserve:false,primaryDisplayId:s.displayIds[0]||null},
       s,
-      {icon:normalizeIconKey(s.icon)}
+      {icon:migrateIconKey(s.icon)}
     );
   }
 
@@ -36,7 +46,7 @@ export function migrateSet(source){
     preserve:s.mode==='preserve',
     displayIds:ids,
     primaryDisplayId:ids[0]||null,
-    icon:normalizeIconKey(s.icon)
+    icon:migrateIconKey(s.icon)
   });
 }
 
