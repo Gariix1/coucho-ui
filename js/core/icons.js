@@ -7,7 +7,7 @@ export function normalizeIconKey(icon){
 
 export function iconMarkup(name,extraClass=''){
   const cls='ui-icon'+(extraClass?' '+extraClass:'');
-  return '<svg class="'+cls+'" aria-hidden="true"><use href="#icon-'+name+'"></use></svg>';
+  return '<svg class="'+cls+'" aria-hidden="true"><use href="./assets/icons.svg#icon-'+name+'"></use></svg>';
 }
 
 export function modeIconMarkup(key){
