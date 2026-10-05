@@ -1,9 +1,5 @@
 /* Workspace editor for creating and editing a mode. */
 
-.workspace-title-copy small:empty,.workspace-section-head small:empty{
-display:none
-}
-
 .visual-workspace{
 border:1px solid var(--glass-soft-border);border-radius:var(--r-card);
   background:var(--glass-panel);
@@ -71,14 +67,6 @@ display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.
 color:var(--create-accent)
 }
 
-.create-mode .workspace-state{
-border-color:rgba(125,211,252,.22);background:rgba(125,211,252,.055)
-}
-
-.detail-mode .workspace-state{
-border-color:rgba(88,140,255,.26);background:rgba(88,140,255,.07)
-}
-
 .detail-mode .workspace-eyebrow{
 display:inline-flex;align-items:center;gap:6px;
   width:max-content;padding:4px 8px;margin:0 0 6px;
@@ -95,10 +83,6 @@ content:"";width:6px;height:6px;border-radius:50%;background:var(--edit-accent);
 margin:0;font-size:22px;font-weight:600
 }
 
-.workspace-title-block>small,#workspaceSub{
-display:block;color:var(--text2);font-size:11px;margin-top:4px;line-height:1.4
-}
-
 .workspace-state{
 flex:0 0 auto;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);color:var(--text2);padding:6px 9px;font-size:10px;font-weight:600
 }
@@ -113,10 +97,6 @@ display:flex;align-items:center;justify-content:space-between;margin:0 0 9px;pad
 
 .workspace-section-head b{
 display:block;font-size:12px
-}
-
-.workspace-section-head small{
-display:block;color:var(--muted);font-size:10px;margin-top:2px
 }
 
 .detail-mode .workspace-section-head b{
