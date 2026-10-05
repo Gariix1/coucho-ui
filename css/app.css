@@ -3,6 +3,7 @@
 @import url("./shell.css");
 @import url("./components.css");
 @import url("./features/modes.css");
+@import url("./features/workspace.css");
 @import url("./features/resources.css");
 @import url("./features/displays.css");
 @import url("./ui/overlays.css");
