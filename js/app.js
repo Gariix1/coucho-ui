@@ -154,11 +154,6 @@ function appUsage(app){
   return {text:matches.length+' modos',empty:false};
 }
 
-function renderModeStatus(){
-  var count=simulatedDisplays.length;
-  q('#modeStatus').innerHTML='<span>'+count+' '+(count===1?'pantalla detectada':'pantallas detectadas')+'</span><span>·</span>'+iconMarkup('gamepad')+'<span>conectado</span>';
-}
-
 function renderResourceViews(){
   [
     ['Steam','#steamUsage'],
@@ -320,7 +315,7 @@ function renderModeList(){
 
   var sourceContext=appliedSession&&appliedSession.modeId
     ?'<span class="source-context"><small>En uso</small><b>'+esc(appliedSession.name||'Modo')+'</b></span>'
-    :'<span class="source-context neutral"><small>Base</small><b>Actual</b></span>';
+    :'';
 
   var current='<div class="mode-list-group">'+
     '<div class="mode-list-label">Crear desde</div>'+
@@ -345,7 +340,10 @@ function renderModeList(){
         '<div class="saved-mode-name">'+
           '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
           '<span class="saved-mode-name-copy"><b class="mode-list-name" id="'+titleId+'">'+safeName+'</b>'+
-          '<small>'+(selected?'<span class="mode-editing-badge">'+(mode.active?'Activo · Editando':'Editando')+'</span>':(mode.active?'<span class="mode-list-badge">Activo</span>':'Guardado'))+'</small></span>'+
+          (selected
+            ?'<small><span class="mode-editing-badge">'+(mode.active?'Activo · Editando':'Editando')+'</span></small>'
+            :(mode.active?'<small><span class="mode-list-badge">Activo</span></small>':''))+
+          '</span>'+
         '</div>'+
         '<div class="saved-mode-actions">'+
           (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el editor':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
@@ -354,7 +352,7 @@ function renderModeList(){
         '</div>'+
       '</div>'+
       (selected
-        ?'<div class="saved-mode-editing"><div><b>Abierto en el editor</b></div></div>'
+        ?''
         :'<div class="saved-mode-body">'+
           '<button class="card-display quick-display" data-id="'+mode.id+'" title="Editar pantallas">'+
             '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode)+'</span>'+
@@ -470,19 +468,17 @@ function renderWorkspaceEditor(){
   var changeCount=workspaceChangeCount(workspaceDraft,workspaceBase);
   var dirty=changeCount>0;
   var changeLabel=changeCount===1?'1 cambio':changeCount+' cambios';
-  var baseDisplays=displaySummary(workspaceBase);
 
   q('.visual-workspace').classList.toggle('create-mode',isNew);
   q('.visual-workspace').classList.toggle('detail-mode',!isNew);
   q('#workspaceProfileIcon').innerHTML=modeIconMarkup(workspaceDraft.icon);
   q('#workspaceEyebrow').textContent=isNew?'Crear modo':'Editando';
   q('#workspaceName').textContent=workspaceDraft.name;
-  q('#workspaceSub').textContent=dirty?changeLabel+' sin guardar':'';
   q('#workspaceScreenTitle').textContent='Pantallas';
-  q('#workspaceScreenMeta').textContent=isNew?'Base: '+baseDisplays:'';
   q('#workspaceAppName').textContent=workspaceDraft.app;
   q('#workspaceShortcutName').textContent=shortcutCardLabel(workspaceDraft.shortcut);
-  q('#workspaceState').textContent=dirty?changeLabel:(isNew?'Borrador':'Guardado');
+  q('#workspaceState').hidden=!dirty;
+  q('#workspaceState').textContent=dirty?changeLabel:'';
   q('#workspaceState').classList.toggle('dirty',dirty);
   q('#workspaceReset').hidden=false;
   q('#workspaceReset').disabled=isNew&&!dirty;
@@ -508,7 +504,6 @@ function renderWorkbench(){
 
 function render(){
   ensureAppliedSession();
-  renderModeStatus();
   renderResourceViews();
   renderDisplayOverview();
   ensureWorkspace();
