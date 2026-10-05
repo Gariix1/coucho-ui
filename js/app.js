@@ -293,10 +293,24 @@ async function closeModeDetail(restore,afterClose){
 
   if(restore){
     var freshSource=q('[data-mode-row="'+closingId+'"]');
-    var view=freshSource&&freshSource.querySelector('.view-mode');
-    if(view)view.focus();
+    var openButton=freshSource&&freshSource.querySelector('.open-mode');
+    if(openButton)openButton.focus();
   }
   return true;
+}
+
+function focusOrOpenMode(card){
+  if(!card)return;
+
+  var id=Number(card.dataset.modeRow);
+  if(!id)return;
+
+  if(workspaceTargetId===id){
+    q('.visual-workspace').focus({preventScroll:true});
+    return;
+  }
+
+  openModeDetail(id,card);
 }
 
 function renderModeList(){
@@ -304,12 +318,16 @@ function renderModeList(){
   if(currentPopAnchor&&modeList&&modeList.contains(currentPopAnchor))closePops();
   var currentSelected=workspaceTargetId===null;
 
+  var sourceContext=appliedSession&&appliedSession.modeId
+    ?'<span class="source-context"><small>En uso</small><b>'+esc(appliedSession.name||'Modo')+'</b></span>'
+    :'<span class="source-context neutral"><small>Base</small><b>Actual</b></span>';
+
   var current='<div class="mode-list-group">'+
     '<div class="mode-list-label">Crear desde</div>'+
     '<button class="mode-list-item current'+(currentSelected?' selected':'')+'" data-workspace-id="current">'+
       '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
       '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
-      '<span></span>'+
+      sourceContext+
     '</button>'+
   '</div>';
 
@@ -320,23 +338,23 @@ function renderModeList(){
     var safeName=esc(mode.name);
     var safeApp=esc(mode.app);
     var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
+    var titleId='mode-title-'+mode.id;
 
-    return '<article class="saved-mode-card'+(selected?' selected':'')+'" data-mode-row="'+mode.id+'">'+
-
+    return '<article class="saved-mode-card'+(selected?' selected':'')+'" data-mode-row="'+mode.id+'" aria-labelledby="'+titleId+'">'+
       '<div class="saved-mode-head">'+
         '<div class="saved-mode-name">'+
           '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
-          '<span class="saved-mode-name-copy"><b class="mode-list-name" data-id="'+mode.id+'" tabindex="'+(selected?'-1':'0')+'" data-locked="'+(selected?'true':'false')+'" title="'+(selected?'Renombra desde el perfil abierto':'Doble clic, F2 o toca para renombrar')+'">'+safeName+'</b>'+
+          '<span class="saved-mode-name-copy"><b class="mode-list-name" id="'+titleId+'">'+safeName+'</b>'+
           '<small>'+(selected?'<span class="mode-editing-badge">'+(mode.active?'Activo · Editando':'Editando')+'</span>':(mode.active?'<span class="mode-list-badge">Activo</span>':'Guardado'))+'</small></span>'+
         '</div>'+
         '<div class="saved-mode-actions">'+
-          (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el perfil abierto':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
-          '<button class="btn view-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" aria-expanded="'+(selected?'true':'false')+'" title="'+(selected?'Cerrar detalle':'Abrir detalle')+'">'+(selected?'Cerrar':'Ver')+'</button>'+
+          (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el editor':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
+          '<button class="open-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" aria-expanded="'+(selected?'true':'false')+'" title="'+(selected?'Ir al editor de '+safeName:'Editar '+safeName)+'" aria-label="'+(selected?'Ir al editor de '+safeName:'Editar '+safeName)+'">'+iconMarkup('arrow-right')+'</button>'+
           '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>'+
         '</div>'+
       '</div>'+
       (selected
-        ?'<div class="saved-mode-editing"><div><b>Editando</b></div></div>'
+        ?'<div class="saved-mode-editing"><div><b>Abierto en el editor</b></div></div>'
         :'<div class="saved-mode-body">'+
           '<button class="card-display quick-display" data-id="'+mode.id+'" title="Editar pantallas">'+
             '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode)+'</span>'+
@@ -358,32 +376,49 @@ function renderModeList(){
   qa('[data-workspace-id]').forEach(function(el){
     el.onclick=function(){selectWorkspace(el.dataset.workspaceId)};
   });
-  qa('#modeList .activate').forEach(function(b){
-    b.onclick=function(e){e.stopPropagation();activate(Number(b.dataset.id))};
-  });
-  qa('#modeList .view-mode').forEach(function(b){
-    b.onclick=function(e){e.stopPropagation();openModeDetail(Number(b.dataset.id),q('[data-mode-row="'+b.dataset.id+'"]'))};
-  });
-  qa('#modeList .trash-mode').forEach(function(b){
-    b.onclick=function(e){e.stopPropagation();openDeletePop(e.currentTarget,b.dataset.id)};
-  });
-  qa('#modeList .quick-display').forEach(function(b){
-    b.onclick=function(e){openDisplayPop(e.currentTarget,b.dataset.id)};
-  });
-  qa('#modeList .quick-app').forEach(function(b){
-    b.onclick=function(e){openAppPop(e.currentTarget,b.dataset.id)};
-  });
-  qa('#modeList .quick-shortcut').forEach(function(b){
-    b.onclick=function(){openShortcut(b.dataset.id)};
-  });
-  qa('#modeList .mode-list-name').forEach(function(el){
-    if(el.dataset.locked==='true')return;
-    el.ondblclick=function(e){e.preventDefault();beginModeRename(el,el.dataset.id)};
-    el.onkeydown=function(e){
-      if(el.isContentEditable)return;
-      if(e.key==='F2'||e.key==='Enter'){e.preventDefault();beginModeRename(el,el.dataset.id)}
+
+  qa('#modeList .saved-mode-card').forEach(function(card){
+    card.onclick=function(event){
+      if(event.target.closest('button,a,input,select,textarea,[contenteditable="true"]'))return;
+
+      var selection=window.getSelection&&window.getSelection();
+      if(selection&&String(selection).trim())return;
+
+      focusOrOpenMode(card);
     };
-    bindTouchRename(el,function(){beginModeRename(el,el.dataset.id)});
+  });
+
+  qa('#modeList .activate').forEach(function(button){
+    button.onclick=function(event){
+      event.stopPropagation();
+      activate(Number(button.dataset.id));
+    };
+  });
+
+  qa('#modeList .open-mode').forEach(function(button){
+    button.onclick=function(event){
+      event.stopPropagation();
+      focusOrOpenMode(q('[data-mode-row="'+button.dataset.id+'"]'));
+    };
+  });
+
+  qa('#modeList .trash-mode').forEach(function(button){
+    button.onclick=function(event){
+      event.stopPropagation();
+      openDeletePop(event.currentTarget,button.dataset.id);
+    };
+  });
+
+  qa('#modeList .quick-display').forEach(function(button){
+    button.onclick=function(event){openDisplayPop(event.currentTarget,button.dataset.id)};
+  });
+
+  qa('#modeList .quick-app').forEach(function(button){
+    button.onclick=function(event){openAppPop(event.currentTarget,button.dataset.id)};
+  });
+
+  qa('#modeList .quick-shortcut').forEach(function(button){
+    button.onclick=function(){openShortcut(button.dataset.id)};
   });
 }
 
@@ -408,8 +443,7 @@ function renderWorkspaceScreens(){
         '<div class="workspace-display-tech">'+esc(d.resolution)+'<br>'+esc(d.hz)+'</div>'+
       '</div>'+
     '</div>';
-  }).join('')+
-  '<div class="workspace-canvas-legend">Izquierda → derecha · resolución y Hz solo informativos</div>';
+  }).join('');
 
   qa('[data-display-layout]').forEach(function(el){
     var display=getDisplay(el.dataset.displayLayout);
@@ -459,7 +493,6 @@ function renderWorkspaceEditor(){
   q('#workspaceClose').hidden=isNew;
   q('#workspaceClose').title=!isNew&&dirty?'Descartar y cerrar':'Cerrar';
   q('#workspaceClose').setAttribute('aria-label',q('#workspaceClose').title);
-  q('#workspaceHelp').innerHTML='Selecciona para activar · '+iconMarkup('star')+' principal';
 }
 
 function refreshWorkspaceDraft(){
@@ -616,26 +649,6 @@ function syncOpenPopPosition(){
 
 window.addEventListener('resize',syncOpenPopPosition);
 q('.main').addEventListener('scroll',syncOpenPopPosition,{passive:true});
-
-function beginModeRename(el,rawId){
-  var id=resolveId(rawId);
-  var mode=byId(id);
-  if(!mode)return;
-  if(workspaceTargetId===id){
-    toast('Editando','Renombra desde el editor');
-    return;
-  }
-
-  var original=mode.name;
-  editInlineText(el,original,function(next){
-    mode.name=next;
-    if(appliedSession&&appliedSession.modeId===mode.id)appliedSession.name=next;
-    commitSets();
-    renderResourceViews();
-    renderDisplayOverview();
-    if(next!==original)toast(next,'Nombre actualizado');
-  });
-}
 
 function openDeletePop(anchor,rawId){
   var id=resolveId(rawId);
