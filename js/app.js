@@ -584,8 +584,11 @@ function renderWorkspaceEditor(){
   q('#workspaceTest').hidden=false;
 
   var activateButton=q('#workspaceActivate');
+  var applying=!!(mode&&activatingId===mode.id);
   activateButton.hidden=isNew||!!(mode&&mode.active&&!pending);
-  activateButton.textContent=pending?'Aplicar':'Activar';
+  activateButton.disabled=applying;
+  activateButton.setAttribute('aria-busy',applying?'true':'false');
+  activateButton.textContent=applying?'…':pending?'Aplicar':'Activar';
   q('#workspaceClose').title=isNew?'Cancelar':'Compactar';
   q('#workspaceClose').setAttribute('aria-label',isNew?'Cancelar':'Compactar');
 
