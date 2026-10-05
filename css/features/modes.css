@@ -308,22 +308,6 @@ min-height:136px;display:grid;place-items:center;
 display:block;font-size:12px;font-weight:700
 }
 
-.saved-mode-editing small{
-display:block;margin-top:4px;color:var(--text2);font-size:10px;font-weight:500
-}
-
-.mode-name-edit{
-display:inline-block;max-width:100%;border-radius:6px;cursor:text;touch-action:manipulation;transition:background .12s ease,box-shadow .12s ease
-}
-
-.mode-name-edit:hover{
-background:var(--glass-command)
-}
-
-.mode-name-edit[contenteditable="true"]{
-min-width:72px;padding:1px 4px;margin:-1px -4px;background:var(--glass-control);box-shadow:0 0 0 1px var(--selected-border);outline:none;white-space:nowrap
-}
-
 .saved-mode-card .card-fact .fact-icon .ui-icon{
 width:16px;height:16px
 }
