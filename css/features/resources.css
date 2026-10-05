@@ -88,22 +88,6 @@ display:flex
 display:flex;gap:8px
 }
 
-.empty-state{
-flex:1 1 100%;width:100%;min-height:230px;border:1px dashed var(--glass-border);border-radius:var(--r-panel);background:var(--glass-panel);display:grid;place-items:center;text-align:center;padding:24px
-}
-
-.empty-state .empty-icon{
-width:56px;height:56px;margin:0 auto 14px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-control);display:grid;place-items:center;color:var(--accent);font-size:24px
-}
-
-.empty-state h3{
-margin:0;font-size:18px;font-weight:600
-}
-
-.empty-state p{
-margin:6px 0 16px;color:var(--text2);font-size:12px
-}
-
 #testBtn.active{
 border-color:var(--accent);color:var(--accent);background:var(--selected-bg)
 }
