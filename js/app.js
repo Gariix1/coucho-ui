@@ -576,7 +576,7 @@ function renderWorkspaceEditor(){
 
   q('#workspaceReset').hidden=!isNew||!dirty;
   q('#workspaceSave').hidden=!isNew;
-  q('#workspaceSave').disabled=isNew&&!dirty;
+  q('#workspaceSave').disabled=false;
   q('#workspaceTest').hidden=false;
 
   var activateButton=q('#workspaceActivate');
@@ -681,14 +681,14 @@ function activate(id,force){
 
   activatingId=id;
   clearTimeout(activationTimer);
-  renderModeList();
+  renderWorkbench();
 
   activationTimer=setTimeout(function(){
     var current=byId(id);
     if(!current){
       activatingId=null;
       activationTimer=null;
-      renderModeList();
+      renderWorkbench();
       return;
     }
 
