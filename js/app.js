@@ -438,6 +438,7 @@ function renderWorkspaceEditor(){
   var changeLabel=changeCount===1?'1 cambio':changeCount+' cambios';
   var baseDisplays=displaySummary(workspaceBase);
 
+  q('.visual-workspace').classList.toggle('create-mode',isNew);
   q('.visual-workspace').classList.toggle('detail-mode',!isNew);
   q('#workspaceProfileIcon').innerHTML=modeIconMarkup(workspaceDraft.icon);
   q('#workspaceEyebrow').textContent=isNew?'Crear modo':'Editando';
