@@ -22,16 +22,16 @@ async function travel(from,to,direction){
   if(reducedMotion()||!usableRect(from)||!usableRect(to))return;
 
   const sheet=document.createElement('div');
-  sheet.className='mode-flight-sheet';
+  sheet.className='mode-flight-sheet '+(direction==='close'?'is-closing':'is-opening');
   sheet.setAttribute('aria-hidden','true');
   document.body.appendChild(sheet);
 
   const startShadow=direction==='close'
-    ?'8px 8px 0 -1px rgba(17,24,40,.12), 0 20px 48px rgba(0,0,0,.16)'
+    ?'0 24px 56px rgba(0,0,0,.20)'
     :'0 8px 22px rgba(0,0,0,.12)';
   const finishShadow=direction==='close'
     ?'0 8px 22px rgba(0,0,0,.12)'
-    :'8px 8px 0 -1px rgba(17,24,40,.12), 0 20px 48px rgba(0,0,0,.16)';
+    :'0 24px 56px rgba(0,0,0,.20)';
 
   try{
     if(typeof sheet.animate!=='function')return;
