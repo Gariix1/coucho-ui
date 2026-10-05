@@ -297,17 +297,6 @@ display:inline-flex;align-items:center;gap:5px;color:var(--success);font-size:9p
 content:"";width:6px;height:6px;border-radius:50%;background:var(--success)
 }
 
-.saved-mode-editing{
-min-height:136px;display:grid;place-items:center;
-  border:1px dashed var(--edit-border);border-radius:var(--r-compact);
-  background:var(--edit-wash);color:var(--edit-accent);
-  text-align:center;padding:16px
-}
-
-.saved-mode-editing b{
-display:block;font-size:12px;font-weight:700
-}
-
 .saved-mode-card .card-fact .fact-icon .ui-icon{
 width:16px;height:16px
 }
