@@ -118,7 +118,9 @@ function prepare(source,{hold=null}={}){
 
     const vector=connectedTransform(flight.rect,to);
     const open=direction!=='close';
-    flight.element.classList.toggle('to-editor',open);
+    const toCreate=!!(open&&destination&&destination.classList.contains('create-mode'));
+    flight.element.classList.toggle('to-create',toCreate);
+    flight.element.classList.toggle('to-editor',open&&!toCreate);
     flight.element.classList.toggle('to-card',!open);
     const travelDuration=open?OPEN_TRAVEL_MS:CLOSE_TRAVEL_MS;
 
