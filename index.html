@@ -165,7 +165,12 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .rail-main{display:flex;flex-direction:column;gap:5px}
 .rail-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid var(--divider)}
 .rail-item,.rail-util{position:relative;width:100%;min-height:56px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px 3px;font-size:9px;font-weight:600;line-height:1}
-.rail-icon{font-size:18px;line-height:1}
+.ui-icon{width:1em;height:1em;display:block;color:currentColor;overflow:visible}
+.icon-sprite{position:absolute;width:0;height:0;overflow:hidden}
+.rail-icon{font-size:18px;line-height:1;display:grid;place-items:center}
+.mode-status{display:flex;align-items:center;gap:5px}
+.mode-status .ui-icon{width:14px;height:14px}
+.workspace-title-copy small:empty,.workspace-section-head small:empty{display:none}
 .rail-item:hover,.rail-util:hover{background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)}
 .rail-item:active,.rail-util:active{background:var(--glass-control)}
 .rail-item.active{color:var(--accent);background:transparent}
@@ -200,7 +205,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .saved-mode-card .card-facts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .saved-mode-card .card-fact{min-height:42px;border:1px solid transparent;border-radius:var(--r-control);background:transparent;display:flex;align-items:center;gap:8px;padding:7px 9px;text-align:left;min-width:0;cursor:pointer}
 .saved-mode-card .card-fact:hover{background:var(--glass-control);border-color:var(--selected-border)}
-.saved-mode-card .card-fact .fact-icon{flex:0 0 auto;color:var(--accent);font-size:14px}
+.saved-mode-card .card-fact .fact-icon{flex:0 0 auto;color:var(--accent);font-size:14px}.saved-mode-card .card-fact .fact-icon .ui-icon{width:16px;height:16px}
 .saved-mode-card .fact-copy{min-width:0}.saved-mode-card .fact-copy small{display:block;color:var(--muted);font-size:9px;font-weight:600;margin-bottom:1px}.saved-mode-card .card-fact b{display:block;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .app-logo{width:46px;height:46px;border-radius:13px;background:var(--glass-control);border:1px solid var(--glass-soft-border);color:var(--text2);display:grid;place-items:center;font-weight:700}
 .key{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:25px;padding:0 7px;border:1px solid var(--key-border);border-radius:7px;background:var(--key-bg);font-size:9px;font-weight:700}.key.round{min-width:24px;width:24px;border-radius:50%;background:var(--key-round-bg);border-color:var(--key-round-border)}
@@ -240,14 +245,13 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .saved-mode-actions .btn{min-height:34px;padding:5px 10px;font-size:11px}
 .saved-mode-card .activate{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent);font-weight:600}
 .saved-mode-card .activate:hover{background:var(--glass-pill);border-color:var(--accent)}
-.saved-mode-actions .trash-mode{width:34px;height:34px;min-height:34px}
+.saved-mode-actions .trash-mode{width:34px;height:34px;min-height:34px}.saved-mode-actions .trash-mode .ui-icon{width:15px;height:15px}
 .trash-mode{
   padding:0;border:1px solid transparent;border-radius:var(--r-control);background:transparent;color:var(--muted);
   display:grid;place-items:center;opacity:.62
 }
 .trash-mode:hover{border-color:rgba(248,113,113,.30);background:rgba(127,29,29,.16);color:#fca5a5;opacity:1}
 .trash-mode:active{background:rgba(127,29,29,.24)}
-.trash-glyph{font-family:"Segoe Fluent Icons","Segoe MDL2 Assets","Segoe UI Symbol",sans-serif;font-size:14px;line-height:1}
 .saved-mode-card .view-mode{border-color:transparent;background:transparent;color:var(--text2)}
 .saved-mode-card .view-mode:hover{border-color:var(--glass-soft-border);background:var(--glass-command);color:var(--text)}
 .mode-editing-badge{color:var(--accent);font-weight:700}
@@ -336,7 +340,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .workspace-display-number{font-size:34px;font-weight:650;line-height:1;color:var(--text)}
 .workspace-display-state{position:absolute;left:8px;top:7px;color:var(--muted);font-size:7px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
 .workspace-display-primary{position:absolute;right:7px;top:7px;width:28px;height:28px;border:1px solid var(--glass-soft-border);border-radius:999px;background:rgba(8,15,27,.72);display:grid;place-items:center;color:var(--text2);z-index:2}
-.workspace-display-primary:hover,.workspace-display-primary[aria-pressed="true"]{border-color:var(--selected-border);color:var(--accent);background:rgba(15,35,52,.9)}
+.workspace-display-primary .ui-icon,.primary-screen-btn .ui-icon{width:15px;height:15px}.workspace-display-primary:hover,.workspace-display-primary[aria-pressed="true"]{border-color:var(--selected-border);color:var(--accent);background:rgba(15,35,52,.9)}
 .workspace-display-info{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:7px 2px 0}
 .workspace-display-copy{min-width:0}.workspace-display-copy b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .workspace-display-copy small{display:block;color:var(--text2);font-size:10px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -349,7 +353,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .workspace-piece-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:10px;background:var(--glass-inset);display:grid;place-items:center;color:var(--accent)}
 .workspace-piece small{display:block;color:var(--muted);font-size:10px;font-weight:600;margin-bottom:2px}.workspace-piece b{display:block;font-size:13px}
 .workspace-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)}
-.workspace-help{color:var(--text2);font-size:10px;line-height:1.4}.workspace-actions{display:flex;gap:8px}.workspace-actions .btn{min-height:38px;padding:7px 14px;font-size:12px}
+.workspace-help{color:var(--text2);font-size:10px;line-height:1.4;display:flex;align-items:center;gap:4px}.workspace-help .ui-icon{width:12px;height:12px}.workspace-actions{display:flex;gap:8px}.workspace-actions .btn{min-height:38px;padding:7px 14px;font-size:12px}
 @media(max-width:1040px){
   .mode-workbench{grid-template-columns:1fr}
   .saved-modes-panel{position:static;max-height:none;overflow:visible;display:block}
@@ -393,7 +397,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .display-editor-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex:0 0 auto}
 .display-editor-head .pop-title{margin:0}
 .display-editor-sub{font-size:10px;color:var(--muted);margin-top:2px}
-.preserve-btn{min-height:28px;padding:3px 8px;border-color:transparent;background:transparent;color:var(--muted);font-size:10px}
+.preserve-btn{min-height:28px;padding:3px 8px;border-color:transparent;background:transparent;color:var(--muted);font-size:10px;display:inline-flex;align-items:center;gap:7px}.preserve-btn .ui-icon{width:14px;height:14px}
 .preserve-btn:hover{background:var(--glass-command);color:var(--text2)}
 .preserve-btn.selected{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
 .screen-map{display:grid;grid-template-columns:1.22fr 1fr 1fr;gap:10px;padding:12px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);overflow:auto;min-height:0}
@@ -498,7 +502,7 @@ body.test-mode .test-tools{display:flex}
 .overview-display .monitor.pc{width:84px;height:54px}
 .overview-display b{font-size:13px}
 .overview-display small{display:block;color:var(--text2);font-size:9px;margin-top:3px}
-.overview-badge{position:absolute;left:10px;top:10px;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);padding:4px 7px;color:var(--text2);font-size:9px;font-weight:600}
+.overview-badge{position:absolute;left:10px;top:10px;border:1px solid var(--glass-soft-border);border-radius:999px;background:var(--glass-command);padding:4px 7px;color:var(--text2);font-size:9px;font-weight:600;display:inline-flex;align-items:center;gap:4px}.overview-badge .ui-icon{width:11px;height:11px}
 .overview-display.primary .overview-badge{border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)}
 .display-state-card{padding:18px;display:flex;flex-direction:column}
 .state-eyebrow{text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-size:9px;font-weight:700}
@@ -584,6 +588,24 @@ body.test-mode .test-tools{display:flex}
 </style>
 </head>
 <body>
+<svg class="icon-sprite" aria-hidden="true">
+  <symbol id="icon-modes" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></g></symbol>
+  <symbol id="icon-play" viewBox="0 0 24 24"><path d="M8 5.5 18 12 8 18.5Z" fill="currentColor"/></symbol>
+  <symbol id="icon-display" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/></g></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M18 6l-1.4 1.4M7.4 16.6 6 18"/></g></symbol>
+  <symbol id="icon-test" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5h6M10 3.5v5L5.5 17a2.5 2.5 0 0 0 2.2 3.5h8.6a2.5 2.5 0 0 0 2.2-3.5L14 8.5v-5"/><path d="M8 15h8"/></g></symbol>
+  <symbol id="icon-gamepad" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 8h9a4 4 0 0 1 3.8 5.2l-1.2 3.7a2 2 0 0 1-3.2.9L14 16h-4l-1.9 1.8a2 2 0 0 1-3.2-.9l-1.2-3.7A4 4 0 0 1 7.5 8Z"/><path d="M8 11v4M6 13h4"/><circle cx="16.5" cy="11.8" r=".7" fill="currentColor" stroke="none"/><circle cx="18" cy="14" r=".7" fill="currentColor" stroke="none"/></g></symbol>
+  <symbol id="icon-film" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M8 5v14M16 5v14M3.5 9h4.5M16 9h4.5M3.5 15h4.5M16 15h4.5"/></g></symbol>
+  <symbol id="icon-desktop" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="11.5" rx="2"/><path d="M8 20h8M12 16v4"/></g></symbol>
+  <symbol id="icon-delete" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M9 7V4.5h6V7M7.5 7l.7 12h7.6l.7-12M10 10v6M14 10v6"/></g></symbol>
+  <symbol id="icon-close" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="icon-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-star-filled" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" fill="currentColor"/></symbol>
+  <symbol id="icon-theme" viewBox="0 0 24 24"><path d="M19 15.5A8 8 0 0 1 8.5 5 8 8 0 1 0 19 15.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></symbol>
+  <symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-preserve" viewBox="0 0 24 24"><path d="M7 8 3.5 12 7 16M17 8l3.5 4-3.5 4M4 12h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 <div class="window">
   <div class="titlebar">
     <div class="brand"><div class="logo">C</div><span>Coucho · Control</span></div>
@@ -594,26 +616,26 @@ body.test-mode .test-tools{display:flex}
   <aside class="nav-rail" aria-label="Navegación de Coucho">
     <nav class="rail-main">
       <button class="rail-item active" data-nav-view="modes" aria-current="page" aria-controls="view-modes" title="Modos">
-        <span class="rail-icon">▣</span><span>Modos</span>
+        <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-modes"></use></svg></span><span>Modos</span>
       </button>
       <button class="rail-item" data-nav-view="library" aria-controls="view-library" title="Biblioteca">
-        <span class="rail-icon">▶</span><span>Apps</span>
+        <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-play"></use></svg></span><span>Apps</span>
       </button>
       <button class="rail-item" data-nav-view="devices" aria-controls="view-devices" title="Dispositivos">
-        <span class="rail-icon">▦</span><span>Pant.</span>
+        <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-display"></use></svg></span><span>Pant.</span>
       </button>
     </nav>
 
     <div class="rail-bottom">
-      <button class="rail-util" id="settingsBtn" title="Ajustes" aria-label="Ajustes"><span class="rail-icon">⚙</span></button>
-      <button class="rail-util prototype-tool" id="testBtn" title="Pruebas del mockup" aria-label="Pruebas del mockup"><span class="rail-icon">🧪</span></button>
+      <button class="rail-util" id="settingsBtn" title="Ajustes" aria-label="Ajustes"><span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-settings"></use></svg></span></button>
+      <button class="rail-util prototype-tool" id="testBtn" title="Pruebas del mockup" aria-label="Pruebas del mockup"><span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-test"></use></svg></span></button>
     </div>
   </aside>
 
   <main class="main">
     <section class="shell-view active" id="view-modes" data-shell-view="modes">
       <div class="wrap workbench-wrap">
-        <div class="mode-status" id="modeStatus">3 pantallas detectadas · 🎮 conectado</div>
+        <div class="mode-status" id="modeStatus"></div>
         <div class="test-tools">
           <span>Modo de prueba · datos locales</span>
           <div class="test-tools-actions">
@@ -633,7 +655,7 @@ body.test-mode .test-tools{display:flex}
           <section class="visual-workspace" id="modeWorkspace" tabindex="-1" aria-label="Editor visual del modo">
             <div class="visual-workspace-head">
               <div class="workspace-title-block">
-                <div class="workspace-profile-icon" id="workspaceProfileIcon">🖥️</div>
+                <div class="workspace-profile-icon" id="workspaceProfileIcon"></div>
                 <div class="workspace-title-copy">
                   <span class="workspace-eyebrow" id="workspaceEyebrow">Escritorio actual</span>
                   <h2 id="workspaceName" class="mode-name-edit" tabindex="0">Escritorio</h2>
@@ -642,7 +664,7 @@ body.test-mode .test-tools{display:flex}
               </div>
               <div class="workspace-head-actions">
                 <span class="workspace-state" id="workspaceState" role="status" aria-live="polite">Sin cambios</span>
-                <button class="workspace-close" id="workspaceClose" title="Cerrar detalle" aria-label="Cerrar detalle">✕</button>
+                <button class="workspace-close" id="workspaceClose" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
               </div>
             </div>
 
@@ -653,11 +675,11 @@ body.test-mode .test-tools{display:flex}
 
             <div class="workspace-pieces">
               <button class="workspace-piece" id="workspaceApp" title="Cambiar app">
-                <span class="workspace-piece-icon">▶</span>
+                <span class="workspace-piece-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-play"></use></svg></span>
                 <span><small>App</small><b id="workspaceAppName">Ninguna</b></span>
               </button>
               <button class="workspace-piece" id="workspaceShortcut" title="Cambiar atajo">
-                <span class="workspace-piece-icon">🎮</span>
+                <span class="workspace-piece-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-gamepad"></use></svg></span>
                 <span><small>Atajo</small><b id="workspaceShortcutName">Sin atajo</b></span>
               </button>
             </div>
@@ -715,7 +737,7 @@ body.test-mode .test-tools{display:flex}
           <aside class="display-state-card">
             <div class="state-eyebrow">Sesión aplicada</div>
             <div class="state-mode">
-              <div class="state-mode-icon" id="displayStateIcon">🎮</div>
+              <div class="state-mode-icon" id="displayStateIcon"></div>
               <div><h2 id="displayStateMode">Gaming</h2><small id="displayStateApp">Steam</small></div>
             </div>
             <div class="state-facts">
@@ -742,14 +764,14 @@ body.test-mode .test-tools{display:flex}
         </div>
         <div class="settings-stack">
           <button class="settings-row" id="settingsTheme">
-            <span class="settings-row-icon">◐</span>
+            <span class="settings-row-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-theme"></use></svg></span>
             <span class="settings-row-copy"><b>Tema</b><small>Cambia la apariencia de Coucho</small></span>
             <span class="settings-row-value" id="themeValue">Oscuro</span>
           </button>
           <button class="settings-row" id="advancedSettings">
-            <span class="settings-row-icon">⋯</span>
+            <span class="settings-row-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-more"></use></svg></span>
             <span class="settings-row-copy"><b>Avanzado</b><small>Diagnóstico y recuperación</small></span>
-            <span class="settings-row-value">›</span>
+            <span class="settings-row-value"><svg class="ui-icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></span>
           </button>
         </div>
       </div>
@@ -765,13 +787,13 @@ body.test-mode .test-tools{display:flex}
       <div class="pop-title">Pantallas</div>
       <div class="display-editor-sub">Clic: activar · ☆: principal</div>
     </div>
-    <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar">✕</button>
+    <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
   </div>
   <div class="screen-map" id="screenMap"></div>
   <div class="display-editor-foot">
     <div>
       <div class="display-editor-summary" id="displayEditorSummary"></div>
-      <button class="btn preserve-btn" id="preserveDisplays">↔ No cambiar pantallas</button>
+      <button class="btn preserve-btn" id="preserveDisplays"><svg class="ui-icon" aria-hidden="true"><use href="#icon-preserve"></use></svg><span>No cambiar pantallas</span></button>
     </div>
     <div class="display-editor-actions">
       <button class="btn" id="tryDisplays">Probar</button>
@@ -847,21 +869,29 @@ body.test-mode .test-tools{display:flex}
 
   function demoSets(){
     return [
-      {id:1,name:'Gaming',icon:'🎮',preserve:false,displayIds:['tv','main'],primaryDisplayId:'tv',app:'Steam',shortcut:'Guide + A',active:true},
-      {id:2,name:'Películas',icon:'🎬',preserve:false,displayIds:['tv'],primaryDisplayId:'tv',app:'Plex',shortcut:'Manual',active:false},
-      {id:3,name:'Escritorio',icon:'🖥️',preserve:false,displayIds:['main','aux'],primaryDisplayId:'main',app:'Ninguna',shortcut:'Manual',active:false}
+      {id:1,name:'Gaming',icon:'gaming',preserve:false,displayIds:['tv','main'],primaryDisplayId:'tv',app:'Steam',shortcut:'Guide + A',active:true},
+      {id:2,name:'Películas',icon:'movies',preserve:false,displayIds:['tv'],primaryDisplayId:'tv',app:'Plex',shortcut:'Manual',active:false},
+      {id:3,name:'Escritorio',icon:'desktop',preserve:false,displayIds:['main','aux'],primaryDisplayId:'main',app:'Ninguna',shortcut:'Manual',active:false}
     ];
+  }
+
+  function normalizeIconKey(icon){
+    if(icon==='gaming'||icon==='movies'||icon==='desktop')return icon;
+    if(icon==='🎮')return 'gaming';
+    if(icon==='🎬')return 'movies';
+    return 'desktop';
   }
 
   function migrateSet(s){
     if(Array.isArray(s.displayIds)){
-      return Object.assign({preserve:false,primaryDisplayId:s.displayIds[0]||null},s);
+      return Object.assign({preserve:false,primaryDisplayId:s.displayIds[0]||null},s,{icon:normalizeIconKey(s.icon)});
     }
     var ids=s.mode==='tv'?['tv']:s.mode==='monitor'?['main']:s.mode==='preserve'?[]:['tv','main'];
     return Object.assign({},s,{
       preserve:s.mode==='preserve',
       displayIds:ids,
-      primaryDisplayId:ids[0]||null
+      primaryDisplayId:ids[0]||null,
+      icon:normalizeIconKey(s.icon)
     });
   }
 
@@ -930,11 +960,19 @@ body.test-mode .test-tools{display:flex}
       if(s.active)s.active=false;
     });
   }
+  function iconMarkup(name,extraClass){
+    var cls='ui-icon'+(extraClass?' '+extraClass:'');
+    return '<svg class="'+cls+'" aria-hidden="true"><use href="#icon-'+name+'"></use></svg>';
+  }
+  function modeIconMarkup(key){
+    var map={gaming:'gamepad',movies:'film',desktop:'desktop'};
+    return iconMarkup(map[normalizeIconKey(key)]||'desktop');
+  }
   function logo(app){return app==='Ninguna'?'—':app.charAt(0).toUpperCase()}
   function autoMeta(app){
-    if(app==='Plex') return {name:'Películas',icon:'🎬'};
-    if(app==='Ninguna') return {name:'Escritorio',icon:'🖥️'};
-    return {name:'Gaming',icon:'🎮'};
+    if(app==='Plex') return {name:'Películas',icon:'movies'};
+    if(app==='Ninguna') return {name:'Escritorio',icon:'desktop'};
+    return {name:'Gaming',icon:'gaming'};
   }
   function getDisplay(id){
     return simulatedDisplays.find(function(d){return d.id===id});
@@ -991,7 +1029,7 @@ body.test-mode .test-tools{display:flex}
     return {
       id:source.id==null?null:source.id,
       name:source.name||'Escritorio',
-      icon:source.icon||'🖥️',
+      icon:normalizeIconKey(source.icon),
       preserve:!!source.preserve,
       displayIds:Array.isArray(source.displayIds)?source.displayIds.slice():[],
       primaryDisplayId:source.primaryDisplayId||null,
@@ -1009,7 +1047,7 @@ body.test-mode .test-tools{display:flex}
       ?appliedSession.primaryDisplayId
       :(ids[0]||'main');
     return {
-      id:null,name:'Nuevo modo',icon:'🖥️',preserve:false,
+      id:null,name:'Nuevo modo',icon:'desktop',preserve:false,
       displayIds:ids,primaryDisplayId:primary,app:'Ninguna',shortcut:'Manual'
     };
   }
@@ -1064,7 +1102,7 @@ body.test-mode .test-tools{display:flex}
       if(!d)return '';
       var cls=d.kind==='tv'?'tv':'pc';
       var primary=id===source.primaryDisplayId?' primary':'';
-      var star=id===source.primaryDisplayId?'<span class="monitor-star">★</span>':'';
+      var star=id===source.primaryDisplayId?'<span class="monitor-star">'+iconMarkup('star-filled')+'</span>':'';
       return '<div class="monitor '+cls+primary+'" title="'+esc(d.name)+'">'+star+'</div>';
     }).join('');
   }
@@ -1094,7 +1132,7 @@ body.test-mode .test-tools{display:flex}
 
   function renderModeStatus(){
     var count=simulatedDisplays.length;
-    q('#modeStatus').textContent=count+' '+(count===1?'pantalla detectada':'pantallas detectadas')+' · 🎮 conectado';
+    q('#modeStatus').innerHTML='<span>'+count+' '+(count===1?'pantalla detectada':'pantallas detectadas')+'</span><span>·</span>'+iconMarkup('gamepad')+'<span>conectado</span>';
   }
 
   function renderResourceViews(){
@@ -1305,7 +1343,7 @@ body.test-mode .test-tools{display:flex}
     var current='<div class="mode-list-group">'+
       '<div class="mode-list-label">Crear desde</div>'+
       '<button class="mode-list-item current'+(currentSelected?' selected':'')+'" data-workspace-id="current">'+
-        '<span class="mode-list-icon">▦</span>'+
+        '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
         '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
         '<span></span>'+
       '</button>'+
@@ -1323,14 +1361,14 @@ body.test-mode .test-tools{display:flex}
 
         '<div class="saved-mode-head">'+
           '<div class="saved-mode-name">'+
-            '<span class="mode-list-icon">'+esc(mode.icon)+'</span>'+
+            '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
             '<span class="saved-mode-name-copy"><b class="mode-list-name" data-id="'+mode.id+'" tabindex="'+(selected?'-1':'0')+'" data-locked="'+(selected?'true':'false')+'" title="'+(selected?'Renombra desde el perfil abierto':'Doble clic, F2 o toca para renombrar')+'">'+safeName+'</b>'+
             '<small>'+(selected?'<span class="mode-editing-badge">'+(mode.active?'Activo · Editando':'Editando')+'</span>':(mode.active?'<span class="mode-list-badge">Activo</span>':'Guardado'))+'</small></span>'+
           '</div>'+
           '<div class="saved-mode-actions">'+
             (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el perfil abierto':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
             '<button class="btn view-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" aria-expanded="'+(selected?'true':'false')+'" title="'+(selected?'Cerrar detalle':'Abrir detalle')+'">'+(selected?'Cerrar':'Ver')+'</button>'+
-            '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'"><span class="trash-glyph" aria-hidden="true">&#xE74D;</span></button>'+
+            '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>'+
           '</div>'+
         '</div>'+
         (selected
@@ -1341,8 +1379,8 @@ body.test-mode .test-tools{display:flex}
               '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
             '</button>'+
             '<div class="card-facts">'+
-              '<button class="card-fact quick-app" data-id="'+mode.id+'" title="Cambiar app"><span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
-              '<button class="card-fact quick-shortcut" data-id="'+mode.id+'" title="Cambiar atajo"><span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
+              '<button class="card-fact quick-app" data-id="'+mode.id+'" title="Cambiar app"><span class="fact-icon">'+iconMarkup('play')+'</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
+              '<button class="card-fact quick-shortcut" data-id="'+mode.id+'" title="Cambiar atajo"><span class="fact-icon">'+iconMarkup('gamepad')+'</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
             '</div>'+
           '</div>')+
       '</article>';
@@ -1402,7 +1440,7 @@ body.test-mode .test-tools{display:flex}
           '<span class="workspace-display-state">'+(selected?'Activa':'Apagada')+'</span>'+
           '<span class="workspace-display-number">'+d.number+'</span>'+
         '</button>'+
-        '<button class="workspace-display-primary" data-workspace-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es principal':'Hacer '+d.name+' principal')+'">'+(primary?'★':'☆')+'</button>'+
+        '<button class="workspace-display-primary" data-workspace-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
         '<div class="workspace-display-info">'+
           '<div class="workspace-display-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.model)+'</small></div>'+
           '<div class="workspace-display-tech">'+esc(d.resolution)+'<br>'+esc(d.hz)+'</div>'+
@@ -1430,7 +1468,7 @@ body.test-mode .test-tools{display:flex}
     var baseDisplays=displaySummary(workspaceBase);
 
     q('.visual-workspace').classList.toggle('detail-mode',!isNew);
-    q('#workspaceProfileIcon').textContent=workspaceDraft.icon;
+    q('#workspaceProfileIcon').innerHTML=modeIconMarkup(workspaceDraft.icon);
     q('#workspaceEyebrow').textContent=isNew?'Nuevo modo':'Perfil abierto · Editando';
     q('#workspaceName').textContent=workspaceDraft.name;
     q('#workspaceSub').textContent=isNew
@@ -1796,7 +1834,7 @@ body.test-mode .test-tools{display:flex}
       var on=ids.indexOf(d.id)>=0;
       var isPrimary=session.primaryDisplayId===d.id;
       var cls=d.kind==='tv'?'tv':'pc';
-      var badge=isPrimary?'★ Principal':on?(session.preserve?'Conservada':'Activa'):'Apagada';
+      var badge=isPrimary?iconMarkup('star-filled')+'<span>Principal</span>':on?(session.preserve?'Conservada':'Activa'):'Apagada';
       return '<div class="overview-display '+(on?'on':'off')+(isPrimary?' primary':'')+'">'+
         '<span class="overview-badge">'+badge+'</span>'+
         '<div class="monitor '+cls+(isPrimary?' primary':'')+'"></div>'+
@@ -1805,7 +1843,7 @@ body.test-mode .test-tools{display:flex}
     }).join('');
 
     q('#displayStateMode').textContent=session.name;
-    q('#displayStateIcon').textContent=session.icon;
+    q('#displayStateIcon').innerHTML=modeIconMarkup(session.icon);
     q('#displayStateApp').textContent=session.app;
     q('#displayStateCount').textContent=String(session.displayIds.length);
     q('#displayStatePrimary').textContent=primary?primary.name:'—';
@@ -1848,7 +1886,7 @@ body.test-mode .test-tools{display:flex}
           '<span class="screen-shape"></span>'+
           '<span class="screen-copy"><b>'+d.name+'</b><small>'+d.detail+'</small></span>'+
         '</button>'+
-        '<button class="primary-screen-btn" data-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es la pantalla principal':'Hacer '+d.name+' principal')+'">'+(primary?'★':'☆')+'</button>'+
+        '<button class="primary-screen-btn" data-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es la pantalla principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
       '</div>';
     }).join('');
 
@@ -1866,7 +1904,7 @@ body.test-mode .test-tools{display:flex}
     var primary=getDisplay(displayDraft.primaryDisplayId);
     q('#displayEditorSummary').innerHTML=displayDraft.preserve
       ?'<b>Las pantallas quedan como están</b>'
-      :'<b>'+summary+'</b>'+(primary?' · ★ '+primary.name:'');
+      :'<b>'+summary+'</b>'+(primary?' · '+iconMarkup('star-filled')+' '+esc(primary.name):'');
   }
 
   function toggleDisplay(id){
