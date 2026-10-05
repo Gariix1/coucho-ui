@@ -658,9 +658,9 @@ function renderDisplayOverview(){
   if(!stage)return;
 
   if(!session){
-    stage.innerHTML='<div class="empty-state"><div><div class="empty-icon">▦</div><h3>Sin sesión aplicada</h3><p>Activa o prueba un modo para ver el estado de tus pantallas.</p></div></div>';
+    stage.innerHTML='<div class="empty-state"><div><div class="empty-icon">'+iconMarkup('display')+'</div><h3>Sin sesión aplicada</h3><p>Activa o prueba un modo para ver el estado de tus pantallas.</p></div></div>';
     q('#displayStateMode').textContent='—';
-    q('#displayStateIcon').textContent='▦';
+    q('#displayStateIcon').innerHTML=iconMarkup('display');
     q('#displayStateApp').textContent='Sin sesión';
     q('#displayStateCount').textContent='0';
     q('#displayStatePrimary').textContent='—';
