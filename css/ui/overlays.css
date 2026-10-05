@@ -104,6 +104,10 @@ right:28px;top:14px
 min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:13px
 }
 
+.capture-placeholder{
+color:var(--muted)
+}
+
 .capture-actions{
 display:flex;justify-content:center;gap:8px
 }
@@ -154,6 +158,10 @@ display:none;padding:15px 18px;border-top:1px solid var(--divider);align-items:c
 
 .confirm.show{
 display:flex
+}
+
+.confirm-actions{
+display:flex;gap:8px
 }
 
 .confirm b{
