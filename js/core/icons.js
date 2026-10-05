@@ -1,8 +1,7 @@
+const MODE_ICON_KEYS=new Set(['gaming','movies','desktop']);
+
 export function normalizeIconKey(icon){
-  if(icon==='gaming'||icon==='movies'||icon==='desktop')return icon;
-  if(icon==='🎮')return 'gaming';
-  if(icon==='🎬')return 'movies';
-  return 'desktop';
+  return MODE_ICON_KEYS.has(icon)?icon:'desktop';
 }
 
 export function iconMarkup(name,extraClass=''){
