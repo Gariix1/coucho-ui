@@ -107,3 +107,17 @@ margin:6px 0 16px;color:var(--text2);font-size:12px
 #testBtn.active{
 border-color:var(--accent);color:var(--accent);background:var(--selected-bg)
 }
+
+/* Feature-specific shared primitive sizing. */
+
+.settings-row-icon .ui-icon{
+width:18px;height:18px
+}
+
+.settings-row-value .ui-icon{
+width:15px;height:15px
+}
+
+.app-logo-large{
+width:58px;height:58px;border-radius:17px;font-size:20px
+}
