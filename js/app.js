@@ -1,4 +1,4 @@
-import {q,qa,esc} from './core/dom.js';
+import {q,qa,esc,setCssVars} from './core/dom.js';
 import {iconMarkup,modeIconMarkup} from './core/icons.js';
 import {
   autoMeta,
@@ -394,9 +394,7 @@ function renderWorkspaceScreens(){
   q('#workspaceScreens').innerHTML=ordered.map(function(d){
     var selected=workspaceDraft.displayIds.indexOf(d.id)>=0;
     var primary=selected&&workspaceDraft.primaryDisplayId===d.id;
-    var layout=d.layout||{width:28,aspect:1.78};
-
-    return '<div class="workspace-display '+(selected?'on':'off')+(primary?' primary':'')+'" style="--width:'+layout.width+';--aspect:'+layout.aspect+'">'+
+    return '<div class="workspace-display '+(selected?'on':'off')+(primary?' primary':'')+'" data-display-layout="'+d.id+'">'+
       '<button class="workspace-display-screen" data-workspace-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'" title="'+(selected?'Apagar ':'Activar ')+esc(d.name)+'">'+
         '<span class="workspace-display-state">'+(selected?'Activa':'Apagada')+'</span>'+
         '<span class="workspace-display-number">'+d.number+'</span>'+
@@ -409,6 +407,15 @@ function renderWorkspaceScreens(){
     '</div>';
   }).join('')+
   '<div class="workspace-canvas-legend">Izquierda → derecha · resolución y Hz solo informativos</div>';
+
+  qa('[data-display-layout]').forEach(function(el){
+    var display=getDisplay(el.dataset.displayLayout);
+    var layout=display&&display.layout?display.layout:{width:28,aspect:1.78};
+    setCssVars(el,{
+      '--display-width':layout.width,
+      '--display-aspect':layout.aspect
+    });
+  });
 
   qa('[data-workspace-display]').forEach(function(b){
     b.onclick=function(){toggleWorkspaceDisplay(b.dataset.workspaceDisplay)};
@@ -1092,6 +1099,11 @@ q('#capUse').onclick=function(){
 
 
 // Safe test/apply flow.
+function setTestProgress(percent){
+  var value=Math.max(0,Math.min(100,Number(percent)||0));
+  setCssVars(q('#progress'),{'--test-progress':value+'%'});
+}
+
 function startTest(ctx){
   closePops();
   closeShortcutOverlay();
@@ -1100,11 +1112,11 @@ function startTest(ctx){
   q('#testApp').textContent=logo(ctx.app);
   q('#testText').textContent='Probando '+ctx.name+'…';
   q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':ctx.kind==='workspace-new'?'Guardar y activar':ctx.kind==='workspace-edit'?'Guardar y activar':'Guardar';
-  q('#progress').style.width='0%';q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
+  setTestProgress(0);q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
 
   var pct=0;
   progressTimer=setInterval(function(){
-    pct+=25;q('#progress').style.width=pct+'%';
+    pct+=25;setTestProgress(pct);
     if(pct>=100){
       clearInterval(progressTimer);q('#testText').textContent='Listo';q('#confirm').classList.add('show');
       var left=15;q('#count').textContent=left;
@@ -1114,7 +1126,7 @@ function startTest(ctx){
           clearInterval(countdownTimer);
           q('#confirm').classList.remove('show');
           q('#testText').textContent='Restaurando…';
-          q('#progress').style.width='100%';
+          setTestProgress(100);
           setTimeout(finishRestore,TEST_TIMEOUT_RESTORE_MS);
         }
       },TEST_COUNTDOWN_INTERVAL_MS);
@@ -1213,9 +1225,9 @@ q('#revert').onclick=function(){
   clearInterval(countdownTimer);
   q('#confirm').classList.remove('show');
   q('#testText').textContent='Restaurando…';
-  q('#progress').style.width='35%';
+  setTestProgress(35);
   setTimeout(function(){
-    q('#progress').style.width='100%';
+    setTestProgress(100);
     setTimeout(finishRestore,MANUAL_RESTORE_FINISH_MS);
   },MANUAL_RESTORE_STEP_MS);
 };
