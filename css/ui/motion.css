@@ -29,6 +29,11 @@ z-index:120;border:1px solid var(--transition-border,var(--glass-border));border
   -webkit-backdrop-filter:blur(26px) saturate(1.18)
 }
 
+.mode-transition-flight.to-create{
+--transition-border:var(--create-border);
+  --transition-wash:var(--create-wash)
+}
+
 .mode-transition-flight.to-editor{
 --transition-border:var(--edit-border);
   --transition-wash:var(--edit-wash)
