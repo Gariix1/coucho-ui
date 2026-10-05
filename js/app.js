@@ -137,18 +137,6 @@ function workspaceFromApplied(){
   };
 }
 
-function detailHasUnsavedChanges(){
-  return workspaceTargetId!==null&&workspaceDraft&&workspaceBase&&!workspaceEqual(workspaceDraft,workspaceBase);
-}
-
-function guardDetailSwitch(nextId){
-  if(workspaceTargetId===null||workspaceTargetId===nextId)return true;
-  if(!detailHasUnsavedChanges())return true;
-  toast('Cambios sin guardar','Guarda o cancela el perfil abierto antes de cambiar');
-  q('.visual-workspace').focus({preventScroll:true});
-  return false;
-}
-
 function appUsage(app){
   var matches=sets.filter(function(mode){return mode.app===app});
   if(matches.length===0)return {text:'Sin usar',empty:true};
@@ -334,7 +322,6 @@ async function closeModeDetail(restore,afterClose){
   var transition=modeSheetTransition.prepare(source);
 
   try{
-    workspaceExpanded=false;
     workspaceExpanded=false;
     workspaceTargetId=null;
     workspaceDraft=workspaceFromApplied();
