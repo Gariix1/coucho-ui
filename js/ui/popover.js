@@ -1,3 +1,5 @@
+import {setCssVars} from '../core/dom.js';
+
 export function positionPopover(pop,anchor,{
   titlebarHeight=32,
   margin=12,
@@ -31,7 +33,9 @@ export function positionPopover(pop,anchor,{
     Math.min(window.innerWidth-popWidth-margin,centeredLeft)
   );
 
-  pop.style.top=Math.round(top)+'px';
-  pop.style.left=Math.round(left)+'px';
+  setCssVars(pop,{
+    '--popover-top':Math.round(top)+'px',
+    '--popover-left':Math.round(left)+'px'
+  });
   return true;
 }
