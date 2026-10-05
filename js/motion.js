@@ -1,5 +1,6 @@
-const OPEN_DURATION_MS=420;
-const CLOSE_DURATION_MS=360;
+const OPEN_TRAVEL_MS=360;
+const CLOSE_TRAVEL_MS=330;
+const RESOLVE_MS=120;
 
 function reducedMotion(){
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -63,6 +64,12 @@ function cleanupAnimation(animation){
   try{animation.cancel()}catch(_){}
 }
 
+function nextPaint(){
+  return new Promise(resolve=>{
+    requestAnimationFrame(()=>requestAnimationFrame(resolve));
+  });
+}
+
 function connectedTransform(from,to){
   return {
     x:to.left-from.left,
@@ -74,24 +81,6 @@ function connectedTransform(from,to){
 
 function transformValue(x,y,scaleX,scaleY){
   return 'translate3d('+x+'px,'+y+'px,0) scale('+scaleX+','+scaleY+')';
-}
-
-function animateCoordinated(elements,duration){
-  return (elements||[])
-    .filter(element=>element&&element.isConnected&&typeof element.animate==='function')
-    .map((element,index)=>{
-      const animation=element.animate([
-        {opacity:0,transform:'translate3d(0,8px,0)',offset:0},
-        {opacity:0,transform:'translate3d(0,8px,0)',offset:.52},
-        {opacity:1,transform:'translate3d(0,0,0)',offset:1}
-      ],{
-        duration,
-        delay:index*12,
-        easing:'cubic-bezier(.16,1,.3,1)',
-        fill:'both'
-      });
-      return animation;
-    });
 }
 
 function prepare(source,{hold=null}={}){
@@ -117,16 +106,19 @@ function prepare(source,{hold=null}={}){
     held?.element.remove();
   }
 
-  async function play(destination,direction='open',coordinated=[]){
-    const to=rectOf(destination);
+  async function play(destination,direction='open'){
+    const destinationSnapshot=createSnapshot(destination,'destination');
+    const to=destinationSnapshot?.rect||rectOf(destination);
+
     if(!usableRect(to)){
+      destinationSnapshot?.element.remove();
       dispose();
       return;
     }
 
     const vector=connectedTransform(flight.rect,to);
     const open=direction!=='close';
-    const duration=open?OPEN_DURATION_MS:CLOSE_DURATION_MS;
+    const travelDuration=open?OPEN_TRAVEL_MS:CLOSE_TRAVEL_MS;
 
     const target=transformValue(
       vector.x,
@@ -135,25 +127,35 @@ function prepare(source,{hold=null}={}){
       vector.scaleY
     );
 
-    const overshootX=vector.x+(vector.x===0?0:Math.sign(vector.x)*4);
-    const overshootY=vector.y+(vector.y===0?0:Math.sign(vector.y)*3);
+    // First 12%: lift/translate slightly without scaling.
+    // The small source content is already gone before the real deformation begins.
+    const releaseX=vector.x*.035;
+    const releaseY=vector.y*.035;
+
+    const overshootX=vector.x+(vector.x===0?0:Math.sign(vector.x)*3);
+    const overshootY=vector.y+(vector.y===0?0:Math.sign(vector.y)*2);
 
     const flightFrames=open
       ?[
           {
             transform:transformValue(0,0,1,1),
-            boxShadow:'0 10px 24px rgba(0,0,0,.12)',
+            boxShadow:'0 8px 20px rgba(0,0,0,.10)',
             offset:0
+          },
+          {
+            transform:transformValue(releaseX,releaseY,1,1),
+            boxShadow:'0 16px 34px rgba(0,0,0,.16)',
+            offset:.12
           },
           {
             transform:transformValue(
               overshootX,
               overshootY,
-              vector.scaleX*1.018,
-              vector.scaleY*.985
+              vector.scaleX*1.012,
+              vector.scaleY*.99
             ),
-            boxShadow:'0 28px 62px rgba(0,0,0,.22)',
-            offset:.84
+            boxShadow:'0 26px 58px rgba(0,0,0,.21)',
+            offset:.86
           },
           {
             transform:target,
@@ -168,9 +170,9 @@ function prepare(source,{hold=null}={}){
             offset:0
           },
           {
-            transform:transformValue(-2,-1,1.012,.982),
-            boxShadow:'0 26px 58px rgba(0,0,0,.20)',
-            offset:.18
+            transform:transformValue(releaseX,releaseY,1,1),
+            boxShadow:'0 24px 54px rgba(0,0,0,.19)',
+            offset:.12
           },
           {
             transform:target,
@@ -180,51 +182,68 @@ function prepare(source,{hold=null}={}){
         ];
 
     const flightAnimation=flight.element.animate(flightFrames,{
-      duration,
+      duration:travelDuration,
       easing:open?'cubic-bezier(.16,1,.3,1)':'cubic-bezier(.4,0,.2,1)',
       fill:'both'
     });
 
-    const contentAnimation=flight.content.animate(
-      open
-        ?[
-            {opacity:1,offset:0},
-            {opacity:.96,offset:.56},
-            {opacity:0,offset:.88},
-            {opacity:0,offset:1}
-          ]
-        :[
-            {opacity:1,offset:0},
-            {opacity:.96,offset:.62},
-            {opacity:0,offset:1}
-          ],
-      {duration,easing:'linear',fill:'both'}
-    );
+    const sourceContentAnimation=flight.content.animate([
+      {opacity:1,offset:0},
+      {opacity:.62,offset:.055},
+      {opacity:0,offset:.14},
+      {opacity:0,offset:1}
+    ],{
+      duration:travelDuration,
+      easing:'linear',
+      fill:'both'
+    });
 
+    // While opening, keep the previous workspace above the newly-rendered editor.
+    // It dissolves only once the connected surface is nearly covering it.
     const holdAnimation=held
       ?held.element.animate([
           {opacity:1,offset:0},
-          {opacity:1,offset:.42},
-          {opacity:0,offset:.78},
+          {opacity:1,offset:.60},
+          {opacity:0,offset:.88},
           {opacity:0,offset:1}
-        ],{duration,easing:'linear',fill:'both'})
+        ],{
+          duration:travelDuration,
+          easing:'linear',
+          fill:'both'
+        })
       :null;
-
-    const coordinatedAnimations=open
-      ?animateCoordinated(coordinated,duration)
-      :[];
 
     await Promise.all([
       animationFinished(flightAnimation),
-      animationFinished(contentAnimation),
-      holdAnimation?animationFinished(holdAnimation):Promise.resolve(),
-      ...coordinatedAnimations.map(animationFinished)
+      animationFinished(sourceContentAnimation),
+      holdAnimation?animationFinished(holdAnimation):Promise.resolve()
     ]);
 
+    // At this point the flight surface is already exactly where the destination lives.
+    // Keep it there and resolve into an exact snapshot of the final UI.
+    let resolveAnimation=null;
+    if(destinationSnapshot){
+      resolveAnimation=destinationSnapshot.element.animate([
+        {opacity:0},
+        {opacity:1}
+      ],{
+        duration:RESOLVE_MS,
+        easing:'cubic-bezier(.2,.8,.2,1)',
+        fill:'both'
+      });
+      await animationFinished(resolveAnimation);
+
+      // Give the real destination underneath one committed paint while the identical
+      // snapshot is still fully opaque. Removing it is then visually lossless.
+      await nextPaint();
+    }
+
     cleanupAnimation(flightAnimation);
-    cleanupAnimation(contentAnimation);
+    cleanupAnimation(sourceContentAnimation);
     if(holdAnimation)cleanupAnimation(holdAnimation);
-    coordinatedAnimations.forEach(cleanupAnimation);
+    if(resolveAnimation)cleanupAnimation(resolveAnimation);
+
+    destinationSnapshot?.element.remove();
     dispose();
   }
 
