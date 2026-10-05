@@ -29,9 +29,7 @@
     width:min(1640px,calc(100% - 64px));
     max-width:none
   }
-  .mode-workbench{
-    grid-template-columns:minmax(410px,460px) minmax(0,1fr)
-  }
+  .mode-workbench{display:block}
 
   .btn{min-height:clamp(38px,2.5vw,44px);padding:7px 16px}
   .btn.icon{
@@ -69,21 +67,13 @@
 }
 
 @media (max-width:1040px){
-  .mode-workbench{grid-template-columns:1fr}
-  .saved-modes-panel{
-    position:static;
-    max-height:none;
-    overflow:visible;
-    display:block
+  .workbench-wrap{width:min(100% - 36px,1120px)}
+  .mode-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mode-grid.detailed .saved-mode-card:not(.expanded-workspace) .saved-mode-body{
+    grid-template-columns:1fr
   }
-  .mode-list{
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    overflow:visible;
-    padding-right:0
-  }
-  .mode-list-group+.mode-list-group{
-    padding-top:0;
-    border-top:0
+  .mode-grid.detailed .saved-mode-card:not(.expanded-workspace) .card-facts{
+    margin-top:0
   }
   .visual-workspace.detail-mode{
     box-shadow:0 16px 38px rgba(0,0,0,.12),0 0 0 1px var(--monitor-glow)
@@ -106,6 +96,9 @@
     margin:0;
     padding:18px 16px 40px
   }
+
+  .mode-grid.compact{grid-template-columns:1fr}
+  .density-toggle{display:none}
 
   .workspace-screen-stage{
     justify-content:flex-start;
