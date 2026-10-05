@@ -118,6 +118,8 @@ function prepare(source,{hold=null}={}){
 
     const vector=connectedTransform(flight.rect,to);
     const open=direction!=='close';
+    flight.element.classList.toggle('to-editor',open);
+    flight.element.classList.toggle('to-card',!open);
     const travelDuration=open?OPEN_TRAVEL_MS:CLOSE_TRAVEL_MS;
 
     const target=transformValue(
