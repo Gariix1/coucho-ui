@@ -12,25 +12,29 @@ body{
 margin:0;overflow:hidden;color:var(--text);
   font:14px/1.35 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;
   background:
-    radial-gradient(900px 640px at 82% -10%,var(--glow-a),transparent 64%),
-    radial-gradient(760px 580px at -10% 100%,var(--glow-b),transparent 66%),
+    radial-gradient(980px 700px at 84% -12%,var(--glow-a),transparent 62%),
+    radial-gradient(860px 640px at -12% 106%,var(--glow-b),transparent 64%),
     linear-gradient(135deg,var(--window-bg-1) 0%,var(--window-bg-2) 48%,var(--window-bg-3) 100%);
   position:relative
 }
 
 body:before{
-content:"";position:fixed;inset:-40px;z-index:-2;
+content:"";position:fixed;inset:-90px;z-index:-2;
   background:
-    radial-gradient(520px 420px at 18% 24%,var(--glow-c),transparent 66%),
-    radial-gradient(650px 480px at 88% 72%,var(--glow-d),transparent 70%);
-  filter:blur(18px)
+    radial-gradient(420px 320px at 18% 20%,var(--glow-c),transparent 68%),
+    radial-gradient(520px 390px at 76% 18%,rgba(88,140,255,.11),transparent 70%),
+    radial-gradient(700px 520px at 90% 78%,var(--glow-d),transparent 72%),
+    linear-gradient(118deg,transparent 18%,rgba(125,211,252,.035) 38%,transparent 56%);
+  filter:blur(12px) saturate(1.18)
 }
 
 body:after{
 content:"";position:fixed;inset:0;z-index:-1;
-  background:var(--root-wash);
-  backdrop-filter:blur(28px) saturate(1.18);
-  -webkit-backdrop-filter:blur(28px) saturate(1.18)
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.012),transparent 22%),
+    var(--acrylic-tint);
+  backdrop-filter:blur(34px) saturate(1.28);
+  -webkit-backdrop-filter:blur(34px) saturate(1.28)
 }
 
 button{
