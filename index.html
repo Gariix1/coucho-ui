@@ -647,7 +647,7 @@ body.test-mode .test-tools{display:flex}
         <div class="mode-workbench">
           <aside class="saved-modes-panel">
             <div class="workbench-panel-head">
-              <div><h2>Modos</h2><small>Crea desde tu escritorio o edita uno guardado</small></div>
+              <div><h2>Modos</h2></div>
             </div>
             <div class="mode-list" id="modeList"></div>
           </aside>
@@ -659,7 +659,7 @@ body.test-mode .test-tools{display:flex}
                 <div class="workspace-title-copy">
                   <span class="workspace-eyebrow" id="workspaceEyebrow">Escritorio actual</span>
                   <h2 id="workspaceName" class="mode-name-edit" tabindex="0">Escritorio</h2>
-                  <small id="workspaceSub">Manipula las pantallas y guarda el resultado como un modo.</small>
+                  <small id="workspaceSub"></small>
                 </div>
               </div>
               <div class="workspace-head-actions">
@@ -685,7 +685,7 @@ body.test-mode .test-tools{display:flex}
             </div>
 
             <div class="workspace-footer">
-              <div class="workspace-help" id="workspaceHelp">Toca una pantalla para activarla o apagarla · ★ cambia la principal</div>
+              <div class="workspace-help" id="workspaceHelp"></div>
               <div class="workspace-actions">
                 <button class="btn" id="workspaceReset">Restaurar</button>
                 <button class="btn" id="workspaceTest">Probar</button>
@@ -700,7 +700,7 @@ body.test-mode .test-tools{display:flex}
     <section class="shell-view" id="view-library" data-shell-view="library" hidden>
       <div class="shell-placeholder">
         <div class="shell-page-head">
-          <div><h1>Apps</h1><p>Lo que Coucho puede abrir al activar un modo.</p></div>
+          <div><h1>Apps</h1><p>Apps disponibles para los modos.</p></div>
         </div>
         <div class="resource-grid app-library">
           <article class="resource-card">
@@ -722,7 +722,7 @@ body.test-mode .test-tools{display:flex}
     <section class="shell-view" id="view-devices" data-shell-view="devices" hidden>
       <div class="shell-placeholder display-page">
         <div class="shell-page-head">
-          <div><h1>Pantallas</h1><p>Estado actual del escritorio que Coucho está usando.</p></div>
+          <div><h1>Pantallas</h1><p>Estado del escritorio actual.</p></div>
         </div>
 
         <div class="display-overview">
@@ -760,7 +760,7 @@ body.test-mode .test-tools{display:flex}
     <section class="shell-view" id="view-settings" data-shell-view="settings" hidden>
       <div class="shell-placeholder">
         <div class="shell-page-head">
-          <div><h1>Ajustes</h1><p>Preferencias y herramientas poco frecuentes.</p></div>
+          <div><h1>Ajustes</h1><p>Preferencias y herramientas.</p></div>
         </div>
         <div class="settings-stack">
           <button class="settings-row" id="settingsTheme">
@@ -785,7 +785,7 @@ body.test-mode .test-tools{display:flex}
   <div class="display-editor-head">
     <div>
       <div class="pop-title">Pantallas</div>
-      <div class="display-editor-sub">Clic: activar · ☆: principal</div>
+      <div class="display-editor-sub">Selecciona para activar · estrella para principal</div>
     </div>
     <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
   </div>
@@ -1372,7 +1372,7 @@ body.test-mode .test-tools{display:flex}
           '</div>'+
         '</div>'+
         (selected
-          ?'<div class="saved-mode-editing"><div><b>Editando</b><small>Este modo está abierto en el visualizador</small></div></div>'
+          ?'<div class="saved-mode-editing"><div><b>Editando</b></div></div>'
           :'<div class="saved-mode-body">'+
             '<button class="card-display quick-display" data-id="'+mode.id+'" title="Editar pantallas">'+
               '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode)+'</span>'+
@@ -1469,19 +1469,11 @@ body.test-mode .test-tools{display:flex}
 
     q('.visual-workspace').classList.toggle('detail-mode',!isNew);
     q('#workspaceProfileIcon').innerHTML=modeIconMarkup(workspaceDraft.icon);
-    q('#workspaceEyebrow').textContent=isNew?'Nuevo modo':'Perfil abierto · Editando';
+    q('#workspaceEyebrow').textContent=isNew?'Crear modo':'Editando';
     q('#workspaceName').textContent=workspaceDraft.name;
-    q('#workspaceSub').textContent=isNew
-      ?(dirty
-        ?'Partiendo de '+baseDisplays+'. '+changeLabel+' sin guardar.'
-        :'Partiendo de '+baseDisplays+'. Ajusta solo lo que quieras.')
-      :(dirty
-        ?changeLabel+' sin guardar. No se aplican hasta probar o activar.'
-        :'Configuración guardada. Los cambios no se aplican hasta probar o activar.');
-    q('#workspaceScreenTitle').textContent=isNew?'Pantallas':'Pantallas del modo';
-    q('#workspaceScreenMeta').textContent=isNew
-      ?'Base actual: '+baseDisplays
-      :'Configuración guardada en este modo';
+    q('#workspaceSub').textContent=dirty?changeLabel+' sin guardar':'';
+    q('#workspaceScreenTitle').textContent='Pantallas';
+    q('#workspaceScreenMeta').textContent=isNew?'Base: '+baseDisplays:'';
     q('#workspaceAppName').textContent=workspaceDraft.app;
     q('#workspaceShortcutName').textContent=shortcutCardLabel(workspaceDraft.shortcut);
     q('#workspaceState').textContent=dirty?changeLabel:(isNew?'Borrador':'Guardado');
@@ -1490,12 +1482,12 @@ body.test-mode .test-tools{display:flex}
     q('#workspaceReset').disabled=isNew&&!dirty;
     q('#workspaceReset').textContent=isNew?'Restablecer':'Cancelar';
     q('#workspaceReset').title=isNew?'Volver al estado del escritorio actual':'Descartar cambios sin guardar';
-    q('#workspaceSave').textContent=isNew?'Crear modo':'Guardar cambios';
+    q('#workspaceSave').textContent=isNew?'Crear modo':'Guardar';
     q('#workspaceSave').disabled=!isNew&&!dirty;
     q('#workspaceClose').hidden=isNew;
-    q('#workspaceClose').title=!isNew&&dirty?'Cancelar cambios y cerrar':'Cerrar detalle';
+    q('#workspaceClose').title=!isNew&&dirty?'Descartar y cerrar':'Cerrar';
     q('#workspaceClose').setAttribute('aria-label',q('#workspaceClose').title);
-    q('#workspaceHelp').textContent='Selecciona una pantalla para activarla o apagarla · ☆ cambia la principal · Resolución y Hz son informativos';
+    q('#workspaceHelp').innerHTML='Selecciona para activar · '+iconMarkup('star')+' principal';
   }
 
   function refreshWorkspaceDraft(){
@@ -1770,7 +1762,7 @@ body.test-mode .test-tools{display:flex}
     var mode=byId(id);
     if(!mode)return;
     if(workspaceTargetId===id){
-      toast('Perfil abierto','Renombra desde el editor de detalle');
+      toast('Editando','Renombra desde el editor');
       return;
     }
 
@@ -1856,7 +1848,7 @@ body.test-mode .test-tools{display:flex}
     closePops();
     displayEditModeId=resolveId(rawId);
     if(workspaceTargetId===displayEditModeId){
-      toast('Perfil abierto','Edita las pantallas desde el detalle');
+      toast('Editando','Cambia las pantallas desde el editor');
       return;
     }
     var source=byId(displayEditModeId);
@@ -1937,7 +1929,7 @@ body.test-mode .test-tools{display:flex}
     closePops();
     appEditTarget={kind:'mode',id:resolveId(rawId)};
     if(workspaceTargetId===appEditTarget.id){
-      toast('Perfil abierto','Edita la app desde el detalle');
+      toast('Editando','Cambia la app desde el editor');
       return;
     }
     var mode=byId(appEditTarget.id);
@@ -2192,7 +2184,7 @@ body.test-mode .test-tools{display:flex}
 
     if(shortcutEditTarget.kind==='mode'&&workspaceTargetId===shortcutEditTarget.id){
       shortcutEditTarget=null;
-      toast('Perfil abierto','Edita el atajo desde el detalle');
+      toast('Editando','Cambia el atajo desde el editor');
       return;
     }
     if(shortcutEditTarget.kind==='mode'&&!byId(shortcutEditTarget.id)){
