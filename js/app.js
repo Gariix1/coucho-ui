@@ -249,12 +249,7 @@ async function openModeDetail(id,source){
     renderWorkbench();
 
     workspace=q('.visual-workspace');
-    await transition.play(workspace,'open',[
-      q('.visual-workspace-head'),
-      q('.workspace-screen-stage'),
-      q('.workspace-pieces'),
-      q('.workspace-footer')
-    ]);
+    await transition.play(workspace,'open');
   }finally{
     transition.cancel();
     setModeTransitioning(false);
