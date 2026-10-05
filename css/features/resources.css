@@ -1,0 +1,109 @@
+/* Apps, settings and prototype support views. */
+
+.resource-grid{
+display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;align-items:stretch
+}
+
+.resource-card,.settings-stack{
+border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card)
+}
+
+.resource-card{
+padding:14px;min-width:0
+}
+
+.resource-visual{
+min-height:112px;border:1px solid var(--glass-soft-border);border-radius:var(--r-compact);background:var(--glass-inset);display:grid;place-items:center;margin-bottom:12px
+}
+
+.resource-copy{
+display:flex;align-items:center;justify-content:space-between;gap:12px
+}
+
+.resource-copy h3{
+margin:0;font-size:15px;font-weight:600
+}
+
+.resource-copy small{
+display:block;color:var(--text2);font-size:11px;margin-top:3px
+}
+
+.status-dot{
+display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--success);margin-right:5px
+}
+
+.usage-chip{
+max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid var(--selected-border);border-radius:999px;background:var(--selected-bg);color:var(--accent);padding:5px 8px;font-size:10px;font-weight:600
+}
+
+.muted-chip{
+border-color:var(--glass-soft-border);background:var(--glass-command);color:var(--muted)
+}
+
+.settings-stack{
+overflow:hidden
+}
+
+.settings-row{
+width:100%;min-height:68px;border:0;border-top:1px solid var(--divider);background:transparent;color:var(--text);display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 14px;text-align:left
+}
+
+.settings-row:first-child{
+border-top:0
+}
+
+.settings-row:is(button){
+cursor:pointer
+}
+
+.settings-row:is(button):hover{
+background:var(--glass-command)
+}
+
+.settings-row-icon{
+width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-control);color:var(--accent);display:grid;place-items:center
+}
+
+.settings-row-copy b{
+display:block;font-size:13px
+}
+
+.settings-row-copy small{
+display:block;color:var(--text2);font-size:10px;margin-top:2px
+}
+
+.settings-row-value{
+color:var(--muted);font-size:11px;font-weight:600
+}
+
+.test-tools{
+display:none;align-items:center;justify-content:space-between;gap:12px;margin:-4px 0 16px;padding:10px 12px;border:1px dashed var(--glass-border);border-radius:var(--r-control);background:var(--glass-surface);color:var(--text2);font-size:12px
+}
+
+body.test-mode .test-tools{
+display:flex
+}
+
+.test-tools-actions{
+display:flex;gap:8px
+}
+
+.empty-state{
+flex:1 1 100%;width:100%;min-height:230px;border:1px dashed var(--glass-border);border-radius:var(--r-panel);background:var(--glass-panel);display:grid;place-items:center;text-align:center;padding:24px
+}
+
+.empty-state .empty-icon{
+width:56px;height:56px;margin:0 auto 14px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-control);display:grid;place-items:center;color:var(--accent);font-size:24px
+}
+
+.empty-state h3{
+margin:0;font-size:18px;font-weight:600
+}
+
+.empty-state p{
+margin:6px 0 16px;color:var(--text2);font-size:12px
+}
+
+#testBtn.active{
+border-color:var(--accent);color:var(--accent);background:var(--selected-bg)
+}
