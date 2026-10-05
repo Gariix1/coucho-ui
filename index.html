@@ -353,8 +353,10 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
   .saved-modes-panel{position:static;max-height:none;overflow:visible;display:block}
   .mode-list{grid-template-columns:repeat(auto-fit,minmax(260px,1fr));overflow:visible;padding-right:0}
   .mode-list-group+.mode-list-group{padding-top:0;border-top:0}
-  .workspace-screen-stage{min-height:300px}
   .visual-workspace.detail-mode{box-shadow:0 16px 38px rgba(0,0,0,.12),0 0 0 1px var(--monitor-glow)}
+}
+@media(min-width:761px) and (max-width:1040px){
+  .workspace-screen-stage{min-height:300px}
 }
 /* support views + floating UI */
 .resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;align-items:stretch}
