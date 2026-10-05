@@ -1,0 +1,13 @@
+/* Motion owned by the isolated mode-sheet transition. */
+
+.mode-flight-sheet{
+position:fixed;z-index:120;pointer-events:none;margin:0;
+  border:1px solid var(--selected-border);border-radius:var(--r-card);
+  background:var(--glass-card);
+  box-shadow:0 12px 32px rgba(0,0,0,.16);
+  transform:none;will-change:left,top,width,height,box-shadow,opacity
+}
+
+@media(prefers-reduced-motion:reduce){
+.mode-flight-sheet{display:none}
+}
