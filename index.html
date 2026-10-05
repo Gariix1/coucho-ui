@@ -14,16 +14,16 @@
     <div class="win" aria-hidden="true"><span>—</span><span>□</span><span>✕</span></div>
   </header>
 
-  <div class="app-shell" id="appShell">
+  <div class="app-shell">
   <aside class="nav-rail" aria-label="Navegación de Coucho">
     <nav class="rail-main">
       <button class="rail-item active" data-nav-view="modes" aria-current="page" aria-controls="view-modes" title="Modos">
         <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-modes"></use></svg></span><span>Modos</span>
       </button>
-      <button class="rail-item" data-nav-view="library" aria-controls="view-library" title="Apps">
+      <button class="rail-item" data-nav-view="apps" aria-controls="view-apps" title="Apps">
         <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-play"></use></svg></span><span>Apps</span>
       </button>
-      <button class="rail-item" data-nav-view="devices" aria-controls="view-devices" title="Pantallas">
+      <button class="rail-item" data-nav-view="displays" aria-controls="view-displays" title="Pantallas">
         <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-display"></use></svg></span><span>Pant.</span>
       </button>
     </nav>
@@ -99,12 +99,12 @@
       </div>
     </section>
 
-    <section class="shell-view" id="view-library" data-shell-view="library" hidden>
+    <section class="shell-view" id="view-apps" data-shell-view="apps" hidden>
       <div class="shell-placeholder">
         <header class="shell-page-head">
           <div><h1>Apps</h1><p>Apps disponibles para los modos.</p></div>
         </header>
-        <div class="resource-grid app-library">
+        <div class="resource-grid">
           <article class="resource-card">
             <div class="resource-visual"><div class="app-logo app-logo-large">S</div></div>
             <div class="resource-copy"><div><h3>Steam</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip" id="steamUsage">Gaming</span></div>
@@ -121,7 +121,7 @@
       </div>
     </section>
 
-    <section class="shell-view" id="view-devices" data-shell-view="devices" hidden>
+    <section class="shell-view" id="view-displays" data-shell-view="displays" hidden>
       <div class="shell-placeholder display-page">
         <header class="shell-page-head">
           <div><h1>Pantallas</h1><p>Estado del escritorio actual.</p></div>
@@ -154,7 +154,7 @@
         </div>
 
         <div class="display-page-foot">
-          <button class="quiet-action" id="advancedDisplays">Configuración avanzada</button>
+          <button id="advancedDisplays">Configuración avanzada</button>
         </div>
       </div>
     </section>
