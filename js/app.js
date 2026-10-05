@@ -292,7 +292,6 @@ async function openWorkspace(targetId,source){
   }finally{
     transition.cancel();
     setModeTransitioning(false);
-    renderWorkbench();
   }
 
   var closeButton=q('#workspaceClose');
@@ -338,7 +337,6 @@ async function closeModeDetail(restore,afterClose){
   }finally{
     transition.cancel();
     setModeTransitioning(false);
-    renderWorkbench();
   }
 
   if(typeof afterClose==='function'){
@@ -584,8 +582,8 @@ function renderWorkspaceEditor(){
   var activateButton=q('#workspaceActivate');
   activateButton.hidden=isNew||!!(mode&&mode.active&&!pending);
   activateButton.textContent=pending?'Aplicar':'Activar';
-  q('#workspaceClose').title='Compactar';
-  q('#workspaceClose').setAttribute('aria-label','Compactar');
+  q('#workspaceClose').title=isNew?'Cancelar':'Compactar';
+  q('#workspaceClose').setAttribute('aria-label',isNew?'Cancelar':'Compactar');
 
   bindWorkspaceControls();
 }
@@ -1045,7 +1043,6 @@ async function createWorkspaceMode(){
   }finally{
     transition.cancel();
     setModeTransitioning(false);
-    render();
   }
 
   toast(created.name,'Modo creado');
