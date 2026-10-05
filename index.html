@@ -1280,11 +1280,10 @@ body.test-mode .test-tools{display:flex}
     var modeList=q('#modeList');
     if(currentPopAnchor&&modeList&&modeList.contains(currentPopAnchor))closePops();
     var currentSelected=workspaceTargetId===null;
-    var transitioning=modeTransitioning;
 
     var current='<div class="mode-list-group">'+
       '<div class="mode-list-label">Crear desde</div>'+
-      '<button class="mode-list-item current'+(currentSelected?' selected':'')+'" data-workspace-id="current"'+(transitioning?' disabled':'')+'>'+
+      '<button class="mode-list-item current'+(currentSelected?' selected':'')+'" data-workspace-id="current">'+
         '<span class="mode-list-icon">▦</span>'+
         '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
         '<span></span>'+
@@ -1308,21 +1307,21 @@ body.test-mode .test-tools{display:flex}
             '<small>'+(selected?'<span class="mode-editing-badge">'+(mode.active?'Activo · Editando':'Editando')+'</span>':(mode.active?'<span class="mode-list-badge">Activo</span>':'Guardado'))+'</small></span>'+
           '</div>'+
           '<div class="saved-mode-actions">'+
-            (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty||transitioning)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el perfil abierto':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
-            '<button class="btn view-mode" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' aria-controls="modeWorkspace" aria-expanded="'+(selected?'true':'false')+'" title="'+(selected?'Cerrar detalle':'Abrir detalle')+'">'+(selected?'Cerrar':'Ver')+'</button>'+
-            '<button class="trash-mode" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Eliminar" aria-label="Eliminar '+safeName+'"><span class="trash-glyph" aria-hidden="true">&#xE74D;</span></button>'+
+            (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el perfil abierto':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
+            '<button class="btn view-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" aria-expanded="'+(selected?'true':'false')+'" title="'+(selected?'Cerrar detalle':'Abrir detalle')+'">'+(selected?'Cerrar':'Ver')+'</button>'+
+            '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'"><span class="trash-glyph" aria-hidden="true">&#xE74D;</span></button>'+
           '</div>'+
         '</div>'+
         (selected
           ?'<div class="saved-mode-editing"><div><b>Editando</b><small>Este modo está abierto en el visualizador</small></div></div>'
           :'<div class="saved-mode-body">'+
-            '<button class="card-display quick-display" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Editar pantallas">'+
+            '<button class="card-display quick-display" data-id="'+mode.id+'" title="Editar pantallas">'+
               '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode)+'</span>'+
               '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
             '</button>'+
             '<div class="card-facts">'+
-              '<button class="card-fact quick-app" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Cambiar app"><span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
-              '<button class="card-fact quick-shortcut" data-id="'+mode.id+'"'+(transitioning?' disabled':'')+' title="Cambiar atajo"><span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
+              '<button class="card-fact quick-app" data-id="'+mode.id+'" title="Cambiar app"><span class="fact-icon">▶</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
+              '<button class="card-fact quick-shortcut" data-id="'+mode.id+'" title="Cambiar atajo"><span class="fact-icon">🎮</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
             '</div>'+
           '</div>')+
       '</article>';
