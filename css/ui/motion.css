@@ -3,11 +3,62 @@
 .mode-flight-sheet{
 position:fixed;z-index:120;pointer-events:none;margin:0;
   border:1px solid var(--selected-border);border-radius:var(--r-card);
-  background:var(--glass-card);
+  background:linear-gradient(180deg,var(--selected-bg),transparent 84px),var(--glass-card);
   box-shadow:0 12px 32px rgba(0,0,0,.16);
   transform:none;will-change:left,top,width,height,box-shadow,opacity
 }
 
+.mode-flight-sheet:before,
+.mode-flight-sheet:after{
+content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1
+}
+
+.mode-flight-sheet:before{
+transform:translate(7px,7px);border:1px solid var(--glass-border);background:var(--glass-control)
+}
+
+.mode-flight-sheet:after{
+transform:translate(13px,13px);border:1px solid var(--glass-soft-border);background:var(--glass-panel)
+}
+
+.mode-flight-sheet.is-opening:before{
+animation:flightSheetLayerOneIn 300ms cubic-bezier(.2,.8,.2,1) both
+}
+
+.mode-flight-sheet.is-opening:after{
+animation:flightSheetLayerTwoIn 300ms cubic-bezier(.2,.8,.2,1) both
+}
+
+.mode-flight-sheet.is-closing:before{
+animation:flightSheetLayerOneOut 300ms cubic-bezier(.2,.8,.2,1) both
+}
+
+.mode-flight-sheet.is-closing:after{
+animation:flightSheetLayerTwoOut 300ms cubic-bezier(.2,.8,.2,1) both
+}
+
+@keyframes flightSheetLayerOneIn{
+from{transform:translate(1px,1px);opacity:0}
+to{transform:translate(7px,7px);opacity:1}
+}
+
+@keyframes flightSheetLayerTwoIn{
+from{transform:translate(2px,2px);opacity:0}
+to{transform:translate(13px,13px);opacity:.9}
+}
+
+@keyframes flightSheetLayerOneOut{
+from{transform:translate(7px,7px);opacity:1}
+to{transform:translate(1px,1px);opacity:0}
+}
+
+@keyframes flightSheetLayerTwoOut{
+from{transform:translate(13px,13px);opacity:.9}
+to{transform:translate(2px,2px);opacity:0}
+}
+
 @media(prefers-reduced-motion:reduce){
 .mode-flight-sheet{display:none}
+.visual-workspace.detail-mode:before,
+.visual-workspace.detail-mode:after{animation:none}
 }
