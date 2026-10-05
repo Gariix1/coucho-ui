@@ -1,48 +1,29 @@
+import {q,qa,esc} from './core/dom.js';
+import {iconMarkup,modeIconMarkup} from './core/icons.js';
+import {
+  autoMeta,
+  demoSets,
+  getDisplay,
+  loadSets,
+  saveSets as persistSets,
+  simulatedDisplays
+} from './data/catalog.js';
+import {
+  cloneModeConfig,
+  displayConfig,
+  displayCountLabel,
+  displayMarkup,
+  displaySummary,
+  logo,
+  shortcutCardLabel,
+  shortcutMarkup,
+  workspaceChangeCount,
+  workspaceEqual
+} from './model.js';
+
 (function(){
-  var simulatedDisplays=[
-    {id:'tv',number:1,name:'TV Sala',model:'LG OLED42C3',resolution:'3840 × 2160',hz:'120 Hz',detail:'3840 × 2160 · 120 Hz',kind:'tv',layout:{left:4,top:34,width:31,aspect:1.78}},
-    {id:'main',number:2,name:'Monitor 1',model:'LG 27GP850-B',resolution:'2560 × 1440',hz:'165 Hz',detail:'2560 × 1440 · 165 Hz',kind:'monitor',layout:{left:37,top:22,width:28,aspect:1.78}},
-    {id:'aux',number:3,name:'Monitor 2',model:'Dell P2422H',resolution:'1920 × 1080',hz:'75 Hz',detail:'1920 × 1080 · 75 Hz',kind:'monitor',layout:{left:67,top:38,width:25,aspect:1.78}}
-  ];
 
-  function demoSets(){
-    return [
-      {id:1,name:'Gaming',icon:'gaming',preserve:false,displayIds:['tv','main'],primaryDisplayId:'tv',app:'Steam',shortcut:'Guide + A',active:true},
-      {id:2,name:'Películas',icon:'movies',preserve:false,displayIds:['tv'],primaryDisplayId:'tv',app:'Plex',shortcut:'Manual',active:false},
-      {id:3,name:'Escritorio',icon:'desktop',preserve:false,displayIds:['main','aux'],primaryDisplayId:'main',app:'Ninguna',shortcut:'Manual',active:false}
-    ];
-  }
 
-  function normalizeIconKey(icon){
-    if(icon==='gaming'||icon==='movies'||icon==='desktop')return icon;
-    if(icon==='🎮')return 'gaming';
-    if(icon==='🎬')return 'movies';
-    return 'desktop';
-  }
-
-  function migrateSet(s){
-    if(Array.isArray(s.displayIds)){
-      return Object.assign({preserve:false,primaryDisplayId:s.displayIds[0]||null},s,{icon:normalizeIconKey(s.icon)});
-    }
-    var ids=s.mode==='tv'?['tv']:s.mode==='monitor'?['main']:s.mode==='preserve'?[]:['tv','main'];
-    return Object.assign({},s,{
-      preserve:s.mode==='preserve',
-      displayIds:ids,
-      primaryDisplayId:ids[0]||null,
-      icon:normalizeIconKey(s.icon)
-    });
-  }
-
-  function loadSets(){
-    try{
-      var saved=localStorage.getItem('coucho-test-sets');
-      if(saved!==null){
-        var parsed=JSON.parse(saved);
-        if(Array.isArray(parsed)) return parsed.map(migrateSet);
-      }
-    }catch(_){}
-    return demoSets();
-  }
 
   var sets=loadSets();
 
@@ -68,28 +49,15 @@
   var initialTheme=savedTheme==='light'||savedTheme==='dark'?savedTheme:'dark';
   document.documentElement.dataset.theme=initialTheme;
 
-  function q(s){return document.querySelector(s)}
-  function qa(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
-  function esc(value){
-    return String(value==null?'':value)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;')
-      .replace(/'/g,'&#39;');
-  }
   function byId(id){return sets.find(function(x){return x.id===id})||null}
   function active(){return sets.find(function(x){return x.active})||null}
   function resolveId(raw){
     var a=active();
     return raw==='active'?(a?a.id:null):Number(raw);
   }
-  function saveSets(){
-    localStorage.setItem('coucho-test-sets',JSON.stringify(sets));
-  }
   function commitSets(){
     normalizeActive();
-    saveSets();
+    persistSets(sets);
   }
   function normalizeActive(){
     var kept=false;
@@ -98,31 +66,6 @@
       if(s.active)s.active=false;
     });
   }
-  function iconMarkup(name,extraClass){
-    var cls='ui-icon'+(extraClass?' '+extraClass:'');
-    return '<svg class="'+cls+'" aria-hidden="true"><use href="#icon-'+name+'"></use></svg>';
-  }
-  function modeIconMarkup(key){
-    var map={gaming:'gamepad',movies:'film',desktop:'desktop'};
-    return iconMarkup(map[normalizeIconKey(key)]||'desktop');
-  }
-  function logo(app){return app==='Ninguna'?'—':app.charAt(0).toUpperCase()}
-  function autoMeta(app){
-    if(app==='Plex') return {name:'Películas',icon:'movies'};
-    if(app==='Ninguna') return {name:'Escritorio',icon:'desktop'};
-    return {name:'Gaming',icon:'gaming'};
-  }
-  function getDisplay(id){
-    return simulatedDisplays.find(function(d){return d.id===id});
-  }
-  function displayConfig(source){
-    return {
-      preserve:!!source.preserve,
-      displayIds:Array.isArray(source.displayIds)?source.displayIds.slice():[],
-      primaryDisplayId:source.primaryDisplayId||null
-    };
-  }
-
   function sessionFromMode(mode){
     if(!mode)return null;
 
@@ -163,19 +106,6 @@
     var b=(mode.displayIds||[]).slice().sort().join('|');
     return a===b;
   }
-  function cloneModeConfig(source){
-    return {
-      id:source.id==null?null:source.id,
-      name:source.name||'Escritorio',
-      icon:normalizeIconKey(source.icon),
-      preserve:!!source.preserve,
-      displayIds:Array.isArray(source.displayIds)?source.displayIds.slice():[],
-      primaryDisplayId:source.primaryDisplayId||null,
-      app:source.app||'Ninguna',
-      shortcut:source.shortcut||'Manual'
-    };
-  }
-
   function workspaceFromApplied(){
     ensureAppliedSession();
     var ids=appliedSession&&appliedSession.displayIds.length
@@ -190,26 +120,6 @@
     };
   }
 
-  function workspaceEqual(a,b){
-    if(!a||!b)return false;
-    if(a.name!==b.name||a.icon!==b.icon||a.app!==b.app||a.shortcut!==b.shortcut||!!a.preserve!==!!b.preserve||a.primaryDisplayId!==b.primaryDisplayId)return false;
-    return a.displayIds.slice().sort().join('|')===b.displayIds.slice().sort().join('|');
-  }
-
-  function workspaceChangeCount(a,b){
-    if(!a||!b)return 0;
-    var count=0;
-    if(a.name!==b.name||a.icon!==b.icon)count++;
-    if(a.app!==b.app)count++;
-    if(a.shortcut!==b.shortcut)count++;
-
-    var displaysChanged=!!a.preserve!==!!b.preserve||
-      a.primaryDisplayId!==b.primaryDisplayId||
-      a.displayIds.slice().sort().join('|')!==b.displayIds.slice().sort().join('|');
-    if(displaysChanged)count++;
-    return count;
-  }
-
   function detailHasUnsavedChanges(){
     return workspaceTargetId!==null&&workspaceDraft&&workspaceBase&&!workspaceEqual(workspaceDraft,workspaceBase);
   }
@@ -222,40 +132,6 @@
     return false;
   }
 
-  function displaySummary(source){
-    if(source.preserve)return 'No cambiar pantallas';
-    var ids=Array.isArray(source.displayIds)?source.displayIds:[];
-    var names=ids.map(function(id){var d=getDisplay(id);return d?d.name:id});
-    if(names.length===0)return 'Sin pantallas';
-    if(names.length===1)return names[0];
-    if(names.length===2)return names.join(' + ');
-    return names.length+' pantallas';
-  }
-  function displayMarkup(source){
-    if(source.preserve)return '<div class="display-placeholder preserve">↔</div>';
-    var ids=Array.isArray(source.displayIds)?source.displayIds:[];
-    if(ids.length===0)return '<div class="display-placeholder empty">—</div>';
-    return ids.map(function(id){
-      var d=getDisplay(id);
-      if(!d)return '';
-      var cls=d.kind==='tv'?'tv':'pc';
-      var primary=id===source.primaryDisplayId?' primary':'';
-      var star=id===source.primaryDisplayId?'<span class="monitor-star">'+iconMarkup('star-filled')+'</span>':'';
-      return '<div class="monitor '+cls+primary+'" title="'+esc(d.name)+'">'+star+'</div>';
-    }).join('');
-  }
-  function shortcutLabel(v){return v==='Manual'?'Añadir':v}
-  function shortcutCardLabel(v){return v==='Manual'?'Sin atajo':v}
-  function displayCountLabel(source){
-    if(source.preserve)return 'No cambia pantallas';
-    var count=Array.isArray(source.displayIds)?source.displayIds.length:0;
-    return count===1?'1 pantalla':count+' pantallas';
-  }
-  function shortcutMarkup(v){
-    if(v==='Manual') return '<span style="color:var(--muted)">Sin atajo</span>';
-    var p=v.split(' + ');
-    return '<span class="key">'+p[0]+'</span><span>+</span><span class="key round">'+p[1]+'</span>';
-  }
   function toast(t,s){
     q('#toastTitle').textContent=t;q('#toastText').textContent=s;q('#toast').classList.add('show');
     clearTimeout(window._toast);window._toast=setTimeout(function(){q('#toast').classList.remove('show')},2100);
