@@ -1013,7 +1013,7 @@ function closeShortcutOverlay(){
   q('#shortcutOverlay').classList.remove('open');
   shortcutEditTarget=null;
   captured=null;
-  q('#capUse').style.display='none';
+  q('#capUse').hidden=true;
 }
 
 function openShortcut(rawId){
@@ -1033,15 +1033,15 @@ function openShortcut(rawId){
   }
 
   captured=null;
-  q('#captureResult').innerHTML='<span style="color:var(--muted)">A · X · Y</span>';
-  q('#capUse').style.display='none';
+  q('#captureResult').innerHTML='<span class="capture-placeholder">A · X · Y</span>';
+  q('#capUse').hidden=true;
   q('#shortcutOverlay').classList.add('open');
 }
 
 function capture(v){
   captured='Guide + '+v;
   q('#captureResult').innerHTML=shortcutMarkup(captured);
-  q('#capUse').style.display='inline-flex';
+  q('#capUse').hidden=false;
 }
 
 q('#capA').onclick=function(){capture('A')};
