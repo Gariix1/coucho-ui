@@ -49,7 +49,7 @@ display:flex;justify-content:flex-end;gap:7px;margin-top:10px
 }
 
 .capture-wrap{
-display:none;position:fixed;inset:32px 0 0 0;z-index:70;background:var(--scrim);backdrop-filter:blur(12px);place-items:center
+display:none;position:fixed;inset:32px 0 0;z-index:70;background:var(--scrim);backdrop-filter:blur(6px);place-items:center
 }
 
 .capture-wrap.open{
@@ -57,7 +57,7 @@ display:grid
 }
 
 .capture{
-width:min(440px,92vw);border:1px solid var(--glass-border);border-radius:var(--r-panel);background:var(--floating-bg);box-shadow:var(--shadow);padding:24px;text-align:center;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)
+width:min(460px,92vw);border:1px solid var(--glass-border);border-radius:var(--r-panel);background:var(--floating-bg);box-shadow:var(--shadow);padding:26px;text-align:center;backdrop-filter:blur(24px) saturate(1.14);-webkit-backdrop-filter:blur(24px) saturate(1.14)
 }
 
 .capture h3{
@@ -65,43 +65,59 @@ margin:0;font-size:18px;font-weight:600
 }
 
 .controller{
-width:210px;height:116px;margin:20px auto 16px;border:1px solid var(--glass-soft-border);border-radius:70px;background:var(--glass-card);position:relative
+width:320px;height:160px;margin:22px auto 18px;border:1px solid var(--glass-soft-border);border-radius:92px 92px 72px 72px;background:linear-gradient(180deg,var(--glass-card),var(--glass-inset));position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)
 }
 
 .guide{
-position:absolute;left:50%;top:20px;transform:translateX(-50%);min-width:58px;height:28px;border-radius:999px;background:var(--gamepad-bg);border:1px solid var(--gamepad-border);display:grid;place-items:center;font-size:9px;font-weight:700
+position:absolute;left:50%;top:22px;transform:translateX(-50%);min-width:62px;height:30px;padding:0 12px;border-radius:999px;background:var(--gamepad-bg);border:1px solid var(--gamepad-border);display:grid;place-items:center;color:var(--text2);font-size:9px;font-weight:700
 }
 
 .stick{
-position:absolute;width:28px;height:28px;border-radius:50%;background:#202838;border:1px solid #465267;top:56px
+position:absolute;width:34px;height:34px;border-radius:50%;background:#202838;border:1px solid #465267;box-shadow:inset 0 0 0 6px rgba(255,255,255,.018)
 }
 
 .stick.left{
-left:35px
+left:50px;top:67px
 }
 
 .stick.right{
-right:38px
+left:126px;top:96px;width:30px;height:30px
+}
+
+.face-buttons{
+position:absolute;right:34px;top:39px;width:96px;height:96px;display:grid;grid-template-columns:repeat(3,32px);grid-template-rows:repeat(3,32px);place-items:center
 }
 
 .cbtn{
-position:absolute;width:30px;height:30px;border-radius:50%;border:1px solid var(--gamepad-button-border);background:var(--gamepad-bg);font-size:10px;font-weight:700
+width:30px;height:30px;border-radius:50%;border:1px solid var(--gamepad-button-border);background:var(--gamepad-bg);color:var(--text2);display:grid;place-items:center;padding:0;font-size:10px;font-weight:700
 }
 
-.cbtn.a{
-right:26px;top:49px
+button.cbtn:hover{
+border-color:var(--selected-border);background:var(--glass-pill);color:var(--text)
 }
 
-.cbtn.x{
-right:62px;top:24px
+button.cbtn.selected{
+border-color:var(--accent);background:var(--selected-bg);color:var(--accent);box-shadow:0 0 0 2px var(--monitor-glow)
 }
 
 .cbtn.y{
-right:28px;top:14px
+grid-column:2;grid-row:1
+}
+
+.cbtn.x{
+grid-column:1;grid-row:2
+}
+
+.cbtn.b{
+grid-column:3;grid-row:2;opacity:.28
+}
+
+.cbtn.a{
+grid-column:2;grid-row:3
 }
 
 .capture-result{
-min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:13px
+min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px;margin:0 0 18px
 }
 
 .capture-placeholder{
@@ -109,7 +125,15 @@ color:var(--muted)
 }
 
 .capture-actions{
-display:flex;justify-content:center;gap:8px
+display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid var(--divider)
+}
+
+.capture-clear{
+color:var(--text2)
+}
+
+.capture-actions-main{
+display:flex;align-items:center;gap:8px
 }
 
 .test-wrap{
