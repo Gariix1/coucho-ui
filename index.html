@@ -47,7 +47,6 @@
   <main class="main">
     <section class="shell-view active" id="view-modes" data-shell-view="modes">
       <div class="wrap workbench-wrap">
-        <div class="mode-status" id="modeStatus" role="status" aria-live="polite"></div>
         <div class="test-tools">
           <span>Modo de prueba · datos locales</span>
           <div class="test-tools-actions">
@@ -71,17 +70,16 @@
                 <div class="workspace-title-copy">
                   <span class="workspace-eyebrow" id="workspaceEyebrow">Escritorio actual</span>
                   <h2 id="workspaceName" class="mode-name-edit" tabindex="0">Escritorio</h2>
-                  <small id="workspaceSub"></small>
                 </div>
               </div>
               <div class="workspace-head-actions">
-                <span class="workspace-state" id="workspaceState" role="status" aria-live="polite">Sin cambios</span>
+                <span class="workspace-state" id="workspaceState" role="status" aria-live="polite" hidden></span>
                 <button class="workspace-close" id="workspaceClose" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-close"></use></svg></button>
               </div>
             </header>
 
             <header class="workspace-section-head">
-              <div><b id="workspaceScreenTitle">Pantallas</b><small id="workspaceScreenMeta">Orden horizontal del escritorio</small></div>
+              <b id="workspaceScreenTitle">Pantallas</b>
             </header>
             <div class="workspace-screen-stage" id="workspaceScreens"></div>
 
@@ -111,7 +109,7 @@
     <section class="shell-view" id="view-apps" data-shell-view="apps" hidden>
       <div class="shell-placeholder">
         <header class="shell-page-head">
-          <div><h1>Apps</h1><p>Apps disponibles para los modos.</p></div>
+          <h1>Apps</h1>
         </header>
         <div class="resource-grid">
           <article class="resource-card">
@@ -133,7 +131,7 @@
     <section class="shell-view" id="view-displays" data-shell-view="displays" hidden>
       <div class="shell-placeholder display-page">
         <header class="shell-page-head">
-          <div><h1>Pantallas</h1><p>Estado del escritorio actual.</p></div>
+          <h1>Pantallas</h1>
         </header>
 
         <div class="display-overview">
@@ -171,7 +169,7 @@
     <section class="shell-view" id="view-settings" data-shell-view="settings" hidden>
       <div class="shell-placeholder">
         <header class="shell-page-head">
-          <div><h1>Ajustes</h1><p>Preferencias y herramientas.</p></div>
+          <h1>Ajustes</h1>
         </header>
         <div class="settings-stack">
           <button class="settings-row" id="settingsTheme">
