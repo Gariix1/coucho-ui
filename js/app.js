@@ -233,6 +233,7 @@ function workspaceMarkup(kind,id){
       '<div class="workspace-actions">'+
         '<button class="btn" id="workspaceReset">Restablecer</button>'+
         '<button class="btn" id="workspaceTest">Probar</button>'+
+        '<button class="btn primary" id="workspaceActivate" hidden>Activar</button>'+
         '<button class="btn primary" id="workspaceSave">Crear modo</button>'+
       '</div>'+
     '</footer>'+
@@ -579,6 +580,10 @@ function renderWorkspaceEditor(){
   q('#workspaceSave').hidden=!isNew;
   q('#workspaceSave').disabled=isNew&&!dirty;
   q('#workspaceTest').hidden=false;
+
+  var activateButton=q('#workspaceActivate');
+  activateButton.hidden=isNew||!!(mode&&mode.active&&!pending);
+  activateButton.textContent=pending?'Aplicar':'Activar';
   q('#workspaceClose').title='Compactar';
   q('#workspaceClose').setAttribute('aria-label','Compactar');
 
@@ -672,9 +677,9 @@ function removeSet(id){
   toast('Modo eliminado',removed.name);
 }
 
-function activate(id){
+function activate(id,force){
   var target=byId(id);
-  if(!target||target.active||activatingId!==null)return;
+  if(!target||(!force&&target.active)||activatingId!==null)return;
 
   activatingId=id;
   clearTimeout(activationTimer);
@@ -693,7 +698,7 @@ function activate(id){
     appliedSession=sessionFromMode(current);
     commitSets();
 
-    if(workspaceTargetId===null){
+    if(workspaceTargetId===null&&!workspaceExpanded){
       workspaceDraft=workspaceFromApplied();
       workspaceBase=cloneModeConfig(workspaceDraft);
     }
@@ -1077,6 +1082,10 @@ function bindWorkspaceControls(){
 
   q('#workspaceSave').onclick=createWorkspaceMode;
 
+  q('#workspaceActivate').onclick=function(){
+    if(workspaceTargetId!==null)activate(workspaceTargetId,true);
+  };
+
   q('#workspaceTest').onclick=function(){
     if(!workspaceDraft)return;
     startTest({
@@ -1286,6 +1295,7 @@ q('#keep').onclick=function(){
     sets.forEach(function(s){s.active=false});
     sets.push(created);
     appliedSession=sessionFromMode(created);
+    workspaceExpanded=false;
     workspaceTargetId=null;
     workspaceDraft=workspaceFromApplied();
     workspaceBase=cloneModeConfig(workspaceDraft);
