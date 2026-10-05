@@ -34,7 +34,6 @@ const ACTIVATION_DELAY_MS=850;
 const TEST_PROGRESS_INTERVAL_MS=340;
 const TEST_COUNTDOWN_INTERVAL_MS=1000;
 const TEST_TIMEOUT_RESTORE_MS=420;
-const DETAIL_CLOSE_DELAY_MS=80;
 const MANUAL_RESTORE_STEP_MS=380;
 const MANUAL_RESTORE_FINISH_MS=220;
 
@@ -335,6 +334,7 @@ async function closeModeDetail(restore,afterClose){
   var transition=modeSheetTransition.prepare(source);
 
   try{
+    workspaceExpanded=false;
     workspaceExpanded=false;
     workspaceTargetId=null;
     workspaceDraft=workspaceFromApplied();
@@ -674,11 +674,11 @@ function removeSet(id){
   }
 
   if(workspaceTargetId===id){
+    workspaceExpanded=false;
     workspaceTargetId=null;
     workspaceDraft=workspaceFromApplied();
     workspaceBase=cloneModeConfig(workspaceDraft);
     workspaceAutoNamed=true;
-    q('.visual-workspace').classList.remove('detail-mode');
   }
   commitSets();
   render();
@@ -830,10 +830,6 @@ function renderDisplayOverview(){
 function openDisplayPop(anchor,rawId){
   closePops();
   displayEditModeId=resolveId(rawId);
-  if(workspaceTargetId===displayEditModeId){
-    toast('Editando','Cambia las pantallas desde el editor');
-    return;
-  }
   var source=byId(displayEditModeId);
   if(!source)return;
   displayDraft=displayConfig(source);
@@ -911,10 +907,6 @@ function makePrimary(id){
 function openAppPop(anchor,rawId){
   closePops();
   appEditTarget={kind:'mode',id:resolveId(rawId)};
-  if(workspaceTargetId===appEditTarget.id){
-    toast('Editando','Cambia la app desde el editor');
-    return;
-  }
   var mode=byId(appEditTarget.id);
   if(!mode)return;
   var app=mode.app;
@@ -1021,109 +1013,120 @@ q('#testBtn').onclick=function(){
   syncTestMode();
 };
 
-q('#workspaceClose').onclick=function(){closeModeDetail(true)};
-
-q('#workspaceApp').onclick=function(e){
-  closePops();
-  appEditTarget={kind:'workspace'};
-  qa('#appPop .app-option').forEach(function(x){
-    var selected=x.dataset.app===workspaceDraft.app;
-    x.classList.toggle('selected',selected);
-    x.setAttribute('aria-pressed',selected?'true':'false');
-  });
-  openAnchoredPop(q('#appPop'),e.currentTarget);
-};
-
-q('#workspaceShortcut').onclick=function(){openShortcut('workspace')};
-
-q('#workspaceReset').onclick=function(){
-  if(workspaceTargetId!==null){
-    closeModeDetail(true);
-    return;
-  }
-  workspaceDraft=cloneModeConfig(workspaceBase);
-  refreshWorkspaceDraft();
-};
-
-q('#workspaceSave').onclick=function(){
-  if(!workspaceDraft)return;
-
-  if(workspaceTargetId===null){
-    var created=cloneModeConfig(workspaceDraft);
-    created.id=Date.now();
-    created.active=false;
-    sets.push(created);
-    commitSets();
-    workspaceTargetId=null;
-    workspaceDraft=workspaceFromApplied();
-    workspaceBase=cloneModeConfig(workspaceDraft);
-    workspaceAutoNamed=true;
-    render();
-    toast(created.name,'Modo creado');
-    requestAnimationFrame(function(){
-      var card=q('[data-mode-row="'+created.id+'"]');
-      if(card)card.scrollIntoView({behavior:'smooth',block:'nearest'});
-    });
-    return;
-  }
-
-  var mode=byId(workspaceTargetId);
-  if(!mode)return;
-  mode.name=workspaceDraft.name;
-  mode.icon=workspaceDraft.icon;
-  mode.preserve=workspaceDraft.preserve;
-  mode.displayIds=workspaceDraft.displayIds.slice();
-  mode.primaryDisplayId=workspaceDraft.primaryDisplayId;
-  mode.app=workspaceDraft.app;
-  mode.shortcut=workspaceDraft.shortcut;
-  workspaceBase=cloneModeConfig(mode);
-  commitSets();
-  renderModeList();
-  toast(mode.name,'Cambios guardados');
-  closeModeDetail(true);
-};
-
-q('#workspaceTest').onclick=function(){
-  if(!workspaceDraft)return;
-  startTest({
-    kind:workspaceTargetId===null?'workspace-new':'workspace-edit',
-    existingId:workspaceTargetId,
-    preserve:workspaceDraft.preserve,
-    displayIds:workspaceDraft.displayIds.slice(),
-    primaryDisplayId:workspaceDraft.primaryDisplayId,
-    app:workspaceDraft.app,
-    shortcut:workspaceDraft.shortcut,
-    name:workspaceDraft.name,
-    icon:workspaceDraft.icon
-  });
-};
-
-// Workspace actions and shortcut capture.
 function beginWorkspaceRename(){
-  var el=q('#workspaceName');
-  if(!el||el.isContentEditable)return;
+  var element=q('#workspaceName');
+  if(!element||element.isContentEditable)return;
+
   var original=workspaceDraft.name;
-  editInlineText(el,original,function(next){
+  editInlineText(element,original,function(next){
     workspaceDraft.name=next;
     workspaceAutoNamed=false;
     refreshWorkspaceDraft();
   });
 }
 
-q('#workspaceName').ondblclick=function(e){e.preventDefault();beginWorkspaceRename()};
-q('#workspaceName').onkeydown=function(e){
-  if(q('#workspaceName').isContentEditable)return;
-  if(e.key==='F2'||e.key==='Enter'){e.preventDefault();beginWorkspaceRename()}
-};
-bindTouchRename(q('#workspaceName'),beginWorkspaceRename);
+async function createWorkspaceMode(){
+  if(!workspaceDraft||workspaceTargetId!==null)return;
+
+  var source=q('.visual-workspace');
+  var transition=modeSheetTransition.prepare(source);
+  setModeTransitioning(true);
+
+  var created=cloneModeConfig(workspaceDraft);
+  created.id=Date.now();
+  created.active=false;
+
+  try{
+    sets.push(created);
+    commitSets();
+
+    workspaceExpanded=false;
+    workspaceTargetId=null;
+    workspaceDraft=workspaceFromApplied();
+    workspaceBase=cloneModeConfig(workspaceDraft);
+    workspaceAutoNamed=true;
+
+    render();
+
+    var destination=q('[data-mode-row="'+created.id+'"]');
+    await transition.play(destination,'close');
+  }finally{
+    transition.cancel();
+    setModeTransitioning(false);
+    render();
+  }
+
+  toast(created.name,'Modo creado');
+  requestAnimationFrame(function(){
+    var card=q('[data-mode-row="'+created.id+'"]');
+    if(card)card.scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+}
+
+function bindWorkspaceControls(){
+  var close=q('#workspaceClose');
+  if(!close)return;
+
+  close.onclick=function(){closeModeDetail(true)};
+
+  q('#workspaceApp').onclick=function(event){
+    closePops();
+    appEditTarget={kind:'workspace'};
+    qa('#appPop .app-option').forEach(function(option){
+      var selected=option.dataset.app===workspaceDraft.app;
+      option.classList.toggle('selected',selected);
+      option.setAttribute('aria-pressed',selected?'true':'false');
+    });
+    openAnchoredPop(q('#appPop'),event.currentTarget);
+  };
+
+  q('#workspaceShortcut').onclick=function(){openShortcut('workspace')};
+
+  q('#workspaceReset').onclick=function(){
+    if(workspaceTargetId!==null)return;
+    workspaceDraft=cloneModeConfig(workspaceBase);
+    refreshWorkspaceDraft();
+  };
+
+  q('#workspaceSave').onclick=createWorkspaceMode;
+
+  q('#workspaceTest').onclick=function(){
+    if(!workspaceDraft)return;
+    startTest({
+      kind:workspaceTargetId===null?'workspace-new':'workspace-edit',
+      existingId:workspaceTargetId,
+      preserve:workspaceDraft.preserve,
+      displayIds:workspaceDraft.displayIds.slice(),
+      primaryDisplayId:workspaceDraft.primaryDisplayId,
+      app:workspaceDraft.app,
+      shortcut:workspaceDraft.shortcut,
+      name:workspaceDraft.name,
+      icon:workspaceDraft.icon
+    });
+  };
+
+  var name=q('#workspaceName');
+  name.ondblclick=function(event){
+    event.preventDefault();
+    beginWorkspaceRename();
+  };
+  name.onkeydown=function(event){
+    if(name.isContentEditable)return;
+    if(event.key==='F2'||event.key==='Enter'){
+      event.preventDefault();
+      beginWorkspaceRename();
+    }
+  };
+  bindTouchRename(name,beginWorkspaceRename);
+}
 
 q('#clearModes').onclick=function(){
   sets=[];
   appliedSession=null;
+  workspaceExpanded=false;
   workspaceTargetId=null;
   workspaceDraft=null;
   workspaceBase=null;
-  q('.visual-workspace').classList.remove('detail-mode');
   commitSets();
   render();
   toast('Modos vaciados','Ya puedes probar el flujo desde cero');
@@ -1132,10 +1135,10 @@ q('#clearModes').onclick=function(){
 q('#restoreDemo').onclick=function(){
   sets=demoSets();
   appliedSession=null;
+  workspaceExpanded=false;
   workspaceTargetId=null;
   workspaceDraft=null;
   workspaceBase=null;
-  q('.visual-workspace').classList.remove('detail-mode');
   commitSets();
   render();
   toast('Demo restaurada','3 modos');
@@ -1155,11 +1158,6 @@ function openShortcut(rawId){
     ?{kind:'workspace'}
     :{kind:'mode',id:resolveId(rawId)};
 
-  if(shortcutEditTarget.kind==='mode'&&workspaceTargetId===shortcutEditTarget.id){
-    shortcutEditTarget=null;
-    toast('Editando','Cambia el atajo desde el editor');
-    return;
-  }
   if(shortcutEditTarget.kind==='mode'&&!byId(shortcutEditTarget.id)){
     shortcutEditTarget=null;
     return;
@@ -1248,7 +1246,7 @@ function startTest(ctx){
   q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx)+'</div>';
   q('#testApp').textContent=logo(ctx.app);
   q('#testText').textContent='Probando '+ctx.name+'…';
-  q('#keep').textContent=ctx.kind==='mode-preview'?'Activar':ctx.kind==='workspace-new'?'Guardar y activar':ctx.kind==='workspace-edit'?'Guardar y activar':'Guardar';
+  q('#keep').textContent=ctx.kind==='mode-preview'||ctx.kind==='workspace-edit'?'Activar':ctx.kind==='workspace-new'?'Guardar y activar':'Guardar';
   setTestProgress(0);q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
 
   var pct=0;
@@ -1326,16 +1324,16 @@ q('#keep').onclick=function(){
       edited.shortcut=testContext.shortcut||'Manual';
       sets.forEach(function(s){s.active=s.id===edited.id});
       appliedSession=sessionFromMode(edited);
+      workspaceExpanded=true;
       workspaceTargetId=edited.id;
       workspaceDraft=cloneModeConfig(edited);
       workspaceBase=cloneModeConfig(edited);
     }
     q('#testOverlay').classList.remove('open');
     commitSets();
-    renderModeList();
-    toast(editedName,'Guardado y activo');
+    render();
+    toast(editedName,'Activo');
     testContext=null;
-    setTimeout(function(){closeModeDetail(true)},DETAIL_CLOSE_DELAY_MS);
     return;
   }
 
@@ -1395,7 +1393,7 @@ document.addEventListener('keydown',function(e){
   // The safe display test is intentionally not dismissible with Escape.
   if(q('#testOverlay').classList.contains('open'))return;
 
-  if(workspaceTargetId!==null){
+  if(workspaceExpanded){
     closeModeDetail(true);
     return;
   }
