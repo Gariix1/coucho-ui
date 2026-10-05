@@ -74,7 +74,7 @@ export function displaySummary(source){
 }
 
 export function displayMarkup(source){
-  if(source.preserve)return '<div class="display-placeholder preserve">↔</div>';
+  if(source.preserve)return '<div class="display-placeholder preserve">'+iconMarkup('preserve')+'</div>';
 
   const ids=Array.isArray(source.displayIds)?source.displayIds:[];
   if(ids.length===0)return '<div class="display-placeholder empty">—</div>';
