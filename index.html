@@ -56,51 +56,11 @@
         </div>
 
         <div class="mode-workbench">
-          <aside class="saved-modes-panel" aria-labelledby="modesHeading">
+          <section class="saved-modes-panel" aria-labelledby="modesHeading">
             <header class="workbench-panel-head">
               <h2 id="modesHeading">Modos</h2>
             </header>
             <div class="mode-list" id="modeList"></div>
-          </aside>
-
-          <section class="visual-workspace" id="modeWorkspace" tabindex="-1" aria-labelledby="workspaceName">
-            <header class="visual-workspace-head">
-              <div class="workspace-title-block">
-                <div class="workspace-profile-icon" id="workspaceProfileIcon"></div>
-                <div class="workspace-title-copy">
-                  <span class="workspace-eyebrow" id="workspaceEyebrow">Escritorio actual</span>
-                  <h2 id="workspaceName" class="mode-name-edit" tabindex="0">Escritorio</h2>
-                </div>
-              </div>
-              <div class="workspace-head-actions">
-                <span class="workspace-state" id="workspaceState" role="status" aria-live="polite" hidden></span>
-                <button class="workspace-close" id="workspaceClose" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-close"></use></svg></button>
-              </div>
-            </header>
-
-            <header class="workspace-section-head">
-              <b id="workspaceScreenTitle">Pantallas</b>
-            </header>
-            <div class="workspace-screen-stage" id="workspaceScreens"></div>
-
-            <div class="workspace-pieces">
-              <button class="workspace-piece" id="workspaceApp" title="Cambiar app">
-                <span class="workspace-piece-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-play"></use></svg></span>
-                <span><small>App</small><b id="workspaceAppName">Ninguna</b></span>
-              </button>
-              <button class="workspace-piece" id="workspaceShortcut" title="Cambiar atajo">
-                <span class="workspace-piece-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-gamepad"></use></svg></span>
-                <span><small>Atajo</small><b id="workspaceShortcutName">Sin atajo</b></span>
-              </button>
-            </div>
-
-            <footer class="workspace-footer">
-              <div class="workspace-actions">
-                <button class="btn" id="workspaceReset">Restaurar</button>
-                <button class="btn" id="workspaceTest">Probar</button>
-                <button class="btn primary" id="workspaceSave">Guardar como modo</button>
-              </div>
-            </footer>
           </section>
         </div>
       </div>
