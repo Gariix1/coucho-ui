@@ -5,57 +5,39 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Coucho · Control</title>
 <link rel="stylesheet" href="./css/app.css">
-
 </head>
 <body>
-<svg class="icon-sprite" aria-hidden="true">
-  <symbol id="icon-modes" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></g></symbol>
-  <symbol id="icon-play" viewBox="0 0 24 24"><path d="M8 5.5 18 12 8 18.5Z" fill="currentColor"/></symbol>
-  <symbol id="icon-display" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/></g></symbol>
-  <symbol id="icon-settings" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M18 6l-1.4 1.4M7.4 16.6 6 18"/></g></symbol>
-  <symbol id="icon-test" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5h6M10 3.5v5L5.5 17a2.5 2.5 0 0 0 2.2 3.5h8.6a2.5 2.5 0 0 0 2.2-3.5L14 8.5v-5"/><path d="M8 15h8"/></g></symbol>
-  <symbol id="icon-gamepad" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 8h9a4 4 0 0 1 3.8 5.2l-1.2 3.7a2 2 0 0 1-3.2.9L14 16h-4l-1.9 1.8a2 2 0 0 1-3.2-.9l-1.2-3.7A4 4 0 0 1 7.5 8Z"/><path d="M8 11v4M6 13h4"/><circle cx="16.5" cy="11.8" r=".7" fill="currentColor" stroke="none"/><circle cx="18" cy="14" r=".7" fill="currentColor" stroke="none"/></g></symbol>
-  <symbol id="icon-film" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M8 5v14M16 5v14M3.5 9h4.5M16 9h4.5M3.5 15h4.5M16 15h4.5"/></g></symbol>
-  <symbol id="icon-desktop" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="11.5" rx="2"/><path d="M8 20h8M12 16v4"/></g></symbol>
-  <symbol id="icon-delete" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h14M9 7V4.5h6V7M7.5 7l.7 12h7.6l.7-12M10 10v6M14 10v6"/></g></symbol>
-  <symbol id="icon-close" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
-  <symbol id="icon-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
-  <symbol id="icon-star-filled" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" fill="currentColor"/></symbol>
-  <symbol id="icon-theme" viewBox="0 0 24 24"><path d="M19 15.5A8 8 0 0 1 8.5 5 8 8 0 1 0 19 15.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-  <symbol id="icon-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></symbol>
-  <symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="icon-preserve" viewBox="0 0 24 24"><path d="M7 8 3.5 12 7 16M17 8l3.5 4-3.5 4M4 12h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-</svg>
+
 <div class="window">
-  <div class="titlebar">
-    <div class="brand"><div class="logo">C</div><span>Coucho · Control</span></div>
+  <header class="titlebar">
+    <div class="brand"><span class="logo">C</span><span>Coucho · Control</span></div>
     <div class="win" aria-hidden="true"><span>—</span><span>□</span><span>✕</span></div>
-  </div>
+  </header>
 
   <div class="app-shell" id="appShell">
   <aside class="nav-rail" aria-label="Navegación de Coucho">
     <nav class="rail-main">
       <button class="rail-item active" data-nav-view="modes" aria-current="page" aria-controls="view-modes" title="Modos">
-        <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-modes"></use></svg></span><span>Modos</span>
+        <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-modes"></use></svg></span><span>Modos</span>
       </button>
-      <button class="rail-item" data-nav-view="library" aria-controls="view-library" title="Biblioteca">
-        <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-play"></use></svg></span><span>Apps</span>
+      <button class="rail-item" data-nav-view="library" aria-controls="view-library" title="Apps">
+        <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-play"></use></svg></span><span>Apps</span>
       </button>
-      <button class="rail-item" data-nav-view="devices" aria-controls="view-devices" title="Dispositivos">
-        <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-display"></use></svg></span><span>Pant.</span>
+      <button class="rail-item" data-nav-view="devices" aria-controls="view-devices" title="Pantallas">
+        <span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-display"></use></svg></span><span>Pant.</span>
       </button>
     </nav>
 
     <div class="rail-bottom">
-      <button class="rail-util" id="settingsBtn" title="Ajustes" aria-label="Ajustes"><span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-settings"></use></svg></span></button>
-      <button class="rail-util prototype-tool" id="testBtn" title="Pruebas del mockup" aria-label="Pruebas del mockup"><span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-test"></use></svg></span></button>
+      <button class="rail-util" id="settingsBtn" title="Ajustes" aria-label="Ajustes"><span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-settings"></use></svg></span></button>
+      <button class="rail-util prototype-tool" id="testBtn" title="Pruebas del mockup" aria-label="Pruebas del mockup"><span class="rail-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-test"></use></svg></span></button>
     </div>
   </aside>
 
   <main class="main">
     <section class="shell-view active" id="view-modes" data-shell-view="modes">
       <div class="wrap workbench-wrap">
-        <div class="mode-status" id="modeStatus"></div>
+        <div class="mode-status" id="modeStatus" role="status" aria-live="polite"></div>
         <div class="test-tools">
           <span>Modo de prueba · datos locales</span>
           <div class="test-tools-actions">
@@ -65,15 +47,15 @@
         </div>
 
         <div class="mode-workbench">
-          <aside class="saved-modes-panel">
-            <div class="workbench-panel-head">
-              <div><h2>Modos</h2></div>
-            </div>
+          <aside class="saved-modes-panel" aria-labelledby="modesHeading">
+            <header class="workbench-panel-head">
+              <h2 id="modesHeading">Modos</h2>
+            </header>
             <div class="mode-list" id="modeList"></div>
           </aside>
 
-          <section class="visual-workspace" id="modeWorkspace" tabindex="-1" aria-label="Editor visual del modo">
-            <div class="visual-workspace-head">
+          <section class="visual-workspace" id="modeWorkspace" tabindex="-1" aria-labelledby="workspaceName">
+            <header class="visual-workspace-head">
               <div class="workspace-title-block">
                 <div class="workspace-profile-icon" id="workspaceProfileIcon"></div>
                 <div class="workspace-title-copy">
@@ -84,34 +66,34 @@
               </div>
               <div class="workspace-head-actions">
                 <span class="workspace-state" id="workspaceState" role="status" aria-live="polite">Sin cambios</span>
-                <button class="workspace-close" id="workspaceClose" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
+                <button class="workspace-close" id="workspaceClose" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-close"></use></svg></button>
               </div>
-            </div>
+            </header>
 
-            <div class="workspace-section-head">
+            <header class="workspace-section-head">
               <div><b id="workspaceScreenTitle">Pantallas</b><small id="workspaceScreenMeta">Orden horizontal del escritorio</small></div>
-            </div>
+            </header>
             <div class="workspace-screen-stage" id="workspaceScreens"></div>
 
             <div class="workspace-pieces">
               <button class="workspace-piece" id="workspaceApp" title="Cambiar app">
-                <span class="workspace-piece-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-play"></use></svg></span>
+                <span class="workspace-piece-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-play"></use></svg></span>
                 <span><small>App</small><b id="workspaceAppName">Ninguna</b></span>
               </button>
               <button class="workspace-piece" id="workspaceShortcut" title="Cambiar atajo">
-                <span class="workspace-piece-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-gamepad"></use></svg></span>
+                <span class="workspace-piece-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-gamepad"></use></svg></span>
                 <span><small>Atajo</small><b id="workspaceShortcutName">Sin atajo</b></span>
               </button>
             </div>
 
-            <div class="workspace-footer">
+            <footer class="workspace-footer">
               <div class="workspace-help" id="workspaceHelp"></div>
               <div class="workspace-actions">
                 <button class="btn" id="workspaceReset">Restaurar</button>
                 <button class="btn" id="workspaceTest">Probar</button>
                 <button class="btn primary" id="workspaceSave">Guardar como modo</button>
               </div>
-            </div>
+            </footer>
           </section>
         </div>
       </div>
@@ -119,9 +101,9 @@
 
     <section class="shell-view" id="view-library" data-shell-view="library" hidden>
       <div class="shell-placeholder">
-        <div class="shell-page-head">
+        <header class="shell-page-head">
           <div><h1>Apps</h1><p>Apps disponibles para los modos.</p></div>
-        </div>
+        </header>
         <div class="resource-grid app-library">
           <article class="resource-card">
             <div class="resource-visual"><div class="app-logo app-logo-large">S</div></div>
@@ -141,9 +123,9 @@
 
     <section class="shell-view" id="view-devices" data-shell-view="devices" hidden>
       <div class="shell-placeholder display-page">
-        <div class="shell-page-head">
+        <header class="shell-page-head">
           <div><h1>Pantallas</h1><p>Estado del escritorio actual.</p></div>
-        </div>
+        </header>
 
         <div class="display-overview">
           <section class="display-topology">
@@ -179,19 +161,19 @@
 
     <section class="shell-view" id="view-settings" data-shell-view="settings" hidden>
       <div class="shell-placeholder">
-        <div class="shell-page-head">
+        <header class="shell-page-head">
           <div><h1>Ajustes</h1><p>Preferencias y herramientas.</p></div>
-        </div>
+        </header>
         <div class="settings-stack">
           <button class="settings-row" id="settingsTheme">
-            <span class="settings-row-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-theme"></use></svg></span>
+            <span class="settings-row-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-theme"></use></svg></span>
             <span class="settings-row-copy"><b>Tema</b><small>Cambia la apariencia de Coucho</small></span>
             <span class="settings-row-value" id="themeValue">Oscuro</span>
           </button>
           <button class="settings-row" id="advancedSettings">
-            <span class="settings-row-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-more"></use></svg></span>
+            <span class="settings-row-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-more"></use></svg></span>
             <span class="settings-row-copy"><b>Avanzado</b><small>Diagnóstico y recuperación</small></span>
-            <span class="settings-row-value"><svg class="ui-icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></span>
+            <span class="settings-row-value"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-arrow-right"></use></svg></span>
           </button>
         </div>
       </div>
@@ -199,31 +181,30 @@
   </main>
 </div>
 </div>
-</div>
 
-<div class="pop display-editor" id="displayPop">
-  <div class="display-editor-head">
+<div class="pop display-editor" id="displayPop" role="dialog" aria-labelledby="displayPopTitle">
+  <header class="display-editor-head">
     <div>
-      <div class="pop-title">Pantallas</div>
+      <h2 class="pop-title" id="displayPopTitle">Pantallas</h2>
       <div class="display-editor-sub">Selecciona para activar</div>
     </div>
-    <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
-  </div>
+    <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-close"></use></svg></button>
+  </header>
   <div class="screen-map" id="screenMap"></div>
-  <div class="display-editor-foot">
+  <footer class="display-editor-foot">
     <div>
       <div class="display-editor-summary" id="displayEditorSummary"></div>
-      <button class="btn preserve-btn" id="preserveDisplays"><svg class="ui-icon" aria-hidden="true"><use href="#icon-preserve"></use></svg><span>No cambiar pantallas</span></button>
+      <button class="btn preserve-btn" id="preserveDisplays"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-preserve"></use></svg><span>No cambiar pantallas</span></button>
     </div>
     <div class="display-editor-actions">
       <button class="btn" id="tryDisplays">Probar</button>
       <button class="btn primary" id="saveDisplays">Guardar</button>
     </div>
-  </div>
+  </footer>
 </div>
 
-<div class="pop" id="appPop">
-  <div class="pop-title">Apps</div>
+<div class="pop" id="appPop" role="dialog" aria-labelledby="appPopTitle">
+  <h2 class="pop-title" id="appPopTitle">Apps</h2>
   <div class="app-options">
     <button class="app-option" data-app="Ninguna"><div><div class="app-logo">—</div><b>Ninguna</b></div></button>
     <button class="app-option" data-app="Steam"><div><div class="app-logo">S</div><b>Steam</b></div></button>
@@ -232,8 +213,8 @@
   </div>
 </div>
 
-<div class="pop delete-confirm" id="deletePop" role="dialog" aria-label="Confirmar eliminación">
-  <div class="pop-title delete-title">Eliminar modo</div>
+<div class="pop delete-confirm" id="deletePop" role="dialog" aria-labelledby="deletePopTitle">
+  <h2 class="pop-title delete-title" id="deletePopTitle">Eliminar modo</h2>
   <div class="delete-copy" id="deleteText"></div>
   <div class="delete-actions">
     <button class="btn" id="deleteCancel">Cancelar</button>
@@ -241,20 +222,20 @@
   </div>
 </div>
 
-<div class="capture-wrap" id="shortcutOverlay" role="dialog" aria-modal="true" aria-label="Configurar atajo">
+<div class="capture-wrap" id="shortcutOverlay" role="dialog" aria-modal="true" aria-labelledby="shortcutTitle">
   <div class="capture">
-    <h3>Activar con</h3>
+    <h3 id="shortcutTitle">Activar con</h3>
     <div class="controller">
       <div class="guide">Guide</div><div class="stick left"></div><div class="stick right"></div>
       <button class="cbtn a" id="capA">A</button>
       <button class="cbtn x" id="capX">X</button>
       <button class="cbtn y" id="capY">Y</button>
     </div>
-    <div class="capture-result" id="captureResult"><span style="color:var(--muted)">A · X · Y</span></div>
+    <div class="capture-result" id="captureResult"><span class="capture-placeholder">A · X · Y</span></div>
     <div class="capture-actions">
       <button class="btn" id="capCancel">Cancelar</button>
       <button class="btn" id="capManual">Sin atajo</button>
-      <button class="btn primary" id="capUse" style="display:none">Usar</button>
+      <button class="btn primary" id="capUse" hidden>Usar</button>
     </div>
   </div>
 </div>
@@ -263,16 +244,16 @@
   <div class="test">
     <div class="test-main">
       <div class="test-flow">
-        <div class="test-node" id="testDisplay">▣</div>
-        <div class="test-arrow">+</div>
-        <div class="test-node" id="testApp">S</div>
+        <div class="test-node" id="testDisplay"></div>
+        <div class="test-arrow" aria-hidden="true">+</div>
+        <div class="test-node" id="testApp"></div>
       </div>
       <div class="testing" id="testText">Probando…</div>
     </div>
     <div class="progress"><div id="progress"></div></div>
     <div class="confirm" id="confirm">
       <div><b>¿Se ve bien?</b><small>Restaurar en <span class="count" id="count">15</span> s</small></div>
-      <div style="display:flex;gap:8px"><button class="btn" id="revert">Restaurar</button><button class="btn primary" id="keep">Guardar</button></div>
+      <div class="confirm-actions"><button class="btn" id="revert">Restaurar</button><button class="btn primary" id="keep">Guardar</button></div>
     </div>
   </div>
 </div>
