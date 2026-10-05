@@ -1252,7 +1252,7 @@ document.addEventListener('keydown',function(e){
   }
 });
 
-var shellView='modes';
+let shellView='modes';
 
 // Shell navigation and global event wiring.
 function openShellView(viewName){
