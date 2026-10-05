@@ -64,6 +64,10 @@ border-color:var(--monitor-primary);box-shadow:0 0 0 1px var(--monitor-glow),0 0
 display:grid;place-items:center;color:var(--muted);line-height:1
 }
 
+.display-placeholder .ui-icon{
+width:1em;height:1em
+}
+
 .app-logo{
 width:46px;height:46px;border-radius:13px;background:var(--glass-control);border:1px solid var(--glass-soft-border);color:var(--text2);display:grid;place-items:center;font-weight:700
 }
