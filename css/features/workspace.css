@@ -5,17 +5,25 @@ display:none
 }
 
 .visual-workspace{
-border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card)
+border:1px solid var(--glass-soft-border);border-radius:var(--r-card);
+  background:var(--glass-panel);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025)
 }
 
 .visual-workspace{
 padding:16px;min-width:0;overflow:visible;position:relative;isolation:isolate;z-index:1
 }
 
+.visual-workspace.create-mode{
+border-color:var(--create-border);
+  background:linear-gradient(180deg,var(--create-wash),transparent 128px),var(--glass-panel);
+  box-shadow:inset 2px 0 0 var(--create-accent),inset 0 1px 0 rgba(255,255,255,.03),0 14px 38px rgba(0,0,0,.08)
+}
+
 .visual-workspace.detail-mode{
-border-color:var(--selected-border);
-  background:linear-gradient(180deg,var(--selected-bg),transparent 112px),var(--glass-card);
-  box-shadow:inset 3px 0 0 var(--accent),0 22px 52px rgba(0,0,0,.18)
+border-color:var(--edit-border);
+  background:linear-gradient(180deg,var(--edit-wash),transparent 138px),var(--glass-panel);
+  box-shadow:inset 3px 0 0 var(--edit-accent),inset 0 1px 0 rgba(255,255,255,.03),0 24px 56px rgba(0,0,0,.20)
 }
 
 .workspace-head-actions{
@@ -59,16 +67,28 @@ min-width:0
 display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px
 }
 
+.create-mode .workspace-eyebrow{
+color:var(--create-accent)
+}
+
+.create-mode .workspace-state{
+border-color:rgba(125,211,252,.22);background:rgba(125,211,252,.055)
+}
+
+.detail-mode .workspace-state{
+border-color:rgba(88,140,255,.26);background:rgba(88,140,255,.07)
+}
+
 .detail-mode .workspace-eyebrow{
 display:inline-flex;align-items:center;gap:6px;
   width:max-content;padding:4px 8px;margin:0 0 6px;
   border:1px solid var(--selected-border);border-radius:999px;
-  background:var(--selected-bg);color:var(--accent);letter-spacing:.08em
+  background:var(--selected-bg);color:var(--edit-accent);letter-spacing:.08em
 }
 
 .detail-mode .workspace-eyebrow:before{
-content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);
-  box-shadow:0 0 0 3px var(--monitor-glow)
+content:"";width:6px;height:6px;border-radius:50%;background:var(--edit-accent);
+  box-shadow:0 0 0 3px rgba(88,140,255,.12)
 }
 
 .workspace-title-block h2{
@@ -100,7 +120,7 @@ display:block;color:var(--muted);font-size:10px;margin-top:2px
 }
 
 .detail-mode .workspace-section-head b{
-color:var(--accent)
+color:var(--edit-accent)
 }
 
 .workspace-screen-stage{
