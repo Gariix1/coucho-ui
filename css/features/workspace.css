@@ -89,6 +89,10 @@ flex:0 0 auto;border:1px solid var(--glass-soft-border);border-radius:999px;back
 border-color:var(--selected-border);background:var(--selected-bg);color:var(--accent)
 }
 
+.workspace-state.active{
+border-color:rgba(74,222,128,.22);background:rgba(74,222,128,.06);color:var(--success)
+}
+
 .workspace-section-head{
 display:flex;align-items:center;justify-content:space-between;margin:0 0 9px;padding:0 2px
 }
