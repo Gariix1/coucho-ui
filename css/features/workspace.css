@@ -237,3 +237,17 @@ width:18px;height:18px
 .workspace-actions .btn{
 min-height:38px;padding:7px 14px;font-size:12px
 }
+
+.mode-name-edit{
+display:inline-block;max-width:100%;border-radius:6px;cursor:text;touch-action:manipulation;
+  transition:background .12s ease,box-shadow .12s ease
+}
+
+.mode-name-edit:hover{
+background:var(--glass-command)
+}
+
+.mode-name-edit[contenteditable="true"]{
+min-width:72px;padding:1px 4px;margin:-1px -4px;background:var(--glass-control);
+  box-shadow:0 0 0 1px var(--selected-border);outline:none;white-space:nowrap
+}
