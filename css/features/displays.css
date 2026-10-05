@@ -235,3 +235,25 @@ display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto;padding-top:1
 .display-page-foot{
 display:flex;justify-content:flex-end;margin-top:10px
 }
+
+/* Feature-specific shared primitive sizing. */
+
+.primary-screen-btn .ui-icon{
+width:15px;height:15px
+}
+
+.overview-badge .ui-icon{
+width:11px;height:11px
+}
+
+.overview-display .monitor{
+margin:8px 0 18px
+}
+
+.overview-display .monitor.tv{
+width:116px;height:67px
+}
+
+.overview-display .monitor.pc{
+width:84px;height:54px
+}
