@@ -33,12 +33,6 @@
     grid-template-columns:minmax(410px,460px) minmax(0,1fr)
   }
 
-  .mode-status{
-    width:100%;
-    margin:0 0 16px;
-    font-size:clamp(12px,.72vw,13px)
-  }
-
   .btn{min-height:clamp(38px,2.5vw,44px);padding:7px 16px}
   .btn.icon{
     width:clamp(42px,2.7vw,48px);
