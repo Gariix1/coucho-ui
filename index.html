@@ -350,7 +350,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .workspace-pieces{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
 .workspace-piece{min-height:56px;border:1px solid transparent;border-radius:var(--r-compact);background:var(--glass-control);display:flex;align-items:center;gap:9px;padding:9px 11px;text-align:left;min-width:0}
 .workspace-piece:hover{background:var(--glass-pill);border-color:var(--glass-soft-border)}
-.workspace-piece-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:10px;background:var(--glass-inset);display:grid;place-items:center;color:var(--accent)}
+.workspace-piece-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:10px;background:var(--glass-inset);display:grid;place-items:center;color:var(--accent)}.workspace-piece-icon .ui-icon{width:18px;height:18px}
 .workspace-piece small{display:block;color:var(--muted);font-size:10px;font-weight:600;margin-bottom:2px}.workspace-piece b{display:block;font-size:13px}
 .workspace-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)}
 .workspace-help{color:var(--text2);font-size:10px;line-height:1.4;display:flex;align-items:center;gap:4px}.workspace-help .ui-icon{width:12px;height:12px}.workspace-actions{display:flex;gap:8px}.workspace-actions .btn{min-height:38px;padding:7px 14px;font-size:12px}
@@ -382,7 +382,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .settings-row:first-child{border-top:0}
 .settings-row:is(button){cursor:pointer}
 .settings-row:is(button):hover{background:var(--glass-command)}
-.settings-row-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-control);color:var(--accent);display:grid;place-items:center}
+.settings-row-icon{width:36px;height:36px;border:1px solid var(--glass-soft-border);border-radius:var(--r-control);background:var(--glass-control);color:var(--accent);display:grid;place-items:center}.settings-row-icon .ui-icon{width:18px;height:18px}.settings-row-value .ui-icon{width:15px;height:15px}
 .settings-row-copy b{display:block;font-size:13px}
 .settings-row-copy small{display:block;color:var(--text2);font-size:10px;margin-top:2px}
 .settings-row-value{color:var(--muted);font-size:11px;font-weight:600}
@@ -419,7 +419,7 @@ button.mode-list-copy:hover,button.mode-list-copy:focus-visible{background:trans
 .screen-map.preserve .screen-device{pointer-events:none;opacity:.38}
 .display-editor-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider);flex:0 0 auto}
 .display-editor-actions{display:flex;gap:8px;flex:0 0 auto}
-.display-editor-summary{min-width:0;color:var(--text2);font-size:11px}
+.display-editor-summary{min-width:0;color:var(--text2);font-size:11px}.display-editor-summary .ui-icon{display:inline-block;width:11px;height:11px;vertical-align:-1px}
 .display-editor-summary b{color:var(--text);font-weight:600}
 
 .app-options{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
@@ -785,7 +785,7 @@ body.test-mode .test-tools{display:flex}
   <div class="display-editor-head">
     <div>
       <div class="pop-title">Pantallas</div>
-      <div class="display-editor-sub">Selecciona para activar · estrella para principal</div>
+      <div class="display-editor-sub">Selecciona para activar</div>
     </div>
     <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
   </div>
