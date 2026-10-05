@@ -349,7 +349,7 @@ function renderModeList(){
         '</div>'+
         '<div class="saved-mode-actions">'+
           (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+((applying||detailDirty)?' disabled':'')+(applying?' aria-busy="true"':'')+' title="'+(detailDirty?'Prueba o guarda desde el editor':'Activar modo')+'">'+(applying?'…':'Activar')+'</button>':'')+
-          '<button class="open-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" aria-expanded="'+(selected?'true':'false')+'" title="'+(selected?'Ir al editor de '+safeName:'Editar '+safeName)+'" aria-label="'+(selected?'Ir al editor de '+safeName:'Editar '+safeName)+'">'+iconMarkup('arrow-right')+'</button>'+
+          '<button class="open-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" title="'+(selected?'Ir al editor de '+safeName:'Editar '+safeName)+'" aria-label="'+(selected?'Ir al editor de '+safeName:'Editar '+safeName)+'">'+iconMarkup('arrow-right')+'</button>'+
           '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>'+
         '</div>'+
       '</div>'+
