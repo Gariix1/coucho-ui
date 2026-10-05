@@ -235,17 +235,30 @@
 <div class="capture-wrap" id="shortcutOverlay" role="dialog" aria-modal="true" aria-labelledby="shortcutTitle">
   <div class="capture">
     <h3 id="shortcutTitle">Activar con</h3>
-    <div class="controller">
-      <div class="guide">Guide</div><div class="stick left"></div><div class="stick right"></div>
-      <button class="cbtn a" id="capA">A</button>
-      <button class="cbtn x" id="capX">X</button>
-      <button class="cbtn y" id="capY">Y</button>
+
+    <div class="controller" aria-label="Selecciona A, X o Y">
+      <span class="guide" aria-hidden="true">Guide</span>
+      <span class="stick left" aria-hidden="true"></span>
+      <span class="stick right" aria-hidden="true"></span>
+
+      <div class="face-buttons">
+        <button class="cbtn y" id="capY" data-shortcut-key="Y" aria-label="Guide más Y">Y</button>
+        <button class="cbtn x" id="capX" data-shortcut-key="X" aria-label="Guide más X">X</button>
+        <span class="cbtn b" aria-hidden="true">B</span>
+        <button class="cbtn a" id="capA" data-shortcut-key="A" aria-label="Guide más A">A</button>
+      </div>
     </div>
-    <div class="capture-result" id="captureResult"><span class="capture-placeholder">A · X · Y</span></div>
+
+    <div class="capture-result" id="captureResult">
+      <span class="capture-placeholder">Guide + …</span>
+    </div>
+
     <div class="capture-actions">
-      <button class="btn" id="capCancel">Cancelar</button>
-      <button class="btn" id="capManual">Sin atajo</button>
-      <button class="btn primary" id="capUse" hidden>Usar</button>
+      <button class="btn capture-clear" id="capManual">Sin atajo</button>
+      <div class="capture-actions-main">
+        <button class="btn" id="capCancel">Cancelar</button>
+        <button class="btn primary" id="capUse" hidden>Usar</button>
+      </div>
     </div>
   </div>
 </div>
