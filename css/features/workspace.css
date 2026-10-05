@@ -194,10 +194,6 @@ display:block;color:var(--text2);font-size:10px;margin-top:2px;white-space:nowra
 flex:0 0 auto;text-align:right;color:var(--muted);font-size:9px;line-height:1.45;white-space:nowrap
 }
 
-.workspace-canvas-legend{
-position:absolute;right:10px;bottom:7px;color:var(--muted);font-size:9px;z-index:2;background:var(--glass-inset);padding-left:5px
-}
-
 .workspace-pieces{
 display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px
 }
@@ -223,15 +219,11 @@ display:block;font-size:13px
 }
 
 .workspace-footer{
-display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)
-}
-
-.workspace-help{
-color:var(--text2);font-size:10px;line-height:1.4;display:flex;align-items:center;gap:4px
+display:flex;align-items:center;justify-content:flex-end;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)
 }
 
 .workspace-actions{
-display:flex;gap:8px
+display:flex;gap:8px;margin-left:auto
 }
 
 .workspace-display-primary .ui-icon{
@@ -240,10 +232,6 @@ width:15px;height:15px
 
 .workspace-piece-icon .ui-icon{
 width:18px;height:18px
-}
-
-.workspace-help .ui-icon{
-width:12px;height:12px
 }
 
 .workspace-actions .btn{
