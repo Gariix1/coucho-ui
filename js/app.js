@@ -1040,15 +1040,26 @@ function openShortcut(rawId){
   }
 
   captured=null;
-  q('#captureResult').innerHTML='<span class="capture-placeholder">A · X · Y</span>';
+  q('#captureResult').innerHTML='<span class="capture-placeholder">Guide + …</span>';
   q('#capUse').hidden=true;
+  qa('[data-shortcut-key]').forEach(function(button){
+    button.classList.remove('selected');
+    button.setAttribute('aria-pressed','false');
+  });
   q('#shortcutOverlay').classList.add('open');
+  q('#capA').focus();
 }
 
 function capture(v){
   captured='Guide + '+v;
   q('#captureResult').innerHTML=shortcutMarkup(captured);
   q('#capUse').hidden=false;
+
+  qa('[data-shortcut-key]').forEach(function(button){
+    var selected=button.dataset.shortcutKey===v;
+    button.classList.toggle('selected',selected);
+    button.setAttribute('aria-pressed',selected?'true':'false');
+  });
 }
 
 q('#capA').onclick=function(){capture('A')};
@@ -1073,7 +1084,7 @@ q('#capManual').onclick=function(){
   mode.shortcut='Manual';
   commitSets();
   render();
-  toast('Activar con','Sin atajo');
+  toast('Atajo','Sin atajo');
 };
 
 q('#capUse').onclick=function(){
@@ -1094,7 +1105,7 @@ q('#capUse').onclick=function(){
   mode.shortcut=value;
   commitSets();
   render();
-  toast('Activar con',value);
+  toast('Atajo',value);
 };
 
 
