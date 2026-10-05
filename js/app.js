@@ -214,7 +214,7 @@ function workspaceMarkup(kind,id){
       '</div>'+
       '<div class="workspace-head-actions">'+
         '<span class="workspace-state" id="workspaceState" role="status" aria-live="polite" hidden></span>'+
-        '<button class="workspace-close" id="workspaceClose" title="Compactar" aria-label="Compactar">'+iconMarkup('collapse')+'</button>'+
+        '<button class="workspace-close" id="workspaceClose" title="'+(saved?'Compactar':'Cancelar')+'" aria-label="'+(saved?'Compactar':'Cancelar')+'">'+iconMarkup(saved?'collapse':'close')+'</button>'+
       '</div>'+
     '</header>'+
     '<header class="workspace-section-head"><b id="workspaceScreenTitle">Pantallas</b></header>'+
