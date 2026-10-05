@@ -112,11 +112,4 @@ display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margi
 margin:0;font-size:28px;font-weight:600
 }
 
-.shell-page-head p{
-margin:5px 0 0;color:var(--text2);font-size:12px
-}
 
-.mode-status{
-display:flex;align-items:center;gap:5px;
-margin:0 0 12px;color:var(--text2);font-size:11px
-}
