@@ -1,0 +1,122 @@
+/* Window chrome, navigation rail and view containers. */
+
+.window{
+height:100%;display:grid;grid-template-rows:32px 1fr
+}
+
+.titlebar{
+display:flex;align-items:center;justify-content:space-between;background:rgba(17,24,40,.10);border-bottom:1px solid var(--divider);backdrop-filter:blur(26px) saturate(1.15);-webkit-backdrop-filter:blur(26px) saturate(1.15)
+}
+
+.brand{
+display:flex;align-items:center;gap:8px;padding-left:12px;color:var(--text2);font-size:12px
+}
+
+.logo{
+width:18px;height:18px;border-radius:5px;background:var(--logo-bg);border:1px solid var(--logo-border);color:var(--accent);display:grid;place-items:center;font-size:10px;font-weight:800
+}
+
+.win{
+display:flex;height:100%;pointer-events:none
+}
+
+.win span{
+width:46px;display:grid;place-items:center;color:var(--win-fg);font-size:11px
+}
+
+.app-shell{
+height:100%;min-height:0;display:grid;grid-template-columns:72px minmax(0,1fr)
+}
+
+.nav-rail{
+min-height:0;border-right:1px solid var(--divider);background:var(--glass-surface);display:flex;flex-direction:column;align-items:stretch;padding:8px 7px 10px;overflow:hidden
+}
+
+.rail-main{
+display:flex;flex-direction:column;gap:5px
+}
+
+.rail-bottom{
+margin-top:auto;display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid var(--divider)
+}
+
+.rail-item,.rail-util{
+position:relative;width:100%;min-height:56px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px 3px;font-size:9px;font-weight:600;line-height:1
+}
+
+.rail-icon{
+font-size:18px;line-height:1;display:grid;place-items:center
+}
+
+.rail-item:hover,.rail-util:hover{
+background:var(--glass-command);border-color:var(--glass-soft-border);color:var(--text)
+}
+
+.rail-item:active,.rail-util:active{
+background:var(--glass-control)
+}
+
+.rail-item.active{
+color:var(--accent);background:transparent
+}
+
+.rail-item.active:before{
+content:"";position:absolute;left:-7px;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)
+}
+
+.rail-util{
+min-height:44px;font-size:0
+}
+
+.rail-util .rail-icon{
+font-size:16px
+}
+
+.prototype-tool{
+opacity:.34
+}
+
+.prototype-tool:hover,.prototype-tool.active{
+opacity:1
+}
+
+#settingsBtn.active{
+color:var(--accent)
+}
+
+.main{
+height:100%;min-width:0;overflow:auto
+}
+
+.shell-view{
+display:none;min-height:100%
+}
+
+.shell-view.active{
+display:block
+}
+
+.wrap{
+max-width:1000px;margin:0;padding:24px 24px 48px
+}
+
+.shell-placeholder{
+max-width:900px;margin:0;padding:24px 24px 48px
+}
+
+.shell-page-head{
+display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:20px
+}
+
+.shell-page-head h1{
+margin:0;font-size:28px;font-weight:600
+}
+
+.shell-page-head p{
+margin:5px 0 0;color:var(--text2);font-size:12px
+}
+
+.mode-status{
+display:flex;align-items:center;gap:5px;
+margin:0 0 12px;color:var(--text2);font-size:11px
+}
