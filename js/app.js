@@ -22,6 +22,7 @@ import {
 } from './model.js';
 
 import {modeSurfaceTransition} from './motion.js';
+import {modeLayoutTransition} from './layout-motion.js';
 
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
@@ -36,6 +37,9 @@ const TEST_COUNTDOWN_INTERVAL_MS=1000;
 const TEST_TIMEOUT_RESTORE_MS=420;
 const MANUAL_RESTORE_STEP_MS=380;
 const MANUAL_RESTORE_FINISH_MS=220;
+const OPEN_LAYOUT_MS=360;
+const CLOSE_LAYOUT_MS=330;
+const DENSITY_LAYOUT_MS=280;
 
 // Persistent mode/session state.
 let sets=loadSets();
@@ -191,6 +195,33 @@ function setModeTransitioning(value){
   }
 }
 
+function layoutKeyForMode(id){
+  return id===null?'current':'mode:'+id;
+}
+
+function elementForMode(id){
+  return id===null
+    ?q('[data-expand-source="current"]')
+    :q('[data-mode-row="'+id+'"]');
+}
+
+function setExpandedTarget(targetId){
+  var mode=targetId===null?null:byId(targetId);
+
+  expandedOpen=true;
+  expandedModeId=targetId;
+
+  if(mode){
+    expandedConfig=cloneModeConfig(mode);
+    newModeBase=null;
+    createAutoNamed=false;
+  }else{
+    expandedConfig=newModeConfigFromApplied();
+    newModeBase=cloneModeConfig(expandedConfig);
+    createAutoNamed=true;
+  }
+}
+
 function expandedModeMarkup(kind,id){
   var saved=kind==='mode';
   var rootTag=saved?'article':'section';
@@ -239,11 +270,89 @@ function expandedModeMarkup(kind,id){
   '</'+rootTag+'>';
 }
 
-function setCardDensity(next){
+async function setCardDensity(next){
   if(next!=='compact'&&next!=='detailed')return;
-  cardDensity=next;
-  localStorage.setItem(CARD_DENSITY_KEY,cardDensity);
-  renderWorkbench();
+  if(next===cardDensity||modeTransitioning)return;
+
+  var root=q('#modeList');
+  var anchorKey=expandedOpen?layoutKeyForMode(expandedModeId):null;
+  var layout=modeLayoutTransition.prepare(root,{
+    anchorKey:anchorKey,
+    scrollElement:q('.main')
+  });
+
+  setModeTransitioning(true);
+
+  try{
+    cardDensity=next;
+    localStorage.setItem(CARD_DENSITY_KEY,cardDensity);
+    renderWorkbench();
+
+    await layout.play({
+      root:q('#modeList'),
+      anchorKey:anchorKey,
+      excludeKeys:anchorKey?[anchorKey]:[],
+      duration:DENSITY_LAYOUT_MS
+    });
+  }finally{
+    layout.cancel();
+    setModeTransitioning(false);
+  }
+
+  var selected=q('[data-density="'+next+'"]');
+  if(selected)selected.focus({preventScroll:true});
+}
+
+async function switchExpandedSurface(targetId,source){
+  if(!expandedOpen||modeTransitioning)return false;
+  if(expandedModeId===targetId)return true;
+  if(!guardExpandedSwitch(targetId))return false;
+
+  var previousId=expandedModeId;
+  var previousKey=layoutKeyForMode(previousId);
+  var targetKey=layoutKeyForMode(targetId);
+  var root=q('#modeList');
+  var previousSurface=q('.mode-expanded');
+
+  if(!previousSurface||!source)return false;
+
+  closePops();
+  setModeTransitioning(true);
+
+  var closingTransition=modeSurfaceTransition.prepare(previousSurface);
+  var openingTransition=modeSurfaceTransition.prepare(source);
+  var layout=modeLayoutTransition.prepare(root,{
+    anchorKey:targetKey,
+    scrollElement:q('.main')
+  });
+
+  try{
+    setExpandedTarget(targetId);
+    renderWorkbench();
+
+    var destination=q('.mode-expanded');
+    var previousDestination=elementForMode(previousId);
+
+    await Promise.all([
+      closingTransition.play(previousDestination,'close'),
+      openingTransition.play(destination,'open'),
+      layout.play({
+        root:q('#modeList'),
+        anchorKey:targetKey,
+        excludeKeys:[previousKey,targetKey],
+        duration:OPEN_LAYOUT_MS
+      })
+    ]);
+  }finally{
+    closingTransition.cancel();
+    openingTransition.cancel();
+    layout.cancel();
+    setModeTransitioning(false);
+  }
+
+  var closeButton=q('#expandedClose');
+  if(closeButton)closeButton.focus({preventScroll:true});
+  return true;
 }
 
 async function expandModeSurface(targetId,source){
@@ -255,46 +364,47 @@ async function expandModeSurface(targetId,source){
       if(current)current.focus({preventScroll:true});
       return true;
     }
-    if(!guardExpandedSwitch(targetId))return false;
-    await collapseExpandedMode(false);
-    source=targetId===null
-      ?q('[data-expand-source="current"]')
-      :q('[data-mode-row="'+targetId+'"]');
-    if(!source)return false;
+    return switchExpandedSurface(targetId,source);
   }
 
   var mode=targetId===null?null:byId(targetId);
   if(targetId!==null&&!mode)return false;
+  if(!source)return false;
 
   closePops();
   setModeTransitioning(true);
+
+  var targetKey=layoutKeyForMode(targetId);
+  var root=q('#modeList');
   var transition=modeSurfaceTransition.prepare(source);
+  var layout=modeLayoutTransition.prepare(root,{
+    anchorKey:targetKey,
+    scrollElement:q('.main')
+  });
 
   try{
-    expandedOpen=true;
-    expandedModeId=targetId;
-
-    if(mode){
-      expandedConfig=cloneModeConfig(mode);
-      newModeBase=null;
-      createAutoNamed=false;
-    }else{
-      expandedConfig=newModeConfigFromApplied();
-      newModeBase=cloneModeConfig(expandedConfig);
-      createAutoNamed=true;
-    }
-
+    setExpandedTarget(targetId);
     renderWorkbench();
 
     var destination=q('.mode-expanded');
-    await transition.play(destination,'open');
+
+    await Promise.all([
+      transition.play(destination,'open'),
+      layout.play({
+        root:q('#modeList'),
+        anchorKey:targetKey,
+        excludeKeys:[targetKey],
+        duration:OPEN_LAYOUT_MS
+      })
+    ]);
   }finally{
     transition.cancel();
+    layout.cancel();
     setModeTransitioning(false);
   }
 
   var closeButton=q('#expandedClose');
-  if(closeButton)closeButton.focus();
+  if(closeButton)closeButton.focus({preventScroll:true});
   return true;
 }
 
@@ -315,10 +425,17 @@ async function collapseExpandedMode(restore,afterClose){
   closePops();
 
   var closingId=expandedModeId;
+  var closingKey=layoutKeyForMode(closingId);
   var source=q('.mode-expanded');
+  var root=q('#modeList');
 
   setModeTransitioning(true);
+
   var transition=modeSurfaceTransition.prepare(source);
+  var layout=modeLayoutTransition.prepare(root,{
+    anchorKey:closingKey,
+    scrollElement:q('.main')
+  });
 
   try{
     expandedOpen=false;
@@ -328,13 +445,20 @@ async function collapseExpandedMode(restore,afterClose){
     createAutoNamed=true;
     renderWorkbench();
 
-    var destination=closingId===null
-      ?q('[data-expand-source="current"]')
-      :q('[data-mode-row="'+closingId+'"]');
+    var destination=elementForMode(closingId);
 
-    await transition.play(destination,'close');
+    await Promise.all([
+      transition.play(destination,'close'),
+      layout.play({
+        root:q('#modeList'),
+        anchorKey:closingKey,
+        excludeKeys:[closingKey],
+        duration:CLOSE_LAYOUT_MS
+      })
+    ]);
   }finally{
     transition.cancel();
+    layout.cancel();
     setModeTransitioning(false);
   }
 
@@ -347,7 +471,7 @@ async function collapseExpandedMode(restore,afterClose){
     var focusTarget=closingId===null
       ?q('[data-expand-source="current"]')
       :q('[data-mode-row="'+closingId+'"] .open-mode');
-    if(focusTarget)focusTarget.focus();
+    if(focusTarget)focusTarget.focus({preventScroll:true});
   }
   return true;
 }
@@ -366,7 +490,7 @@ function renderModeCard(mode){
   var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
   var titleId='mode-title-'+mode.id;
 
-  return '<article class="saved-mode-card" data-mode-row="'+mode.id+'" aria-labelledby="'+titleId+'">'+
+  return '<article class="saved-mode-card" data-mode-row="'+mode.id+'" data-layout-key="'+layoutKeyForMode(mode.id)+'" aria-labelledby="'+titleId+'">'+
     '<div class="saved-mode-head">'+
       '<div class="saved-mode-name">'+
         '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
@@ -419,7 +543,7 @@ function renderModeList(){
       current+
     '</div>'+
     '<div class="mode-list-group saved-group">'+
-      '<div class="mode-list-group-head">'+
+      '<div class="mode-list-group-head" data-layout-key="saved-head">'+
         '<div class="mode-list-label">Tus modos</div>'+
         '<div class="density-toggle" role="group" aria-label="Vista de modos">'+
           '<button class="density-button" data-density="compact" aria-pressed="'+(cardDensity==='compact'?'true':'false')+'" title="Vista compacta" aria-label="Vista compacta">'+iconMarkup('grid')+'</button>'+
