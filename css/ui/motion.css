@@ -58,17 +58,17 @@ overflow:hidden
 }
 
 .mode-transition-content>.saved-mode-card,
-.mode-transition-content>.visual-workspace{
+.mode-transition-content>.mode-expanded{
 width:100%;height:100%;max-width:none;min-width:0;margin:0;
   box-sizing:border-box
 }
 
 .mode-transition-flight .mode-transition-content>.saved-mode-card,
-.mode-transition-flight .mode-transition-content>.visual-workspace{
+.mode-transition-flight .mode-transition-content>.mode-expanded{
 box-shadow:none
 }
 
-.mode-transition-hold .mode-transition-content>.visual-workspace{
+.mode-transition-hold .mode-transition-content>.mode-expanded{
 border-radius:var(--r-card)
 }
 
