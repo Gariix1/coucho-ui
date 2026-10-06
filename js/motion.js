@@ -118,7 +118,7 @@ function prepare(source,{hold=null}={}){
 
     const vector=connectedTransform(flight.rect,to);
     const open=direction!=='close';
-    const toCreate=!!(open&&destination&&destination.classList.contains('create-mode'));
+    const toCreate=!!(open&&destination&&destination.classList.contains('new-mode-expanded'));
     flight.element.classList.toggle('to-create',toCreate);
     flight.element.classList.toggle('to-editor',open&&!toCreate);
     flight.element.classList.toggle('to-card',!open);
@@ -202,7 +202,7 @@ function prepare(source,{hold=null}={}){
       fill:'both'
     });
 
-    // While opening, keep the previous workspace above the newly-rendered editor.
+    // While opening, keep the previous surface above the newly-rendered editor.
     // It dissolves only once the connected surface is nearly covering it.
     const holdAnimation=held
       ?held.element.animate([
