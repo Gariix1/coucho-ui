@@ -595,3 +595,17 @@ background:var(--glass-command)
 min-width:72px;padding:1px 4px;margin:-1px -4px;background:var(--glass-control);
   box-shadow:0 0 0 1px var(--selected-border);outline:none;white-space:nowrap
 }
+
+
+.saved-mode-expanded .mode-expanded-head{
+cursor:pointer;border-radius:var(--r-control);margin:-5px -5px 9px;padding:5px;
+  transition:background .14s ease
+}
+
+.saved-mode-expanded .mode-expanded-head:hover{
+background:var(--glass-command)
+}
+
+.saved-mode-expanded .mode-expanded-head .mode-name-edit{
+cursor:text
+}
