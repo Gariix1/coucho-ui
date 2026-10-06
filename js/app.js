@@ -159,12 +159,14 @@ function renderResourceViews(){
 }
 
 // Modes list and inline expanded visualizer.
-function newModeHasChanges(){
-  return expandedOpen&&expandedModeId===null&&expandedConfig&&newModeBase&&!modeConfigEqual(expandedConfig,newModeBase);
-}
-
 function hasPendingCreateChanges(){
-  return expandedOpen&&newModeHasChanges();
+  return !!(
+    expandedOpen&&
+    expandedModeId===null&&
+    expandedConfig&&
+    newModeBase&&
+    !modeConfigEqual(expandedConfig,newModeBase)
+  );
 }
 
 function guardExpandedSwitch(nextId){
@@ -747,10 +749,9 @@ function openDeletePop(anchor,rawId){
   closePops();
   deleteTarget=id;
   var fallback=mode.active?sets.find(function(s){return s.id!==mode.id}):null;
-  var deletingOpenDirty=expandedModeId===mode.id&&hasPendingCreateChanges();
   q('#deleteText').textContent=mode.active&&fallback
-    ?'¿Eliminar “'+mode.name+'”? Se activará “'+fallback.name+'”.'+(deletingOpenDirty?' También se perderán los cambios sin guardar.':'')
-    :'¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.'+(deletingOpenDirty?' También se perderán los cambios sin guardar.':'');
+    ?'¿Eliminar “'+mode.name+'”? Se activará “'+fallback.name+'”.'
+    :'¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.';
   openAnchoredPop(q('#deletePop'),anchor);
   requestAnimationFrame(function(){q('#deleteCancel').focus()});
 }
@@ -1229,7 +1230,7 @@ function startTest(ctx){
   q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx)+'</div>';
   q('#testApp').textContent=logo(ctx.app);
   q('#testText').textContent='Probando '+ctx.name+'…';
-  q('#keep').textContent=ctx.kind==='mode-preview'||ctx.kind==='saved-mode'?'Activar':ctx.kind==='new-mode'?'Guardar y activar':'Guardar';
+  q('#keep').textContent=ctx.kind==='saved-mode'?'Activar':ctx.kind==='new-mode'?'Guardar y activar':'Guardar';
   setTestProgress(0);q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
 
   var pct=0;
@@ -1321,16 +1322,7 @@ q('#keep').onclick=function(){
     return;
   }
 
-  if(kind==='mode-preview'){
-    sets.forEach(function(s){s.active=s.id===testContext.existingId});
-    appliedSession=sessionFromMode(byId(testContext.existingId));
-    q('#testOverlay').classList.remove('open');
-    commitSets();
-    render();
-    toast(testContext.name,'Activo después de probar');
-    testContext=null;
-    return;
-  }
+
 };
 
 function finishRestore(){
