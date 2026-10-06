@@ -210,7 +210,7 @@ function expandedModeMarkup(kind,id){
       '<button class="btn primary" id="expandedSave">Crear modo</button>';
 
   return '<'+rootTag+' class="'+rootClass+'" id="expandedMode" tabindex="-1" aria-labelledby="expandedName"'+dataAttr+'>'+
-    '<header class="mode-expanded-head">'+
+    '<header class="mode-expanded-head"'+(saved?' data-collapse-expanded="true"':'')+'>'+
       '<div class="mode-expanded-title-block">'+
         titleLead+
         '<div class="mode-expanded-title-copy">'+
@@ -1052,6 +1052,14 @@ function bindExpandedControls(){
   if(!close)return;
 
   close.onclick=function(){collapseExpandedMode(true)};
+
+  var collapseSurface=q('[data-collapse-expanded]');
+  if(collapseSurface)collapseSurface.onclick=function(event){
+    if(event.target.closest('button,a,input,select,textarea,[contenteditable="true"],.mode-name-edit'))return;
+    var selection=window.getSelection&&window.getSelection();
+    if(selection&&String(selection).trim())return;
+    collapseExpandedMode(true);
+  };
 
   q('#expandedApp').onclick=function(event){
     closePops();
