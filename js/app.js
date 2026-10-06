@@ -48,7 +48,7 @@ let expandedModeId=null;
 let expandedOpen=false;
 let cardDensity=localStorage.getItem(CARD_DENSITY_KEY)==='compact'?'compact':'detailed';
 let expandedConfig=null;
-let expandedBase=null;
+let newModeBase=null;
 let createAutoNamed=true;
 let modeTransitioning=false;
 
@@ -159,16 +159,8 @@ function renderResourceViews(){
 }
 
 // Modes list and inline expanded visualizer.
-function ensureExpandedConfig(){
-  if(expandedConfig)return;
-  expandedModeId=null;
-  expandedConfig=newModeConfigFromApplied();
-  expandedBase=cloneModeConfig(expandedConfig);
-  createAutoNamed=true;
-}
-
 function newModeHasChanges(){
-  return expandedModeId===null&&expandedConfig&&expandedBase&&!modeConfigEqual(expandedConfig,expandedBase);
+  return expandedOpen&&expandedModeId===null&&expandedConfig&&newModeBase&&!modeConfigEqual(expandedConfig,newModeBase);
 }
 
 function hasPendingCreateChanges(){
@@ -277,11 +269,11 @@ async function expandModeSurface(targetId,source){
 
     if(mode){
       expandedConfig=cloneModeConfig(mode);
-      expandedBase=cloneModeConfig(mode);
+      newModeBase=null;
       createAutoNamed=false;
     }else{
       expandedConfig=newModeConfigFromApplied();
-      expandedBase=cloneModeConfig(expandedConfig);
+      newModeBase=cloneModeConfig(expandedConfig);
       createAutoNamed=true;
     }
 
@@ -324,8 +316,8 @@ async function collapseExpandedMode(restore,afterClose){
   try{
     expandedOpen=false;
     expandedModeId=null;
-    expandedConfig=newModeConfigFromApplied();
-    expandedBase=cloneModeConfig(expandedConfig);
+    expandedConfig=null;
+    newModeBase=null;
     createAutoNamed=true;
     renderWorkbench();
 
@@ -543,21 +535,19 @@ function syncExpandedSavedMode(){
   mode.primaryDisplayId=expandedConfig.primaryDisplayId;
   mode.app=expandedConfig.app;
   mode.shortcut=expandedConfig.shortcut;
-  expandedBase=cloneModeConfig(expandedConfig);
   commitSets();
 }
 
 function renderExpandedMode(){
-  if(!expandedOpen)return;
+  if(!expandedOpen||!expandedConfig)return;
 
-  ensureExpandedConfig();
   var surface=q('.mode-expanded');
   if(!surface)return;
 
   renderExpandedScreens();
 
   var isNew=expandedModeId===null;
-  var changeCount=isNew?modeChangeCount(expandedConfig,expandedBase):0;
+  var changeCount=isNew?modeChangeCount(expandedConfig,newModeBase):0;
   var dirty=changeCount>0;
   var mode=isNew?null:byId(expandedModeId);
   var pending=!!(mode&&mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode));
@@ -603,7 +593,6 @@ function refreshExpandedConfig(){
 }
 
 function renderWorkbench(){
-  ensureExpandedConfig();
   renderModeList();
   if(expandedOpen)renderExpandedMode();
 }
@@ -612,7 +601,6 @@ function render(){
   ensureAppliedSession();
   renderResourceViews();
   renderDisplayOverview();
-  ensureExpandedConfig();
   renderWorkbench();
 }
 
@@ -673,8 +661,8 @@ function removeSet(id){
   if(expandedModeId===id){
     expandedOpen=false;
     expandedModeId=null;
-    expandedConfig=newModeConfigFromApplied();
-    expandedBase=cloneModeConfig(expandedConfig);
+    expandedConfig=null;
+    newModeBase=null;
     createAutoNamed=true;
   }
   commitSets();
@@ -702,11 +690,6 @@ function activate(id,force){
     sets.forEach(function(s){s.active=s.id===id});
     appliedSession=sessionFromMode(current);
     commitSets();
-
-    if(expandedModeId===null&&!expandedOpen){
-      expandedConfig=newModeConfigFromApplied();
-      expandedBase=cloneModeConfig(expandedConfig);
-    }
 
     activatingId=null;
     activationTimer=null;
@@ -1040,7 +1023,7 @@ async function createModeFromExpanded(){
     expandedOpen=false;
     expandedModeId=null;
     expandedConfig=newModeConfigFromApplied();
-    expandedBase=cloneModeConfig(expandedConfig);
+    newModeBase=cloneModeConfig(expandedConfig);
     createAutoNamed=true;
 
     render();
@@ -1080,7 +1063,7 @@ function bindExpandedControls(){
 
   q('#expandedReset').onclick=function(){
     if(expandedModeId!==null)return;
-    expandedConfig=cloneModeConfig(expandedBase);
+    expandedConfig=cloneModeConfig(newModeBase);
     refreshExpandedConfig();
   };
 
@@ -1126,7 +1109,7 @@ q('#clearModes').onclick=function(){
   expandedOpen=false;
   expandedModeId=null;
   expandedConfig=null;
-  expandedBase=null;
+  newModeBase=null;
   commitSets();
   render();
   toast('Modos vaciados','Ya puedes probar el flujo desde cero');
@@ -1138,7 +1121,7 @@ q('#restoreDemo').onclick=function(){
   expandedOpen=false;
   expandedModeId=null;
   expandedConfig=null;
-  expandedBase=null;
+  newModeBase=null;
   commitSets();
   render();
   toast('Demo restaurada','3 modos');
@@ -1301,8 +1284,8 @@ q('#keep').onclick=function(){
     appliedSession=sessionFromMode(created);
     expandedOpen=false;
     expandedModeId=null;
-    expandedConfig=newModeConfigFromApplied();
-    expandedBase=cloneModeConfig(expandedConfig);
+    expandedConfig=null;
+    newModeBase=null;
     createAutoNamed=true;
     q('#testOverlay').classList.remove('open');
     commitSets();
@@ -1328,7 +1311,7 @@ q('#keep').onclick=function(){
       expandedOpen=true;
       expandedModeId=edited.id;
       expandedConfig=cloneModeConfig(edited);
-      expandedBase=cloneModeConfig(edited);
+      newModeBase=null;
     }
     q('#testOverlay').classList.remove('open');
     commitSets();
