@@ -56,7 +56,7 @@ grid-template-columns:minmax(0,1fr)
 grid-template-columns:repeat(2,minmax(0,1fr))
 }
 
-.mode-grid .expanded-workspace{
+.mode-grid .mode-expanded{
 grid-column:1/-1
 }
 
@@ -148,7 +148,7 @@ min-width:0;border:1px solid var(--glass-soft-border);border-radius:var(--r-card
   transition:border-color .14s ease,background .14s ease,box-shadow .14s ease
 }
 
-.saved-mode-card:not(.expanded-workspace):hover{
+.saved-mode-card:not(.mode-expanded):hover{
 border-color:var(--glass-border);background:var(--glass-pill);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 10px 26px rgba(0,0,0,.08)
 }
@@ -310,41 +310,41 @@ content:"";width:6px;height:6px;border-radius:50%;background:var(--success)
 }
 
 /* Detailed density uses the width to make quick editing faster. */
-.mode-grid.detailed .saved-mode-card:not(.expanded-workspace) .saved-mode-body{
+.mode-grid.detailed .saved-mode-card:not(.mode-expanded) .saved-mode-body{
 display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);
   gap:10px;align-items:stretch
 }
 
-.mode-grid.detailed .saved-mode-card:not(.expanded-workspace) .card-display{
+.mode-grid.detailed .saved-mode-card:not(.mode-expanded) .card-display{
 margin:10px 0 0;min-height:92px
 }
 
-.mode-grid.detailed .saved-mode-card:not(.expanded-workspace) .card-facts{
+.mode-grid.detailed .saved-mode-card:not(.mode-expanded) .card-facts{
 margin-top:10px
 }
 
 /* Compact density preserves every quick action, only reducing visual weight. */
-.mode-grid.compact .saved-mode-card:not(.expanded-workspace){
+.mode-grid.compact .saved-mode-card:not(.mode-expanded){
 padding:10px
 }
 
-.mode-grid.compact .saved-mode-card:not(.expanded-workspace) .saved-mode-name-copy b{
+.mode-grid.compact .saved-mode-card:not(.mode-expanded) .saved-mode-name-copy b{
 font-size:13px
 }
 
-.mode-grid.compact .saved-mode-card:not(.expanded-workspace) .card-display{
+.mode-grid.compact .saved-mode-card:not(.mode-expanded) .card-display{
 min-height:66px;margin:8px 0 6px;padding:8px
 }
 
-.mode-grid.compact .saved-mode-card:not(.expanded-workspace) .card-fact{
+.mode-grid.compact .saved-mode-card:not(.mode-expanded) .card-fact{
 min-height:38px;padding:6px 7px
 }
 
-.mode-grid.compact .saved-mode-card:not(.expanded-workspace) .fact-icon{
+.mode-grid.compact .saved-mode-card:not(.mode-expanded) .fact-icon{
 display:none
 }
 
-.mode-grid.compact .saved-mode-card:not(.expanded-workspace) .activate{
+.mode-grid.compact .saved-mode-card:not(.mode-expanded) .activate{
 padding-inline:8px
 }
 
@@ -377,6 +377,6 @@ position:absolute;right:3px;top:1px;color:var(--accent);font-size:8px;
   line-height:1;text-shadow:0 1px 4px rgba(0,0,0,.3)
 }
 
-.expanded-workspace.saved-mode-card{
+.mode-expanded.saved-mode-card{
 cursor:default;padding:16px
 }
