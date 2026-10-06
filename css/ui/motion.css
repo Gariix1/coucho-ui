@@ -35,8 +35,8 @@ z-index:120;border:1px solid var(--transition-border,var(--glass-border));border
 }
 
 .mode-transition-flight.to-expanded{
---transition-border:var(--edit-border);
-  --transition-wash:var(--edit-wash)
+--transition-border:var(--saved-border);
+  --transition-wash:var(--saved-wash)
 }
 
 .mode-transition-flight.to-card{
