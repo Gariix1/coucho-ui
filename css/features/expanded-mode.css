@@ -1,13 +1,10 @@
 /* Expanded mode surface for viewing and editing a mode in place. */
 
 .mode-expanded{
-border:1px solid var(--glass-soft-border);border-radius:var(--r-card);
+width:100%;padding:16px;min-width:0;overflow:visible;position:relative;isolation:isolate;z-index:1;
+  border:1px solid var(--glass-soft-border);border-radius:var(--r-card);
   background:var(--glass-panel);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.025)
-}
-
-.mode-expanded{
-width:100%;padding:16px;min-width:0;overflow:visible;position:relative;isolation:isolate;z-index:1
 }
 
 .mode-expanded.new-mode-expanded{
