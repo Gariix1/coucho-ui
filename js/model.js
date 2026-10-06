@@ -27,7 +27,7 @@ export function cloneModeConfig(source){
   };
 }
 
-export function workspaceEqual(a,b){
+export function modeConfigEqual(a,b){
   if(!a||!b)return false;
   if(
     a.name!==b.name||
@@ -41,7 +41,7 @@ export function workspaceEqual(a,b){
   return sortedDisplayIds(a)===sortedDisplayIds(b);
 }
 
-export function workspaceChangeCount(a,b){
+export function modeChangeCount(a,b){
   if(!a||!b)return 0;
 
   let count=0;
