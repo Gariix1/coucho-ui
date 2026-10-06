@@ -30,6 +30,12 @@ function clamp(value,min,max){
   return Math.max(min,Math.min(max,value));
 }
 
+function findByKey(root,key){
+  if(!root||!key)return null;
+  return Array.from(root.querySelectorAll('[data-layout-key]'))
+    .find(element=>element.dataset.layoutKey===key)||null;
+}
+
 function finished(animation){
   return animation.finished.catch(()=>{});
 }
@@ -82,7 +88,7 @@ function prepare(root,{
     // Keep the element the user acted on at the same viewport Y whenever
     // scrolling can absorb the layout shift.
     if(scroller&&anchorBefore&&nextAnchorKey){
-      const anchor=nextRoot?.querySelector('[data-layout-key="'+CSS.escape(nextAnchorKey)+'"]');
+      const anchor=findByKey(nextRoot,nextAnchorKey);
       if(anchor){
         const nextRect=anchor.getBoundingClientRect();
         const deltaY=nextRect.top-anchorBefore.top;
