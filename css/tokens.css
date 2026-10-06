@@ -54,9 +54,9 @@
   --create-accent:#7dd3fc;
   --create-border:rgba(125,211,252,.44);
   --create-wash:rgba(125,211,252,.075);
-  --edit-accent:#588cff;
-  --edit-border:rgba(88,140,255,.72);
-  --edit-wash:rgba(88,140,255,.11);
+  --saved-accent:#588cff;
+  --saved-border:rgba(88,140,255,.72);
+  --saved-wash:rgba(88,140,255,.11);
   --transition-glass:rgba(15,23,42,.78);
   --gamepad-bg:rgba(70,84,105,.45);
   --gamepad-border:rgba(215,231,255,.50);
@@ -119,9 +119,9 @@ html[data-theme="light"]{
   --create-accent:#2563eb;
   --create-border:rgba(37,99,235,.42);
   --create-wash:rgba(37,99,235,.07);
-  --edit-accent:#356be8;
-  --edit-border:rgba(53,107,232,.52);
-  --edit-wash:rgba(53,107,232,.085);
+  --saved-accent:#356be8;
+  --saved-border:rgba(53,107,232,.52);
+  --saved-wash:rgba(53,107,232,.085);
   --transition-glass:rgba(248,250,254,.86);
   --gamepad-bg:rgba(232,240,250,.86);
   --gamepad-border:rgba(142,166,195,.72);
