@@ -200,37 +200,37 @@ function setModeTransitioning(value){
 function expandedModeMarkup(kind,id){
   var saved=kind==='mode';
   var rootTag=saved?'article':'section';
-  var rootClass='mode-expanded mode-expanded '+(saved?'saved-mode-card saved-mode-expanded':'new-mode-expanded');
+  var rootClass='mode-expanded '+(saved?'saved-mode-card saved-mode-expanded':'new-mode-expanded');
   var dataAttr=saved?' data-mode-row="'+id+'"':'';
 
   return '<'+rootTag+' class="'+rootClass+'" id="expandedMode" tabindex="-1" aria-labelledby="expandedName"'+dataAttr+'>'+
     '<header class="mode-expanded-head">'+
-      '<div class="expanded-title-block">'+
-        '<div class="expanded-profile-icon" id="expandedProfileIcon"></div>'+
-        '<div class="expanded-title-copy">'+
-          '<span class="expanded-eyebrow" id="expandedEyebrow"></span>'+
+      '<div class="mode-expanded-title-block">'+
+        '<div class="mode-expanded-profile-icon" id="expandedProfileIcon"></div>'+
+        '<div class="mode-expanded-title-copy">'+
+          '<span class="mode-expanded-eyebrow" id="expandedEyebrow"></span>'+
           '<h2 id="expandedName" class="mode-name-edit" tabindex="0"></h2>'+
         '</div>'+
       '</div>'+
-      '<div class="expanded-head-actions">'+
-        '<span class="expanded-state" id="expandedState" role="status" aria-live="polite" hidden></span>'+
-        '<button class="expanded-close" id="expandedClose" title="'+(saved?'Compactar':'Cancelar')+'" aria-label="'+(saved?'Compactar':'Cancelar')+'">'+iconMarkup(saved?'collapse':'close')+'</button>'+
+      '<div class="mode-expanded-head-actions">'+
+        '<span class="mode-expanded-state" id="expandedState" role="status" aria-live="polite" hidden></span>'+
+        '<button class="mode-expanded-close" id="expandedClose" title="'+(saved?'Compactar':'Cancelar')+'" aria-label="'+(saved?'Compactar':'Cancelar')+'">'+iconMarkup(saved?'collapse':'close')+'</button>'+
       '</div>'+
     '</header>'+
-    '<header class="expanded-section-head"><b id="expandedScreenTitle">Pantallas</b></header>'+
-    '<div class="expanded-screen-stage" id="expandedScreens"></div>'+
-    '<div class="expanded-pieces">'+
-      '<button class="expanded-piece" id="expandedApp" title="Cambiar app">'+
-        '<span class="expanded-piece-icon">'+iconMarkup('play')+'</span>'+
+    '<header class="mode-expanded-section-head"><b id="expandedScreenTitle">Pantallas</b></header>'+
+    '<div class="mode-expanded-screen-stage" id="expandedScreens"></div>'+
+    '<div class="mode-mode-expanded-pieces">'+
+      '<button class="mode-expanded-piece" id="expandedApp" title="Cambiar app">'+
+        '<span class="mode-mode-expanded-piece-icon">'+iconMarkup('play')+'</span>'+
         '<span><small>App</small><b id="expandedAppName"></b></span>'+
       '</button>'+
-      '<button class="expanded-piece" id="expandedShortcut" title="Cambiar atajo">'+
-        '<span class="expanded-piece-icon">'+iconMarkup('gamepad')+'</span>'+
+      '<button class="mode-expanded-piece" id="expandedShortcut" title="Cambiar atajo">'+
+        '<span class="mode-mode-expanded-piece-icon">'+iconMarkup('gamepad')+'</span>'+
         '<span><small>Atajo</small><b id="expandedShortcutName"></b></span>'+
       '</button>'+
     '</div>'+
-    '<footer class="expanded-footer">'+
-      '<div class="expanded-actions">'+
+    '<footer class="mode-expanded-footer">'+
+      '<div class="mode-expanded-actions">'+
         '<button class="btn" id="expandedReset">Restablecer</button>'+
         '<button class="btn" id="expandedTest">Probar</button>'+
         '<button class="btn primary" id="expandedActivate" hidden>Activar</button>'+
@@ -499,15 +499,15 @@ function renderExpandedScreens(){
   stage.innerHTML=ordered.map(function(d){
     var selected=expandedConfig.displayIds.indexOf(d.id)>=0;
     var primary=selected&&expandedConfig.primaryDisplayId===d.id;
-    return '<div class="expanded-display '+(selected?'on':'off')+(primary?' primary':'')+'" data-display-layout="'+d.id+'">'+
-      '<button class="expanded-display-screen" data-expanded-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'" title="'+(selected?'Apagar ':'Activar ')+esc(d.name)+'">'+
-        '<span class="expanded-display-state">'+(selected?'Activa':'Apagada')+'</span>'+
-        '<span class="expanded-display-number">'+d.number+'</span>'+
+    return '<div class="mode-expanded-display '+(selected?'on':'off')+(primary?' primary':'')+'" data-display-layout="'+d.id+'">'+
+      '<button class="mode-mode-expanded-display-screen" data-mode-expanded-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'" title="'+(selected?'Apagar ':'Activar ')+esc(d.name)+'">'+
+        '<span class="mode-mode-expanded-display-state">'+(selected?'Activa':'Apagada')+'</span>'+
+        '<span class="mode-mode-expanded-display-number">'+d.number+'</span>'+
       '</button>'+
-      '<button class="expanded-display-primary" data-expanded-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
-      '<div class="expanded-display-info">'+
-        '<div class="expanded-display-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.model)+'</small></div>'+
-        '<div class="expanded-display-tech">'+esc(d.resolution)+'<br>'+esc(d.hz)+'</div>'+
+      '<button class="mode-mode-expanded-display-primary" data-expanded-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
+      '<div class="mode-mode-expanded-display-info">'+
+        '<div class="mode-mode-expanded-display-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.model)+'</small></div>'+
+        '<div class="mode-mode-expanded-display-tech">'+esc(d.resolution)+'<br>'+esc(d.hz)+'</div>'+
       '</div>'+
     '</div>';
   }).join('');
@@ -521,7 +521,7 @@ function renderExpandedScreens(){
     });
   });
 
-  qa('[data-expanded-display]').forEach(function(button){
+  qa('[data-mode-expanded-display]').forEach(function(button){
     button.onclick=function(){toggleExpandedDisplay(button.dataset.expandedDisplay)};
   });
 
