@@ -227,6 +227,7 @@ function expandedModeMarkup(kind,id){
   var rootTag=saved?'article':'section';
   var rootClass='mode-expanded '+(saved?'saved-mode-card saved-mode-expanded':'new-mode-expanded');
   var dataAttr=saved?' data-mode-row="'+id+'"':'';
+  var layoutKey=layoutKeyForMode(saved?id:null);
   var titleLead=saved
     ?'<div class="mode-expanded-profile-icon" id="expandedProfileIcon"></div>'
     :'';
@@ -240,7 +241,7 @@ function expandedModeMarkup(kind,id){
       '<button class="btn" id="expandedTest">Probar</button>'+
       '<button class="btn primary" id="expandedSave">Crear modo</button>';
 
-  return '<'+rootTag+' class="'+rootClass+'" id="expandedMode" tabindex="-1" aria-labelledby="expandedName"'+dataAttr+'>'+
+  return '<'+rootTag+' class="'+rootClass+'" id="expandedMode" data-layout-key="'+layoutKey+'" tabindex="-1" aria-labelledby="expandedName"'+dataAttr+'>'+
     '<header class="mode-expanded-head"'+(saved?' data-collapse-expanded="true"':'')+'>'+
       '<div class="mode-expanded-title-block">'+
         titleLead+
