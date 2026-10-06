@@ -219,13 +219,13 @@ function expandedModeMarkup(kind,id){
     '</header>'+
     '<header class="mode-expanded-section-head"><b id="expandedScreenTitle">Pantallas</b></header>'+
     '<div class="mode-expanded-screen-stage" id="expandedScreens"></div>'+
-    '<div class="mode-mode-expanded-pieces">'+
+    '<div class="mode-expanded-pieces">'+
       '<button class="mode-expanded-piece" id="expandedApp" title="Cambiar app">'+
-        '<span class="mode-mode-expanded-piece-icon">'+iconMarkup('play')+'</span>'+
+        '<span class="mode-expanded-piece-icon">'+iconMarkup('play')+'</span>'+
         '<span><small>App</small><b id="expandedAppName"></b></span>'+
       '</button>'+
       '<button class="mode-expanded-piece" id="expandedShortcut" title="Cambiar atajo">'+
-        '<span class="mode-mode-expanded-piece-icon">'+iconMarkup('gamepad')+'</span>'+
+        '<span class="mode-expanded-piece-icon">'+iconMarkup('gamepad')+'</span>'+
         '<span><small>Atajo</small><b id="expandedShortcutName"></b></span>'+
       '</button>'+
     '</div>'+
