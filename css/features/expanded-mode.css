@@ -45,11 +45,8 @@ min-width:0;display:flex;align-items:center;gap:12px
 }
 
 .mode-expanded-profile-icon{
-display:none;width:48px;height:48px;flex:0 0 auto;border:1px solid var(--selected-border);border-radius:14px;background:var(--selected-bg);place-items:center;font-size:22px
-}
-
-.saved-mode-expanded .mode-expanded-profile-icon{
-display:grid;
+display:grid;width:48px;height:48px;flex:0 0 auto;border:1px solid var(--selected-border);
+  border-radius:14px;background:var(--selected-bg);place-items:center;font-size:22px;
   box-shadow:0 8px 20px rgba(0,0,0,.12),0 0 0 1px var(--monitor-glow)
 }
 
@@ -58,23 +55,8 @@ min-width:0
 }
 
 .mode-expanded-eyebrow{
-display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px
-}
-
-.new-mode-expanded .mode-expanded-eyebrow{
-color:var(--create-accent)
-}
-
-.saved-mode-expanded .mode-expanded-eyebrow{
-display:inline-flex;align-items:center;gap:6px;
-  width:max-content;padding:4px 8px;margin:0 0 6px;
-  border:1px solid var(--selected-border);border-radius:999px;
-  background:var(--selected-bg);color:var(--edit-accent);letter-spacing:.08em
-}
-
-.saved-mode-expanded .mode-expanded-eyebrow:before{
-content:"";width:6px;height:6px;border-radius:50%;background:var(--edit-accent);
-  box-shadow:0 0 0 3px rgba(88,140,255,.12)
+display:block;color:var(--create-accent);font-size:10px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px
 }
 
 .mode-expanded-title-block h2{
