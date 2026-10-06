@@ -34,7 +34,7 @@ z-index:120;border:1px solid var(--transition-border,var(--glass-border));border
   --transition-wash:var(--create-wash)
 }
 
-.mode-transition-flight.to-editor{
+.mode-transition-flight.to-expanded{
 --transition-border:var(--edit-border);
   --transition-wash:var(--edit-wash)
 }
