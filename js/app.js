@@ -376,7 +376,7 @@ function renderModeCard(mode){
       '</div>'+
       '<div class="saved-mode-actions">'+
         (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+' title="Activar modo">'+(applying?'…':'Activar')+'</button>':'')+
-        '<button class="open-mode" data-id="'+mode.id+'" aria-controls="expandedMode" title="Expandir '+safeName+'" aria-label="Expandir '+safeName+'">'+iconMarkup('expand')+'</button>'+
+        '<button class="open-mode" data-id="'+mode.id+'" title="Expandir '+safeName+'" aria-label="Expandir '+safeName+'">'+iconMarkup('expand')+'</button>'+
         '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>'+
       '</div>'+
     '</div>'+
@@ -400,7 +400,7 @@ function renderModeList(){
   var currentExpanded=expandedOpen&&expandedModeId===null;
   var current=currentExpanded
     ?expandedModeMarkup('new',null)
-    :'<button class="mode-list-item current" data-expand-source="current" aria-controls="expandedMode">'+
+    :'<button class="mode-list-item current" data-expand-source="current">'+
       '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
       '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
       '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
