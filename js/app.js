@@ -21,7 +21,7 @@ import {
   modeConfigEqual
 } from './model.js';
 
-import {modeSheetTransition} from './motion.js';
+import {modeSurfaceTransition} from './motion.js';
 
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
@@ -268,7 +268,7 @@ async function expandModeSurface(targetId,source){
 
   closePops();
   setModeTransitioning(true);
-  var transition=modeSheetTransition.prepare(source);
+  var transition=modeSurfaceTransition.prepare(source);
 
   try{
     expandedOpen=true;
@@ -318,7 +318,7 @@ async function collapseExpandedMode(restore,afterClose){
   var source=q('.mode-expanded');
 
   setModeTransitioning(true);
-  var transition=modeSheetTransition.prepare(source);
+  var transition=modeSurfaceTransition.prepare(source);
 
   try{
     expandedOpen=false;
@@ -1014,7 +1014,7 @@ async function createModeFromExpanded(){
   if(!expandedConfig||expandedModeId!==null)return;
 
   var source=q('.mode-expanded');
-  var transition=modeSheetTransition.prepare(source);
+  var transition=modeSurfaceTransition.prepare(source);
   setModeTransitioning(true);
 
   var created=cloneModeConfig(expandedConfig);
