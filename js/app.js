@@ -179,8 +179,8 @@ function guardExpandedSwitch(nextId){
   if(!expandedOpen||expandedModeId===nextId)return true;
   if(!hasPendingCreateChanges())return true;
   toast('Nuevo modo','Crea o restablece el borrador antes de cambiar');
-  var workspace=q('.mode-expanded');
-  if(workspace)workspace.focus({preventScroll:true});
+  var surface=q('.mode-expanded');
+  if(surface)surface.focus({preventScroll:true});
   return false;
 }
 
@@ -500,14 +500,14 @@ function renderExpandedScreens(){
     var selected=expandedConfig.displayIds.indexOf(d.id)>=0;
     var primary=selected&&expandedConfig.primaryDisplayId===d.id;
     return '<div class="mode-expanded-display '+(selected?'on':'off')+(primary?' primary':'')+'" data-display-layout="'+d.id+'">'+
-      '<button class="mode-mode-expanded-display-screen" data-mode-expanded-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'" title="'+(selected?'Apagar ':'Activar ')+esc(d.name)+'">'+
-        '<span class="mode-mode-expanded-display-state">'+(selected?'Activa':'Apagada')+'</span>'+
-        '<span class="mode-mode-expanded-display-number">'+d.number+'</span>'+
+      '<button class="mode-expanded-display-screen" data-expanded-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'" title="'+(selected?'Apagar ':'Activar ')+esc(d.name)+'">'+
+        '<span class="mode-expanded-display-state">'+(selected?'Activa':'Apagada')+'</span>'+
+        '<span class="mode-expanded-display-number">'+d.number+'</span>'+
       '</button>'+
-      '<button class="mode-mode-expanded-display-primary" data-expanded-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
-      '<div class="mode-mode-expanded-display-info">'+
-        '<div class="mode-mode-expanded-display-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.model)+'</small></div>'+
-        '<div class="mode-mode-expanded-display-tech">'+esc(d.resolution)+'<br>'+esc(d.hz)+'</div>'+
+      '<button class="mode-expanded-display-primary" data-expanded-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
+      '<div class="mode-expanded-display-info">'+
+        '<div class="mode-expanded-display-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.model)+'</small></div>'+
+        '<div class="mode-expanded-display-tech">'+esc(d.resolution)+'<br>'+esc(d.hz)+'</div>'+
       '</div>'+
     '</div>';
   }).join('');
@@ -521,7 +521,7 @@ function renderExpandedScreens(){
     });
   });
 
-  qa('[data-mode-expanded-display]').forEach(function(button){
+  qa('[data-expanded-display]').forEach(function(button){
     button.onclick=function(){toggleExpandedDisplay(button.dataset.expandedDisplay)};
   });
 
@@ -551,8 +551,8 @@ function renderExpandedMode(){
   if(!expandedOpen)return;
 
   ensureExpandedConfig();
-  var workspace=q('.mode-expanded');
-  if(!workspace)return;
+  var surface=q('.mode-expanded');
+  if(!surface)return;
 
   renderExpandedScreens();
 
