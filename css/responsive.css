@@ -69,10 +69,10 @@
 @media (max-width:1040px){
   .workbench-wrap{width:min(100% - 36px,1120px)}
   .mode-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .mode-grid.detailed .saved-mode-card:not(.expanded-workspace) .saved-mode-body{
+  .mode-grid.detailed .saved-mode-card:not(.mode-expanded) .saved-mode-body{
     grid-template-columns:1fr
   }
-  .mode-grid.detailed .saved-mode-card:not(.expanded-workspace) .card-facts{
+  .mode-grid.detailed .saved-mode-card:not(.mode-expanded) .card-facts{
     margin-top:0
   }
   .mode-expanded.saved-mode-expanded{
@@ -81,7 +81,7 @@
 }
 
 @media (min-width:761px) and (max-width:1040px){
-  .workspace-screen-stage{min-height:300px}
+  .mode-expanded-screen-stage{min-height:300px}
 }
 
 @media (max-width:760px){
@@ -100,22 +100,22 @@
   .mode-grid.compact{grid-template-columns:1fr}
   .density-toggle{display:none}
 
-  .workspace-screen-stage{
+  .mode-expanded-screen-stage{
     justify-content:flex-start;
     min-height:240px
   }
-  .workspace-display{
+  .mode-expanded-display{
     flex:0 0 180px;
     width:180px;
     min-width:180px
   }
-  .workspace-pieces{grid-template-columns:1fr}
-  .workspace-footer{
+  .mode-expanded-pieces{grid-template-columns:1fr}
+  .mode-expanded-footer{
     align-items:stretch;
     flex-direction:column
   }
-  .workspace-actions{width:100%}
-  .workspace-actions .btn{flex:1}
+  .mode-expanded-actions{width:100%}
+  .mode-expanded-actions .btn{flex:1}
 
   .display-overview{grid-template-columns:1fr}
   .display-overview-stage{grid-template-columns:1fr}
