@@ -196,13 +196,25 @@ function expandedModeMarkup(kind,id){
   var rootTag=saved?'article':'section';
   var rootClass='mode-expanded '+(saved?'saved-mode-card saved-mode-expanded':'new-mode-expanded');
   var dataAttr=saved?' data-mode-row="'+id+'"':'';
+  var titleLead=saved
+    ?'<div class="mode-expanded-profile-icon" id="expandedProfileIcon"></div>'
+    :'';
+  var eyebrow=saved
+    ?''
+    :'<span class="mode-expanded-eyebrow">Crear modo</span>';
+  var actions=saved
+    ?'<button class="btn" id="expandedTest">Probar</button>'+
+      '<button class="btn primary" id="expandedActivate" hidden>Activar</button>'
+    :'<button class="btn" id="expandedReset" hidden>Restablecer</button>'+
+      '<button class="btn" id="expandedTest">Probar</button>'+
+      '<button class="btn primary" id="expandedSave">Crear modo</button>';
 
   return '<'+rootTag+' class="'+rootClass+'" id="expandedMode" tabindex="-1" aria-labelledby="expandedName"'+dataAttr+'>'+
     '<header class="mode-expanded-head">'+
       '<div class="mode-expanded-title-block">'+
-        '<div class="mode-expanded-profile-icon" id="expandedProfileIcon"></div>'+
+        titleLead+
         '<div class="mode-expanded-title-copy">'+
-          '<span class="mode-expanded-eyebrow" id="expandedEyebrow"></span>'+
+          eyebrow+
           '<h2 id="expandedName" class="mode-name-edit" tabindex="0"></h2>'+
         '</div>'+
       '</div>'+
@@ -211,7 +223,7 @@ function expandedModeMarkup(kind,id){
         '<button class="mode-expanded-close" id="expandedClose" title="'+(saved?'Compactar':'Cancelar')+'" aria-label="'+(saved?'Compactar':'Cancelar')+'">'+iconMarkup(saved?'collapse':'close')+'</button>'+
       '</div>'+
     '</header>'+
-    '<header class="mode-expanded-section-head"><b id="expandedScreenTitle">Pantallas</b></header>'+
+    '<header class="mode-expanded-section-head"><b>Pantallas</b></header>'+
     '<div class="mode-expanded-screen-stage" id="expandedScreens"></div>'+
     '<div class="mode-expanded-pieces">'+
       '<button class="mode-expanded-piece" id="expandedApp" title="Cambiar app">'+
@@ -223,14 +235,7 @@ function expandedModeMarkup(kind,id){
         '<span><small>Atajo</small><b id="expandedShortcutName"></b></span>'+
       '</button>'+
     '</div>'+
-    '<footer class="mode-expanded-footer">'+
-      '<div class="mode-expanded-actions">'+
-        '<button class="btn" id="expandedReset">Restablecer</button>'+
-        '<button class="btn" id="expandedTest">Probar</button>'+
-        '<button class="btn primary" id="expandedActivate" hidden>Activar</button>'+
-        '<button class="btn primary" id="expandedSave">Crear modo</button>'+
-      '</div>'+
-    '</footer>'+
+    '<footer class="mode-expanded-footer"><div class="mode-expanded-actions">'+actions+'</div></footer>'+
   '</'+rootTag+'>';
 }
 
@@ -554,9 +559,8 @@ function renderExpandedMode(){
   var mode=isNew?null:byId(expandedModeId);
   var pending=!!(mode&&mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode));
 
-  q('#expandedProfileIcon').innerHTML=modeIconMarkup(expandedConfig.icon);
-  q('#expandedEyebrow').hidden=!isNew;
-  q('#expandedEyebrow').textContent=isNew?'Crear modo':'';
+  var profileIcon=q('#expandedProfileIcon');
+  if(profileIcon)profileIcon.innerHTML=modeIconMarkup(expandedConfig.icon);
   q('#expandedName').textContent=expandedConfig.name;
   q('#expandedAppName').textContent=expandedConfig.app;
   q('#expandedShortcutName').textContent=shortcutCardLabel(expandedConfig.shortcut);
@@ -570,17 +574,17 @@ function renderExpandedMode(){
   state.classList.toggle('dirty',dirty||pending);
   state.classList.toggle('active',activeState);
 
-  q('#expandedReset').hidden=!isNew||!dirty;
-  q('#expandedSave').hidden=!isNew;
-  q('#expandedSave').disabled=false;
-  q('#expandedTest').hidden=false;
+  var resetButton=q('#expandedReset');
+  if(resetButton)resetButton.hidden=!dirty;
 
   var activateButton=q('#expandedActivate');
-  var applying=!!(mode&&activatingId===mode.id);
-  activateButton.hidden=isNew||!!(mode&&mode.active&&!pending);
-  activateButton.disabled=applying;
-  activateButton.setAttribute('aria-busy',applying?'true':'false');
-  activateButton.textContent=applying?'…':pending?'Aplicar':'Activar';
+  if(activateButton){
+    var applying=!!(mode&&activatingId===mode.id);
+    activateButton.hidden=!!(mode&&mode.active&&!pending);
+    activateButton.disabled=applying;
+    activateButton.setAttribute('aria-busy',applying?'true':'false');
+    activateButton.textContent=applying?'…':pending?'Aplicar':'Activar';
+  }
   q('#expandedClose').title=isNew?'Cancelar':'Compactar';
   q('#expandedClose').setAttribute('aria-label',isNew?'Cancelar':'Compactar');
 
@@ -1062,15 +1066,17 @@ function bindExpandedControls(){
 
   q('#expandedShortcut').onclick=function(){openShortcut('expanded')};
 
-  q('#expandedReset').onclick=function(){
-    if(expandedModeId!==null)return;
+  var reset=q('#expandedReset');
+  if(reset)reset.onclick=function(){
     expandedConfig=cloneModeConfig(newModeBase);
     refreshExpandedConfig();
   };
 
-  q('#expandedSave').onclick=createModeFromExpanded;
+  var save=q('#expandedSave');
+  if(save)save.onclick=createModeFromExpanded;
 
-  q('#expandedActivate').onclick=function(){
+  var activateButton=q('#expandedActivate');
+  if(activateButton)activateButton.onclick=function(){
     if(expandedModeId!==null)activate(expandedModeId,true);
   };
 
