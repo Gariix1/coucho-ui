@@ -43,7 +43,7 @@ let appliedSession=null;
 let activatingId=null;
 let activationTimer=null;
 
-// Workspace editor state.
+// Expanded mode state.
 let expandedModeId=null;
 let expandedOpen=false;
 let cardDensity=localStorage.getItem(CARD_DENSITY_KEY)==='compact'?'compact':'detailed';
@@ -158,7 +158,7 @@ function renderResourceViews(){
   });
 }
 
-// Modes workbench and expandable mode visualizer.
+// Modes list and inline expanded visualizer.
 function ensureExpandedConfig(){
   if(expandedConfig)return;
   expandedModeId=null;
@@ -167,19 +167,19 @@ function ensureExpandedConfig(){
   createAutoNamed=true;
 }
 
-function newWorkspaceHasChanges(){
+function newModeHasChanges(){
   return expandedModeId===null&&expandedConfig&&expandedBase&&!modeConfigEqual(expandedConfig,expandedBase);
 }
 
 function hasPendingCreateChanges(){
-  return expandedOpen&&newWorkspaceHasChanges();
+  return expandedOpen&&newModeHasChanges();
 }
 
 function guardExpandedSwitch(nextId){
   if(!expandedOpen||expandedModeId===nextId)return true;
   if(!hasPendingCreateChanges())return true;
   toast('Nuevo modo','Crea o restablece el borrador antes de cambiar');
-  var workspace=q('.visual-workspace');
+  var workspace=q('.mode-expanded');
   if(workspace)workspace.focus({preventScroll:true});
   return false;
 }
@@ -200,41 +200,41 @@ function setModeTransitioning(value){
 function expandedModeMarkup(kind,id){
   var saved=kind==='mode';
   var rootTag=saved?'article':'section';
-  var rootClass='visual-workspace expanded-workspace '+(saved?'saved-mode-card detail-mode':'create-mode');
-  var dataAttr=saved?' data-mode-row="'+id+'"':' data-workspace-expanded="current"';
+  var rootClass='mode-expanded mode-expanded '+(saved?'saved-mode-card saved-mode-expanded':'new-mode-expanded');
+  var dataAttr=saved?' data-mode-row="'+id+'"':'';
 
-  return '<'+rootTag+' class="'+rootClass+'" id="modeWorkspace" tabindex="-1" aria-labelledby="workspaceName"'+dataAttr+'>'+
-    '<header class="visual-workspace-head">'+
-      '<div class="workspace-title-block">'+
-        '<div class="workspace-profile-icon" id="workspaceProfileIcon"></div>'+
-        '<div class="workspace-title-copy">'+
-          '<span class="workspace-eyebrow" id="workspaceEyebrow"></span>'+
-          '<h2 id="workspaceName" class="mode-name-edit" tabindex="0"></h2>'+
+  return '<'+rootTag+' class="'+rootClass+'" id="expandedMode" tabindex="-1" aria-labelledby="expandedName"'+dataAttr+'>'+
+    '<header class="mode-expanded-head">'+
+      '<div class="expanded-title-block">'+
+        '<div class="expanded-profile-icon" id="expandedProfileIcon"></div>'+
+        '<div class="expanded-title-copy">'+
+          '<span class="expanded-eyebrow" id="expandedEyebrow"></span>'+
+          '<h2 id="expandedName" class="mode-name-edit" tabindex="0"></h2>'+
         '</div>'+
       '</div>'+
-      '<div class="workspace-head-actions">'+
-        '<span class="workspace-state" id="workspaceState" role="status" aria-live="polite" hidden></span>'+
-        '<button class="workspace-close" id="workspaceClose" title="'+(saved?'Compactar':'Cancelar')+'" aria-label="'+(saved?'Compactar':'Cancelar')+'">'+iconMarkup(saved?'collapse':'close')+'</button>'+
+      '<div class="expanded-head-actions">'+
+        '<span class="expanded-state" id="expandedState" role="status" aria-live="polite" hidden></span>'+
+        '<button class="expanded-close" id="expandedClose" title="'+(saved?'Compactar':'Cancelar')+'" aria-label="'+(saved?'Compactar':'Cancelar')+'">'+iconMarkup(saved?'collapse':'close')+'</button>'+
       '</div>'+
     '</header>'+
-    '<header class="workspace-section-head"><b id="workspaceScreenTitle">Pantallas</b></header>'+
-    '<div class="workspace-screen-stage" id="workspaceScreens"></div>'+
-    '<div class="workspace-pieces">'+
-      '<button class="workspace-piece" id="workspaceApp" title="Cambiar app">'+
-        '<span class="workspace-piece-icon">'+iconMarkup('play')+'</span>'+
-        '<span><small>App</small><b id="workspaceAppName"></b></span>'+
+    '<header class="expanded-section-head"><b id="expandedScreenTitle">Pantallas</b></header>'+
+    '<div class="expanded-screen-stage" id="expandedScreens"></div>'+
+    '<div class="expanded-pieces">'+
+      '<button class="expanded-piece" id="expandedApp" title="Cambiar app">'+
+        '<span class="expanded-piece-icon">'+iconMarkup('play')+'</span>'+
+        '<span><small>App</small><b id="expandedAppName"></b></span>'+
       '</button>'+
-      '<button class="workspace-piece" id="workspaceShortcut" title="Cambiar atajo">'+
-        '<span class="workspace-piece-icon">'+iconMarkup('gamepad')+'</span>'+
-        '<span><small>Atajo</small><b id="workspaceShortcutName"></b></span>'+
+      '<button class="expanded-piece" id="expandedShortcut" title="Cambiar atajo">'+
+        '<span class="expanded-piece-icon">'+iconMarkup('gamepad')+'</span>'+
+        '<span><small>Atajo</small><b id="expandedShortcutName"></b></span>'+
       '</button>'+
     '</div>'+
-    '<footer class="workspace-footer">'+
-      '<div class="workspace-actions">'+
-        '<button class="btn" id="workspaceReset">Restablecer</button>'+
-        '<button class="btn" id="workspaceTest">Probar</button>'+
-        '<button class="btn primary" id="workspaceActivate" hidden>Activar</button>'+
-        '<button class="btn primary" id="workspaceSave">Crear modo</button>'+
+    '<footer class="expanded-footer">'+
+      '<div class="expanded-actions">'+
+        '<button class="btn" id="expandedReset">Restablecer</button>'+
+        '<button class="btn" id="expandedTest">Probar</button>'+
+        '<button class="btn primary" id="expandedActivate" hidden>Activar</button>'+
+        '<button class="btn primary" id="expandedSave">Crear modo</button>'+
       '</div>'+
     '</footer>'+
   '</'+rootTag+'>';
@@ -252,14 +252,14 @@ async function expandModeSurface(targetId,source){
 
   if(expandedOpen){
     if(expandedModeId===targetId){
-      var current=q('.visual-workspace');
+      var current=q('.mode-expanded');
       if(current)current.focus({preventScroll:true});
       return true;
     }
     if(!guardExpandedSwitch(targetId))return false;
     await collapseExpandedMode(false);
     source=targetId===null
-      ?q('[data-workspace-id="current"]')
+      ?q('[data-expand-source="current"]')
       :q('[data-mode-row="'+targetId+'"]');
     if(!source)return false;
   }
@@ -287,21 +287,21 @@ async function expandModeSurface(targetId,source){
 
     renderWorkbench();
 
-    var destination=q('.visual-workspace');
+    var destination=q('.mode-expanded');
     await transition.play(destination,'open');
   }finally{
     transition.cancel();
     setModeTransitioning(false);
   }
 
-  var closeButton=q('#workspaceClose');
+  var closeButton=q('#expandedClose');
   if(closeButton)closeButton.focus();
   return true;
 }
 
 function expandCurrentDesktop(rawId){
   if(rawId!=='current')return;
-  expandModeSurface(null,q('[data-workspace-id="current"]'));
+  expandModeSurface(null,q('[data-expand-source="current"]'));
 }
 
 function expandSavedMode(id,source){
@@ -316,7 +316,7 @@ async function collapseExpandedMode(restore,afterClose){
   closePops();
 
   var closingId=expandedModeId;
-  var source=q('.visual-workspace');
+  var source=q('.mode-expanded');
 
   setModeTransitioning(true);
   var transition=modeSheetTransition.prepare(source);
@@ -330,7 +330,7 @@ async function collapseExpandedMode(restore,afterClose){
     renderWorkbench();
 
     var destination=closingId===null
-      ?q('[data-workspace-id="current"]')
+      ?q('[data-expand-source="current"]')
       :q('[data-mode-row="'+closingId+'"]');
 
     await transition.play(destination,'close');
@@ -346,7 +346,7 @@ async function collapseExpandedMode(restore,afterClose){
 
   if(restore){
     var focusTarget=closingId===null
-      ?q('[data-workspace-id="current"]')
+      ?q('[data-expand-source="current"]')
       :q('[data-mode-row="'+closingId+'"] .open-mode');
     if(focusTarget)focusTarget.focus();
   }
@@ -377,7 +377,7 @@ function renderModeCard(mode){
       '</div>'+
       '<div class="saved-mode-actions">'+
         (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+' title="Activar modo">'+(applying?'…':'Activar')+'</button>':'')+
-        '<button class="open-mode" data-id="'+mode.id+'" aria-controls="modeWorkspace" title="Expandir '+safeName+'" aria-label="Expandir '+safeName+'">'+iconMarkup('expand')+'</button>'+
+        '<button class="open-mode" data-id="'+mode.id+'" aria-controls="expandedMode" title="Expandir '+safeName+'" aria-label="Expandir '+safeName+'">'+iconMarkup('expand')+'</button>'+
         '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>'+
       '</div>'+
     '</div>'+
@@ -401,7 +401,7 @@ function renderModeList(){
   var currentExpanded=expandedOpen&&expandedModeId===null;
   var current=currentExpanded
     ?expandedModeMarkup('new',null)
-    :'<button class="mode-list-item current" data-workspace-id="current" aria-controls="modeWorkspace">'+
+    :'<button class="mode-list-item current" data-expand-source="current" aria-controls="expandedMode">'+
       '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
       '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
       '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
@@ -439,11 +439,11 @@ function renderModeList(){
     };
   });
 
-  qa('[data-workspace-id]').forEach(function(element){
-    element.onclick=function(){expandCurrentDesktop(element.dataset.workspaceId)};
+  qa('[data-expand-source]').forEach(function(element){
+    element.onclick=function(){expandCurrentDesktop(element.dataset.expandSource)};
   });
 
-  qa('#modeList .saved-mode-card:not(.expanded-workspace)').forEach(function(card){
+  qa('#modeList .saved-mode-card:not(.mode-expanded)').forEach(function(card){
     card.onclick=function(event){
       if(event.target.closest('button,a,input,select,textarea,[contenteditable="true"]'))return;
       var selection=window.getSelection&&window.getSelection();
@@ -487,7 +487,7 @@ function renderModeList(){
 }
 
 function renderExpandedScreens(){
-  var stage=q('#workspaceScreens');
+  var stage=q('#expandedScreens');
   if(!stage||!expandedConfig)return;
 
   var ordered=simulatedDisplays.slice().sort(function(a,b){
@@ -499,15 +499,15 @@ function renderExpandedScreens(){
   stage.innerHTML=ordered.map(function(d){
     var selected=expandedConfig.displayIds.indexOf(d.id)>=0;
     var primary=selected&&expandedConfig.primaryDisplayId===d.id;
-    return '<div class="workspace-display '+(selected?'on':'off')+(primary?' primary':'')+'" data-display-layout="'+d.id+'">'+
-      '<button class="workspace-display-screen" data-workspace-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'" title="'+(selected?'Apagar ':'Activar ')+esc(d.name)+'">'+
-        '<span class="workspace-display-state">'+(selected?'Activa':'Apagada')+'</span>'+
-        '<span class="workspace-display-number">'+d.number+'</span>'+
+    return '<div class="expanded-display '+(selected?'on':'off')+(primary?' primary':'')+'" data-display-layout="'+d.id+'">'+
+      '<button class="expanded-display-screen" data-expanded-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'" title="'+(selected?'Apagar ':'Activar ')+esc(d.name)+'">'+
+        '<span class="expanded-display-state">'+(selected?'Activa':'Apagada')+'</span>'+
+        '<span class="expanded-display-number">'+d.number+'</span>'+
       '</button>'+
-      '<button class="workspace-display-primary" data-workspace-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
-      '<div class="workspace-display-info">'+
-        '<div class="workspace-display-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.model)+'</small></div>'+
-        '<div class="workspace-display-tech">'+esc(d.resolution)+'<br>'+esc(d.hz)+'</div>'+
+      '<button class="expanded-display-primary" data-expanded-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
+      '<div class="expanded-display-info">'+
+        '<div class="expanded-display-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.model)+'</small></div>'+
+        '<div class="expanded-display-tech">'+esc(d.resolution)+'<br>'+esc(d.hz)+'</div>'+
       '</div>'+
     '</div>';
   }).join('');
@@ -521,12 +521,12 @@ function renderExpandedScreens(){
     });
   });
 
-  qa('[data-workspace-display]').forEach(function(button){
-    button.onclick=function(){toggleExpandedDisplay(button.dataset.workspaceDisplay)};
+  qa('[data-expanded-display]').forEach(function(button){
+    button.onclick=function(){toggleExpandedDisplay(button.dataset.expandedDisplay)};
   });
 
-  qa('[data-workspace-primary]').forEach(function(button){
-    button.onclick=function(){makeExpandedPrimary(button.dataset.workspacePrimary)};
+  qa('[data-expanded-primary]').forEach(function(button){
+    button.onclick=function(){makeExpandedPrimary(button.dataset.expandedPrimary)};
   });
 }
 
@@ -551,7 +551,7 @@ function renderExpandedMode(){
   if(!expandedOpen)return;
 
   ensureExpandedConfig();
-  var workspace=q('.visual-workspace');
+  var workspace=q('.mode-expanded');
   if(!workspace)return;
 
   renderExpandedScreens();
@@ -562,14 +562,14 @@ function renderExpandedMode(){
   var mode=isNew?null:byId(expandedModeId);
   var pending=!!(mode&&mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode));
 
-  q('#workspaceProfileIcon').innerHTML=modeIconMarkup(expandedConfig.icon);
-  q('#workspaceEyebrow').hidden=!isNew;
-  q('#workspaceEyebrow').textContent=isNew?'Crear modo':'';
-  q('#workspaceName').textContent=expandedConfig.name;
-  q('#workspaceAppName').textContent=expandedConfig.app;
-  q('#workspaceShortcutName').textContent=shortcutCardLabel(expandedConfig.shortcut);
+  q('#expandedProfileIcon').innerHTML=modeIconMarkup(expandedConfig.icon);
+  q('#expandedEyebrow').hidden=!isNew;
+  q('#expandedEyebrow').textContent=isNew?'Crear modo':'';
+  q('#expandedName').textContent=expandedConfig.name;
+  q('#expandedAppName').textContent=expandedConfig.app;
+  q('#expandedShortcutName').textContent=shortcutCardLabel(expandedConfig.shortcut);
 
-  var state=q('#workspaceState');
+  var state=q('#expandedState');
   var activeState=!!(mode&&mode.active&&!pending);
   state.hidden=!(dirty||pending||activeState);
   state.textContent=dirty
@@ -578,19 +578,19 @@ function renderExpandedMode(){
   state.classList.toggle('dirty',dirty||pending);
   state.classList.toggle('active',activeState);
 
-  q('#workspaceReset').hidden=!isNew||!dirty;
-  q('#workspaceSave').hidden=!isNew;
-  q('#workspaceSave').disabled=false;
-  q('#workspaceTest').hidden=false;
+  q('#expandedReset').hidden=!isNew||!dirty;
+  q('#expandedSave').hidden=!isNew;
+  q('#expandedSave').disabled=false;
+  q('#expandedTest').hidden=false;
 
-  var activateButton=q('#workspaceActivate');
+  var activateButton=q('#expandedActivate');
   var applying=!!(mode&&activatingId===mode.id);
   activateButton.hidden=isNew||!!(mode&&mode.active&&!pending);
   activateButton.disabled=applying;
   activateButton.setAttribute('aria-busy',applying?'true':'false');
   activateButton.textContent=applying?'…':pending?'Aplicar':'Activar';
-  q('#workspaceClose').title=isNew?'Cancelar':'Compactar';
-  q('#workspaceClose').setAttribute('aria-label',isNew?'Cancelar':'Compactar');
+  q('#expandedClose').title=isNew?'Cancelar':'Compactar';
+  q('#expandedClose').setAttribute('aria-label',isNew?'Cancelar':'Compactar');
 
   bindExpandedControls();
 }
@@ -973,7 +973,7 @@ qa('#appPop .app-option').forEach(function(b){
     closePops();
     if(!target)return;
 
-    if(target.kind==='workspace'){
+    if(target.kind==='expanded'){
       expandedConfig.app=app;
       if(expandedModeId===null&&createAutoNamed){
         var wm=autoMeta(app);
@@ -1011,7 +1011,7 @@ q('#testBtn').onclick=function(){
 };
 
 function beginExpandedRename(){
-  var element=q('#workspaceName');
+  var element=q('#expandedName');
   if(!element||element.isContentEditable)return;
 
   var original=expandedConfig.name;
@@ -1025,7 +1025,7 @@ function beginExpandedRename(){
 async function createModeFromExpanded(){
   if(!expandedConfig||expandedModeId!==null)return;
 
-  var source=q('.visual-workspace');
+  var source=q('.mode-expanded');
   var transition=modeSheetTransition.prepare(source);
   setModeTransitioning(true);
 
@@ -1060,14 +1060,14 @@ async function createModeFromExpanded(){
 }
 
 function bindExpandedControls(){
-  var close=q('#workspaceClose');
+  var close=q('#expandedClose');
   if(!close)return;
 
   close.onclick=function(){collapseExpandedMode(true)};
 
-  q('#workspaceApp').onclick=function(event){
+  q('#expandedApp').onclick=function(event){
     closePops();
-    appEditTarget={kind:'workspace'};
+    appEditTarget={kind:'expanded'};
     qa('#appPop .app-option').forEach(function(option){
       var selected=option.dataset.app===expandedConfig.app;
       option.classList.toggle('selected',selected);
@@ -1076,24 +1076,24 @@ function bindExpandedControls(){
     openAnchoredPop(q('#appPop'),event.currentTarget);
   };
 
-  q('#workspaceShortcut').onclick=function(){openShortcut('workspace')};
+  q('#expandedShortcut').onclick=function(){openShortcut('expanded')};
 
-  q('#workspaceReset').onclick=function(){
+  q('#expandedReset').onclick=function(){
     if(expandedModeId!==null)return;
     expandedConfig=cloneModeConfig(expandedBase);
     refreshExpandedConfig();
   };
 
-  q('#workspaceSave').onclick=createModeFromExpanded;
+  q('#expandedSave').onclick=createModeFromExpanded;
 
-  q('#workspaceActivate').onclick=function(){
+  q('#expandedActivate').onclick=function(){
     if(expandedModeId!==null)activate(expandedModeId,true);
   };
 
-  q('#workspaceTest').onclick=function(){
+  q('#expandedTest').onclick=function(){
     if(!expandedConfig)return;
     startTest({
-      kind:expandedModeId===null?'workspace-new':'workspace-edit',
+      kind:expandedModeId===null?'new-mode':'saved-mode',
       existingId:expandedModeId,
       preserve:expandedConfig.preserve,
       displayIds:expandedConfig.displayIds.slice(),
@@ -1105,7 +1105,7 @@ function bindExpandedControls(){
     });
   };
 
-  var name=q('#workspaceName');
+  var name=q('#expandedName');
   name.ondblclick=function(event){
     event.preventDefault();
     beginExpandedRename();
@@ -1154,8 +1154,8 @@ function closeShortcutOverlay(){
 
 function openShortcut(rawId){
   closePops();
-  shortcutEditTarget=rawId==='workspace'
-    ?{kind:'workspace'}
+  shortcutEditTarget=rawId==='expanded'
+    ?{kind:'expanded'}
     :{kind:'mode',id:resolveId(rawId)};
 
   if(shortcutEditTarget.kind==='mode'&&!byId(shortcutEditTarget.id)){
@@ -1195,7 +1195,7 @@ q('#capManual').onclick=function(){
   var target=shortcutEditTarget;
   if(!target)return;
 
-  if(target.kind==='workspace'){
+  if(target.kind==='expanded'){
     expandedConfig.shortcut='Manual';
     closeShortcutOverlay();
     refreshExpandedConfig();
@@ -1216,7 +1216,7 @@ q('#capUse').onclick=function(){
   var value=captured;
   var target=shortcutEditTarget;
 
-  if(target.kind==='workspace'){
+  if(target.kind==='expanded'){
     expandedConfig.shortcut=value;
     closeShortcutOverlay();
     refreshExpandedConfig();
@@ -1246,7 +1246,7 @@ function startTest(ctx){
   q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx)+'</div>';
   q('#testApp').textContent=logo(ctx.app);
   q('#testText').textContent='Probando '+ctx.name+'…';
-  q('#keep').textContent=ctx.kind==='mode-preview'||ctx.kind==='workspace-edit'?'Activar':ctx.kind==='workspace-new'?'Guardar y activar':'Guardar';
+  q('#keep').textContent=ctx.kind==='mode-preview'||ctx.kind==='saved-mode'?'Activar':ctx.kind==='new-mode'?'Guardar y activar':'Guardar';
   setTestProgress(0);q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
 
   var pct=0;
@@ -1289,7 +1289,7 @@ q('#keep').onclick=function(){
     return;
   }
 
-  if(kind==='workspace-new'){
+  if(kind==='new-mode'){
     var created={
       id:Date.now(),name:testContext.name,icon:testContext.icon,
       preserve:testContext.preserve,displayIds:testContext.displayIds.slice(),
@@ -1312,7 +1312,7 @@ q('#keep').onclick=function(){
     return;
   }
 
-  if(kind==='workspace-edit'){
+  if(kind==='saved-mode'){
     var edited=byId(testContext.existingId);
     var editedName=testContext.name;
     if(edited){
@@ -1373,7 +1373,7 @@ document.addEventListener('click',function(e){
   var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
   var insideAppPop=path.indexOf(q('#appPop'))>=0;
   var insideDeletePop=path.indexOf(q('#deletePop'))>=0;
-  if(!insideDisplayPop&&!insideAppPop&&!insideDeletePop&&!e.target.closest('.quick-display')&&!e.target.closest('.quick-app')&&!e.target.closest('#workspaceApp')&&!e.target.closest('.trash-mode')){
+  if(!insideDisplayPop&&!insideAppPop&&!insideDeletePop&&!e.target.closest('.quick-display')&&!e.target.closest('.quick-app')&&!e.target.closest('#expandedApp')&&!e.target.closest('.trash-mode')){
     closePops();
   }
 });
