@@ -525,7 +525,7 @@ function renderModeList(){
   var currentExpanded=expandedOpen&&expandedModeId===null;
   var current=currentExpanded
     ?expandedModeMarkup('new',null)
-    :'<button class="mode-list-item current" data-expand-source="current">'+
+    :'<button class="mode-list-item current" data-expand-source="current" data-layout-key="current">'+
       '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
       '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
       '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
