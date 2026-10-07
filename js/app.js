@@ -40,6 +40,8 @@ const TEST_COUNTDOWN_INTERVAL_MS=1000;
 const TEST_TIMEOUT_RESTORE_MS=420;
 const MANUAL_RESTORE_STEP_MS=380;
 const MANUAL_RESTORE_FINISH_MS=220;
+const INTERACTIVE_SELECTOR='button,a,input,select,textarea,[contenteditable="true"]';
+const EXPANDED_TOGGLE_EXCLUDE_SELECTOR=INTERACTIVE_SELECTOR+',.mode-name-edit';
 
 // Persistent mode/session state.
 let sets=loadSets();
@@ -171,6 +173,12 @@ function renderResourceViews(){
 }
 
 // Modes list and inline expanded visualizer.
+function hasTextSelection(){
+  var selection=window.getSelection&&window.getSelection();
+  return !!(selection&&String(selection).trim());
+}
+
+
 function hasPendingCreateChanges(){
   return !!(
     expandedOpen&&
@@ -1201,19 +1209,14 @@ function handleModeListClick(event){
 
   var toggleSurface=target.closest('[data-expanded-toggle]');
   if(toggleSurface){
-    if(target.closest('button,a,input,select,textarea,[contenteditable="true"],.mode-name-edit'))return;
-    var selectedText=window.getSelection&&window.getSelection();
-    if(selectedText&&String(selectedText).trim())return;
+    if(target.closest(EXPANDED_TOGGLE_EXCLUDE_SELECTOR)||hasTextSelection())return;
     collapseExpandedMode(true);
     return;
   }
 
   var card=target.closest('.saved-mode-card:not(.mode-expanded)');
   if(!card)return;
-  if(target.closest('button,a,input,select,textarea,[contenteditable="true"]'))return;
-
-  var selection=window.getSelection&&window.getSelection();
-  if(selection&&String(selection).trim())return;
+  if(target.closest(INTERACTIVE_SELECTOR)||hasTextSelection())return;
 
   focusOrExpandMode(card);
 }
