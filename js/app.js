@@ -27,6 +27,10 @@ import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
 import {expandedModeMarkup,modeCardMarkup} from './ui/mode-markup.js';
 import {initTheme,toggleTheme} from './features/theme.js';
+import {
+  layoutKeyForMode,
+  modesForRender
+} from './features/mode-layout.js';
 
 const TEST_MODE_KEY='coucho-test-mode';
 const CARD_DENSITY_KEY='coucho-card-density';
@@ -194,10 +198,6 @@ function setModeTransitioning(value){
     workbench.removeAttribute('inert');
     workbench.removeAttribute('aria-busy');
   }
-}
-
-function layoutKeyForMode(id){
-  return id===null?'current':'mode:'+id;
 }
 
 function elementForMode(id){
@@ -432,34 +432,6 @@ function focusOrExpandMode(card){
   expandSavedMode(id,card);
 }
 
-function modeColumnCount(modeList){
-  if(!modeList)return 1;
-  var raw=getComputedStyle(modeList).getPropertyValue('--mode-columns').trim();
-  var count=parseInt(raw,10);
-  return Number.isFinite(count)&&count>0?count:1;
-}
-
-function modesForRender(modeList){
-  var ordered=sets.slice();
-
-  if(!expandedOpen||expandedModeId===null)return ordered;
-
-  var selectedIndex=ordered.findIndex(function(mode){
-    return mode.id===expandedModeId;
-  });
-  if(selectedIndex<0)return ordered;
-
-  var columns=modeColumnCount(modeList);
-  if(columns<=1)return ordered;
-
-  var rowStart=Math.floor(selectedIndex/columns)*columns;
-  if(selectedIndex===rowStart)return ordered;
-
-  var selected=ordered.splice(selectedIndex,1)[0];
-  ordered.splice(rowStart,0,selected);
-  return ordered;
-}
-
 function renderModeList(){
   var modeList=q('#modeList');
   if(!modeList)return;
@@ -480,7 +452,11 @@ function renderModeList(){
       '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
     '</button>';
 
-  var saved=modesForRender(modeList).map(function(mode){
+  var saved=modesForRender(sets,{
+    expandedOpen:expandedOpen,
+    expandedModeId:expandedModeId,
+    modeList:modeList
+  }).map(function(mode){
     if(expandedOpen&&expandedModeId===mode.id){
       return expandedModeMarkup({
         kind:'mode',
