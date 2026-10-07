@@ -62,9 +62,13 @@ function prepare(root,{
   let animations=[];
   let disposed=false;
 
+  const onResize=()=>cancel();
+  window.addEventListener('resize',onResize,{passive:true});
+
   function cancel(){
     if(disposed)return;
     disposed=true;
+    window.removeEventListener('resize',onResize);
     animations.forEach(cancelAnimation);
     animations=[];
     if(scroller)scroller.classList.remove('layout-motion-active');
