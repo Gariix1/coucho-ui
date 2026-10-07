@@ -602,15 +602,15 @@ min-width:72px;padding:1px 4px;margin:-1px -4px;background:var(--glass-control);
 }
 
 
-.saved-mode-expanded .mode-expanded-head{
+.mode-expanded .mode-expanded-head{
 cursor:pointer;border-radius:var(--r-control);margin:-5px -5px 9px;padding:5px;
   transition:background .14s ease
 }
 
-.saved-mode-expanded .mode-expanded-head:hover{
+.mode-expanded .mode-expanded-head:hover{
 background:var(--glass-command)
 }
 
-.saved-mode-expanded .mode-expanded-head .mode-name-edit{
+.mode-expanded .mode-expanded-head .mode-name-edit{
 cursor:text
 }
