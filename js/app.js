@@ -489,7 +489,7 @@ function renderModeCard(mode){
   var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
   var titleId='mode-title-'+mode.id;
 
-  return '<article class="saved-mode-card" data-mode-row="'+mode.id+'" data-layout-key="'+layoutKeyForMode(mode.id)+'" aria-labelledby="'+titleId+'">'+
+  return '<article class="saved-mode-card mode-card-'+cardDensity+'" data-mode-row="'+mode.id+'" data-layout-key="'+layoutKeyForMode(mode.id)+'" aria-labelledby="'+titleId+'">'+
     '<div class="saved-mode-head">'+
       '<div class="saved-mode-name">'+
         '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
