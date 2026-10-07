@@ -245,7 +245,7 @@ async function setCardDensity(next){
     renderWorkbench();
 
     await layout.play({
-      root:q('#modeList'),
+      root:root,
       anchorKey:anchorKey,
       excludeKeys:anchorKey?[anchorKey]:[],
       duration:MOTION_DURATION.density
@@ -293,7 +293,7 @@ async function switchExpandedSurface(targetId,source){
       closingTransition.play(previousDestination,'close'),
       openingTransition.play(destination,'open'),
       layout.play({
-        root:q('#modeList'),
+        root:root,
         anchorKey:targetKey,
         excludeKeys:[previousKey,targetKey],
         duration:MOTION_DURATION.open
@@ -347,7 +347,7 @@ async function expandModeSurface(targetId,source){
     await Promise.all([
       transition.play(destination,'open'),
       layout.play({
-        root:q('#modeList'),
+        root:root,
         anchorKey:targetKey,
         excludeKeys:[targetKey],
         duration:MOTION_DURATION.open
@@ -402,7 +402,7 @@ async function collapseExpandedMode(restore,afterClose){
     await Promise.all([
       transition.play(destination,'close'),
       layout.play({
-        root:q('#modeList'),
+        root:root,
         anchorKey:closingKey,
         excludeKeys:[closingKey],
         duration:MOTION_DURATION.close
@@ -474,7 +474,7 @@ function renderModeList(){
     });
   }).join('');
 
-  q('#modeList').innerHTML=
+  modeList.innerHTML=
     '<div class="mode-list-group source-group">'+
       '<div class="mode-list-label">Crear desde</div>'+
       current+
