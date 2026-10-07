@@ -530,13 +530,6 @@ function renderExpandedScreens(){
     });
   });
 
-  qa('[data-expanded-display]').forEach(function(button){
-    button.onclick=function(){toggleExpandedDisplay(button.dataset.expandedDisplay)};
-  });
-
-  qa('[data-expanded-primary]').forEach(function(button){
-    button.onclick=function(){makeExpandedPrimary(button.dataset.expandedPrimary)};
-  });
 }
 
 function syncExpandedSavedMode(){
@@ -846,27 +839,36 @@ function renderDisplayEditor(){
       '<button class="screen-face screen-toggle" data-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'">'+
         '<span class="screen-number">'+d.number+'</span>'+
         '<span class="screen-shape"></span>'+
-        '<span class="screen-copy"><b>'+d.name+'</b><small>'+d.detail+'</small></span>'+
+        '<span class="screen-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.detail)+'</small></span>'+
       '</button>'+
       '<button class="primary-screen-btn" data-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es la pantalla principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
     '</div>';
   }).join('');
-
-  qa('.screen-toggle').forEach(function(b){
-    b.onclick=function(e){
-      e.stopPropagation();
-      toggleDisplay(b.dataset.display);
-    };
-  });
-  qa('.primary-screen-btn').forEach(function(b){
-    b.onclick=function(e){e.stopPropagation();makePrimary(b.dataset.primary)};
-  });
 
   var summary=displayDraft.preserve?'No cambiar las pantallas al activar':displaySummary(displayDraft);
   var primary=getDisplay(displayDraft.primaryDisplayId);
   q('#displayEditorSummary').innerHTML=displayDraft.preserve
     ?'<b>Las pantallas quedan como están</b>'
     :'<b>'+summary+'</b>'+(primary?' · '+iconMarkup('star-filled')+' '+esc(primary.name):'');
+}
+
+function handleDisplayEditorClick(event){
+  var target=event.target;
+  if(!(target instanceof Element))return;
+
+  var toggle=target.closest('.screen-toggle');
+  if(toggle){
+    toggleDisplay(toggle.dataset.display);
+    return;
+  }
+
+  var primary=target.closest('.primary-screen-btn');
+  if(primary)makePrimary(primary.dataset.primary);
+}
+
+function bindDisplayEditorEvents(){
+  var map=q('#screenMap');
+  if(map)map.addEventListener('click',handleDisplayEditorClick);
 }
 
 function toggleDisplay(id){
@@ -1101,6 +1103,18 @@ function bindExpandedRename(){
 function handleModeListClick(event){
   var target=event.target;
   if(!(target instanceof Element))return;
+
+  var expandedDisplay=target.closest('[data-expanded-display]');
+  if(expandedDisplay){
+    toggleExpandedDisplay(expandedDisplay.dataset.expandedDisplay);
+    return;
+  }
+
+  var expandedPrimary=target.closest('[data-expanded-primary]');
+  if(expandedPrimary){
+    makeExpandedPrimary(expandedPrimary.dataset.expandedPrimary);
+    return;
+  }
 
   var density=target.closest('[data-density]');
   if(density){
@@ -1508,6 +1522,7 @@ q('#restoreDisplays').onclick=function(){toast('Pantallas','Recuperación simula
 q('#advancedSettings').onclick=function(){toast('Avanzado','Diagnóstico y recuperación · prototipo')};
 
 bindModeListEvents();
+bindDisplayEditorEvents();
 openShellView('modes');
 initTheme();
 syncTestMode();
