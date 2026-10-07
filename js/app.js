@@ -20,7 +20,10 @@ import {
 
 import {modeSurfaceTransition} from './motion.js';
 import {modeLayoutTransition} from './layout-motion.js';
-import {MOTION_DURATION} from './motion-settings.js';
+import {
+  MOTION_DURATION,
+  prefersReducedMotion
+} from './motion-settings.js';
 
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
@@ -1058,7 +1061,10 @@ async function createModeFromExpanded(){
   toast(created.name,'Modo creado');
   requestAnimationFrame(function(){
     var card=q('[data-mode-row="'+created.id+'"]');
-    if(card)card.scrollIntoView({behavior:'smooth',block:'nearest'});
+    if(card)card.scrollIntoView({
+      behavior:prefersReducedMotion()?'auto':'smooth',
+      block:'nearest'
+    });
   });
 }
 
