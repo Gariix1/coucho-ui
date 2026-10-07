@@ -29,7 +29,6 @@
   --glow-b:rgba(37,99,235,.10);
   --glow-c:rgba(125,211,252,.13);
   --glow-d:rgba(51,65,85,.26);
-  --root-wash:rgba(17,24,40,.10);
   --logo-bg:rgba(0,0,0,.09);
   --logo-border:rgba(255,255,255,.13);
   --win-fg:#aeb8c8;
@@ -46,9 +45,6 @@
   --selected-border:rgba(125,211,252,.42);
   --selected-bg:rgba(34,211,238,.10);
   --floating-bg:rgba(15,23,42,.85);
-  --floating-footer:rgba(17,24,39,.60);
-  --modal-border:rgba(124,138,163,.40);
-  --modal-footer-border:rgba(124,138,163,.20);
   --scrim:rgba(2,6,23,.40);
   --acrylic-tint:rgba(17,24,40,.18);
   --create-accent:#7dd3fc;
@@ -94,7 +90,6 @@ html[data-theme="light"]{
   --glow-b:rgba(125,211,252,.16);
   --glow-c:rgba(37,99,235,.08);
   --glow-d:rgba(148,163,184,.17);
-  --root-wash:rgba(245,248,252,.10);
   --logo-bg:rgba(255,255,255,.22);
   --logo-border:rgba(76,112,158,.16);
   --win-fg:#455a70;
@@ -111,9 +106,6 @@ html[data-theme="light"]{
   --selected-border:rgba(37,99,235,.42);
   --selected-bg:rgba(37,99,235,.09);
   --floating-bg:rgba(248,250,254,.91);
-  --floating-footer:rgba(242,246,252,.72);
-  --modal-border:rgba(159,176,199,.72);
-  --modal-footer-border:rgba(159,176,199,.44);
   --scrim:rgba(15,23,42,.35);
   --acrylic-tint:rgba(242,246,252,.18);
   --create-accent:#2563eb;
