@@ -241,3 +241,13 @@ font-size:30px
 .test-node .display-placeholder.empty{
 font-size:26px
 }
+
+/* Display-editor overlay icon sizing belongs with the overlay feature. */
+
+.preserve-btn .ui-icon{
+width:14px;height:14px
+}
+
+.display-editor-summary .ui-icon{
+display:inline-block;width:11px;height:11px;vertical-align:-1px
+}
