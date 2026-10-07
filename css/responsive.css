@@ -67,10 +67,10 @@
 
 @media (max-width:1040px){
   .workbench-wrap{width:min(100% - 36px,1120px)}
-  .mode-grid.detailed .saved-mode-card:not(.mode-expanded) .saved-mode-body{
+  .saved-mode-card.mode-card-detailed .saved-mode-body{
     grid-template-columns:1fr
   }
-  .mode-grid.detailed .saved-mode-card:not(.mode-expanded) .card-facts{
+  .saved-mode-card.mode-card-detailed .card-facts{
     margin-top:0
   }
   .mode-expanded.saved-mode-expanded{
