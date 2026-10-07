@@ -80,7 +80,11 @@ opacity:.34
 opacity:1
 }
 
-#settingsBtn.active{
+.prototype-tool.active{
+border-color:var(--accent);color:var(--accent);background:var(--selected-bg)
+}
+
+.settings-trigger.active{
 color:var(--accent)
 }
 
