@@ -88,10 +88,6 @@ display:flex
 display:flex;gap:8px
 }
 
-#testBtn.active{
-border-color:var(--accent);color:var(--accent);background:var(--selected-bg)
-}
-
 /* Feature-specific shared primitive sizing. */
 
 .settings-row-icon .ui-icon{
