@@ -23,6 +23,7 @@ import {
 
 import {modeSurfaceTransition} from './motion.js';
 import {modeLayoutTransition} from './layout-motion.js';
+import {MOTION_DURATION} from './motion-settings.js';
 
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
@@ -37,9 +38,6 @@ const TEST_COUNTDOWN_INTERVAL_MS=1000;
 const TEST_TIMEOUT_RESTORE_MS=420;
 const MANUAL_RESTORE_STEP_MS=380;
 const MANUAL_RESTORE_FINISH_MS=220;
-const OPEN_LAYOUT_MS=360;
-const CLOSE_LAYOUT_MS=330;
-const DENSITY_LAYOUT_MS=280;
 
 // Persistent mode/session state.
 let sets=loadSets();
@@ -293,7 +291,7 @@ async function setCardDensity(next){
       root:q('#modeList'),
       anchorKey:anchorKey,
       excludeKeys:anchorKey?[anchorKey]:[],
-      duration:DENSITY_LAYOUT_MS
+      duration:MOTION_DURATION.density
     });
   }finally{
     layout.cancel();
@@ -341,7 +339,7 @@ async function switchExpandedSurface(targetId,source){
         root:q('#modeList'),
         anchorKey:targetKey,
         excludeKeys:[previousKey,targetKey],
-        duration:OPEN_LAYOUT_MS
+        duration:MOTION_DURATION.open
       })
     ]);
   }finally{
@@ -395,7 +393,7 @@ async function expandModeSurface(targetId,source){
         root:q('#modeList'),
         anchorKey:targetKey,
         excludeKeys:[targetKey],
-        duration:OPEN_LAYOUT_MS
+        duration:MOTION_DURATION.open
       })
     ]);
   }finally{
@@ -454,7 +452,7 @@ async function collapseExpandedMode(restore,afterClose){
         root:q('#modeList'),
         anchorKey:closingKey,
         excludeKeys:[closingKey],
-        duration:CLOSE_LAYOUT_MS
+        duration:MOTION_DURATION.close
       })
     ]);
   }finally{
