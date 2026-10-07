@@ -68,7 +68,7 @@
 
 @media (max-width:1040px){
   .workbench-wrap{width:min(100% - 36px,1120px)}
-  .mode-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mode-grid.compact{grid-template-columns:repeat(var(--mode-columns),minmax(0,1fr))}
   .mode-grid.detailed .saved-mode-card:not(.mode-expanded) .saved-mode-body{
     grid-template-columns:1fr
   }
@@ -97,7 +97,8 @@
     padding:18px 16px 40px
   }
 
-  .mode-grid.compact{grid-template-columns:1fr}
+  .mode-list[data-density="compact"]{--mode-columns:1}
+  .mode-grid.compact{grid-template-columns:repeat(var(--mode-columns),minmax(0,1fr))}
   .density-toggle{display:none}
 
   .mode-expanded-screen-stage{
