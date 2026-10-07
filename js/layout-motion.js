@@ -2,6 +2,7 @@ import {
   MOTION_DURATION,
   MOTION_EASING,
   prefersReducedMotion,
+  supportsWebAnimations,
   animationFinished,
   cancelAnimation
 } from './motion-settings.js';
@@ -95,7 +96,7 @@ function prepare(root,{
       }
     }
 
-    if(prefersReducedMotion()){
+    if(prefersReducedMotion()||!supportsWebAnimations()){
       cancel();
       return;
     }
