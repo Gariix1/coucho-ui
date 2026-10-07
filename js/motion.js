@@ -2,6 +2,7 @@ import {
   MOTION_DURATION,
   MOTION_EASING,
   prefersReducedMotion,
+  supportsWebAnimations,
   animationFinished,
   cancelAnimation
 } from './motion-settings.js';
@@ -97,7 +98,7 @@ function transformValue(x,y,scaleX,scaleY){
 }
 
 function prepare(source,{hold=null}={}){
-  if(prefersReducedMotion())return {
+  if(prefersReducedMotion()||!supportsWebAnimations())return {
     play:async()=>{},
     cancel:()=>{}
   };
