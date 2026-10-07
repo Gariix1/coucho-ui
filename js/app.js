@@ -897,17 +897,20 @@ function makePrimary(id){
   renderDisplayEditor();
 }
 
+function syncAppOptions(selectedApp){
+  qa('#appPop .app-option').forEach(function(option){
+    var selected=option.dataset.app===selectedApp;
+    option.classList.toggle('selected',selected);
+    option.setAttribute('aria-pressed',selected?'true':'false');
+  });
+}
+
 function openAppPop(anchor,rawId){
   closePops();
   appEditTarget={kind:'mode',id:resolveId(rawId)};
   var mode=byId(appEditTarget.id);
   if(!mode)return;
-  var app=mode.app;
-  qa('#appPop .app-option').forEach(function(x){
-    var selected=x.dataset.app===app;
-    x.classList.toggle('selected',selected);
-    x.setAttribute('aria-pressed',selected?'true':'false');
-  });
+  syncAppOptions(mode.app);
   openAnchoredPop(q('#appPop'),anchor);
 }
 
@@ -1055,12 +1058,7 @@ function openExpandedAppPicker(anchor){
   closePops();
   appEditTarget={kind:'expanded'};
 
-  qa('#appPop .app-option').forEach(function(option){
-    var selected=option.dataset.app===expandedConfig.app;
-    option.classList.toggle('selected',selected);
-    option.setAttribute('aria-pressed',selected?'true':'false');
-  });
-
+  syncAppOptions(expandedConfig.app);
   openAnchoredPop(q('#appPop'),anchor);
 }
 
@@ -1253,6 +1251,14 @@ function closeShortcutOverlay(){
   q('#capUse').hidden=true;
 }
 
+function syncShortcutKeys(selectedKey){
+  qa('[data-shortcut-key]').forEach(function(button){
+    var selected=button.dataset.shortcutKey===selectedKey;
+    button.classList.toggle('selected',selected);
+    button.setAttribute('aria-pressed',selected?'true':'false');
+  });
+}
+
 function openShortcut(rawId){
   closePops();
   shortcutEditTarget=rawId==='expanded'
@@ -1267,10 +1273,7 @@ function openShortcut(rawId){
   captured=null;
   q('#captureResult').innerHTML='<span class="capture-placeholder">Guide + …</span>';
   q('#capUse').hidden=true;
-  qa('[data-shortcut-key]').forEach(function(button){
-    button.classList.remove('selected');
-    button.setAttribute('aria-pressed','false');
-  });
+  syncShortcutKeys(null);
   q('#shortcutOverlay').classList.add('open');
   q('#capA').focus();
 }
@@ -1280,11 +1283,7 @@ function capture(v){
   q('#captureResult').innerHTML=shortcutMarkup(captured);
   q('#capUse').hidden=false;
 
-  qa('[data-shortcut-key]').forEach(function(button){
-    var selected=button.dataset.shortcutKey===v;
-    button.classList.toggle('selected',selected);
-    button.setAttribute('aria-pressed',selected?'true':'false');
-  });
+  syncShortcutKeys(v);
 }
 
 q('#capA').onclick=function(){capture('A')};
