@@ -1,3 +1,4 @@
+import {setCssVars} from './core/dom.js';
 import {
   MOTION_DURATION,
   MOTION_EASING,
@@ -60,11 +61,11 @@ function createSnapshot(element,kind,host){
   snapshot.setAttribute('aria-hidden','true');
   snapshot.setAttribute('inert','');
 
-  Object.assign(snapshot.style,{
-    left:rect.left+'px',
-    top:rect.top+'px',
-    width:rect.width+'px',
-    height:rect.height+'px'
+  setCssVars(snapshot,{
+    '--motion-left':rect.left+'px',
+    '--motion-top':rect.top+'px',
+    '--motion-width':rect.width+'px',
+    '--motion-height':rect.height+'px'
   });
 
   const content=document.createElement('div');
