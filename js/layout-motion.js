@@ -1,9 +1,10 @@
-const DEFAULT_DURATION_MS=340;
-const DEFAULT_EASING='cubic-bezier(.2,.8,.2,1)';
-
-function reducedMotion(){
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
+import {
+  MOTION_DURATION,
+  MOTION_EASING,
+  prefersReducedMotion,
+  animationFinished,
+  cancelAnimation
+} from './motion-settings.js';
 
 function usableRect(rect){
   return !!rect&&rect.width>0&&rect.height>0;
@@ -36,10 +37,6 @@ function findByKey(root,key){
     .find(element=>element.dataset.layoutKey===key)||null;
 }
 
-function finished(animation){
-  return animation.finished.catch(()=>{});
-}
-
 function animationDelta(before,after){
   return {
     x:before.left-after.left,
@@ -67,9 +64,7 @@ function prepare(root,{
   function cancel(){
     if(disposed)return;
     disposed=true;
-    animations.forEach(animation=>{
-      try{animation.cancel()}catch(_){}
-    });
+    animations.forEach(cancelAnimation);
     animations=[];
     if(scroller)scroller.classList.remove('layout-motion-active');
   }
@@ -78,8 +73,8 @@ function prepare(root,{
     root:nextRoot=root,
     anchorKey:nextAnchorKey=anchorKey,
     excludeKeys=[],
-    duration=DEFAULT_DURATION_MS,
-    easing=DEFAULT_EASING
+    duration=MOTION_DURATION.open,
+    easing=MOTION_EASING.layout
   }={}){
     if(disposed)return;
 
@@ -100,7 +95,7 @@ function prepare(root,{
       }
     }
 
-    if(reducedMotion()){
+    if(prefersReducedMotion()){
       cancel();
       return;
     }
@@ -126,7 +121,7 @@ function prepare(root,{
       }));
     });
 
-    await Promise.all(animations.map(finished));
+    await Promise.all(animations.map(animationFinished));
     cancel();
   }
 
