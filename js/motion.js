@@ -1,23 +1,44 @@
-const OPEN_TRAVEL_MS=360;
-const CLOSE_TRAVEL_MS=330;
-const RESOLVE_MS=120;
-
-function reducedMotion(){
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
+import {
+  MOTION_DURATION,
+  MOTION_EASING,
+  prefersReducedMotion,
+  animationFinished,
+  cancelAnimation
+} from './motion-settings.js';
 
 function usableRect(rect){
-  return !!rect&&
-    rect.width>0&&
-    rect.height>0&&
-    rect.bottom>32&&
-    rect.top<window.innerHeight&&
-    rect.right>0&&
-    rect.left<window.innerWidth;
+  return !!rect&&rect.width>0&&rect.height>0;
 }
 
 function rectOf(element){
   return element&&element.isConnected?element.getBoundingClientRect():null;
+}
+
+function scrollHostFor(element){
+  return element?.closest?.('.main')||document.querySelector('.main')||document.body;
+}
+
+function localRect(element,host){
+  const rect=rectOf(element);
+  if(!usableRect(rect))return null;
+
+  if(host===document.body||host===document.documentElement){
+    return {
+      left:rect.left+window.scrollX,
+      top:rect.top+window.scrollY,
+      width:rect.width,
+      height:rect.height
+    };
+  }
+
+  const hostRect=host.getBoundingClientRect();
+
+  return {
+    left:rect.left-hostRect.left+host.scrollLeft-host.clientLeft,
+    top:rect.top-hostRect.top+host.scrollTop-host.clientTop,
+    width:rect.width,
+    height:rect.height
+  };
 }
 
 function sanitizeClone(root){
@@ -29,8 +50,8 @@ function sanitizeClone(root){
   return root;
 }
 
-function createSnapshot(element,kind){
-  const rect=rectOf(element);
+function createSnapshot(element,kind,host){
+  const rect=localRect(element,host);
   if(!usableRect(rect))return null;
 
   const snapshot=document.createElement('div');
@@ -51,17 +72,9 @@ function createSnapshot(element,kind){
   const clone=sanitizeClone(element.cloneNode(true));
   content.appendChild(clone);
   snapshot.appendChild(content);
-  document.body.appendChild(snapshot);
+  host.appendChild(snapshot);
 
   return {element:snapshot,content,rect};
-}
-
-function animationFinished(animation){
-  return animation.finished.catch(()=>{});
-}
-
-function cleanupAnimation(animation){
-  try{animation.cancel()}catch(_){}
 }
 
 function nextPaint(){
@@ -84,13 +97,14 @@ function transformValue(x,y,scaleX,scaleY){
 }
 
 function prepare(source,{hold=null}={}){
-  if(reducedMotion())return {
+  if(prefersReducedMotion())return {
     play:async()=>{},
     cancel:()=>{}
   };
 
-  const flight=createSnapshot(source,'flight');
-  const held=hold?createSnapshot(hold,'hold'):null;
+  const host=scrollHostFor(source);
+  const flight=createSnapshot(source,'flight',host);
+  const held=hold?createSnapshot(hold,'hold',host):null;
 
   if(!flight)return {
     play:async()=>{},
@@ -98,31 +112,45 @@ function prepare(source,{hold=null}={}){
   };
 
   let disposed=false;
+  let activeAnimations=[];
+  let destinationSnapshot=null;
+
+  const onResize=()=>dispose();
+  window.addEventListener('resize',onResize,{passive:true});
 
   function dispose(){
     if(disposed)return;
     disposed=true;
+
+    window.removeEventListener('resize',onResize);
+    activeAnimations.forEach(cancelAnimation);
+    activeAnimations=[];
+
+    destinationSnapshot?.element.remove();
+    destinationSnapshot=null;
     flight.element.remove();
     held?.element.remove();
   }
 
   async function play(destination,direction='open'){
-    const destinationSnapshot=createSnapshot(destination,'destination');
-    const to=destinationSnapshot?.rect||rectOf(destination);
+    if(disposed||!destination)return;
+
+    destinationSnapshot=createSnapshot(destination,'destination',host);
+    const to=destinationSnapshot?.rect||localRect(destination,host);
 
     if(!usableRect(to)){
-      destinationSnapshot?.element.remove();
       dispose();
       return;
     }
 
     const vector=connectedTransform(flight.rect,to);
     const open=direction!=='close';
-    const toCreate=!!(open&&destination&&destination.classList.contains('new-mode-expanded'));
+    const toCreate=!!(open&&destination.classList.contains('new-mode-expanded'));
+    const travelDuration=open?MOTION_DURATION.open:MOTION_DURATION.close;
+
     flight.element.classList.toggle('to-create',toCreate);
     flight.element.classList.toggle('to-expanded',open&&!toCreate);
     flight.element.classList.toggle('to-card',!open);
-    const travelDuration=open?OPEN_TRAVEL_MS:CLOSE_TRAVEL_MS;
 
     const target=transformValue(
       vector.x,
@@ -131,11 +159,8 @@ function prepare(source,{hold=null}={}){
       vector.scaleY
     );
 
-    // First 12%: lift/translate slightly without scaling.
-    // The small source content is already gone before the real deformation begins.
     const releaseX=vector.x*.035;
     const releaseY=vector.y*.035;
-
     const overshootX=vector.x+(vector.x===0?0:Math.sign(vector.x)*3);
     const overshootY=vector.y+(vector.y===0?0:Math.sign(vector.y)*2);
 
@@ -187,7 +212,7 @@ function prepare(source,{hold=null}={}){
 
     const flightAnimation=flight.element.animate(flightFrames,{
       duration:travelDuration,
-      easing:open?'cubic-bezier(.16,1,.3,1)':'cubic-bezier(.4,0,.2,1)',
+      easing:open?MOTION_EASING.open:MOTION_EASING.close,
       fill:'both'
     });
 
@@ -198,12 +223,10 @@ function prepare(source,{hold=null}={}){
       {opacity:0,offset:1}
     ],{
       duration:travelDuration,
-      easing:'linear',
+      easing:MOTION_EASING.linear,
       fill:'both'
     });
 
-    // While opening, keep the previous surface above the newly-rendered expanded mode.
-    // It dissolves only once the connected surface is nearly covering it.
     const holdAnimation=held
       ?held.element.animate([
           {opacity:1,offset:0},
@@ -212,46 +235,48 @@ function prepare(source,{hold=null}={}){
           {opacity:0,offset:1}
         ],{
           duration:travelDuration,
-          easing:'linear',
+          easing:MOTION_EASING.linear,
           fill:'both'
         })
       :null;
 
-    await Promise.all([
-      animationFinished(flightAnimation),
-      animationFinished(sourceContentAnimation),
-      holdAnimation?animationFinished(holdAnimation):Promise.resolve()
-    ]);
+    activeAnimations=[
+      flightAnimation,
+      sourceContentAnimation,
+      ...(holdAnimation?[holdAnimation]:[])
+    ];
 
-    // At this point the flight surface is already exactly where the destination lives.
-    // Keep it there and resolve into an exact snapshot of the final UI.
+    await Promise.all(activeAnimations.map(animationFinished));
+    if(disposed)return;
+
     let resolveAnimation=null;
+
     if(destinationSnapshot){
       resolveAnimation=destinationSnapshot.element.animate([
         {opacity:0},
         {opacity:1}
       ],{
-        duration:RESOLVE_MS,
-        easing:'cubic-bezier(.2,.8,.2,1)',
+        duration:MOTION_DURATION.resolve,
+        easing:MOTION_EASING.layout,
         fill:'both'
       });
-      await animationFinished(resolveAnimation);
 
-      // Give the real destination underneath one committed paint while the identical
-      // snapshot is still fully opaque. Removing it is then visually lossless.
+      activeAnimations=[resolveAnimation];
+      await animationFinished(resolveAnimation);
+      if(disposed)return;
+
       await nextPaint();
+      if(disposed)return;
     }
 
-    cleanupAnimation(flightAnimation);
-    cleanupAnimation(sourceContentAnimation);
-    if(holdAnimation)cleanupAnimation(holdAnimation);
-    if(resolveAnimation)cleanupAnimation(resolveAnimation);
-
+    activeAnimations.forEach(cancelAnimation);
+    activeAnimations=[];
     destinationSnapshot?.element.remove();
+    destinationSnapshot=null;
     dispose();
   }
 
   return {play,cancel:dispose};
 }
 
-export const modeSurfaceTransition={rectOf,prepare};
+export const modeSurfaceTransition={prepare};
