@@ -1488,25 +1488,20 @@ function openShellView(viewName){
     view.hidden=!selected;
   });
 
-  qa('.rail-item').forEach(function(item){
+  qa('[data-nav-view]').forEach(function(item){
     var selected=item.dataset.navView===shellView;
     item.classList.toggle('active',selected);
     if(selected)item.setAttribute('aria-current','page');
     else item.removeAttribute('aria-current');
   });
-  var settingsActive=shellView==='settings';
-  q('#settingsBtn').classList.toggle('active',settingsActive);
-  if(settingsActive)q('#settingsBtn').setAttribute('aria-current','page');
-  else q('#settingsBtn').removeAttribute('aria-current');
 
   q('.main').scrollTo({top:0,behavior:'auto'});
 }
 
-qa('.rail-item').forEach(function(item){
-  item.onclick=function(){openShellView(item.dataset.navView)};
+q('.nav-rail').addEventListener('click',function(event){
+  var trigger=event.target.closest('[data-nav-view]');
+  if(trigger)openShellView(trigger.dataset.navView);
 });
-
-q('#settingsBtn').onclick=function(){openShellView('settings')};
 q('#identifyDisplays').onclick=function(){toast('Pantallas','Identificación simulada')};
 q('#advancedDisplays').onclick=function(){toast('Pantallas','Configuración avanzada · prototipo')};
 q('#restoreDisplays').onclick=function(){toast('Pantallas','Recuperación simulada')};
