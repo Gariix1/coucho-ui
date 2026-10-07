@@ -315,41 +315,41 @@ content:"";width:6px;height:6px;border-radius:50%;background:var(--success)
 }
 
 /* Detailed density uses the width to make quick editing faster. */
-.mode-grid.detailed .saved-mode-card:not(.mode-expanded) .saved-mode-body{
+.saved-mode-card.mode-card-detailed .saved-mode-body{
 display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);
   gap:10px;align-items:stretch
 }
 
-.mode-grid.detailed .saved-mode-card:not(.mode-expanded) .card-display{
+.saved-mode-card.mode-card-detailed .card-display{
 margin:10px 0 0;min-height:92px
 }
 
-.mode-grid.detailed .saved-mode-card:not(.mode-expanded) .card-facts{
+.saved-mode-card.mode-card-detailed .card-facts{
 margin-top:10px
 }
 
 /* Compact density preserves every quick action, only reducing visual weight. */
-.mode-grid.compact .saved-mode-card:not(.mode-expanded){
+.saved-mode-card.mode-card-compact{
 padding:10px
 }
 
-.mode-grid.compact .saved-mode-card:not(.mode-expanded) .saved-mode-name-copy b{
+.saved-mode-card.mode-card-compact .saved-mode-name-copy b{
 font-size:13px
 }
 
-.mode-grid.compact .saved-mode-card:not(.mode-expanded) .card-display{
+.saved-mode-card.mode-card-compact .card-display{
 min-height:66px;margin:8px 0 6px;padding:8px
 }
 
-.mode-grid.compact .saved-mode-card:not(.mode-expanded) .card-fact{
+.saved-mode-card.mode-card-compact .card-fact{
 min-height:38px;padding:6px 7px
 }
 
-.mode-grid.compact .saved-mode-card:not(.mode-expanded) .fact-icon{
+.saved-mode-card.mode-card-compact .fact-icon{
 display:none
 }
 
-.mode-grid.compact .saved-mode-card:not(.mode-expanded) .activate{
+.saved-mode-card.mode-card-compact .activate{
 padding-inline:8px
 }
 
@@ -361,11 +361,11 @@ width:62px;height:36px
 width:44px;height:29px
 }
 
-.mode-grid.compact .saved-mode-card .card-display .monitor.tv{
+.saved-mode-card.mode-card-compact .card-display .monitor.tv{
 width:52px;height:30px
 }
 
-.mode-grid.compact .saved-mode-card .card-display .monitor.pc{
+.saved-mode-card.mode-card-compact .card-display .monitor.pc{
 width:38px;height:25px
 }
 
