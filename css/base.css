@@ -53,18 +53,3 @@ display:none!important
 width:1em;height:1em;display:block;color:currentColor;overflow:visible
 }
 
-.mode-status .ui-icon{
-width:14px;height:14px
-}
-
-button.mode-list-copy:hover,button.mode-list-copy:focus-visible{
-background:transparent
-}
-
-.preserve-btn .ui-icon{
-width:14px;height:14px
-}
-
-.display-editor-summary .ui-icon{
-display:inline-block;width:11px;height:11px;vertical-align:-1px
-}
