@@ -85,7 +85,8 @@ color:var(--accent)
 }
 
 .main{
-height:100%;min-width:0;overflow:auto
+position:relative;isolation:isolate;
+  height:100%;min-width:0;overflow:auto
 }
 
 .main.layout-motion-active{
