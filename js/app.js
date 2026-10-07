@@ -57,7 +57,10 @@ let createAutoNamed=true;
 let modeTransitioning=false;
 
 function resetExpandedState(){
-  resetExpandedState();
+  expandedOpen=false;
+  expandedModeId=null;
+  expandedConfig=null;
+  newModeBase=null;
   createAutoNamed=true;
 }
 
