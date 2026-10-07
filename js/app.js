@@ -11,11 +11,8 @@ import {
 import {
   cloneModeConfig,
   displayConfig,
-  displayCountLabel,
-  displayMarkup,
   displaySummary,
   logo,
-  shortcutCardLabel,
   shortcutMarkup,
   modeChangeCount,
   modeConfigEqual
@@ -28,6 +25,7 @@ import {MOTION_DURATION} from './motion-settings.js';
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
+import {expandedModeMarkup,modeCardMarkup} from './ui/mode-markup.js';
 import {initTheme,toggleTheme} from './features/theme.js';
 
 const TEST_MODE_KEY='coucho-test-mode';
@@ -223,55 +221,6 @@ function setExpandedTarget(targetId){
     newModeBase=cloneModeConfig(expandedConfig);
     createAutoNamed=true;
   }
-}
-
-function expandedModeMarkup(kind,id){
-  var saved=kind==='mode';
-  var rootTag=saved?'article':'section';
-  var rootClass='mode-expanded '+(saved?'saved-mode-card saved-mode-expanded':'new-mode-expanded');
-  var dataAttr=saved?' data-mode-row="'+id+'"':'';
-  var layoutKey=layoutKeyForMode(saved?id:null);
-  var titleLead=saved
-    ?'<div class="mode-expanded-profile-icon" id="expandedProfileIcon"></div>'
-    :'';
-  var eyebrow=saved
-    ?''
-    :'<span class="mode-expanded-eyebrow">Crear modo</span>';
-  var actions=saved
-    ?'<button class="btn" id="expandedTest">Probar</button>'+
-      '<button class="btn primary" id="expandedActivate" hidden>Activar</button>'
-    :'<button class="btn" id="expandedReset" hidden>Restablecer</button>'+
-      '<button class="btn" id="expandedTest">Probar</button>'+
-      '<button class="btn primary" id="expandedSave">Crear modo</button>';
-
-  return '<'+rootTag+' class="'+rootClass+'" id="expandedMode" data-layout-key="'+layoutKey+'" tabindex="-1" aria-labelledby="expandedName"'+dataAttr+'>'+
-    '<header class="mode-expanded-head" data-expanded-toggle="true">'+
-      '<div class="mode-expanded-title-block">'+
-        titleLead+
-        '<div class="mode-expanded-title-copy">'+
-          eyebrow+
-          '<h2 id="expandedName" class="mode-name-edit" tabindex="0"></h2>'+
-        '</div>'+
-      '</div>'+
-      '<div class="mode-expanded-head-actions">'+
-        '<span class="mode-expanded-state" id="expandedState" role="status" aria-live="polite" hidden></span>'+
-        '<button class="mode-expanded-close" id="expandedClose" title="'+(saved?'Compactar':'Cancelar')+'" aria-label="'+(saved?'Compactar':'Cancelar')+'">'+iconMarkup(saved?'collapse':'close')+'</button>'+
-      '</div>'+
-    '</header>'+
-    '<header class="mode-expanded-section-head"><b>Pantallas</b></header>'+
-    '<div class="mode-expanded-screen-stage" id="expandedScreens"></div>'+
-    '<div class="mode-expanded-pieces">'+
-      '<button class="mode-expanded-piece" id="expandedApp" title="Cambiar app">'+
-        '<span class="mode-expanded-piece-icon">'+iconMarkup('play')+'</span>'+
-        '<span><small>App</small><b id="expandedAppName"></b></span>'+
-      '</button>'+
-      '<button class="mode-expanded-piece" id="expandedShortcut" title="Cambiar atajo">'+
-        '<span class="mode-expanded-piece-icon">'+iconMarkup('gamepad')+'</span>'+
-        '<span><small>Atajo</small><b id="expandedShortcutName"></b></span>'+
-      '</button>'+
-    '</div>'+
-    '<footer class="mode-expanded-footer"><div class="mode-expanded-actions">'+actions+'</div></footer>'+
-  '</'+rootTag+'>';
 }
 
 async function setCardDensity(next){
@@ -483,40 +432,6 @@ function focusOrExpandMode(card){
   expandSavedMode(id,card);
 }
 
-function renderModeCard(mode){
-  var applying=activatingId===mode.id;
-  var safeName=esc(mode.name);
-  var safeApp=esc(mode.app);
-  var safeShortcut=esc(shortcutCardLabel(mode.shortcut));
-  var titleId='mode-title-'+mode.id;
-
-  return '<article class="saved-mode-card mode-card-'+cardDensity+'" data-mode-row="'+mode.id+'" data-layout-key="'+layoutKeyForMode(mode.id)+'" aria-labelledby="'+titleId+'">'+
-    '<div class="saved-mode-head">'+
-      '<div class="saved-mode-name">'+
-        '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
-        '<span class="saved-mode-name-copy"><b class="mode-list-name" id="'+titleId+'">'+safeName+'</b>'+
-          (mode.active?'<small><span class="mode-list-badge">Activo</span></small>':'')+
-        '</span>'+
-      '</div>'+
-      '<div class="saved-mode-actions">'+
-        (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+' title="Activar modo">'+(applying?'…':'Activar')+'</button>':'')+
-        '<button class="open-mode" data-id="'+mode.id+'" title="Expandir '+safeName+'" aria-label="Expandir '+safeName+'">'+iconMarkup('expand')+'</button>'+
-        '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>'+
-      '</div>'+
-    '</div>'+
-    '<div class="saved-mode-body">'+
-      '<button class="card-display quick-display" data-id="'+mode.id+'" title="Editar pantallas">'+
-        '<span class="card-screen-row"><span class="displays card-displays">'+displayMarkup(mode)+'</span>'+
-        '<span class="screen-count"><small>Pantallas</small>'+esc(displayCountLabel(mode))+'</span></span>'+
-      '</button>'+
-      '<div class="card-facts">'+
-        '<button class="card-fact quick-app" data-id="'+mode.id+'" title="Cambiar app"><span class="fact-icon">'+iconMarkup('play')+'</span><span class="fact-copy"><small>App</small><b>'+safeApp+'</b></span></button>'+
-        '<button class="card-fact quick-shortcut" data-id="'+mode.id+'" title="Cambiar atajo"><span class="fact-icon">'+iconMarkup('gamepad')+'</span><span class="fact-copy"><small>Atajo</small><b>'+safeShortcut+'</b></span></button>'+
-      '</div>'+
-    '</div>'+
-  '</article>';
-}
-
 function modeColumnCount(modeList){
   if(!modeList)return 1;
   var raw=getComputedStyle(modeList).getPropertyValue('--mode-columns').trim();
@@ -554,7 +469,11 @@ function renderModeList(){
 
   var currentExpanded=expandedOpen&&expandedModeId===null;
   var current=currentExpanded
-    ?expandedModeMarkup('new',null)
+    ?expandedModeMarkup({
+      kind:'new',
+      id:null,
+      layoutKey:layoutKeyForMode(null)
+    })
     :'<button class="mode-list-item current" data-expand-source="current" data-layout-key="current">'+
       '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
       '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
@@ -563,9 +482,17 @@ function renderModeList(){
 
   var saved=modesForRender(modeList).map(function(mode){
     if(expandedOpen&&expandedModeId===mode.id){
-      return expandedModeMarkup('mode',mode.id);
+      return expandedModeMarkup({
+        kind:'mode',
+        id:mode.id,
+        layoutKey:layoutKeyForMode(mode.id)
+      });
     }
-    return renderModeCard(mode);
+    return modeCardMarkup(mode,{
+      applying:activatingId===mode.id,
+      density:cardDensity,
+      layoutKey:layoutKeyForMode(mode.id)
+    });
   }).join('');
 
   q('#modeList').innerHTML=
