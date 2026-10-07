@@ -518,9 +518,40 @@ function renderModeCard(mode){
   '</article>';
 }
 
+function modeColumnCount(modeList){
+  if(!modeList)return 1;
+  var raw=getComputedStyle(modeList).getPropertyValue('--mode-columns').trim();
+  var count=parseInt(raw,10);
+  return Number.isFinite(count)&&count>0?count:1;
+}
+
+function modesForRender(modeList){
+  var ordered=sets.slice();
+
+  if(!expandedOpen||expandedModeId===null)return ordered;
+
+  var selectedIndex=ordered.findIndex(function(mode){
+    return mode.id===expandedModeId;
+  });
+  if(selectedIndex<0)return ordered;
+
+  var columns=modeColumnCount(modeList);
+  if(columns<=1)return ordered;
+
+  var rowStart=Math.floor(selectedIndex/columns)*columns;
+  if(selectedIndex===rowStart)return ordered;
+
+  var selected=ordered.splice(selectedIndex,1)[0];
+  ordered.splice(rowStart,0,selected);
+  return ordered;
+}
+
 function renderModeList(){
   var modeList=q('#modeList');
-  if(currentPopAnchor&&modeList&&modeList.contains(currentPopAnchor))closePops();
+  if(!modeList)return;
+
+  modeList.dataset.density=cardDensity;
+  if(currentPopAnchor&&modeList.contains(currentPopAnchor))closePops();
 
   var currentExpanded=expandedOpen&&expandedModeId===null;
   var current=currentExpanded
@@ -531,7 +562,7 @@ function renderModeList(){
       '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
     '</button>';
 
-  var saved=sets.map(function(mode){
+  var saved=modesForRender(modeList).map(function(mode){
     if(expandedOpen&&expandedModeId===mode.id){
       return expandedModeMarkup('mode',mode.id);
     }
