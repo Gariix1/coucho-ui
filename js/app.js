@@ -54,6 +54,11 @@ let newModeBase=null;
 let createAutoNamed=true;
 let modeTransitioning=false;
 
+function resetExpandedState(){
+  resetExpandedState();
+  createAutoNamed=true;
+}
+
 // Transient picker / overlay state.
 let displayEditModeId=null;
 let displayDraft=null;
@@ -437,11 +442,7 @@ async function collapseExpandedMode(restore,afterClose){
   });
 
   try{
-    expandedOpen=false;
-    expandedModeId=null;
-    expandedConfig=null;
-    newModeBase=null;
-    createAutoNamed=true;
+    resetExpandedState();
     renderWorkbench();
 
     var destination=elementForMode(closingId);
@@ -585,58 +586,7 @@ function renderModeList(){
       '</div>'+
     '</div>';
 
-  qa('[data-density]').forEach(function(button){
-    button.onclick=function(event){
-      event.stopPropagation();
-      setCardDensity(button.dataset.density);
-    };
-  });
 
-  qa('[data-expand-source]').forEach(function(element){
-    element.onclick=function(){expandCurrentDesktop(element.dataset.expandSource)};
-  });
-
-  qa('#modeList .saved-mode-card:not(.mode-expanded)').forEach(function(card){
-    card.onclick=function(event){
-      if(event.target.closest('button,a,input,select,textarea,[contenteditable="true"]'))return;
-      var selection=window.getSelection&&window.getSelection();
-      if(selection&&String(selection).trim())return;
-      focusOrExpandMode(card);
-    };
-  });
-
-  qa('#modeList .activate').forEach(function(button){
-    button.onclick=function(event){
-      event.stopPropagation();
-      activate(Number(button.dataset.id));
-    };
-  });
-
-  qa('#modeList .open-mode').forEach(function(button){
-    button.onclick=function(event){
-      event.stopPropagation();
-      focusOrExpandMode(q('[data-mode-row="'+button.dataset.id+'"]'));
-    };
-  });
-
-  qa('#modeList .trash-mode').forEach(function(button){
-    button.onclick=function(event){
-      event.stopPropagation();
-      openDeletePop(event.currentTarget,button.dataset.id);
-    };
-  });
-
-  qa('#modeList .quick-display').forEach(function(button){
-    button.onclick=function(event){openDisplayPop(event.currentTarget,button.dataset.id)};
-  });
-
-  qa('#modeList .quick-app').forEach(function(button){
-    button.onclick=function(event){openAppPop(event.currentTarget,button.dataset.id)};
-  });
-
-  qa('#modeList .quick-shortcut').forEach(function(button){
-    button.onclick=function(){openShortcut(button.dataset.id)};
-  });
 }
 
 function renderExpandedScreens(){
@@ -742,7 +692,7 @@ function renderExpandedMode(){
   q('#expandedClose').title=isNew?'Cancelar':'Compactar';
   q('#expandedClose').setAttribute('aria-label',isNew?'Cancelar':'Compactar');
 
-  bindExpandedControls();
+  bindExpandedRename();
 }
 
 function refreshExpandedConfig(){
@@ -819,11 +769,7 @@ function removeSet(id){
   }
 
   if(expandedModeId===id){
-    expandedOpen=false;
-    expandedModeId=null;
-    expandedConfig=null;
-    newModeBase=null;
-    createAutoNamed=true;
+    resetExpandedState();
   }
   commitSets();
   render();
@@ -1179,11 +1125,7 @@ async function createModeFromExpanded(){
     sets.push(created);
     commitSets();
 
-    expandedOpen=false;
-    expandedModeId=null;
-    expandedConfig=newModeConfigFromApplied();
-    newModeBase=cloneModeConfig(expandedConfig);
-    createAutoNamed=true;
+    resetExpandedState();
 
     render();
 
@@ -1201,67 +1143,44 @@ async function createModeFromExpanded(){
   });
 }
 
-function bindExpandedControls(){
-  var close=q('#expandedClose');
-  if(!close)return;
+function openExpandedAppPicker(anchor){
+  closePops();
+  appEditTarget={kind:'expanded'};
 
-  close.onclick=function(){collapseExpandedMode(true)};
+  qa('#appPop .app-option').forEach(function(option){
+    var selected=option.dataset.app===expandedConfig.app;
+    option.classList.toggle('selected',selected);
+    option.setAttribute('aria-pressed',selected?'true':'false');
+  });
 
-  var toggleSurface=q('[data-expanded-toggle]');
-  if(toggleSurface)toggleSurface.onclick=function(event){
-    if(event.target.closest('button,a,input,select,textarea,[contenteditable="true"],.mode-name-edit'))return;
-    var selection=window.getSelection&&window.getSelection();
-    if(selection&&String(selection).trim())return;
-    collapseExpandedMode(true);
-  };
+  openAnchoredPop(q('#appPop'),anchor);
+}
 
-  q('#expandedApp').onclick=function(event){
-    closePops();
-    appEditTarget={kind:'expanded'};
-    qa('#appPop .app-option').forEach(function(option){
-      var selected=option.dataset.app===expandedConfig.app;
-      option.classList.toggle('selected',selected);
-      option.setAttribute('aria-pressed',selected?'true':'false');
-    });
-    openAnchoredPop(q('#appPop'),event.currentTarget);
-  };
+function testExpandedMode(){
+  if(!expandedConfig)return;
 
-  q('#expandedShortcut').onclick=function(){openShortcut('expanded')};
+  startTest({
+    kind:expandedModeId===null?'new-mode':'saved-mode',
+    existingId:expandedModeId,
+    preserve:expandedConfig.preserve,
+    displayIds:expandedConfig.displayIds.slice(),
+    primaryDisplayId:expandedConfig.primaryDisplayId,
+    app:expandedConfig.app,
+    shortcut:expandedConfig.shortcut,
+    name:expandedConfig.name,
+    icon:expandedConfig.icon
+  });
+}
 
-  var reset=q('#expandedReset');
-  if(reset)reset.onclick=function(){
-    expandedConfig=cloneModeConfig(newModeBase);
-    refreshExpandedConfig();
-  };
-
-  var save=q('#expandedSave');
-  if(save)save.onclick=createModeFromExpanded;
-
-  var activateButton=q('#expandedActivate');
-  if(activateButton)activateButton.onclick=function(){
-    if(expandedModeId!==null)activate(expandedModeId,true);
-  };
-
-  q('#expandedTest').onclick=function(){
-    if(!expandedConfig)return;
-    startTest({
-      kind:expandedModeId===null?'new-mode':'saved-mode',
-      existingId:expandedModeId,
-      preserve:expandedConfig.preserve,
-      displayIds:expandedConfig.displayIds.slice(),
-      primaryDisplayId:expandedConfig.primaryDisplayId,
-      app:expandedConfig.app,
-      shortcut:expandedConfig.shortcut,
-      name:expandedConfig.name,
-      icon:expandedConfig.icon
-    });
-  };
-
+function bindExpandedRename(){
   var name=q('#expandedName');
+  if(!name)return;
+
   name.ondblclick=function(event){
     event.preventDefault();
     beginExpandedRename();
   };
+
   name.onkeydown=function(event){
     if(name.isContentEditable)return;
     if(event.key==='F2'||event.key==='Enter'){
@@ -1269,16 +1188,129 @@ function bindExpandedControls(){
       beginExpandedRename();
     }
   };
+
   bindTouchRename(name,beginExpandedRename);
 }
+
+function handleModeListClick(event){
+  var target=event.target;
+  if(!(target instanceof Element))return;
+
+  var density=target.closest('[data-density]');
+  if(density){
+    setCardDensity(density.dataset.density);
+    return;
+  }
+
+  var current=target.closest('[data-expand-source]');
+  if(current){
+    expandCurrentDesktop(current.dataset.expandSource);
+    return;
+  }
+
+  var activateButton=target.closest('.activate');
+  if(activateButton){
+    activate(Number(activateButton.dataset.id));
+    return;
+  }
+
+  var openButton=target.closest('.open-mode');
+  if(openButton){
+    focusOrExpandMode(openButton.closest('[data-mode-row]'));
+    return;
+  }
+
+  var trashButton=target.closest('.trash-mode');
+  if(trashButton){
+    openDeletePop(trashButton,trashButton.dataset.id);
+    return;
+  }
+
+  var displayButton=target.closest('.quick-display');
+  if(displayButton){
+    openDisplayPop(displayButton,displayButton.dataset.id);
+    return;
+  }
+
+  var appButton=target.closest('.quick-app');
+  if(appButton){
+    openAppPop(appButton,appButton.dataset.id);
+    return;
+  }
+
+  var shortcutButton=target.closest('.quick-shortcut');
+  if(shortcutButton){
+    openShortcut(shortcutButton.dataset.id);
+    return;
+  }
+
+  if(target.closest('#expandedClose')){
+    collapseExpandedMode(true);
+    return;
+  }
+
+  var expandedApp=target.closest('#expandedApp');
+  if(expandedApp){
+    openExpandedAppPicker(expandedApp);
+    return;
+  }
+
+  if(target.closest('#expandedShortcut')){
+    openShortcut('expanded');
+    return;
+  }
+
+  if(target.closest('#expandedReset')){
+    expandedConfig=cloneModeConfig(newModeBase);
+    refreshExpandedConfig();
+    return;
+  }
+
+  if(target.closest('#expandedSave')){
+    createModeFromExpanded();
+    return;
+  }
+
+  if(target.closest('#expandedActivate')){
+    if(expandedModeId!==null)activate(expandedModeId,true);
+    return;
+  }
+
+  if(target.closest('#expandedTest')){
+    testExpandedMode();
+    return;
+  }
+
+  var toggleSurface=target.closest('[data-expanded-toggle]');
+  if(toggleSurface){
+    if(target.closest('button,a,input,select,textarea,[contenteditable="true"],.mode-name-edit'))return;
+    var selectedText=window.getSelection&&window.getSelection();
+    if(selectedText&&String(selectedText).trim())return;
+    collapseExpandedMode(true);
+    return;
+  }
+
+  var card=target.closest('.saved-mode-card:not(.mode-expanded)');
+  if(!card)return;
+  if(target.closest('button,a,input,select,textarea,[contenteditable="true"]'))return;
+
+  var selection=window.getSelection&&window.getSelection();
+  if(selection&&String(selection).trim())return;
+
+  focusOrExpandMode(card);
+}
+
+function bindModeListEvents(){
+  var modeList=q('#modeList');
+  if(!modeList)return;
+  modeList.addEventListener('click',handleModeListClick);
+}
+
 
 q('#clearModes').onclick=function(){
   sets=[];
   appliedSession=null;
-  expandedOpen=false;
-  expandedModeId=null;
-  expandedConfig=null;
-  newModeBase=null;
+  resetExpandedState();
   commitSets();
   render();
   toast('Modos vaciados','Ya puedes probar el flujo desde cero');
@@ -1287,10 +1319,7 @@ q('#clearModes').onclick=function(){
 q('#restoreDemo').onclick=function(){
   sets=demoSets();
   appliedSession=null;
-  expandedOpen=false;
-  expandedModeId=null;
-  expandedConfig=null;
-  newModeBase=null;
+  resetExpandedState();
   commitSets();
   render();
   toast('Demo restaurada','3 modos');
@@ -1451,11 +1480,7 @@ q('#keep').onclick=function(){
     sets.forEach(function(s){s.active=false});
     sets.push(created);
     appliedSession=sessionFromMode(created);
-    expandedOpen=false;
-    expandedModeId=null;
-    expandedConfig=null;
-    newModeBase=null;
-    createAutoNamed=true;
+    resetExpandedState();
     q('#testOverlay').classList.remove('open');
     commitSets();
     render();
@@ -1581,6 +1606,7 @@ q('#advancedDisplays').onclick=function(){toast('Pantallas','Configuración avan
 q('#restoreDisplays').onclick=function(){toast('Pantallas','Recuperación simulada')};
 q('#advancedSettings').onclick=function(){toast('Avanzado','Diagnóstico y recuperación · prototipo')};
 
+bindModeListEvents();
 openShellView('modes');
 initTheme();
 syncTestMode();
