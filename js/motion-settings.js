@@ -13,7 +13,13 @@ export const MOTION_EASING=Object.freeze({
 });
 
 export function prefersReducedMotion(){
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return typeof window.matchMedia==='function'&&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+export function supportsWebAnimations(){
+  return typeof Element!=='undefined'&&
+    typeof Element.prototype.animate==='function';
 }
 
 export function animationFinished(animation){
