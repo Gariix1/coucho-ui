@@ -76,6 +76,7 @@ border-radius:var(--r-card)
 
 @media(prefers-reduced-motion:reduce){
 .mode-transition-snapshot{display:none}
+.progress div{transition:none}
 }
 
 /* Native scroll anchoring is suspended only while our FLIP transaction owns it. */
