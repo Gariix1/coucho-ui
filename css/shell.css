@@ -89,10 +89,6 @@ position:relative;isolation:isolate;
   height:100%;min-width:0;overflow:auto
 }
 
-.main.layout-motion-active{
-overflow-anchor:none
-}
-
 .shell-view{
 display:none;min-height:100%
 }
