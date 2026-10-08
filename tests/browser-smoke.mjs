@@ -55,8 +55,12 @@ try{
   await page.mouse.down();
   const transform=await current.evaluate(element=>getComputedStyle(element).transform);
   assert.equal(transform,'none','Press feedback changes bounding geometry');
+  // Release away from the trigger: this test is about pointer feedback,
+  // and must not itself open a Couchset before the navigation checks.
+  await page.mouse.move(1,1);
   await page.mouse.up();
   await stable();
+  assert.equal(await page.locator('#expandedMode').count(),0);
   console.log('PASS stable current-card geometry on pointerdown');
 
   await check('open saved Couchset',async()=>{
