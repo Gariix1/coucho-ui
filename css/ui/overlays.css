@@ -183,7 +183,7 @@ height:3px;background:var(--progress-track)
 }
 
 .progress div{
-height:100%;width:var(--test-progress,0%);background:var(--accent);transition:width .4s
+height:100%;width:var(--test-progress,0%);background:var(--accent);transition:width var(--motion-progress-duration) var(--motion-feedback-easing)
 }
 
 .confirm{

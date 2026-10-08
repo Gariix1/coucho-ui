@@ -1,24 +1,23 @@
-/* Connected mode transition.
-   Source content dissolves before deformation; the destination resolves on the same surface. */
+/* Motion tokens are written by installMotionTokens() in motion-settings.js. */
+
+/* Connected mode transition: fixed viewport-space snapshots never contribute
+   to scroll height or inherit clipping from the scrollable .main container. */
 
 .mode-transition-snapshot{
-position:absolute;left:var(--motion-left);top:var(--motion-top);
+position:fixed;left:var(--motion-left);top:var(--motion-top);
   width:var(--motion-width);height:var(--motion-height);
   z-index:120;pointer-events:none;margin:0;
-  transform-origin:0 0;will-change:transform,opacity,box-shadow
+  transform-origin:0 0;will-change:transform,opacity;user-select:none
 }
 
-.mode-transition-snapshot[aria-hidden="true"]{
-user-select:none
+.mode-transition-snapshot,
+.mode-transition-snapshot *{
+  /* Child controls must not animate independently of the connected surface. */
+  transition:none!important
 }
 
-.mode-transition-flight,
-.mode-transition-hold{
+.mode-transition-flight{
 overflow:hidden;contain:paint
-}
-
-.mode-transition-hold{
-z-index:118
 }
 
 .mode-transition-flight{
@@ -47,12 +46,16 @@ z-index:120;border:1px solid var(--transition-border,var(--glass-border));border
 }
 
 .mode-transition-destination{
-z-index:121;overflow:visible;opacity:0
+z-index:121;overflow:hidden;opacity:0
+}
+
+.mode-transition-live-hidden{
+visibility:hidden!important
 }
 
 .mode-transition-content{
 width:100%;height:100%;border-radius:inherit;
-  transform-origin:0 0;will-change:opacity
+  transform-origin:0 0
 }
 
 .mode-transition-flight .mode-transition-content{
@@ -70,13 +73,14 @@ width:100%;height:100%;max-width:none;min-width:0;margin:0;
 box-shadow:none
 }
 
-.mode-transition-hold .mode-transition-content>.mode-expanded{
-border-radius:var(--r-card)
-}
-
 @media(prefers-reduced-motion:reduce){
-.mode-transition-snapshot{display:none}
-.progress div{transition:none}
+  .mode-transition-snapshot{display:none}
+  *,*::before,*::after{
+    animation-duration:0.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:0.01ms!important;
+    scroll-behavior:auto!important
+  }
 }
 
 /* Native scroll anchoring is suspended only while our FLIP transaction owns it. */

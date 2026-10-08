@@ -1,0 +1,31 @@
+name: Mockup Motion Regression
+
+on:
+  pull_request:
+    paths:
+      - 'js/**'
+      - 'css/**'
+      - 'tests/**'
+      - 'index.html'
+      - '.github/workflows/mockup-motion.yml'
+  workflow_dispatch:
+
+jobs:
+  motion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test and lint tools
+        run: npm install --no-save playwright eslint globals
+      - name: Check undefined symbols and module hygiene
+        run: npx eslint js tests
+      - name: Unit and component tests
+        run: node --experimental-default-type=module --test tests/*.test.mjs
+      - name: Serve mockup
+        run: python3 -m http.server 8123 --bind 127.0.0.1 > /tmp/coucho-http.log 2>&1 &
+      - name: Browser interactions on Chrome
+        run: node tests/browser-smoke.mjs

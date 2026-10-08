@@ -14,6 +14,34 @@ export function displayConfig(source){
   };
 }
 
+// Share display-selection rules between the expanded and quick editors.
+export function applyDisplayConfig(target,source){
+  target.preserve=!!source.preserve;
+  target.displayIds=source.displayIds.slice();
+  target.primaryDisplayId=source.primaryDisplayId;
+  return target;
+}
+
+export function toggleSelectedDisplay(config,id){
+  const index=config.displayIds.indexOf(id);
+  if(index>=0){
+    if(config.displayIds.length===1)return false;
+    config.displayIds.splice(index,1);
+    if(config.primaryDisplayId===id){
+      config.primaryDisplayId=config.displayIds[0]||null;
+    }
+  }else{
+    config.displayIds.push(id);
+    if(!config.primaryDisplayId)config.primaryDisplayId=id;
+  }
+  return true;
+}
+
+export function selectPrimaryDisplay(config,id){
+  if(config.displayIds.indexOf(id)<0)config.displayIds.push(id);
+  config.primaryDisplayId=id;
+}
+
 export function cloneModeConfig(source){
   return {
     id:source.id==null?null:source.id,

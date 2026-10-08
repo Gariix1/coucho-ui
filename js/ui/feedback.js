@@ -1,11 +1,14 @@
 import {q} from '../core/dom.js';
+import {animateNotice} from './interaction-motion.js';
 
 let toastTimer=null;
 
 export function toast(title,message){
   q('#toastTitle').textContent=title;
   q('#toastText').textContent=message;
-  q('#toast').classList.add('show');
+  const notice=q('#toast');
+  notice.classList.add('show');
+  animateNotice(notice);
 
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>{

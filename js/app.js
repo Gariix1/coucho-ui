@@ -1,4 +1,4 @@
-import {q,qa,esc,setCssVars} from './core/dom.js';
+import {q,qa,esc,setCssVars,closestWithin} from './core/dom.js';
 import {iconMarkup,modeIconMarkup} from './core/icons.js';
 import {
   autoMeta,
@@ -10,21 +10,23 @@ import {
 } from './data/catalog.js';
 import {
   cloneModeConfig,
+  applyDisplayConfig,
+  toggleSelectedDisplay,
+  selectPrimaryDisplay,
   displayConfig,
   displaySummary,
+  displayMarkup,
+  shortcutCardLabel,
   logo,
   shortcutMarkup,
   modeChangeCount,
   modeConfigEqual
 } from './model.js';
 
-import {modeSurfaceTransition} from './motion.js';
-import {modeLayoutTransition} from './layout-motion.js';
-import {
-  MOTION_DURATION,
-  prefersReducedMotion
-} from './motion-settings.js';
-
+import {runMotionTransaction} from './motion-transaction.js';
+import {createMotionScheduler} from './motion-scheduler.js';
+import {installMotionTokens,MOTION_DURATION,prefersReducedMotion} from './motion-settings.js';
+import {bindPressFeedback,celebrateSurface} from './ui/interaction-motion.js';
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
@@ -60,6 +62,7 @@ let expandedConfig=null;
 let newModeBase=null;
 let createAutoNamed=true;
 let modeTransitioning=false;
+const motionScheduler=createMotionScheduler();
 
 function resetExpandedState(){
   expandedOpen=false;
@@ -81,6 +84,23 @@ let captured=null;
 let testContext=null;
 let progressTimer=null;
 let countdownTimer=null;
+let restoreTimer=null;
+
+function clearTestTimers(){
+  clearInterval(progressTimer);
+  clearInterval(countdownTimer);
+  clearTimeout(restoreTimer);
+  progressTimer=null;
+  countdownTimer=null;
+  restoreTimer=null;
+}
+
+function scheduleTestRestore(callback,delay){
+  restoreTimer=setTimeout(function(){
+    restoreTimer=null;
+    callback();
+  },delay);
+}
 
 // Mode/session domain helpers.
 function byId(id){return sets.find(function(x){return x.id===id})||null}
@@ -203,15 +223,18 @@ function guardExpandedSwitch(nextId){
 
 function setModeTransitioning(value){
   modeTransitioning=!!value;
-  var workbench=q('.mode-workbench');
-  if(!workbench)return;
-  if(modeTransitioning){
-    workbench.setAttribute('inert','');
-    workbench.setAttribute('aria-busy','true');
-  }else{
-    workbench.removeAttribute('inert');
-    workbench.removeAttribute('aria-busy');
+  const workbench=q('.mode-workbench');
+  if(workbench){
+    if(modeTransitioning){
+      workbench.setAttribute('inert','');
+      workbench.setAttribute('aria-busy','true');
+    }else{
+      workbench.removeAttribute('inert');
+      workbench.removeAttribute('aria-busy');
+    }
   }
+  // Flush delayed state updates only after the motion-owned DOM is released.
+  motionScheduler.setBusy(modeTransitioning);
 }
 
 function elementForMode(id){
@@ -241,33 +264,27 @@ async function setCardDensity(next){
   if(next!=='compact'&&next!=='detailed')return;
   if(next===cardDensity||modeTransitioning)return;
 
-  var root=q('#modeList');
-  var anchorKey=expandedOpen?layoutKeyForMode(expandedModeId):null;
-  var layout=modeLayoutTransition.prepare(root,{
-    anchorKey:anchorKey,
-    scrollElement:q('.main')
+  const root=q('#modeList');
+  const anchorKey=expandedOpen?layoutKeyForMode(expandedModeId):null;
+
+  await runMotionTransaction({
+    root,
+    layout:{
+      anchorKey,
+      scrollElement:q('.main'),
+      excludeKeys:anchorKey?[anchorKey]:[],
+      duration:MOTION_DURATION.density,
+      animateSize:true
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      cardDensity=next;
+      localStorage.setItem(CARD_DENSITY_KEY,cardDensity);
+      renderWorkbench();
+    }
   });
 
-  setModeTransitioning(true);
-
-  try{
-    cardDensity=next;
-    localStorage.setItem(CARD_DENSITY_KEY,cardDensity);
-    renderWorkbench();
-
-    await layout.play({
-      root:root,
-      anchorKey:anchorKey,
-      excludeKeys:anchorKey?[anchorKey]:[],
-      duration:MOTION_DURATION.density
-    });
-  }finally{
-    layout.cancel();
-    setModeTransitioning(false);
-  }
-
-  var selected=q('[data-density="'+next+'"]');
-  if(selected)selected.focus({preventScroll:true});
+  q('.density-button[data-density-option="'+next+'"]')?.focus({preventScroll:true});
 }
 
 async function switchExpandedSurface(targetId,source){
@@ -275,50 +292,33 @@ async function switchExpandedSurface(targetId,source){
   if(expandedModeId===targetId)return true;
   if(!guardExpandedSwitch(targetId))return false;
 
-  var previousId=expandedModeId;
-  var previousKey=layoutKeyForMode(previousId);
-  var targetKey=layoutKeyForMode(targetId);
-  var root=q('#modeList');
-  var previousSurface=q('.mode-expanded');
-
+  const previousId=expandedModeId;
+  const previousKey=layoutKeyForMode(previousId);
+  const targetKey=layoutKeyForMode(targetId);
+  const previousSurface=q('.mode-expanded');
   if(!previousSurface||!source)return false;
 
   closePops();
-  setModeTransitioning(true);
-
-  var closingTransition=modeSurfaceTransition.prepare(previousSurface);
-  var openingTransition=modeSurfaceTransition.prepare(source);
-  var layout=modeLayoutTransition.prepare(root,{
-    anchorKey:targetKey,
-    scrollElement:q('.main')
+  await runMotionTransaction({
+    root:q('#modeList'),
+    surfaces:[
+      {source:previousSurface,destination:()=>elementForMode(previousId),direction:'close'},
+      {source,destination:()=>q('.mode-expanded'),direction:'open'}
+    ],
+    layout:{
+      anchorKey:targetKey,
+      scrollElement:q('.main'),
+      excludeKeys:[previousKey,targetKey],
+      duration:MOTION_DURATION.open
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      setExpandedTarget(targetId);
+      renderWorkbench();
+    }
   });
 
-  try{
-    setExpandedTarget(targetId);
-    renderWorkbench();
-
-    var destination=q('.mode-expanded');
-    var previousDestination=elementForMode(previousId);
-
-    await Promise.all([
-      closingTransition.play(previousDestination,'close'),
-      openingTransition.play(destination,'open'),
-      layout.play({
-        root:root,
-        anchorKey:targetKey,
-        excludeKeys:[previousKey,targetKey],
-        duration:MOTION_DURATION.open
-      })
-    ]);
-  }finally{
-    closingTransition.cancel();
-    openingTransition.cancel();
-    layout.cancel();
-    setModeTransitioning(false);
-  }
-
-  var closeButton=q('#expandedClose');
-  if(closeButton)closeButton.focus({preventScroll:true});
+  q('#expandedClose')?.focus({preventScroll:true});
   return true;
 }
 
@@ -327,51 +327,35 @@ async function expandModeSurface(targetId,source){
 
   if(expandedOpen){
     if(expandedModeId===targetId){
-      var current=q('.mode-expanded');
-      if(current)current.focus({preventScroll:true});
+      q('.mode-expanded')?.focus({preventScroll:true});
       return true;
     }
     return switchExpandedSurface(targetId,source);
   }
 
-  var mode=targetId===null?null:byId(targetId);
-  if(targetId!==null&&!mode)return false;
+  if(targetId!==null&&!byId(targetId))return false;
   if(!source)return false;
 
+  const targetKey=layoutKeyForMode(targetId);
   closePops();
-  setModeTransitioning(true);
 
-  var targetKey=layoutKeyForMode(targetId);
-  var root=q('#modeList');
-  var transition=modeSurfaceTransition.prepare(source);
-  var layout=modeLayoutTransition.prepare(root,{
-    anchorKey:targetKey,
-    scrollElement:q('.main')
+  await runMotionTransaction({
+    root:q('#modeList'),
+    surfaces:[{source,destination:()=>q('.mode-expanded'),direction:'open'}],
+    layout:{
+      anchorKey:targetKey,
+      scrollElement:q('.main'),
+      excludeKeys:[targetKey],
+      duration:MOTION_DURATION.open
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      setExpandedTarget(targetId);
+      renderWorkbench();
+    }
   });
 
-  try{
-    setExpandedTarget(targetId);
-    renderWorkbench();
-
-    var destination=q('.mode-expanded');
-
-    await Promise.all([
-      transition.play(destination,'open'),
-      layout.play({
-        root:root,
-        anchorKey:targetKey,
-        excludeKeys:[targetKey],
-        duration:MOTION_DURATION.open
-      })
-    ]);
-  }finally{
-    transition.cancel();
-    layout.cancel();
-    setModeTransitioning(false);
-  }
-
-  var closeButton=q('#expandedClose');
-  if(closeButton)closeButton.focus({preventScroll:true});
+  q('#expandedClose')?.focus({preventScroll:true});
   return true;
 }
 
@@ -390,40 +374,28 @@ async function collapseExpandedMode(restore,afterClose){
   if(!expandedOpen||modeTransitioning)return false;
 
   closePops();
+  const closingId=expandedModeId;
+  const closingKey=layoutKeyForMode(closingId);
 
-  var closingId=expandedModeId;
-  var closingKey=layoutKeyForMode(closingId);
-  var source=q('.mode-expanded');
-  var root=q('#modeList');
-
-  setModeTransitioning(true);
-
-  var transition=modeSurfaceTransition.prepare(source);
-  var layout=modeLayoutTransition.prepare(root,{
-    anchorKey:closingKey,
-    scrollElement:q('.main')
+  await runMotionTransaction({
+    root:q('#modeList'),
+    surfaces:[{
+      source:q('.mode-expanded'),
+      destination:()=>elementForMode(closingId),
+      direction:'close'
+    }],
+    layout:{
+      anchorKey:closingKey,
+      scrollElement:q('.main'),
+      excludeKeys:[closingKey],
+      duration:MOTION_DURATION.close
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      resetExpandedState();
+      renderWorkbench();
+    }
   });
-
-  try{
-    resetExpandedState();
-    renderWorkbench();
-
-    var destination=elementForMode(closingId);
-
-    await Promise.all([
-      transition.play(destination,'close'),
-      layout.play({
-        root:root,
-        anchorKey:closingKey,
-        excludeKeys:[closingKey],
-        duration:MOTION_DURATION.close
-      })
-    ]);
-  }finally{
-    transition.cancel();
-    layout.cancel();
-    setModeTransitioning(false);
-  }
 
   if(typeof afterClose==='function'){
     afterClose();
@@ -431,10 +403,10 @@ async function collapseExpandedMode(restore,afterClose){
   }
 
   if(restore){
-    var focusTarget=closingId===null
+    const focusTarget=closingId===null
       ?q('[data-expand-source="current"]')
       :q('[data-mode-row="'+closingId+'"] .open-mode');
-    if(focusTarget)focusTarget.focus({preventScroll:true});
+    focusTarget?.focus({preventScroll:true});
   }
   return true;
 }
@@ -494,8 +466,8 @@ function renderModeList(){
       '<div class="mode-list-group-head" data-layout-key="saved-head">'+
         '<div class="mode-list-label">Tus modos</div>'+
         '<div class="density-toggle" role="group" aria-label="Vista de modos">'+
-          '<button class="density-button" data-density="compact" aria-pressed="'+(cardDensity==='compact'?'true':'false')+'" title="Vista compacta" aria-label="Vista compacta">'+iconMarkup('grid')+'</button>'+
-          '<button class="density-button" data-density="detailed" aria-pressed="'+(cardDensity==='detailed'?'true':'false')+'" title="Vista detallada" aria-label="Vista detallada">'+iconMarkup('list')+'</button>'+
+          '<button class="density-button" data-density-option="compact" aria-pressed="'+(cardDensity==='compact'?'true':'false')+'" title="Vista compacta" aria-label="Vista compacta">'+iconMarkup('grid')+'</button>'+
+          '<button class="density-button" data-density-option="detailed" aria-pressed="'+(cardDensity==='detailed'?'true':'false')+'" title="Vista detallada" aria-label="Vista detallada">'+iconMarkup('list')+'</button>'+
         '</div>'+
       '</div>'+
       '<div class="mode-grid '+cardDensity+'">'+
@@ -551,9 +523,7 @@ function syncExpandedSavedMode(){
 
   mode.name=expandedConfig.name;
   mode.icon=expandedConfig.icon;
-  mode.preserve=expandedConfig.preserve;
-  mode.displayIds=expandedConfig.displayIds.slice();
-  mode.primaryDisplayId=expandedConfig.primaryDisplayId;
+  applyDisplayConfig(mode,expandedConfig);
   mode.app=expandedConfig.app;
   mode.shortcut=expandedConfig.shortcut;
   commitSets();
@@ -628,30 +598,17 @@ function toggleExpandedDisplay(id){
   if(!expandedConfig)return;
 
   expandedConfig.preserve=false;
-  var index=expandedConfig.displayIds.indexOf(id);
-
-  if(index>=0){
-    if(expandedConfig.displayIds.length===1){
-      toast('Pantallas','Debe quedar al menos una activa');
-      return;
-    }
-    expandedConfig.displayIds.splice(index,1);
-    if(expandedConfig.primaryDisplayId===id){
-      expandedConfig.primaryDisplayId=expandedConfig.displayIds[0]||null;
-    }
-  }else{
-    expandedConfig.displayIds.push(id);
-    if(!expandedConfig.primaryDisplayId)expandedConfig.primaryDisplayId=id;
+  if(!toggleSelectedDisplay(expandedConfig,id)){
+    toast('Pantallas','Debe quedar al menos una activa');
+    return;
   }
-
   refreshExpandedConfig();
 }
 
 function makeExpandedPrimary(id){
   if(!expandedConfig)return;
   expandedConfig.preserve=false;
-  if(expandedConfig.displayIds.indexOf(id)<0)expandedConfig.displayIds.push(id);
-  expandedConfig.primaryDisplayId=id;
+  selectPrimaryDisplay(expandedConfig,id);
   refreshExpandedConfig();
 }
 
@@ -662,6 +619,7 @@ function removeSet(id){
   if(activatingId===id){
     clearTimeout(activationTimer);
     activationTimer=null;
+    motionScheduler.cancel('activation');
     activatingId=null;
   }
 
@@ -686,31 +644,35 @@ function removeSet(id){
   toast('Modo eliminado',removed.name);
 }
 
-function activate(id,force){
-  var target=byId(id);
-  if(!target||(!force&&target.active)||activatingId!==null)return;
+function completeActivation(id){
+  if(activatingId!==id)return;
+  const current=byId(id);
+  if(!current){
+    activatingId=null;
+    renderWorkbench();
+    return;
+  }
 
+  sets.forEach(function(s){s.active=s.id===id});
+  appliedSession=sessionFromMode(current);
+  commitSets();
+  activatingId=null;
+  render();
+  celebrateSurface(q('[data-mode-row="'+id+'"]'));
+  toast(current.name,'Activo');
+}
+
+function activate(id,force){
+  const target=byId(id);
+  if(!target||(!force&&target.active)||activatingId!==null||modeTransitioning)return;
   activatingId=id;
+  motionScheduler.cancel('activation');
   clearTimeout(activationTimer);
   renderWorkbench();
 
   activationTimer=setTimeout(function(){
-    var current=byId(id);
-    if(!current){
-      activatingId=null;
-      activationTimer=null;
-      renderWorkbench();
-      return;
-    }
-
-    sets.forEach(function(s){s.active=s.id===id});
-    appliedSession=sessionFromMode(current);
-    commitSets();
-
-    activatingId=null;
     activationTimer=null;
-    render();
-    toast(current.name,'Activo');
+    motionScheduler.whenIdle('activation',()=>completeActivation(id));
   },ACTIVATION_DELAY_MS);
 }
 
@@ -884,27 +846,16 @@ function bindDisplayEditorEvents(){
 
 function toggleDisplay(id){
   if(displayDraft.preserve)return;
-  var index=displayDraft.displayIds.indexOf(id);
-  if(index>=0){
-    if(displayDraft.displayIds.length===1){
-      toast('Pantallas','Debe quedar al menos una activa');
-      return;
-    }
-    displayDraft.displayIds.splice(index,1);
-    if(displayDraft.primaryDisplayId===id){
-      displayDraft.primaryDisplayId=displayDraft.displayIds[0]||null;
-    }
-  }else{
-    displayDraft.displayIds.push(id);
-    if(!displayDraft.primaryDisplayId)displayDraft.primaryDisplayId=id;
+  if(!toggleSelectedDisplay(displayDraft,id)){
+    toast('Pantallas','Debe quedar al menos una activa');
+    return;
   }
   renderDisplayEditor();
 }
 
 function makePrimary(id){
   if(displayDraft.preserve)return;
-  if(displayDraft.displayIds.indexOf(id)<0)displayDraft.displayIds.push(id);
-  displayDraft.primaryDisplayId=id;
+  selectPrimaryDisplay(displayDraft,id);
   renderDisplayEditor();
 }
 
@@ -939,19 +890,13 @@ function isValidDisplayDraft(){
   return true;
 }
 
-function copyDisplayDraft(target){
-  target.preserve=displayDraft.preserve;
-  target.displayIds=displayDraft.displayIds.slice();
-  target.primaryDisplayId=displayDraft.primaryDisplayId;
-}
-
 q('#closeDisplays').onclick=closePops;
 
 q('#saveDisplays').onclick=function(){
   if(!isValidDisplayDraft())return;
   var s=byId(displayEditModeId);
   if(!s)return;
-  copyDisplayDraft(s);
+  applyDisplayConfig(s,displayDraft);
   commitSets();
   closePops();
   render();
@@ -1033,35 +978,39 @@ function beginExpandedRename(){
 }
 
 async function createModeFromExpanded(){
-  if(!expandedConfig||expandedModeId!==null)return;
+  if(!expandedConfig||expandedModeId!==null||modeTransitioning)return;
 
-  var source=q('.mode-expanded');
-  var transition=modeSurfaceTransition.prepare(source);
-  setModeTransitioning(true);
-
-  var created=cloneModeConfig(expandedConfig);
+  const created=cloneModeConfig(expandedConfig);
   created.id=Date.now();
   created.active=false;
 
-  try{
-    sets.push(created);
-    commitSets();
+  await runMotionTransaction({
+    root:q('#modeList'),
+    surfaces:[{
+      source:q('.mode-expanded'),
+      destination:()=>q('[data-mode-row="'+created.id+'"]'),
+      direction:'close'
+    }],
+    layout:{
+      anchorKey:layoutKeyForMode(null),
+      scrollElement:q('.main'),
+      excludeKeys:[layoutKeyForMode(null),layoutKeyForMode(created.id)],
+      duration:MOTION_DURATION.close
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      sets.push(created);
+      commitSets();
+      resetExpandedState();
+      render();
+    }
+  });
 
-    resetExpandedState();
-
-    render();
-
-    var destination=q('[data-mode-row="'+created.id+'"]');
-    await transition.play(destination,'close');
-  }finally{
-    transition.cancel();
-    setModeTransitioning(false);
-  }
-
+  const card=q('[data-mode-row="'+created.id+'"]');
+  celebrateSurface(card);
   toast(created.name,'Modo creado');
   requestAnimationFrame(function(){
-    var card=q('[data-mode-row="'+created.id+'"]');
-    if(card)card.scrollIntoView({
+    card?.scrollIntoView({
       behavior:prefersReducedMotion()?'auto':'smooth',
       block:'nearest'
     });
@@ -1113,116 +1062,119 @@ function bindExpandedRename(){
 }
 
 function handleModeListClick(event){
-  var target=event.target;
+  const target=event.target;
   if(!(target instanceof Element))return;
+  // Use a scoped resolver: data attributes on #modeList describe state,
+  // never user actions, and must not capture descendant clicks.
+  const find=selector=>closestWithin(target,selector,event.currentTarget);
 
-  var expandedDisplay=target.closest('[data-expanded-display]');
+  var expandedDisplay=find('[data-expanded-display]');
   if(expandedDisplay){
     toggleExpandedDisplay(expandedDisplay.dataset.expandedDisplay);
     return;
   }
 
-  var expandedPrimary=target.closest('[data-expanded-primary]');
+  var expandedPrimary=find('[data-expanded-primary]');
   if(expandedPrimary){
     makeExpandedPrimary(expandedPrimary.dataset.expandedPrimary);
     return;
   }
 
-  var density=target.closest('[data-density]');
+  var density=find('button[data-density-option]');
   if(density){
-    setCardDensity(density.dataset.density);
+    setCardDensity(density.dataset.densityOption);
     return;
   }
 
-  var current=target.closest('[data-expand-source]');
+  var current=find('[data-expand-source]');
   if(current){
     expandCurrentDesktop(current.dataset.expandSource);
     return;
   }
 
-  var activateButton=target.closest('.activate');
+  var activateButton=find('.activate');
   if(activateButton){
     activate(Number(activateButton.dataset.id));
     return;
   }
 
-  var openButton=target.closest('.open-mode');
+  var openButton=find('.open-mode');
   if(openButton){
     focusOrExpandMode(openButton.closest('[data-mode-row]'));
     return;
   }
 
-  var trashButton=target.closest('.trash-mode');
+  var trashButton=find('.trash-mode');
   if(trashButton){
     openDeletePop(trashButton,trashButton.dataset.id);
     return;
   }
 
-  var displayButton=target.closest('.quick-display');
+  var displayButton=find('.quick-display');
   if(displayButton){
     openDisplayPop(displayButton,displayButton.dataset.id);
     return;
   }
 
-  var appButton=target.closest('.quick-app');
+  var appButton=find('.quick-app');
   if(appButton){
     openAppPop(appButton,appButton.dataset.id);
     return;
   }
 
-  var shortcutButton=target.closest('.quick-shortcut');
+  var shortcutButton=find('.quick-shortcut');
   if(shortcutButton){
     openShortcut(shortcutButton.dataset.id);
     return;
   }
 
-  if(target.closest('#expandedClose')){
+  if(find('#expandedClose')){
     collapseExpandedMode(true);
     return;
   }
 
-  var expandedApp=target.closest('#expandedApp');
+  var expandedApp=find('#expandedApp');
   if(expandedApp){
     openExpandedAppPicker(expandedApp);
     return;
   }
 
-  if(target.closest('#expandedShortcut')){
+  if(find('#expandedShortcut')){
     openShortcut('expanded');
     return;
   }
 
-  if(target.closest('#expandedReset')){
+  if(find('#expandedReset')){
     expandedConfig=cloneModeConfig(newModeBase);
     refreshExpandedConfig();
     return;
   }
 
-  if(target.closest('#expandedSave')){
+  if(find('#expandedSave')){
     createModeFromExpanded();
     return;
   }
 
-  if(target.closest('#expandedActivate')){
+  if(find('#expandedActivate')){
     if(expandedModeId!==null)activate(expandedModeId,true);
     return;
   }
 
-  if(target.closest('#expandedTest')){
+  if(find('#expandedTest')){
     testExpandedMode();
     return;
   }
 
-  var toggleSurface=target.closest('[data-expanded-toggle]');
+  var toggleSurface=find('[data-expanded-toggle]');
   if(toggleSurface){
-    if(target.closest(EXPANDED_TOGGLE_EXCLUDE_SELECTOR)||hasTextSelection())return;
+    if(find(EXPANDED_TOGGLE_EXCLUDE_SELECTOR)||hasTextSelection())return;
     collapseExpandedMode(true);
     return;
   }
 
-  var card=target.closest('.saved-mode-card:not(.mode-expanded)');
+  var card=find('.saved-mode-card:not(.mode-expanded)');
   if(!card)return;
-  if(target.closest(INTERACTIVE_SELECTOR)||hasTextSelection())return;
+  if(find(INTERACTIVE_SELECTOR)||hasTextSelection())return;
 
   focusOrExpandMode(card);
 }
@@ -1351,7 +1303,8 @@ function setTestProgress(percent){
 function startTest(ctx){
   closePops();
   closeShortcutOverlay();
-  testContext=ctx;clearInterval(progressTimer);clearInterval(countdownTimer);
+  clearTestTimers();
+  testContext=ctx;
   q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx)+'</div>';
   q('#testApp').textContent=logo(ctx.app);
   q('#testText').textContent='Probando '+ctx.name+'…';
@@ -1362,16 +1315,18 @@ function startTest(ctx){
   progressTimer=setInterval(function(){
     pct+=25;setTestProgress(pct);
     if(pct>=100){
-      clearInterval(progressTimer);q('#testText').textContent='Listo';q('#confirm').classList.add('show');
+      clearInterval(progressTimer);progressTimer=null;
+      q('#testText').textContent='Listo';q('#confirm').classList.add('show');
       var left=15;q('#count').textContent=left;
       countdownTimer=setInterval(function(){
         left--;q('#count').textContent=left;
         if(left<=0){
           clearInterval(countdownTimer);
+          countdownTimer=null;
           q('#confirm').classList.remove('show');
           q('#testText').textContent='Restaurando…';
           setTestProgress(100);
-          setTimeout(finishRestore,TEST_TIMEOUT_RESTORE_MS);
+          scheduleTestRestore(finishRestore,TEST_TIMEOUT_RESTORE_MS);
         }
       },TEST_COUNTDOWN_INTERVAL_MS);
     }
@@ -1379,20 +1334,19 @@ function startTest(ctx){
 }
 
 q('#keep').onclick=function(){
-  clearInterval(countdownTimer);
+  clearTestTimers();
   var kind=testContext&&testContext.kind;
 
   if(kind==='display'){
     var s=byId(testContext.id);
     if(s){
-      s.preserve=testContext.preserve;
-      s.displayIds=testContext.displayIds.slice();
-      s.primaryDisplayId=testContext.primaryDisplayId;
+      applyDisplayConfig(s,testContext);
       if(s.active)appliedSession=sessionFromMode(s);
     }
     q('#testOverlay').classList.remove('open');
     commitSets();
     render();
+    celebrateSurface(q('[data-mode-row="'+testContext.id+'"]'));
     toast(testContext.name,'Pantallas guardadas');
     testContext=null;
     return;
@@ -1412,6 +1366,7 @@ q('#keep').onclick=function(){
     q('#testOverlay').classList.remove('open');
     commitSets();
     render();
+    celebrateSurface(q('[data-mode-row="'+created.id+'"]'));
     toast(created.name,'Guardado y activo');
     testContext=null;
     return;
@@ -1423,9 +1378,7 @@ q('#keep').onclick=function(){
     if(edited){
       edited.name=testContext.name;
       edited.icon=testContext.icon;
-      edited.preserve=testContext.preserve;
-      edited.displayIds=testContext.displayIds.slice();
-      edited.primaryDisplayId=testContext.primaryDisplayId;
+      applyDisplayConfig(edited,testContext);
       edited.app=testContext.app;
       edited.shortcut=testContext.shortcut||'Manual';
       sets.forEach(function(s){s.active=s.id===edited.id});
@@ -1438,6 +1391,7 @@ q('#keep').onclick=function(){
     q('#testOverlay').classList.remove('open');
     commitSets();
     render();
+    if(edited)celebrateSurface(q('[data-mode-row="'+edited.id+'"]'));
     toast(editedName,'Activo');
     testContext=null;
     return;
@@ -1447,6 +1401,7 @@ q('#keep').onclick=function(){
 };
 
 function finishRestore(){
+  clearTestTimers();
   q('#testOverlay').classList.remove('open');
   testContext=null;
   renderWorkbench();
@@ -1454,13 +1409,13 @@ function finishRestore(){
 }
 
 q('#revert').onclick=function(){
-  clearInterval(countdownTimer);
+  clearTestTimers();
   q('#confirm').classList.remove('show');
   q('#testText').textContent='Restaurando…';
   setTestProgress(35);
-  setTimeout(function(){
+  scheduleTestRestore(function(){
     setTestProgress(100);
-    setTimeout(finishRestore,MANUAL_RESTORE_FINISH_MS);
+    scheduleTestRestore(finishRestore,MANUAL_RESTORE_FINISH_MS);
   },MANUAL_RESTORE_STEP_MS);
 };
 
@@ -1529,6 +1484,8 @@ q('#advancedDisplays').onclick=function(){toast('Pantallas','Configuración avan
 q('#restoreDisplays').onclick=function(){toast('Pantallas','Recuperación simulada')};
 q('#advancedSettings').onclick=function(){toast('Avanzado','Diagnóstico y recuperación · prototipo')};
 
+installMotionTokens();
+bindPressFeedback();
 bindModeListEvents();
 bindDisplayEditorEvents();
 openShellView('modes');
