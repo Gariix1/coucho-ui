@@ -60,12 +60,15 @@ function prepare(root,{
   let disposed=false;
 
   const onResize=()=>cancel();
+  const onVisibilityChange=()=>{if(document.hidden)cancel()};
   window.addEventListener('resize',onResize,{passive:true});
+  document.addEventListener('visibilitychange',onVisibilityChange);
 
   function cancel(){
     if(disposed)return;
     disposed=true;
     window.removeEventListener('resize',onResize);
+    document.removeEventListener('visibilitychange',onVisibilityChange);
     animations.forEach(cancelAnimation);
     animations=[];
     if(scroller)scroller.classList.remove('layout-motion-active');
