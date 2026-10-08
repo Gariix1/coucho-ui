@@ -104,6 +104,32 @@ try{
     await page.waitForFunction(()=>!document.querySelector('#expandedMode'));
   });
 
+  await check('quick display editor opens and closes',async()=>{
+    await page.locator('[data-mode-row="1"] .quick-display').click();
+    await page.waitForSelector('#displayPop.open',{timeout:3000});
+    await page.locator('#closeDisplays').click();
+  });
+  assert.equal(await page.locator('#displayPop.open').count(),0);
+
+  await check('quick app editor opens and closes',async()=>{
+    await page.locator('[data-mode-row="1"] .quick-app').click();
+    await page.waitForSelector('#appPop.open',{timeout:3000});
+    await page.locator('#appPop [data-app="Steam"]').click();
+  });
+
+  await check('quick shortcut editor cancels correctly',async()=>{
+    await page.locator('[data-mode-row="1"] .quick-shortcut').click();
+    await page.waitForSelector('#shortcutOverlay.open',{timeout:3000});
+    await page.locator('#capCancel').click();
+  });
+
+  await check('delete confirmation cancels without deleting',async()=>{
+    await page.locator('[data-mode-row="3"] .trash-mode').click();
+    await page.waitForSelector('#deletePop.open',{timeout:3000});
+    await page.locator('#deleteCancel').click();
+  });
+  assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),3);
+
   await check('change to compact density',async()=>{
     await page.locator('.density-button[data-density-option="compact"]').click();
     await page.waitForFunction(()=>document.querySelector('#modeList')?.dataset.density==='compact');
@@ -126,6 +152,20 @@ try{
       document.querySelectorAll('.saved-mode-card:not(.mode-expanded)').length===4
     );
   });
+
+  await check('delayed activation cannot destroy an in-flight Morph',async()=>{
+    await page.locator('[data-mode-row="2"] .activate').click();
+    // Activation completes after 850 ms. Opening at 650 ms makes the
+    // timer expire during the connected transition.
+    await page.waitForTimeout(650);
+    await page.locator('[data-mode-row="1"] .open-mode').click();
+    await page.waitForSelector('#expandedMode',{timeout:5000});
+    await page.waitForTimeout(200);
+  });
+  assert.equal(await page.locator('#expandedMode').isVisible(),true);
+  assert.equal(await page.locator('[data-mode-row="2"] .mode-list-badge').count(),1);
+  await page.locator('#expandedClose').click();
+  await stable();
 
   await check('resize during active Morph cleans snapshots and lock',async()=>{
     await page.locator('[data-mode-row="1"] .open-mode').click();
