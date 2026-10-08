@@ -31,7 +31,8 @@ import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
 import {expandedModeMarkup,modeCardMarkup} from './ui/mode-markup.js';
-import {initTheme,toggleTheme} from './features/theme.js';
+import {initTheme} from './features/theme.js';
+import {initSettings} from './features/settings.js';
 import {
   layoutKeyForMode,
   modesForRender
@@ -947,8 +948,7 @@ qa('#appPop .app-option').forEach(function(b){
   };
 });
 
-// Settings and prototype test-mode controls.
-q('#settingsTheme').onclick=toggleTheme;
+// Settings controls are owned by the dedicated settings component.
 
 let testMode=localStorage.getItem(TEST_MODE_KEY)==='1';
 function syncTestMode(){
@@ -1481,7 +1481,6 @@ q('.nav-rail').addEventListener('click',function(event){
 q('#identifyDisplays').onclick=function(){toast('Pantallas','Identificación simulada')};
 q('#advancedDisplays').onclick=function(){toast('Pantallas','Configuración avanzada · prototipo')};
 q('#restoreDisplays').onclick=function(){toast('Pantallas','Recuperación simulada')};
-q('#advancedSettings').onclick=function(){toast('Avanzado','Diagnóstico y recuperación · prototipo')};
 
 installMotionTokens();
 bindPressFeedback();
@@ -1489,6 +1488,7 @@ bindModeListEvents();
 bindDisplayEditorEvents();
 openShellView('modes');
 initTheme();
+initSettings();
 syncTestMode();
 commitSets();
 render();
