@@ -43,7 +43,7 @@ function sanitizeClone(root){
   return root;
 }
 
-function createSnapshot(element,kind,host){
+function createSnapshot(element,kind,host,layer){
   const rect=localRect(element,host);
   if(!usableRect(rect))return null;
 
@@ -51,6 +51,7 @@ function createSnapshot(element,kind,host){
   snapshot.className='mode-transition-snapshot mode-transition-'+kind;
   snapshot.setAttribute('aria-hidden','true');
   snapshot.setAttribute('inert','');
+  snapshot.style.zIndex=String((kind==='destination'?121:120)+layer*4);
   setCssVars(snapshot,{
     '--motion-left':rect.left+'px','--motion-top':rect.top+'px',
     '--motion-width':rect.width+'px','--motion-height':rect.height+'px'
@@ -76,13 +77,13 @@ function transformsBetween(from,to){
   };
 }
 
-function prepare(source){
+function prepare(source,{layer=0}={}){
   if(!source||prefersReducedMotion()||!supportsWebAnimations()){
     return {play:async()=>{},cancel:()=>{}};
   }
 
   const host=scrollHostFor(source);
-  const flight=createSnapshot(source,'flight',host);
+  const flight=createSnapshot(source,'flight',host,layer);
   if(!flight)return {play:async()=>{},cancel:()=>{}};
 
   let disposed=false;
@@ -90,12 +91,15 @@ function prepare(source){
   let destinationElement=null;
   const animations=[];
   const onResize=()=>dispose();
+  const onVisibilityChange=()=>{if(document.hidden)dispose()};
   window.addEventListener('resize',onResize,{passive:true});
+  document.addEventListener('visibilitychange',onVisibilityChange);
 
   function dispose(){
     if(disposed)return;
     disposed=true;
     window.removeEventListener('resize',onResize);
+    document.removeEventListener('visibilitychange',onVisibilityChange);
     animations.forEach(cancelAnimation);
     // Reveal the actual destination in the same frame as snapshot removal.
     destinationElement?.classList.remove('mode-transition-live-hidden');
@@ -110,7 +114,7 @@ function prepare(source){
       return;
     }
 
-    destinationSnapshot=createSnapshot(destination,'destination',host);
+    destinationSnapshot=createSnapshot(destination,'destination',host,layer);
     if(!destinationSnapshot){
       dispose();
       return;
