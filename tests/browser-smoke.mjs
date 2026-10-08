@@ -218,6 +218,53 @@ try{
     await page.locator('#expandedClose').click();
   });
 
+  await check('settings have clear category navigation and real theme feedback',async()=>{
+    await page.locator('#settingsBtn').click();
+    await page.waitForSelector('#settingsPanelGeneral:visible');
+    assert.equal(await page.locator('[data-settings-panel]:visible').count(),1);
+    await page.locator('#settingsLanguage').selectOption('es-419');
+    await page.locator('#settingsStartupSurface').selectOption('control');
+    await page.locator('#settingsTabAppearance').click();
+    await page.locator('#settingsThemeSelect').selectOption('light');
+    assert.equal(await page.locator('html').getAttribute('data-theme'),'light');
+    await page.locator('#settingsControlOpacity').fill('65');
+    assert.equal(await page.locator('#settingsControlOpacityValue').innerText(),'65%');
+    assert.equal(await page.locator('#settingsControlPreview').evaluate(el=>el.style.getPropertyValue('--preview-opacity')),'65%');
+  });
+
+  await check('settings persist after reload and Hop avoids inaccessible background state',async()=>{
+    await page.reload({waitUntil:'networkidle'});
+    await page.locator('#settingsBtn').click();
+    assert.equal(await page.locator('#settingsLanguage').inputValue(),'es-419');
+    assert.equal(await page.locator('#settingsStartupSurface').inputValue(),'control');
+    await page.locator('#settingsTabAppearance').click();
+    assert.equal(await page.locator('#settingsThemeSelect').inputValue(),'light');
+    assert.equal(await page.locator('#settingsControlOpacity').inputValue(),'65');
+    await page.locator('#settingsTabHop').click();
+    await page.locator('#settingsHopExit').selectOption('background');
+    await page.locator('#settingsTrayIcon').uncheck();
+    assert.equal(await page.locator('#settingsHopExit').inputValue(),'control');
+    assert.equal(await page.locator('#settingsHopExit option[value="background"]').isDisabled(),true);
+  });
+
+  await check('reset confirms its scope and preserves existing Couchsets',async()=>{
+    const cardCount=await page.locator('.saved-mode-card:not(.mode-expanded)').count();
+    await page.locator('#settingsTabAdvanced').click();
+    await page.locator('#settingsReset').click();
+    assert.equal(await page.locator('#settingsResetConfirm').isVisible(),true);
+    await page.locator('#settingsResetCancel').click();
+    assert.equal(await page.locator('#settingsResetConfirm').isVisible(),false);
+    await page.locator('#settingsReset').click();
+    await page.locator('#settingsResetAccept').click();
+    await page.locator('#settingsTabGeneral').click();
+    assert.equal(await page.locator('#settingsLanguage').inputValue(),'system');
+    await page.locator('#settingsTabAppearance').click();
+    assert.equal(await page.locator('#settingsThemeSelect').inputValue(),'dark');
+    assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
+    await page.locator('[data-nav-view="modes"]').click();
+    assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),cardCount);
+  });
+
   assert.equal(await page.locator('.mode-transition-portal').count(),0);
   assert.equal(await page.locator('.main.layout-motion-active').count(),0);
   assert.equal(await page.locator('.mode-workbench[inert]').count(),0);
