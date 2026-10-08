@@ -93,9 +93,9 @@ export function celebrateSurface(element){
   if(!element?.isConnected||prefersReducedMotion()||!supportsWebAnimations())return;
   // A restrained completion response: no permanent shadow or altered layout.
   element.animate([
-    {boxShadow:'0 0 0 0 rgba(125,211,252,0)',offset:0},
-    {boxShadow:'0 0 0 5px rgba(125,211,252,.28)',offset:.38},
-    {boxShadow:'0 0 0 0 rgba(125,211,252,0)',offset:1}
+    {boxShadow:'0 0 0 0 var(--motion-confirm-ring,var(--selected-border))',offset:0},
+    {boxShadow:'0 0 0 5px var(--motion-confirm-ring,var(--selected-border))',offset:.38},
+    {boxShadow:'0 0 0 0 var(--motion-confirm-ring,var(--selected-border))',offset:1}
   ],{
     duration:MOTION_DURATION.success,
     easing:MOTION_EASING.settle
