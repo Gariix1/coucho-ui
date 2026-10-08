@@ -22,6 +22,7 @@ import {
 } from './model.js';
 
 import {runMotionTransaction} from './motion-transaction.js';
+import {createMotionScheduler} from './motion-scheduler.js';
 import {installMotionTokens,MOTION_DURATION,prefersReducedMotion} from './motion-settings.js';
 import {bindPressFeedback,celebrateSurface} from './ui/interaction-motion.js';
 import {toast} from './ui/feedback.js';
@@ -59,6 +60,7 @@ let expandedConfig=null;
 let newModeBase=null;
 let createAutoNamed=true;
 let modeTransitioning=false;
+const motionScheduler=createMotionScheduler();
 
 function resetExpandedState(){
   expandedOpen=false;
@@ -219,15 +221,18 @@ function guardExpandedSwitch(nextId){
 
 function setModeTransitioning(value){
   modeTransitioning=!!value;
-  var workbench=q('.mode-workbench');
-  if(!workbench)return;
-  if(modeTransitioning){
-    workbench.setAttribute('inert','');
-    workbench.setAttribute('aria-busy','true');
-  }else{
-    workbench.removeAttribute('inert');
-    workbench.removeAttribute('aria-busy');
+  const workbench=q('.mode-workbench');
+  if(workbench){
+    if(modeTransitioning){
+      workbench.setAttribute('inert','');
+      workbench.setAttribute('aria-busy','true');
+    }else{
+      workbench.removeAttribute('inert');
+      workbench.removeAttribute('aria-busy');
+    }
   }
+  // Flush delayed state updates only after the motion-owned DOM is released.
+  motionScheduler.setBusy(modeTransitioning);
 }
 
 function elementForMode(id){
@@ -612,6 +617,7 @@ function removeSet(id){
   if(activatingId===id){
     clearTimeout(activationTimer);
     activationTimer=null;
+    motionScheduler.cancel('activation');
     activatingId=null;
   }
 
@@ -636,32 +642,35 @@ function removeSet(id){
   toast('Modo eliminado',removed.name);
 }
 
-function activate(id,force){
-  var target=byId(id);
-  if(!target||(!force&&target.active)||activatingId!==null)return;
+function completeActivation(id){
+  if(activatingId!==id)return;
+  const current=byId(id);
+  if(!current){
+    activatingId=null;
+    renderWorkbench();
+    return;
+  }
 
+  sets.forEach(function(s){s.active=s.id===id});
+  appliedSession=sessionFromMode(current);
+  commitSets();
+  activatingId=null;
+  render();
+  celebrateSurface(q('[data-mode-row="'+id+'"]'));
+  toast(current.name,'Activo');
+}
+
+function activate(id,force){
+  const target=byId(id);
+  if(!target||(!force&&target.active)||activatingId!==null||modeTransitioning)return;
   activatingId=id;
+  motionScheduler.cancel('activation');
   clearTimeout(activationTimer);
   renderWorkbench();
 
   activationTimer=setTimeout(function(){
-    var current=byId(id);
-    if(!current){
-      activatingId=null;
-      activationTimer=null;
-      renderWorkbench();
-      return;
-    }
-
-    sets.forEach(function(s){s.active=s.id===id});
-    appliedSession=sessionFromMode(current);
-    commitSets();
-
-    activatingId=null;
     activationTimer=null;
-    render();
-    celebrateSurface(q('[data-mode-row="'+id+'"]'));
-    toast(current.name,'Activo');
+    motionScheduler.whenIdle('activation',()=>completeActivation(id));
   },ACTIVATION_DELAY_MS);
 }
 
