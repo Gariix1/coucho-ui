@@ -30,6 +30,7 @@ async function check(label,action){
   }catch(error){
     console.error('FAIL '+label+': '+error.message);
     console.error('Browser errors:',JSON.stringify(errors));
+    console.error('Event trace:',JSON.stringify(await page.evaluate(()=>window.__motionTrace)));
     console.error('DOM state:',JSON.stringify(await page.evaluate(()=>({
       expanded:!!document.querySelector('#expandedMode'),
       expandedVisible:!!document.querySelector('#expandedMode')?.checkVisibility(),
@@ -62,6 +63,29 @@ try{
   await stable();
   assert.equal(await page.locator('#expandedMode').count(),0);
   console.log('PASS stable current-card geometry on pointerdown');
+
+  await page.evaluate(()=>{
+    window.__motionTrace=[];
+    const list=document.querySelector('#modeList');
+    list.addEventListener('click',event=>{
+      window.__motionTrace.push({
+        type:'capture',tag:event.target.tagName,
+        classes:event.target.getAttribute('class'),
+        open:!!event.target.closest('.open-mode'),
+        modeRow:event.target.closest('[data-mode-row]')?.dataset.modeRow
+      });
+    },true);
+    list.addEventListener('click',event=>{
+      window.__motionTrace.push({type:'bubble',open:!!event.target.closest('.open-mode')});
+    });
+    new MutationObserver(()=>{
+      window.__motionTrace.push({
+        type:'mutation',
+        expanded:!!document.querySelector('#expandedMode'),
+        busy:document.querySelector('.mode-workbench')?.getAttribute('aria-busy')
+      });
+    }).observe(list,{childList:true,subtree:true});
+  });
 
   await check('open saved Couchset',async()=>{
     await page.locator('[data-mode-row="1"] .open-mode').click();
