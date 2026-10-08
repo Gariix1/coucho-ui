@@ -41,7 +41,7 @@ export function bindPressFeedback(root=document){
     release();
     if(!element||element.disabled||prefersReducedMotion()||!supportsWebAnimations())return;
     active=element;
-    animation=element.animate([
+    animation=startAnimation(element,[
       {filter:'none'},
       {filter:'brightness(.94)'}
     ],{
@@ -95,7 +95,7 @@ export function bindPressFeedback(root=document){
 export function celebrateSurface(element){
   if(!element?.isConnected||prefersReducedMotion()||!supportsWebAnimations())return;
   // A restrained completion response: no permanent shadow or altered layout.
-  element.animate([
+  startAnimation(element,[
     {boxShadow:'0 0 0 0 var(--motion-confirm-ring,var(--selected-border))',offset:0},
     {boxShadow:'0 0 0 5px var(--motion-confirm-ring,var(--selected-border))',offset:.38},
     {boxShadow:'0 0 0 0 var(--motion-confirm-ring,var(--selected-border))',offset:1}
@@ -108,7 +108,7 @@ export function celebrateSurface(element){
 export function animateNotice(element){
   if(!element?.isConnected||prefersReducedMotion()||!supportsWebAnimations())return;
   element.getAnimations().forEach(cancelAnimation);
-  element.animate([
+  startAnimation(element,[
     {opacity:0,transform:'translate3d(0,8px,0) scale(.98)'},
     {opacity:1,transform:'translate3d(0,0,0) scale(1)'}
   ],{
