@@ -10,6 +10,9 @@ import {
 } from './data/catalog.js';
 import {
   cloneModeConfig,
+  applyDisplayConfig,
+  toggleSelectedDisplay,
+  selectPrimaryDisplay,
   displayConfig,
   displaySummary,
   logo,
@@ -551,9 +554,7 @@ function syncExpandedSavedMode(){
 
   mode.name=expandedConfig.name;
   mode.icon=expandedConfig.icon;
-  mode.preserve=expandedConfig.preserve;
-  mode.displayIds=expandedConfig.displayIds.slice();
-  mode.primaryDisplayId=expandedConfig.primaryDisplayId;
+  applyDisplayConfig(mode,expandedConfig);
   mode.app=expandedConfig.app;
   mode.shortcut=expandedConfig.shortcut;
   commitSets();
@@ -628,30 +629,17 @@ function toggleExpandedDisplay(id){
   if(!expandedConfig)return;
 
   expandedConfig.preserve=false;
-  var index=expandedConfig.displayIds.indexOf(id);
-
-  if(index>=0){
-    if(expandedConfig.displayIds.length===1){
-      toast('Pantallas','Debe quedar al menos una activa');
-      return;
-    }
-    expandedConfig.displayIds.splice(index,1);
-    if(expandedConfig.primaryDisplayId===id){
-      expandedConfig.primaryDisplayId=expandedConfig.displayIds[0]||null;
-    }
-  }else{
-    expandedConfig.displayIds.push(id);
-    if(!expandedConfig.primaryDisplayId)expandedConfig.primaryDisplayId=id;
+  if(!toggleSelectedDisplay(expandedConfig,id)){
+    toast('Pantallas','Debe quedar al menos una activa');
+    return;
   }
-
   refreshExpandedConfig();
 }
 
 function makeExpandedPrimary(id){
   if(!expandedConfig)return;
   expandedConfig.preserve=false;
-  if(expandedConfig.displayIds.indexOf(id)<0)expandedConfig.displayIds.push(id);
-  expandedConfig.primaryDisplayId=id;
+  selectPrimaryDisplay(expandedConfig,id);
   refreshExpandedConfig();
 }
 
@@ -884,27 +872,16 @@ function bindDisplayEditorEvents(){
 
 function toggleDisplay(id){
   if(displayDraft.preserve)return;
-  var index=displayDraft.displayIds.indexOf(id);
-  if(index>=0){
-    if(displayDraft.displayIds.length===1){
-      toast('Pantallas','Debe quedar al menos una activa');
-      return;
-    }
-    displayDraft.displayIds.splice(index,1);
-    if(displayDraft.primaryDisplayId===id){
-      displayDraft.primaryDisplayId=displayDraft.displayIds[0]||null;
-    }
-  }else{
-    displayDraft.displayIds.push(id);
-    if(!displayDraft.primaryDisplayId)displayDraft.primaryDisplayId=id;
+  if(!toggleSelectedDisplay(displayDraft,id)){
+    toast('Pantallas','Debe quedar al menos una activa');
+    return;
   }
   renderDisplayEditor();
 }
 
 function makePrimary(id){
   if(displayDraft.preserve)return;
-  if(displayDraft.displayIds.indexOf(id)<0)displayDraft.displayIds.push(id);
-  displayDraft.primaryDisplayId=id;
+  selectPrimaryDisplay(displayDraft,id);
   renderDisplayEditor();
 }
 
@@ -939,19 +916,13 @@ function isValidDisplayDraft(){
   return true;
 }
 
-function copyDisplayDraft(target){
-  target.preserve=displayDraft.preserve;
-  target.displayIds=displayDraft.displayIds.slice();
-  target.primaryDisplayId=displayDraft.primaryDisplayId;
-}
-
 q('#closeDisplays').onclick=closePops;
 
 q('#saveDisplays').onclick=function(){
   if(!isValidDisplayDraft())return;
   var s=byId(displayEditModeId);
   if(!s)return;
-  copyDisplayDraft(s);
+  applyDisplayConfig(s,displayDraft);
   commitSets();
   closePops();
   render();
@@ -1385,9 +1356,7 @@ q('#keep').onclick=function(){
   if(kind==='display'){
     var s=byId(testContext.id);
     if(s){
-      s.preserve=testContext.preserve;
-      s.displayIds=testContext.displayIds.slice();
-      s.primaryDisplayId=testContext.primaryDisplayId;
+      applyDisplayConfig(s,testContext);
       if(s.active)appliedSession=sessionFromMode(s);
     }
     q('#testOverlay').classList.remove('open');
@@ -1423,9 +1392,7 @@ q('#keep').onclick=function(){
     if(edited){
       edited.name=testContext.name;
       edited.icon=testContext.icon;
-      edited.preserve=testContext.preserve;
-      edited.displayIds=testContext.displayIds.slice();
-      edited.primaryDisplayId=testContext.primaryDisplayId;
+      applyDisplayConfig(edited,testContext);
       edited.app=testContext.app;
       edited.shortcut=testContext.shortcut||'Manual';
       sets.forEach(function(s){s.active=s.id===edited.id});
