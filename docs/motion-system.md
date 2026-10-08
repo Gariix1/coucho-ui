@@ -17,10 +17,11 @@ Este mockup debe sentirse como **un espacio continuo**, no como varias pantallas
 
 1. **Una transformación, un recorrido.** No animar primero una copia vacía y pegar la vista nueva después. Origen y destino comparten trayectoria, duración y easing.
 2. **El entorno responde a la causa.** Capturar posiciones *antes* de rerenderizar y aplicar FLIP *después*. Los hermanos se recolocan con la superficie activa.
-3. **Reacción inmediata.** Los botones responden al contacto y se liberan al soltar o cancelar. La pulsación nunca cambia el layout.
-4. **Celebración proporcional.** Crear o activar un modo puede generar un pulso sutil. Ninguna celebración bloquea la siguiente acción.
-5. **Un único dueño de cada recurso.** El coordinador cancela snapshots, animaciones y scroll anchoring en `finally`; no añadir timers sueltos por pantalla.
-6. **Accesible.** `prefers-reduced-motion` omite trayectorias y efectos; el estado final sigue siendo funcional.
+3. **Una curva compartida.** FLIP y Morph utilizan una duración y un easing común por transacción, incluyendo cambios entre dos Couchsets abiertos.
+4. **Reacción inmediata.** Los botones responden al contacto y se liberan al soltar o cancelar. La pulsación nunca cambia el layout.
+5. **Celebración proporcional.** Crear o activar un modo puede generar un pulso sutil. Ninguna celebración bloquea la siguiente acción.
+6. **Un único dueño de cada recurso.** El coordinador cancela snapshots, animaciones y scroll anchoring en `finally`; no añadir timers sueltos por pantalla.
+7. **Accesible.** `prefers-reduced-motion` omite trayectorias y efectos; el estado final sigue siendo funcional.
 
 ## Cómo conectar una nueva transición
 
@@ -56,10 +57,10 @@ Los valores se modifican en `js/motion-settings.js`. `installMotionTokens()` los
 
 ## Verificaciones
 
-Pruebas unitarias sin dependencias externas:
+Pruebas unitarias de geometría, transacciones, capas y pulsaciones sin dependencias externas:
 
 ```sh
-node --experimental-default-type=module --test tests/motion.test.mjs
+node --experimental-default-type=module --test tests/*.test.mjs
 ```
 
 Pruebas visuales manuales necesarias antes de fusionar:
