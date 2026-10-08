@@ -1,80 +1,87 @@
-/* Motion tokens are written by installMotionTokens() in motion-settings.js. */
+/* Single ownership for connected surface transitions.
+   Shell -> physical geometry; content -> opacity; portal -> scroll offset.
+   Neither text nor icons are ever scaled. */
+.mode-transition-portal{
+  position:fixed;inset:0;
+  pointer-events:none;user-select:none;
+  z-index:120;
+  transform:translate3d(0,0,0)
+}
 
-/* Connected mode transition: fixed viewport-space snapshots never contribute
-   to scroll height or inherit clipping from the scrollable .main container. */
-
-.mode-transition-snapshot{
-position:fixed;left:var(--motion-left);top:var(--motion-top);
+.mode-transition-shell{
+  position:absolute;
+  left:var(--motion-left);top:var(--motion-top);
   width:var(--motion-width);height:var(--motion-height);
-  z-index:120;pointer-events:none;margin:0;
-  transform-origin:0 0;will-change:transform,opacity;user-select:none
-}
-
-.mode-transition-snapshot,
-.mode-transition-snapshot *{
-  /* Child controls must not animate independently of the connected surface. */
-  transition:none!important
-}
-
-.mode-transition-flight{
-overflow:hidden;contain:paint
-}
-
-.mode-transition-flight{
-z-index:120;border:1px solid var(--transition-border,var(--glass-border));border-radius:var(--r-card);
+  box-sizing:border-box;overflow:hidden;
+  border:1px solid var(--transition-border,var(--glass-border));
+  border-radius:var(--r-card);
   background:
-    linear-gradient(180deg,var(--transition-wash,rgba(125,211,252,.06)),transparent 104px),
+    linear-gradient(180deg,var(--transition-wash,rgba(125,211,252,.06)),transparent 140px),
     var(--transition-glass);
-  box-shadow:0 12px 30px rgba(0,0,0,.14);
-  backdrop-filter:blur(26px) saturate(1.18);
-  -webkit-backdrop-filter:blur(26px) saturate(1.18)
+  box-shadow:0 18px 40px rgba(0,0,0,.15);
+  backdrop-filter:blur(16px) saturate(1.12);
+  -webkit-backdrop-filter:blur(16px) saturate(1.12);
+  will-change:left,top,width,height
 }
 
-.mode-transition-flight.to-create{
---transition-border:var(--create-border);
+.mode-transition-shell.to-create{
+  --transition-border:var(--create-border);
   --transition-wash:var(--create-wash)
 }
 
-.mode-transition-flight.to-expanded{
---transition-border:var(--saved-border);
+.mode-transition-shell.to-expanded{
+  --transition-border:var(--saved-border);
   --transition-wash:var(--saved-wash)
 }
 
-.mode-transition-flight.to-card{
---transition-border:var(--glass-border);
+.mode-transition-shell.to-card{
+  --transition-border:var(--glass-border);
   --transition-wash:rgba(125,211,252,.045)
 }
 
-.mode-transition-destination{
-z-index:121;overflow:hidden;opacity:0
-}
-
-.mode-transition-live-hidden{
-visibility:hidden!important
-}
-
+/* Both layouts retain their own real dimensions. The shell does the clipping.
+   The source content fades away and the destination content is progressively
+   revealed as the clipping area grows; neither is transformed or reflowed. */
 .mode-transition-content{
-width:100%;height:100%;border-radius:inherit;
-  transform-origin:0 0
+  position:absolute;left:0;top:0;
+  width:var(--motion-content-width);
+  height:var(--motion-content-height);
+  max-width:none;
+  overflow:hidden;
+  opacity:0;
+  pointer-events:none
 }
 
-.mode-transition-flight .mode-transition-content{
-overflow:hidden
+.mode-transition-content-source{opacity:1}
+
+.mode-transition-content,
+.mode-transition-content *{
+  transition:none!important
 }
 
+.mode-transition-content>.mode-expanded,
 .mode-transition-content>.saved-mode-card,
-.mode-transition-content>.mode-expanded{
-width:100%;height:100%;max-width:none;min-width:0;margin:0;
-  box-sizing:border-box
+.mode-transition-content>.mode-list-item{
+  width:100%!important;height:100%!important;
+  max-width:none!important;min-width:0!important;margin:0!important;
+  box-sizing:border-box;
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important
 }
 
-.mode-transition-flight .mode-transition-content>.saved-mode-card,
-.mode-transition-flight .mode-transition-content>.mode-expanded{
-box-shadow:none
-}
+/* Avoid changing the clone's display semantics: article/section remain normal
+   blocks and the original .mode-list-item remains grid. */
+.mode-transition-content>.mode-expanded,
+.mode-transition-content>.saved-mode-card{display:block}
+.mode-transition-content>.mode-list-item{display:grid}
+
+.mode-transition-live-hidden{visibility:hidden!important}
 
 @media(prefers-reduced-motion:reduce){
-  .mode-transition-snapshot{display:none}
+  .mode-transition-portal{display:none}
   *,*::before,*::after{
     animation-duration:0.01ms!important;
     animation-iteration-count:1!important;
@@ -83,8 +90,5 @@ box-shadow:none
   }
 }
 
-/* Native scroll anchoring is suspended only while our FLIP transaction owns it. */
-
-.main.layout-motion-active{
-overflow-anchor:none
-}
+/* Native scroll anchoring is suspended only while FLIP owns the transaction. */
+.main.layout-motion-active{overflow-anchor:none}
