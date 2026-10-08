@@ -18,9 +18,11 @@ export async function runMotionTransaction({
   onBusy(true);
 
   try{
-    for(const surface of surfaces){
-      snapshots.push(modeSurfaceTransition.prepare(surface.source));
-    }
+    surfaces.forEach((surface,index)=>{
+      // Later surfaces (the incoming editor when switching modes) stay above
+      // outgoing ones throughout the connected transition.
+      snapshots.push(modeSurfaceTransition.prepare(surface.source,{layer:index}));
+    });
 
     if(layout){
       layoutTransition=modeLayoutTransition.prepare(root,{
