@@ -15,6 +15,8 @@ import {
   selectPrimaryDisplay,
   displayConfig,
   displaySummary,
+  displayMarkup,
+  shortcutCardLabel,
   logo,
   shortcutMarkup,
   modeChangeCount,
