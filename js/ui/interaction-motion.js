@@ -1,6 +1,6 @@
 import {
   MOTION_DURATION,MOTION_EASING,prefersReducedMotion,supportsWebAnimations,
-  cancelAnimation,animationFinished
+  cancelAnimation,animationFinished,startAnimation
 } from '../motion-settings.js';
 
 // Shared tactile response for pointer, touch, keyboard and mouse.
@@ -23,7 +23,7 @@ export function bindPressFeedback(root=document){
     animation=null;
     if(!connected||prefersReducedMotion()||!supportsWebAnimations())return;
 
-    const outgoing=element.animate([
+    const outgoing=startAnimation(element,[
       {filter:from==='none'?'brightness(.94)':from},
       {filter:'none'}
     ],{
