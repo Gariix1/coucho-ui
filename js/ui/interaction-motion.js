@@ -7,16 +7,18 @@ import {
 // Animate only the control itself: content and layout geometry stay untouched.
 export function bindPressFeedback(root=document){
   let active=null;
+  let activePointerId=null;
   let animation=null;
 
   function release(){
     if(!active)return;
     const element=active;
     active=null;
-    const from=getComputedStyle(element).transform;
+    const connected=element.isConnected;
+    const from=connected?getComputedStyle(element).transform:'none';
     cancelAnimation(animation);
     animation=null;
-    if(!element.isConnected||prefersReducedMotion()||!supportsWebAnimations())return;
+    if(!connected||prefersReducedMotion()||!supportsWebAnimations())return;
 
     const outgoing=element.animate([
       {transform:from==='none'?'scale(.975)':from},
@@ -36,7 +38,7 @@ export function bindPressFeedback(root=document){
     release();
     if(!element||element.disabled||prefersReducedMotion()||!supportsWebAnimations())return;
     active=element;
-    const outgoing=element.animate([
+    animation=element.animate([
       {transform:'scale(1)'},
       {transform:'scale(.975)'}
     ],{
@@ -44,30 +46,49 @@ export function bindPressFeedback(root=document){
       easing:MOTION_EASING.press,
       fill:'forwards'
     });
-    animation=outgoing;
   }
 
   root.addEventListener('pointerdown',event=>{
-    if(event.button!==0)return;
+    if(event.button!==0||activePointerId!==null)return;
     const button=event.target.closest?.('button,[data-motion-press]');
-    if(button&&!button.disabled)press(button);
+    if(!button||button.disabled)return;
+    activePointerId=event.pointerId;
+    press(button);
   },{capture:true});
 
-  root.addEventListener('pointerup',release,{capture:true});
-  root.addEventListener('pointercancel',release,{capture:true});
-  window.addEventListener('blur',release);
+  function finishPointer(event){
+    if(activePointerId===null||event.pointerId!==activePointerId)return;
+    activePointerId=null;
+    release();
+  }
+
+  // Listen on window so dragging or releasing outside the document cannot
+  // strand a pressed control at scale(.975).
+  window.addEventListener('pointerup',finishPointer,{capture:true});
+  window.addEventListener('pointercancel',finishPointer,{capture:true});
+  window.addEventListener('blur',()=>{
+    activePointerId=null;
+    release();
+  });
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){
+      activePointerId=null;
+      release();
+    }
+  });
 
   root.addEventListener('keydown',event=>{
-    if(event.repeat||!(event.key==='Enter'||event.key===' '))return;
+    if(activePointerId!==null||event.repeat||
+      !(event.key==='Enter'||event.key===' '))return;
     const button=event.target.closest?.('button,[data-motion-press]');
     if(button&&!button.disabled)press(button);
   },{capture:true});
 
-  root.addEventListener('keyup',event=>{
+  window.addEventListener('keyup',event=>{
     if(event.key==='Enter'||event.key===' ')release();
   },{capture:true});
 }
-
 export function celebrateSurface(element){
   if(!element?.isConnected||prefersReducedMotion()||!supportsWebAnimations())return;
   // A restrained completion response: no permanent shadow or altered layout.
