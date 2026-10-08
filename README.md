@@ -12,7 +12,7 @@ El mockup usa un sistema de transiciones conectadas, FLIP para el layout y micro
 Para ejecutar las pruebas, con Node.js 22+:
 
 ```sh
-node --experimental-default-type=module --test tests/motion.test.mjs
+node --experimental-default-type=module --test tests/*.test.mjs
 ```
 
 Se mantiene como HTML, CSS y JavaScript nativo, sin dependencia de frameworks para las animaciones.
