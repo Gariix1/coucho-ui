@@ -12,6 +12,11 @@ export const MOTION_EASING=Object.freeze({
   linear:'linear'
 });
 
+// Shared geometry guard for connected-surface and FLIP layout animations.
+export function usableRect(rect){
+  return !!rect&&rect.width>0&&rect.height>0;
+}
+
 export function prefersReducedMotion(){
   return typeof window.matchMedia==='function'&&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
