@@ -1,47 +1,48 @@
-# Auditoría técnica de Motion — Coucho UI
-Fecha: 2026-10-07  
+# Auditoría de interacciones y Motion — Coucho UI
+
 Rama: `refactor/mockup-motion-cleanup-20261007`  
-Objetivo: verificar conflictos y riesgos **antes** de las pruebas manuales del mockup.
+PR: https://github.com/Gariix1/coucho-ui/pull/1
 
-## Hallazgos corregidos
+## Causas raíz encontradas y corregidas
 
-| Gravedad | Hallazgo | Resolución |
+| Severidad | Problema real | Resolución arquitectónica |
 | --- | --- | --- |
-| Alta | Pulsación mantenida si se suelta el puntero fuera del documento | La liberación ahora escucha en `window`, identifica `pointerId` y responde también a `blur`/pestaña oculta |
-| Alta | Dos Morph de cambio entre Couchsets podían solaparse sin prioridad explícita | Cada superficie recibe una capa; el modo entrante queda por encima del saliente |
-| Alta | FLIP y Morph usaban curvas de easing distintas en el mismo cambio | Cada transacción comparte duración/easing para todos los desplazamientos |
-| Media | El destino podía quedar oculto o los snapshots huérfanos si se ocultaba la pestaña | Cancelación idempotente y limpieza por `visibilitychange`, `resize` y `finally` |
-| Media | El color de confirmación era cyan fijo | Se utiliza `var(--selected-border)`, dependiente del tema |
-| Media | El Morph animaba `boxShadow` además de transformaciones | Trayectoria principal ahora anima `transform` y `opacity`, evitando repintados innecesarios por sombra |
-| Baja | CSS residual de snapshots `hold` y `will-change` de propiedades no animadas | Reglas y pistas obsoletas eliminadas |
-| Baja | Guardar después de prueba no tenía la misma confirmación visual | Unificado el pulso de confirmación de guardar/activar/crear |
+| Crítica | `#modeList` tenía `data-density` como estado, pero `target.closest('[data-density]')` interceptaba **todos los clics** del listado. Por eso no se abrían las tarjetas. | Separación estado/comando: el listado mantiene `data-density`, los botones usan `data-density-option`. Nuevo `closestWithin()` solo resuelve controles descendientes del contenedor. Pruebas de regresión de delegación. |
+| Alta | `renderExpandedMode()` utilizaba `shortcutCardLabel` sin importarlo, y el flujo de prueba usaba `displayMarkup` sin importar. | Imports declarados y ESLint `no-undef` en CI para detectar futuros símbolos inexistentes. |
+| Alta | El feedback de pulsación cambiaba el `transform` del propio botón, interfiriendo con `getBoundingClientRect()` al abrir «Escritorio actual». | Feedback compositado mediante filtro, sin cambiar la geometría que consume Morph/FLIP. |
+| Alta | Los snapshots se insertaban en el contenedor `.main` con scroll, donde podían afectar área desplazable o recortarse. | Superficies fijas en coordenadas de viewport, fuera del scroll container. |
+| Alta | La activación diferida podía rerenderizar durante un Morph en curso. | `createMotionScheduler()` retiene mutaciones hasta que la transacción libera el DOM; admite cancelación por clave. |
+| Media | Cancelar feedback podía rechazar promesas `Animation.finished` sin manejar. | `startAnimation()` observa el ciclo de vida al crear cualquier microanimación y absorbe cancelaciones previstas. |
+| Media | FLIP y Morph podían usar distintas curvas en la misma acción. | `runMotionTransaction()` define duración y easing compartidos por toda la coreografía. |
+| Media | Morph concurrentes carecían de un orden de superposición explícito. | Prioridades de capa por superficie; la entrante se sitúa por encima de la saliente. |
+| Media | Animaciones canceladas podían dejar el destino oculto o anclaje de scroll suspendido. | Limpieza idempotente por `finally`, `resize`, `visibilitychange` y `blur` en sus respectivos componentes. |
+| Baja | Confirmation ring de color fijo, animación de sombra costosa y reglas antiguas de `hold`. | Tokens del tema, desplazamiento con transform/opacity y eliminación de reglas obsoletas. |
 
-## Comprobaciones superadas
+## Validación automatizada
 
-- Sintaxis de **18 módulos JS y archivos de prueba**, y resolución de sus imports relativos: sin errores en la revisión estática.
-- **10 hojas CSS** vinculadas, bloques equilibrados, sin IDs duplicados en `index.html`.
-- Los **5 recorridos de UI** (densidad, abrir, cambiar, cerrar, crear) invocan `runMotionTransaction`, sin manejadores de Morph/FLIP separados en `app.js`.
-- **8 casos de regresión** comprobados en el motor JavaScript, incluidos cancelación, capas, geometría y sincronización de movimiento.
-- `main` no se modifica; cambios solo en la rama de refactorización/PR borrador.
+En GitHub Actions se ejecuta `.github/workflows/mockup-motion.yml`:
 
-## Pendiente — bloqueo de aprobación final
+1. ESLint con detección de variables no definidas y errores estructurales.
+2. `node --experimental-default-type=module --test tests/*.test.mjs` — **17/17 casos correctos**.
+3. `node tests/browser-smoke.mjs` sobre Chrome real en Linux — **sin errores**, con verificación de:
+   - Pulsación sin modificar geometría
+   - Abrir, cambiar y cerrar Couchsets
+   - Editores rápidos de pantalla, app y atajo
+   - Cancelación de eliminación
+   - Densidad compacta y detallada
+   - Crear un Couchset desde el escritorio
+   - Activación diferida simultánea con Morph
+   - Redimensionar durante Morph, movimiento reducido y ausencia final de snapshots/bloqueos
 
-**No se ha ejecutado la aplicación completa en Chromium, Safari o Firefox.** El entorno de análisis no pudo descargar el repositorio para correr la interfaz en un navegador real. El análisis estático y las simulaciones no validan rendimiento GPU, estilo final o comportamiento visual en dispositivos.
+Ejecución validada: https://github.com/Gariix1/coucho-ui/actions/runs/37728934819
 
-Antes de fusionar:
+## Pendiente de aprobación visual
 
-1. Abrir/cerrar y cambiar rápidamente entre Couchsets; observar que contenido y contenedor recorren la misma trayectoria.
-2. Alternar repetidamente entre densidad compacta y detallada; revisar deformación temporal de texto/bordes por escalado FLIP.
-3. Crear modo, guardar desde prueba y activar; comprobar consistencia de pulso sin parpadeos.
-4. Abrir/cerrar popovers, probar teclado, puntero y touch (incluida cancelación o salida de la ventana).
-5. Cambiar tamaño de ventana y ocultar/regresar a la pestaña durante una transición; comprobar que no queda `inert` ni destinos invisibles.
-6. Probar temas claro/oscuro y `prefers-reduced-motion`.
-7. Revisar frame rate en dispositivo móvil: los snapshots con `backdrop-filter` y el escalado de tarjetas todavía requieren validación visual/performance.
+La automatización valida que las interacciones funcionan, pero **no demuestra que cada fotograma tenga la calidad visual deseada**. Antes de fusionar revisar a ojo:
 
-## Ejecución local
+- Curvas, desplazamiento de hermanos, sombras y crossfade a 60 Hz.
+- Deformación temporal en cambios de densidad por FLIP.
+- Temas claro/oscuro, resoluciones móviles, touch real, Safari y Firefox.
+- Rendimiento de filtros Acrylic en dispositivos con GPU limitada.
 
-```sh
-node --experimental-default-type=module --test tests/*.test.mjs
-```
-
-**Resultado de esta auditoría:** aprobada la revisión estática y las pruebas simuladas; **pendiente aprobación visual/browser real**. Mantener el PR como borrador.
+**Estado:** resolución funcional verificada en Chrome y pruebas automáticas; revisión estética y multiplataforma pendiente. PR mantenido como borrador, `main` intacta.
