@@ -161,7 +161,7 @@ try{
         .flatMap(el=>el.getAnimations().flatMap(a=>a.effect?.getKeyframes()||[]));
       return {
         delta,
-        portalTransform:portal.style.transform,
+        portalOffsetY:new DOMMatrix(getComputedStyle(portal).transform).m42,
         geometryOwnedByShell:shellFrames.some(frame=>frame.width&&frame.height),
         noTransformOnContent:contentFrames.every(frame=>frame.transform===undefined),
         sourceTransform:getComputedStyle(shell.querySelector('.mode-transition-content-source')).transform,
@@ -169,7 +169,7 @@ try{
       };
     });
     assert.ok(sample.delta>0,'The viewport must actually scroll during the transition');
-    assert.equal(sample.portalTransform,'translate3d(0px,'+(-sample.delta)+'px,0)');
+    assert.ok(Math.abs(sample.portalOffsetY+sample.delta)<.5,'Scroll offset must match the real document displacement');
     assert.equal(sample.geometryOwnedByShell,true);
     assert.equal(sample.noTransformOnContent,true);
     assert.equal(sample.sourceTransform,'none');
