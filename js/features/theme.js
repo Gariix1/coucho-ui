@@ -1,22 +1,32 @@
-import {q} from '../core/dom.js';
-
 const THEME_KEY='coucho-theme';
+const THEMES=new Set(['system','light','dark']);
+
+export function getThemePreference(){
+  const saved=localStorage.getItem(THEME_KEY);
+  return THEMES.has(saved)?saved:'dark';
+}
+
+function applyTheme(){
+  const preference=getThemePreference();
+  const prefersLight=typeof window.matchMedia==='function'&&
+    window.matchMedia('(prefers-color-scheme: light)').matches;
+  document.documentElement.dataset.theme=
+    preference==='system'?(prefersLight?'light':'dark'):preference;
+}
+
+export function setThemePreference(value){
+  if(!THEMES.has(value))return;
+  localStorage.setItem(THEME_KEY,value);
+  applyTheme();
+}
 
 export function initTheme(){
-  const saved=localStorage.getItem(THEME_KEY);
-  const theme=saved==='light'||saved==='dark'?saved:'dark';
-  document.documentElement.dataset.theme=theme;
-  syncThemeControl();
-}
-
-export function syncThemeControl(){
-  const light=document.documentElement.dataset.theme==='light';
-  q('#themeValue').textContent=light?'Claro':'Oscuro';
-}
-
-export function toggleTheme(){
-  const next=document.documentElement.dataset.theme==='light'?'dark':'light';
-  document.documentElement.dataset.theme=next;
-  localStorage.setItem(THEME_KEY,next);
-  syncThemeControl();
+  applyTheme();
+  // A system preference should follow Windows even while Coucho is open.
+  if(typeof window.matchMedia==='function'){
+    const media=window.matchMedia('(prefers-color-scheme: light)');
+    media.addEventListener?.('change',()=>{
+      if(getThemePreference()==='system')applyTheme();
+    });
+  }
 }
