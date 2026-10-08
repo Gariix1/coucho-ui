@@ -16,7 +16,7 @@ async function stable(){
   await page.waitForFunction(()=>{
     const board=document.querySelector('.mode-workbench');
     return board&&!board.hasAttribute('inert')&&
-      document.querySelectorAll('.mode-transition-snapshot').length===0&&
+      document.querySelectorAll('.mode-transition-portal').length===0&&
       !document.querySelector('.main.layout-motion-active');
   },{timeout:5000});
 }
@@ -34,7 +34,7 @@ async function check(label,action){
     console.error('DOM state:',JSON.stringify(await page.evaluate(()=>({
       expanded:!!document.querySelector('#expandedMode'),
       expandedVisible:!!document.querySelector('#expandedMode')?.checkVisibility(),
-      snapshots:document.querySelectorAll('.mode-transition-snapshot').length,
+      snapshots:document.querySelectorAll('.mode-transition-portal').length,
       busy:document.querySelector('.mode-workbench')?.getAttribute('aria-busy'),
       cards:document.querySelectorAll('.saved-mode-card:not(.mode-expanded)').length,
       modeListText:document.querySelector('#modeList')?.innerText.slice(0,160)
@@ -218,7 +218,7 @@ try{
     await page.locator('#expandedClose').click();
   });
 
-  assert.equal(await page.locator('.mode-transition-snapshot').count(),0);
+  assert.equal(await page.locator('.mode-transition-portal').count(),0);
   assert.equal(await page.locator('.main.layout-motion-active').count(),0);
   assert.equal(await page.locator('.mode-workbench[inert]').count(),0);
   console.log('PASS final cleanup: no stuck animations or inert UI');
