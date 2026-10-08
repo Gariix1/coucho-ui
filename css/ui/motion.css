@@ -1,9 +1,10 @@
 /* Motion tokens are written by installMotionTokens() in motion-settings.js. */
 
-/* Connected mode transition: two snapshots share one path and crossfade in flight. */
+/* Connected mode transition: fixed viewport-space snapshots never contribute
+   to scroll height or inherit clipping from the scrollable .main container. */
 
 .mode-transition-snapshot{
-position:absolute;left:var(--motion-left);top:var(--motion-top);
+position:fixed;left:var(--motion-left);top:var(--motion-top);
   width:var(--motion-width);height:var(--motion-height);
   z-index:120;pointer-events:none;margin:0;
   transform-origin:0 0;will-change:transform,opacity;user-select:none
