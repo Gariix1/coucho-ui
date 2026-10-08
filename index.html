@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="./css/components.css">
 <link rel="stylesheet" href="./css/features/modes.css">
 <link rel="stylesheet" href="./css/features/resources.css">
+<link rel="stylesheet" href="./css/features/settings.css">
 <link rel="stylesheet" href="./css/features/displays.css">
 <link rel="stylesheet" href="./css/ui/overlays.css">
 <link rel="stylesheet" href="./css/ui/motion.css">
@@ -126,22 +127,131 @@
     </section>
 
     <section class="shell-view" id="view-settings" data-shell-view="settings" hidden>
-      <div class="shell-placeholder">
-        <header class="shell-page-head">
-          <h1>Ajustes</h1>
+      <div class="shell-placeholder settings-page">
+        <header class="shell-page-head settings-page-header">
+          <div>
+            <h1>Ajustes</h1>
+            <p>Personaliza Coucho sin complicarte.</p>
+          </div>
+          <span class="settings-save-state" id="settingsSaveState" role="status" aria-live="polite">Se guarda automáticamente</span>
         </header>
-        <div class="settings-stack">
-          <button class="settings-row" id="settingsTheme">
-            <span class="settings-row-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-theme"></use></svg></span>
-            <span class="settings-row-copy"><b>Tema</b><small>Cambia la apariencia de Coucho</small></span>
-            <span class="settings-row-value" id="themeValue">Oscuro</span>
-          </button>
-          <button class="settings-row" id="advancedSettings">
-            <span class="settings-row-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-more"></use></svg></span>
-            <span class="settings-row-copy"><b>Avanzado</b><small>Diagnóstico y recuperación</small></span>
-            <span class="settings-row-value"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-arrow-right"></use></svg></span>
-          </button>
+
+        <div class="settings-layout">
+          <nav class="settings-nav" role="tablist" aria-label="Categorías de ajustes">
+            <button class="settings-tab is-active" type="button" id="settingsTabGeneral" role="tab" data-settings-tab="general" aria-selected="true" aria-controls="settingsPanelGeneral">General</button>
+            <button class="settings-tab" type="button" id="settingsTabAppearance" role="tab" data-settings-tab="appearance" aria-selected="false" aria-controls="settingsPanelAppearance" tabindex="-1">Apariencia</button>
+            <button class="settings-tab" type="button" id="settingsTabHop" role="tab" data-settings-tab="hop" aria-selected="false" aria-controls="settingsPanelHop" tabindex="-1">Hop</button>
+            <button class="settings-tab" type="button" id="settingsTabAdvanced" role="tab" data-settings-tab="advanced" aria-selected="false" aria-controls="settingsPanelAdvanced" tabindex="-1">Avanzado</button>
+          </nav>
+
+          <div class="settings-content">
+            <section class="settings-panel" id="settingsPanelGeneral" role="tabpanel" aria-labelledby="settingsTabGeneral" data-settings-panel="general">
+              <header class="settings-section-head">
+                <h2>General</h2>
+                <p>Lo esencial para empezar y usar Coucho.</p>
+              </header>
+              <div class="settings-group">
+                <div class="settings-field">
+                  <div class="settings-field-copy"><label for="settingsLanguage">Idioma</label><p>El idioma que prefieres para Coucho.</p></div>
+                  <select id="settingsLanguage" class="settings-select">
+                    <option value="system">Igual que Windows</option>
+                    <option value="es-419">Español (Latinoamérica)</option>
+                    <option value="es-ES">Español (España)</option>
+                    <option value="en-US">English (United States)</option>
+                    <option value="pt-BR">Português (Brasil)</option>
+                    <option value="pt-PT">Português (Portugal)</option>
+                    <option value="fr-FR">Français</option>
+                    <option value="de-DE">Deutsch</option>
+                    <option value="it-IT">Italiano</option>
+                  </select>
+                </div>
+                <div class="settings-field">
+                  <div class="settings-field-copy"><label for="settingsStartupSurface">Al abrir Coucho</label><p>Elige qué pantalla ver primero.</p></div>
+                  <select id="settingsStartupSurface" class="settings-select">
+                    <option value="control">Control (escritorio)</option>
+                    <option value="hop">Hop (mando)</option>
+                  </select>
+                </div>
+                <label class="settings-field settings-field-clickable" for="settingsStartupWindows">
+                  <span class="settings-field-copy"><strong>Iniciar con Windows</strong><span>Abre Coucho al encender tu PC.</span></span>
+                  <input id="settingsStartupWindows" class="settings-switch" type="checkbox" role="switch">
+                </label>
+              </div>
+            </section>
+
+            <section class="settings-panel" id="settingsPanelAppearance" role="tabpanel" aria-labelledby="settingsTabAppearance" data-settings-panel="appearance" hidden>
+              <header class="settings-section-head">
+                <h2>Apariencia</h2>
+                <p>Un aspecto cómodo, en Control y en Hop.</p>
+              </header>
+              <div class="settings-group">
+                <div class="settings-field">
+                  <div class="settings-field-copy"><label for="settingsThemeSelect">Tema</label><p>Control y Hop comparten esta elección.</p></div>
+                  <select id="settingsThemeSelect" class="settings-select">
+                    <option value="system">Igual que Windows</option>
+                    <option value="dark">Oscuro</option>
+                    <option value="light">Claro</option>
+                  </select>
+                </div>
+                <div class="settings-field settings-field-range">
+                  <div class="settings-field-copy"><label for="settingsControlOpacity">Opacidad de Control</label><p>Cuánto se ve el fondo detrás de la ventana.</p></div>
+                  <div class="settings-range-control"><input id="settingsControlOpacity" type="range" min="20" max="100" step="5" value="85"><output id="settingsControlOpacityValue" for="settingsControlOpacity">85%</output></div>
+                </div>
+                <div class="settings-field settings-field-range">
+                  <div class="settings-field-copy"><label for="settingsHopOpacity">Opacidad de Hop</label><p>Ajusta la superficie que usas con el mando.</p></div>
+                  <div class="settings-range-control"><input id="settingsHopOpacity" type="range" min="20" max="100" step="5" value="85"><output id="settingsHopOpacityValue" for="settingsHopOpacity">85%</output></div>
+                </div>
+              </div>
+              <div class="settings-preview" aria-label="Vista previa de opacidad">
+                <div class="settings-preview-pattern">
+                  <div class="settings-preview-surface" id="settingsControlPreview"><span class="settings-preview-dot"></span><span>Control</span><i></i></div>
+                  <div class="settings-preview-surface settings-preview-hop" id="settingsHopPreview"><span class="settings-preview-dot"></span><span>Hop</span><i></i></div>
+                </div>
+                <span>Vista previa de la transparencia</span>
+              </div>
+            </section>
+
+            <section class="settings-panel" id="settingsPanelHop" role="tabpanel" aria-labelledby="settingsTabHop" data-settings-panel="hop" hidden>
+              <header class="settings-section-head">
+                <h2>Hop</h2>
+                <p>Qué ocurre al entrar y salir de la interfaz para el mando.</p>
+              </header>
+              <div class="settings-group">
+                <div class="settings-field">
+                  <div class="settings-field-copy"><label for="settingsHopExit">Al salir de Hop</label><p>Decide dónde continúa Coucho.</p></div>
+                  <select id="settingsHopExit" class="settings-select">
+                    <option value="control">Volver a Control</option>
+                    <option value="background">Seguir en segundo plano</option>
+                  </select>
+                </div>
+                <label class="settings-field settings-field-clickable" for="settingsTrayIcon">
+                  <span class="settings-field-copy"><strong>Icono en la bandeja</strong><span>Accede a Coucho desde la barra de tareas.</span></span>
+                  <input id="settingsTrayIcon" class="settings-switch" type="checkbox" role="switch">
+                </label>
+              </div>
+              <p class="settings-hint" id="settingsHopHint">Para dejar Coucho en segundo plano, mantén visible el icono en la bandeja.</p>
+            </section>
+
+            <section class="settings-panel" id="settingsPanelAdvanced" role="tabpanel" aria-labelledby="settingsTabAdvanced" data-settings-panel="advanced" hidden>
+              <header class="settings-section-head">
+                <h2>Avanzado</h2>
+                <p>Recupera tus preferencias sin tocar los modos que has creado.</p>
+              </header>
+              <div class="settings-group">
+                <div class="settings-field">
+                  <div class="settings-field-copy"><strong>Restablecer preferencias</strong><p>Vuelve a los valores originales de General, Apariencia y Hop.</p></div>
+                  <button class="settings-action" id="settingsReset" type="button">Restablecer</button>
+                </div>
+                <div class="settings-reset-confirm" id="settingsResetConfirm" hidden>
+                  <div><strong>¿Restablecer ajustes?</strong><p>Los Couchsets, pantallas y apps guardadas no se borrarán.</p></div>
+                  <div class="settings-reset-actions"><button type="button" class="settings-action" id="settingsResetCancel">Cancelar</button><button type="button" class="settings-action settings-action-danger" id="settingsResetAccept">Sí, restablecer</button></div>
+                </div>
+              </div>
+              <p class="settings-hint">Los respaldos, la recuperación del entorno y los diagnósticos del sistema se gestionarán en Coucho para Windows; aquí no se simulan operaciones sobre tu PC.</p>
+            </section>
+          </div>
         </div>
+        <p class="settings-prototype-note">Prototipo interactivo: estos valores se guardan en este navegador, no modifican Windows ni la instalación de Coucho. El cambio de idioma de toda la aplicación aún no está conectado.</p>
       </div>
     </section>
   </main>
