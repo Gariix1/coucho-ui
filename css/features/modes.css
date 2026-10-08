@@ -150,7 +150,7 @@ grid-column:1/-1;padding:12px 10px;color:var(--muted);font-size:11px;
 min-width:0;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);
   background:var(--glass-card);padding:12px;cursor:pointer;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
-  transition:border-color .14s ease,background .14s ease,box-shadow .14s ease
+  transition:border-color  var(--motion-feedback-duration) var(--motion-feedback-easing),background  var(--motion-feedback-duration) var(--motion-feedback-easing),box-shadow  var(--motion-feedback-duration) var(--motion-feedback-easing)
 }
 
 .saved-mode-card:not(.mode-expanded):hover{
@@ -205,7 +205,7 @@ background:var(--glass-pill);border-color:var(--accent)
 width:34px;height:34px;min-height:34px;padding:0;
   border:1px solid transparent;border-radius:var(--r-control);
   background:transparent;color:var(--text2);display:grid;place-items:center;
-  transition:opacity .14s ease,background .14s ease,border-color .14s ease,color .14s ease
+  transition:opacity  var(--motion-feedback-duration) var(--motion-feedback-easing),background  var(--motion-feedback-duration) var(--motion-feedback-easing),border-color  var(--motion-feedback-duration) var(--motion-feedback-easing),color  var(--motion-feedback-duration) var(--motion-feedback-easing)
 }
 
 .open-mode{
@@ -589,7 +589,7 @@ min-height:38px;padding:7px 14px;font-size:12px
 
 .mode-name-edit{
 display:inline-block;max-width:100%;border-radius:6px;cursor:text;touch-action:manipulation;
-  transition:background .12s ease,box-shadow .12s ease
+  transition:background  var(--motion-feedback-fast-duration) var(--motion-feedback-easing),box-shadow  var(--motion-feedback-fast-duration) var(--motion-feedback-easing)
 }
 
 .mode-name-edit:hover{
@@ -604,7 +604,7 @@ min-width:72px;padding:1px 4px;margin:-1px -4px;background:var(--glass-control);
 
 .mode-expanded .mode-expanded-head{
 cursor:pointer;border-radius:var(--r-control);margin:-5px -5px 9px;padding:5px;
-  transition:background .14s ease
+  transition:background  var(--motion-feedback-duration) var(--motion-feedback-easing)
 }
 
 .mode-expanded .mode-expanded-head:hover{
