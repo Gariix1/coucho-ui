@@ -105,12 +105,12 @@ try{
   });
 
   await check('change to compact density',async()=>{
-    await page.locator('.density-button[data-density="compact"]').click();
+    await page.locator('.density-button[data-density-option="compact"]').click();
     await page.waitForFunction(()=>document.querySelector('#modeList')?.dataset.density==='compact');
   });
 
   await check('change back to detailed density',async()=>{
-    await page.locator('.density-button[data-density="detailed"]').click();
+    await page.locator('.density-button[data-density-option="detailed"]').click();
     await page.waitForFunction(()=>document.querySelector('#modeList')?.dataset.density==='detailed');
   });
 
