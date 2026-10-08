@@ -2,15 +2,12 @@ import {setCssVars} from './core/dom.js';
 import {
   MOTION_DURATION,
   MOTION_EASING,
+  usableRect,
   prefersReducedMotion,
   supportsWebAnimations,
   animationFinished,
   cancelAnimation
 } from './motion-settings.js';
-
-function usableRect(rect){
-  return !!rect&&rect.width>0&&rect.height>0;
-}
 
 function rectOf(element){
   return element&&element.isConnected?element.getBoundingClientRect():null;
