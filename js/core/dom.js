@@ -26,3 +26,12 @@ export function setCssVars(element,values){
     element.style.setProperty(name,String(value));
   });
 }
+
+// Event delegation must not mistake attributes on the listener root for
+// actionable controls. Only descendants inside root can match.
+export function closestWithin(target,selector,root){
+  if(!target||typeof target.closest!=='function'||
+    !root||!root.contains(target))return null;
+  const element=target.closest(selector);
+  return element&&element!==root&&root.contains(element)?element:null;
+}
