@@ -1,6 +1,14 @@
 name: Mockup Motion Regression
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'js/**'
+      - 'css/**'
+      - 'tests/**'
+      - 'index.html'
+      - '.github/workflows/mockup-motion.yml'
   pull_request:
     paths:
       - 'js/**'
