@@ -22,10 +22,24 @@ async function stable(){
 }
 
 async function check(label,action){
-  await action();
-  await stable();
-  assert.deepEqual(errors,[],label+': browser errors');
-  console.log('PASS '+label);
+  try{
+    await action();
+    await stable();
+    assert.deepEqual(errors,[],label+': browser errors');
+    console.log('PASS '+label);
+  }catch(error){
+    console.error('FAIL '+label+': '+error.message);
+    console.error('Browser errors:',JSON.stringify(errors));
+    console.error('DOM state:',JSON.stringify(await page.evaluate(()=>({
+      expanded:!!document.querySelector('#expandedMode'),
+      expandedVisible:!!document.querySelector('#expandedMode')?.checkVisibility(),
+      snapshots:document.querySelectorAll('.mode-transition-snapshot').length,
+      busy:document.querySelector('.mode-workbench')?.getAttribute('aria-busy'),
+      cards:document.querySelectorAll('.saved-mode-card:not(.mode-expanded)').length,
+      modeListText:document.querySelector('#modeList')?.innerText.slice(0,160)
+    }))));
+    throw error;
+  }
 }
 
 try{
@@ -47,7 +61,7 @@ try{
 
   await check('open saved Couchset',async()=>{
     await page.locator('[data-mode-row="1"] .open-mode').click();
-    await page.waitForSelector('#expandedMode');
+    await page.waitForSelector('#expandedMode',{timeout:5000});
   });
   assert.equal(await page.locator('#expandedName').innerText(),'Gaming');
   assert.equal(await page.locator('#expandedMode').isVisible(),true);
@@ -74,7 +88,7 @@ try{
 
   await check('expand current desktop',async()=>{
     await page.locator('[data-expand-source="current"]').click();
-    await page.waitForSelector('#expandedMode.new-mode-expanded');
+    await page.waitForSelector('#expandedMode.new-mode-expanded',{timeout:5000});
   });
 
   await check('create Couchset and close editor',async()=>{
