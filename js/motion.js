@@ -9,26 +9,15 @@ import {
   cancelAnimation
 } from './motion-settings.js';
 
-function scrollHostFor(element){
-  return element?.closest?.('.main')||document.querySelector('.main')||document.body;
-}
-
-function localRect(element,host){
+// Viewport coordinates are the only source of truth for connected surfaces.
+// Portals live outside scroll containers, so scrolling, clipping and FLIP
+// cannot change a snapshot's containing block in the middle of its travel.
+function viewportRect(element){
   if(!element?.isConnected)return null;
   const rect=element.getBoundingClientRect();
   if(!usableRect(rect))return null;
-
-  if(host===document.body||host===document.documentElement){
-    return {
-      left:rect.left+window.scrollX,top:rect.top+window.scrollY,
-      width:rect.width,height:rect.height
-    };
-  }
-
-  const hostRect=host.getBoundingClientRect();
   return {
-    left:rect.left-hostRect.left+host.scrollLeft-host.clientLeft,
-    top:rect.top-hostRect.top+host.scrollTop-host.clientTop,
+    left:rect.left,top:rect.top,
     width:rect.width,height:rect.height
   };
 }
@@ -43,8 +32,8 @@ function sanitizeClone(root){
   return root;
 }
 
-function createSnapshot(element,kind,host,layer){
-  const rect=localRect(element,host);
+function createSnapshot(element,kind,layer){
+  const rect=viewportRect(element);
   if(!usableRect(rect))return null;
 
   const snapshot=document.createElement('div');
@@ -60,7 +49,7 @@ function createSnapshot(element,kind,host,layer){
   content.className='mode-transition-content';
   content.appendChild(sanitizeClone(element.cloneNode(true)));
   snapshot.appendChild(content);
-  host.appendChild(snapshot);
+  document.body.appendChild(snapshot);
   return {element:snapshot,content,rect};
 }
 
@@ -82,8 +71,7 @@ function prepare(source,{layer=0}={}){
     return {play:async()=>{},cancel:()=>{}};
   }
 
-  const host=scrollHostFor(source);
-  const flight=createSnapshot(source,'flight',host,layer);
+  const flight=createSnapshot(source,'flight',layer);
   if(!flight)return {play:async()=>{},cancel:()=>{}};
 
   let disposed=false;
@@ -114,7 +102,7 @@ function prepare(source,{layer=0}={}){
       return;
     }
 
-    destinationSnapshot=createSnapshot(destination,'destination',host,layer);
+    destinationSnapshot=createSnapshot(destination,'destination',layer);
     if(!destinationSnapshot){
       dispose();
       return;
