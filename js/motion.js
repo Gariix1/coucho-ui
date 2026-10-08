@@ -108,7 +108,7 @@ function prepare(source,{layer=0}={}){
     animations.length=0;
   }
 
-  async function play(destination,direction='open'){
+  async function play(destination,direction='open',{duration:sharedDuration=null,easing:sharedEasing=null}={}){
     if(disposed||!destination?.isConnected){
       dispose();
       return;
@@ -123,8 +123,8 @@ function prepare(source,{layer=0}={}){
     const to=destinationSnapshot.rect;
     const {sourceEnd,destinationStart}=transformsBetween(flight.rect,to);
     const open=direction!=='close';
-    const duration=open?MOTION_DURATION.open:MOTION_DURATION.close;
-    const easing=open?MOTION_EASING.open:MOTION_EASING.close;
+    const duration=sharedDuration??(open?MOTION_DURATION.open:MOTION_DURATION.close);
+    const easing=sharedEasing??(open?MOTION_EASING.open:MOTION_EASING.close);
     const expanded=open&&destination.classList.contains('new-mode-expanded');
     flight.element.classList.toggle('to-create',expanded);
     flight.element.classList.toggle('to-expanded',open&&!expanded);
@@ -137,8 +137,8 @@ function prepare(source,{layer=0}={}){
     const travel={duration,easing,fill:'both'};
     animations.push(
       flight.element.animate([
-        {transform:'translate3d(0,0,0) scale(1,1)',boxShadow:'0 8px 20px rgba(0,0,0,.10)'},
-        {transform:sourceEnd,boxShadow:'0 22px 52px rgba(0,0,0,.18)'}
+        {transform:'translate3d(0,0,0) scale(1,1)'},
+        {transform:sourceEnd}
       ],travel),
       destinationSnapshot.element.animate([
         {transform:destinationStart},
