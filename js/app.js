@@ -282,7 +282,7 @@ async function setCardDensity(next){
     }
   });
 
-  q('[data-density="'+next+'"]')?.focus({preventScroll:true});
+  q('.density-button[data-density-option="'+next+'"]')?.focus({preventScroll:true});
 }
 
 async function switchExpandedSurface(targetId,source){
@@ -464,8 +464,8 @@ function renderModeList(){
       '<div class="mode-list-group-head" data-layout-key="saved-head">'+
         '<div class="mode-list-label">Tus modos</div>'+
         '<div class="density-toggle" role="group" aria-label="Vista de modos">'+
-          '<button class="density-button" data-density="compact" aria-pressed="'+(cardDensity==='compact'?'true':'false')+'" title="Vista compacta" aria-label="Vista compacta">'+iconMarkup('grid')+'</button>'+
-          '<button class="density-button" data-density="detailed" aria-pressed="'+(cardDensity==='detailed'?'true':'false')+'" title="Vista detallada" aria-label="Vista detallada">'+iconMarkup('list')+'</button>'+
+          '<button class="density-button" data-density-option="compact" aria-pressed="'+(cardDensity==='compact'?'true':'false')+'" title="Vista compacta" aria-label="Vista compacta">'+iconMarkup('grid')+'</button>'+
+          '<button class="density-button" data-density-option="detailed" aria-pressed="'+(cardDensity==='detailed'?'true':'false')+'" title="Vista detallada" aria-label="Vista detallada">'+iconMarkup('list')+'</button>'+
         '</div>'+
       '</div>'+
       '<div class="mode-grid '+cardDensity+'">'+
@@ -1075,9 +1075,9 @@ function handleModeListClick(event){
     return;
   }
 
-  var density=target.closest('[data-density]');
+  var density=target.closest('button[data-density-option]');
   if(density){
-    setCardDensity(density.dataset.density);
+    setCardDensity(density.dataset.densityOption);
     return;
   }
 
