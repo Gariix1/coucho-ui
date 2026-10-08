@@ -38,8 +38,12 @@ class FakeElement{
       toggle:(key,on)=>on?this.classes.add(key):this.classes.delete(key)
     };
     this.animations=[];
+    this.events=eventHub();
   }
 
+  addEventListener(type,fn){this.events.addEventListener(type,fn)}
+  removeEventListener(type,fn){this.events.removeEventListener(type,fn)}
+  dispatch(type,event={}){this.events.dispatch(type,event)}
   getBoundingClientRect(){return this.rect}
   closest(){return globalThis.document.body}
   hasAttribute(){return false}
@@ -122,7 +126,8 @@ test('simultaneous morphs keep incoming surface above outgoing and clean on hide
     const second=incoming.play(destination,'open');
 
     assert.deepEqual(host.children.map(node=>node.style.zIndex),
-      ['120','124','121','125']);
+      ['120','124']);
+    assert.ok(host.children.every(portal=>portal.children.length===1));
     assert.equal(destination.classes.has('mode-transition-live-hidden'),true);
 
     doc.hidden=true;
@@ -192,15 +197,19 @@ test('one choreography synchronizes outgoing, incoming and neighboring FLIP',asy
     assert.equal(sibling.animations[0].options.easing,MOTION_EASING.open);
     assert.equal(sibling.animations[0].options.duration,MOTION_DURATION.open);
 
-    const snapshotTracks=host.children.flatMap(node=>node.animations);
-    assert.equal(snapshotTracks.length,8);
-    for(const track of snapshotTracks){
-      assert.equal(track.options.duration,MOTION_DURATION.open);
-    }
-    // All geometric tracks follow one curve. Opacity crossfades are linear.
-    const geometric=snapshotTracks.filter(track=>track.frames[0].transform);
-    assert.equal(geometric.length,4);
-    assert.ok(geometric.every(track=>track.options.easing===MOTION_EASING.open));
+    const shells=host.children.map(portal=>portal.children[0]);
+    const tracks=shells.flatMap(shell=>[
+      ...shell.animations,
+      ...shell.children.flatMap(layer=>layer.animations)
+    ]);
+    assert.equal(tracks.length,6);
+    assert.ok(tracks.every(track=>track.options.duration===MOTION_DURATION.open));
+
+    // One geometry animation per surface, two opacity-only content layers.
+    assert.equal(shells.filter(shell=>shell.animations.length===1).length,2);
+    assert.ok(shells.every(shell=>shell.animations[0].options.easing===MOTION_EASING.open));
+    assert.ok(tracks.every(track=>track.frames.every(frame=>!('scale' in frame)&&!('transform' in frame))),
+      'No layer may scale card content');
 
     doc.hidden=true;
     doc.dispatch('visibilitychange');
@@ -231,7 +240,11 @@ test('tactile feedback does not alter geometry of a morph trigger',async()=>{
     const transition=modeSurfaceTransition.prepare(trigger);
     const destination=new FakeElement({left:35,top:90,width:640,height:340});
     const running=transition.play(destination,'open');
-    assert.equal(doc.body.children.length,2);
+    assert.equal(doc.body.children.length,1);
+    const shell=doc.body.children[0].children[0];
+    assert.equal(shell.animations.length,1);
+    assert.ok(shell.animations[0].frames.every(frame=>
+      typeof frame.width==='string'&&typeof frame.height==='string'&&!frame.transform));
 
     doc.hidden=true;
     doc.dispatch('visibilitychange');
@@ -249,16 +262,43 @@ test('fixed viewport snapshots never become children of the scrollable main',asy
     const transition=modeSurfaceTransition.prepare(source);
     assert.equal(main.children.length,0);
     assert.equal(host.children.length,1);
-    assert.equal(host.children[0].styles['--motion-left'],'150px');
-    assert.equal(host.children[0].styles['--motion-top'],'120px');
+    const shell=host.children[0].children[0];
+    assert.equal(shell.styles['--motion-left'],'150px');
+    assert.equal(shell.styles['--motion-top'],'120px');
 
     const destination=new FakeElement({left:130,top:95,width:400,height:350});
     const running=transition.play(destination,'open');
     assert.equal(main.children.length,0);
-    assert.equal(host.children.length,2);
+    assert.equal(host.children.length,1);
     doc.hidden=true;
     doc.dispatch('visibilitychange');
     await running;
     assert.equal(host.children.length,0);
+  });
+});
+
+test('scroll affects only portal translation, never shell geometry or content scale',async()=>{
+  await fakeBrowser(async({host,doc,win})=>{
+    const source=new FakeElement({left:50,top:130,width:160,height:80});
+    source.closest=()=>host;
+    const destination=new FakeElement({left:40,top:170,width:640,height:480});
+    const transition=modeSurfaceTransition.prepare(source);
+    const running=transition.play(destination,'open');
+    const portal=host.children[0];
+    const shell=portal.children[0];
+    const originalFrames=JSON.stringify(shell.animations[0].frames);
+    host.scrollTop=95;
+    host.dispatch('scroll');
+    assert.equal(portal.style.transform,'translate3d(0px,-95px,0)');
+    assert.equal(JSON.stringify(shell.animations[0].frames),originalFrames);
+    assert.ok(shell.children.every(layer=>
+      layer.animations.every(a=>a.frames.every(frame=>frame.transform===undefined))));
+
+    doc.hidden=true;
+    doc.dispatch('visibilitychange');
+    await running;
+    assert.equal(host.children.length,0);
+    assert.equal(host.events.count('scroll'),0);
+    assert.equal(win.count('scroll'),0);
   });
 });
