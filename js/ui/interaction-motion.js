@@ -4,7 +4,10 @@ import {
 } from '../motion-settings.js';
 
 // Shared tactile response for pointer, touch, keyboard and mouse.
-// Animate only the control itself: content and layout geometry stay untouched.
+// Tactile feedback MUST NOT animate transform/layout geometry: buttons can be
+// morph sources, and their bounding rect must stay invariant while clicked.
+// Brightness is composited independently, so connected-surface measurements
+// and FLIP remain stable even if the pointer release overlaps click dispatch.
 export function bindPressFeedback(root=document){
   let active=null;
   let activePointerId=null;
@@ -15,14 +18,14 @@ export function bindPressFeedback(root=document){
     const element=active;
     active=null;
     const connected=element.isConnected;
-    const from=connected?getComputedStyle(element).transform:'none';
+    const from=connected?getComputedStyle(element).filter:'none';
     cancelAnimation(animation);
     animation=null;
     if(!connected||prefersReducedMotion()||!supportsWebAnimations())return;
 
     const outgoing=element.animate([
-      {transform:from==='none'?'scale(.975)':from},
-      {transform:'scale(1)'}
+      {filter:from==='none'?'brightness(.94)':from},
+      {filter:'none'}
     ],{
       duration:MOTION_DURATION.press,
       easing:MOTION_EASING.press
@@ -39,8 +42,8 @@ export function bindPressFeedback(root=document){
     if(!element||element.disabled||prefersReducedMotion()||!supportsWebAnimations())return;
     active=element;
     animation=element.animate([
-      {transform:'scale(1)'},
-      {transform:'scale(.975)'}
+      {filter:'none'},
+      {filter:'brightness(.94)'}
     ],{
       duration:MOTION_DURATION.press,
       easing:MOTION_EASING.press,
