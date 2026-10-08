@@ -74,6 +74,8 @@ function prepare(source,{layer=0}={}){
 
   const from=viewportRect(source);
   if(!from)return {play:async()=>{},cancel:()=>{}};
+  // The source DOM can be replaced by mutate(); capture its style now.
+  const fromRadius=getComputedStyle(source).borderTopLeftRadius||'16px';
 
   // The only portal for this connected surface. It never contributes to the
   // scroll height and contains exactly one moving, clipping shell.
@@ -140,7 +142,6 @@ function prepare(source,{layer=0}={}){
     // Baselines for user scroll must therefore be recorded at THIS moment.
     stopFollowingScroll=followScroll(portal,destination);
 
-    const fromRadius=getComputedStyle(source).borderTopLeftRadius||'16px';
     const toRadius=getComputedStyle(destination).borderTopLeftRadius||'18px';
 
     const travel={duration,easing,fill:'both'};
