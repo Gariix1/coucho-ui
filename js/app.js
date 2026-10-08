@@ -21,13 +21,9 @@ import {
   modeConfigEqual
 } from './model.js';
 
-import {modeSurfaceTransition} from './motion.js';
-import {modeLayoutTransition} from './layout-motion.js';
-import {
-  MOTION_DURATION,
-  prefersReducedMotion
-} from './motion-settings.js';
-
+import {runMotionTransaction} from './motion-transaction.js';
+import {installMotionTokens,MOTION_DURATION,prefersReducedMotion} from './motion-settings.js';
+import {bindPressFeedback,celebrateSurface} from './ui/interaction-motion.js';
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
@@ -261,33 +257,26 @@ async function setCardDensity(next){
   if(next!=='compact'&&next!=='detailed')return;
   if(next===cardDensity||modeTransitioning)return;
 
-  var root=q('#modeList');
-  var anchorKey=expandedOpen?layoutKeyForMode(expandedModeId):null;
-  var layout=modeLayoutTransition.prepare(root,{
-    anchorKey:anchorKey,
-    scrollElement:q('.main')
-  });
+  const root=q('#modeList');
+  const anchorKey=expandedOpen?layoutKeyForMode(expandedModeId):null;
 
-  setModeTransitioning(true);
-
-  try{
-    cardDensity=next;
-    localStorage.setItem(CARD_DENSITY_KEY,cardDensity);
-    renderWorkbench();
-
-    await layout.play({
-      root:root,
-      anchorKey:anchorKey,
+  await runMotionTransaction({
+    root,
+    layout:{
+      anchorKey,
+      scrollElement:q('.main'),
       excludeKeys:anchorKey?[anchorKey]:[],
       duration:MOTION_DURATION.density
-    });
-  }finally{
-    layout.cancel();
-    setModeTransitioning(false);
-  }
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      cardDensity=next;
+      localStorage.setItem(CARD_DENSITY_KEY,cardDensity);
+      renderWorkbench();
+    }
+  });
 
-  var selected=q('[data-density="'+next+'"]');
-  if(selected)selected.focus({preventScroll:true});
+  q('[data-density="'+next+'"]')?.focus({preventScroll:true});
 }
 
 async function switchExpandedSurface(targetId,source){
@@ -295,50 +284,33 @@ async function switchExpandedSurface(targetId,source){
   if(expandedModeId===targetId)return true;
   if(!guardExpandedSwitch(targetId))return false;
 
-  var previousId=expandedModeId;
-  var previousKey=layoutKeyForMode(previousId);
-  var targetKey=layoutKeyForMode(targetId);
-  var root=q('#modeList');
-  var previousSurface=q('.mode-expanded');
-
+  const previousId=expandedModeId;
+  const previousKey=layoutKeyForMode(previousId);
+  const targetKey=layoutKeyForMode(targetId);
+  const previousSurface=q('.mode-expanded');
   if(!previousSurface||!source)return false;
 
   closePops();
-  setModeTransitioning(true);
-
-  var closingTransition=modeSurfaceTransition.prepare(previousSurface);
-  var openingTransition=modeSurfaceTransition.prepare(source);
-  var layout=modeLayoutTransition.prepare(root,{
-    anchorKey:targetKey,
-    scrollElement:q('.main')
+  await runMotionTransaction({
+    root:q('#modeList'),
+    surfaces:[
+      {source:previousSurface,destination:()=>elementForMode(previousId),direction:'close'},
+      {source,destination:()=>q('.mode-expanded'),direction:'open'}
+    ],
+    layout:{
+      anchorKey:targetKey,
+      scrollElement:q('.main'),
+      excludeKeys:[previousKey,targetKey],
+      duration:MOTION_DURATION.open
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      setExpandedTarget(targetId);
+      renderWorkbench();
+    }
   });
 
-  try{
-    setExpandedTarget(targetId);
-    renderWorkbench();
-
-    var destination=q('.mode-expanded');
-    var previousDestination=elementForMode(previousId);
-
-    await Promise.all([
-      closingTransition.play(previousDestination,'close'),
-      openingTransition.play(destination,'open'),
-      layout.play({
-        root:root,
-        anchorKey:targetKey,
-        excludeKeys:[previousKey,targetKey],
-        duration:MOTION_DURATION.open
-      })
-    ]);
-  }finally{
-    closingTransition.cancel();
-    openingTransition.cancel();
-    layout.cancel();
-    setModeTransitioning(false);
-  }
-
-  var closeButton=q('#expandedClose');
-  if(closeButton)closeButton.focus({preventScroll:true});
+  q('#expandedClose')?.focus({preventScroll:true});
   return true;
 }
 
@@ -347,51 +319,35 @@ async function expandModeSurface(targetId,source){
 
   if(expandedOpen){
     if(expandedModeId===targetId){
-      var current=q('.mode-expanded');
-      if(current)current.focus({preventScroll:true});
+      q('.mode-expanded')?.focus({preventScroll:true});
       return true;
     }
     return switchExpandedSurface(targetId,source);
   }
 
-  var mode=targetId===null?null:byId(targetId);
-  if(targetId!==null&&!mode)return false;
+  if(targetId!==null&&!byId(targetId))return false;
   if(!source)return false;
 
+  const targetKey=layoutKeyForMode(targetId);
   closePops();
-  setModeTransitioning(true);
 
-  var targetKey=layoutKeyForMode(targetId);
-  var root=q('#modeList');
-  var transition=modeSurfaceTransition.prepare(source);
-  var layout=modeLayoutTransition.prepare(root,{
-    anchorKey:targetKey,
-    scrollElement:q('.main')
+  await runMotionTransaction({
+    root:q('#modeList'),
+    surfaces:[{source,destination:()=>q('.mode-expanded'),direction:'open'}],
+    layout:{
+      anchorKey:targetKey,
+      scrollElement:q('.main'),
+      excludeKeys:[targetKey],
+      duration:MOTION_DURATION.open
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      setExpandedTarget(targetId);
+      renderWorkbench();
+    }
   });
 
-  try{
-    setExpandedTarget(targetId);
-    renderWorkbench();
-
-    var destination=q('.mode-expanded');
-
-    await Promise.all([
-      transition.play(destination,'open'),
-      layout.play({
-        root:root,
-        anchorKey:targetKey,
-        excludeKeys:[targetKey],
-        duration:MOTION_DURATION.open
-      })
-    ]);
-  }finally{
-    transition.cancel();
-    layout.cancel();
-    setModeTransitioning(false);
-  }
-
-  var closeButton=q('#expandedClose');
-  if(closeButton)closeButton.focus({preventScroll:true});
+  q('#expandedClose')?.focus({preventScroll:true});
   return true;
 }
 
@@ -410,40 +366,28 @@ async function collapseExpandedMode(restore,afterClose){
   if(!expandedOpen||modeTransitioning)return false;
 
   closePops();
+  const closingId=expandedModeId;
+  const closingKey=layoutKeyForMode(closingId);
 
-  var closingId=expandedModeId;
-  var closingKey=layoutKeyForMode(closingId);
-  var source=q('.mode-expanded');
-  var root=q('#modeList');
-
-  setModeTransitioning(true);
-
-  var transition=modeSurfaceTransition.prepare(source);
-  var layout=modeLayoutTransition.prepare(root,{
-    anchorKey:closingKey,
-    scrollElement:q('.main')
+  await runMotionTransaction({
+    root:q('#modeList'),
+    surfaces:[{
+      source:q('.mode-expanded'),
+      destination:()=>elementForMode(closingId),
+      direction:'close'
+    }],
+    layout:{
+      anchorKey:closingKey,
+      scrollElement:q('.main'),
+      excludeKeys:[closingKey],
+      duration:MOTION_DURATION.close
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      resetExpandedState();
+      renderWorkbench();
+    }
   });
-
-  try{
-    resetExpandedState();
-    renderWorkbench();
-
-    var destination=elementForMode(closingId);
-
-    await Promise.all([
-      transition.play(destination,'close'),
-      layout.play({
-        root:root,
-        anchorKey:closingKey,
-        excludeKeys:[closingKey],
-        duration:MOTION_DURATION.close
-      })
-    ]);
-  }finally{
-    transition.cancel();
-    layout.cancel();
-    setModeTransitioning(false);
-  }
 
   if(typeof afterClose==='function'){
     afterClose();
@@ -451,10 +395,10 @@ async function collapseExpandedMode(restore,afterClose){
   }
 
   if(restore){
-    var focusTarget=closingId===null
+    const focusTarget=closingId===null
       ?q('[data-expand-source="current"]')
       :q('[data-mode-row="'+closingId+'"] .open-mode');
-    if(focusTarget)focusTarget.focus({preventScroll:true});
+    focusTarget?.focus({preventScroll:true});
   }
   return true;
 }
@@ -715,6 +659,7 @@ function activate(id,force){
     activatingId=null;
     activationTimer=null;
     render();
+    celebrateSurface(q('[data-mode-row="'+id+'"]'));
     toast(current.name,'Activo');
   },ACTIVATION_DELAY_MS);
 }
@@ -1021,35 +966,39 @@ function beginExpandedRename(){
 }
 
 async function createModeFromExpanded(){
-  if(!expandedConfig||expandedModeId!==null)return;
+  if(!expandedConfig||expandedModeId!==null||modeTransitioning)return;
 
-  var source=q('.mode-expanded');
-  var transition=modeSurfaceTransition.prepare(source);
-  setModeTransitioning(true);
-
-  var created=cloneModeConfig(expandedConfig);
+  const created=cloneModeConfig(expandedConfig);
   created.id=Date.now();
   created.active=false;
 
-  try{
-    sets.push(created);
-    commitSets();
+  await runMotionTransaction({
+    root:q('#modeList'),
+    surfaces:[{
+      source:q('.mode-expanded'),
+      destination:()=>q('[data-mode-row="'+created.id+'"]'),
+      direction:'close'
+    }],
+    layout:{
+      anchorKey:layoutKeyForMode(null),
+      scrollElement:q('.main'),
+      excludeKeys:[layoutKeyForMode(null),layoutKeyForMode(created.id)],
+      duration:MOTION_DURATION.close
+    },
+    onBusy:setModeTransitioning,
+    mutate(){
+      sets.push(created);
+      commitSets();
+      resetExpandedState();
+      render();
+    }
+  });
 
-    resetExpandedState();
-
-    render();
-
-    var destination=q('[data-mode-row="'+created.id+'"]');
-    await transition.play(destination,'close');
-  }finally{
-    transition.cancel();
-    setModeTransitioning(false);
-  }
-
+  const card=q('[data-mode-row="'+created.id+'"]');
+  celebrateSurface(card);
   toast(created.name,'Modo creado');
   requestAnimationFrame(function(){
-    var card=q('[data-mode-row="'+created.id+'"]');
-    if(card)card.scrollIntoView({
+    card?.scrollIntoView({
       behavior:prefersReducedMotion()?'auto':'smooth',
       block:'nearest'
     });
@@ -1517,6 +1466,8 @@ q('#advancedDisplays').onclick=function(){toast('Pantallas','Configuración avan
 q('#restoreDisplays').onclick=function(){toast('Pantallas','Recuperación simulada')};
 q('#advancedSettings').onclick=function(){toast('Avanzado','Diagnóstico y recuperación · prototipo')};
 
+installMotionTokens();
+bindPressFeedback();
 bindModeListEvents();
 bindDisplayEditorEvents();
 openShellView('modes');
