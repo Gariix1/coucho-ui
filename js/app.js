@@ -84,6 +84,23 @@ let captured=null;
 let testContext=null;
 let progressTimer=null;
 let countdownTimer=null;
+let restoreTimer=null;
+
+function clearTestTimers(){
+  clearInterval(progressTimer);
+  clearInterval(countdownTimer);
+  clearTimeout(restoreTimer);
+  progressTimer=null;
+  countdownTimer=null;
+  restoreTimer=null;
+}
+
+function scheduleTestRestore(callback,delay){
+  restoreTimer=setTimeout(function(){
+    restoreTimer=null;
+    callback();
+  },delay);
+}
 
 // Mode/session domain helpers.
 function byId(id){return sets.find(function(x){return x.id===id})||null}
@@ -1322,7 +1339,8 @@ function setTestProgress(percent){
 function startTest(ctx){
   closePops();
   closeShortcutOverlay();
-  testContext=ctx;clearInterval(progressTimer);clearInterval(countdownTimer);
+  clearTestTimers();
+  testContext=ctx;
   q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx)+'</div>';
   q('#testApp').textContent=logo(ctx.app);
   q('#testText').textContent='Probando '+ctx.name+'…';
@@ -1333,16 +1351,18 @@ function startTest(ctx){
   progressTimer=setInterval(function(){
     pct+=25;setTestProgress(pct);
     if(pct>=100){
-      clearInterval(progressTimer);q('#testText').textContent='Listo';q('#confirm').classList.add('show');
+      clearInterval(progressTimer);progressTimer=null;
+      q('#testText').textContent='Listo';q('#confirm').classList.add('show');
       var left=15;q('#count').textContent=left;
       countdownTimer=setInterval(function(){
         left--;q('#count').textContent=left;
         if(left<=0){
           clearInterval(countdownTimer);
+          countdownTimer=null;
           q('#confirm').classList.remove('show');
           q('#testText').textContent='Restaurando…';
           setTestProgress(100);
-          setTimeout(finishRestore,TEST_TIMEOUT_RESTORE_MS);
+          scheduleTestRestore(finishRestore,TEST_TIMEOUT_RESTORE_MS);
         }
       },TEST_COUNTDOWN_INTERVAL_MS);
     }
@@ -1350,7 +1370,7 @@ function startTest(ctx){
 }
 
 q('#keep').onclick=function(){
-  clearInterval(countdownTimer);
+  clearTestTimers();
   var kind=testContext&&testContext.kind;
 
   if(kind==='display'){
@@ -1414,6 +1434,7 @@ q('#keep').onclick=function(){
 };
 
 function finishRestore(){
+  clearTestTimers();
   q('#testOverlay').classList.remove('open');
   testContext=null;
   renderWorkbench();
@@ -1421,13 +1442,13 @@ function finishRestore(){
 }
 
 q('#revert').onclick=function(){
-  clearInterval(countdownTimer);
+  clearTestTimers();
   q('#confirm').classList.remove('show');
   q('#testText').textContent='Restaurando…';
   setTestProgress(35);
-  setTimeout(function(){
+  scheduleTestRestore(function(){
     setTestProgress(100);
-    setTimeout(finishRestore,MANUAL_RESTORE_FINISH_MS);
+    scheduleTestRestore(finishRestore,MANUAL_RESTORE_FINISH_MS);
   },MANUAL_RESTORE_STEP_MS);
 };
 
