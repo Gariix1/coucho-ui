@@ -142,6 +142,42 @@ try{
     await page.waitForFunction(()=>document.querySelector('#modeList')?.dataset.density==='detailed');
   });
 
+  await check('scroll during Morph keeps text unscaled and the shell aligned',async()=>{
+    const scroller=page.locator('.main');
+    await scroller.evaluate(el=>{el.scrollTop=0});
+    await page.locator('[data-mode-row="1"] .open-mode').click();
+    await page.waitForFunction(()=>!!document.querySelector('.mode-transition-portal'));
+
+    const sample=await page.evaluate(()=>{
+      const portal=document.querySelector('.mode-transition-portal');
+      const shell=portal.querySelector('.mode-transition-shell');
+      const main=document.querySelector('.main');
+      const before=main.scrollTop;
+      main.scrollTop+=110;
+      main.dispatchEvent(new Event('scroll'));
+      const delta=main.scrollTop-before;
+      const shellFrames=shell.getAnimations().flatMap(a=>a.effect?.getKeyframes()||[]);
+      const contentFrames=[...shell.querySelectorAll('.mode-transition-content')]
+        .flatMap(el=>el.getAnimations().flatMap(a=>a.effect?.getKeyframes()||[]));
+      return {
+        delta,
+        portalTransform:portal.style.transform,
+        geometryOwnedByShell:shellFrames.some(frame=>frame.width&&frame.height),
+        noTransformOnContent:contentFrames.every(frame=>frame.transform===undefined),
+        sourceTransform:getComputedStyle(shell.querySelector('.mode-transition-content-source')).transform,
+        destinationTransform:getComputedStyle(shell.querySelector('.mode-transition-content-destination')).transform
+      };
+    });
+    assert.ok(sample.delta>0,'The viewport must actually scroll during the transition');
+    assert.equal(sample.portalTransform,'translate3d(0px,'+(-sample.delta)+'px,0)');
+    assert.equal(sample.geometryOwnedByShell,true);
+    assert.equal(sample.noTransformOnContent,true);
+    assert.equal(sample.sourceTransform,'none');
+    assert.equal(sample.destinationTransform,'none');
+  });
+  await page.locator('#expandedClose').click();
+  await stable();
+
   await check('expand current desktop',async()=>{
     await page.locator('[data-expand-source="current"]').click();
     await page.waitForSelector('#expandedMode.new-mode-expanded',{timeout:5000});
