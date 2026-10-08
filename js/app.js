@@ -1,4 +1,4 @@
-import {q,qa,esc,setCssVars} from './core/dom.js';
+import {q,qa,esc,setCssVars,closestWithin} from './core/dom.js';
 import {iconMarkup,modeIconMarkup} from './core/icons.js';
 import {
   autoMeta,
@@ -1062,116 +1062,119 @@ function bindExpandedRename(){
 }
 
 function handleModeListClick(event){
-  var target=event.target;
+  const target=event.target;
   if(!(target instanceof Element))return;
+  // Use a scoped resolver: data attributes on #modeList describe state,
+  // never user actions, and must not capture descendant clicks.
+  const find=selector=>closestWithin(target,selector,event.currentTarget);
 
-  var expandedDisplay=target.closest('[data-expanded-display]');
+  var expandedDisplay=find('[data-expanded-display]');
   if(expandedDisplay){
     toggleExpandedDisplay(expandedDisplay.dataset.expandedDisplay);
     return;
   }
 
-  var expandedPrimary=target.closest('[data-expanded-primary]');
+  var expandedPrimary=find('[data-expanded-primary]');
   if(expandedPrimary){
     makeExpandedPrimary(expandedPrimary.dataset.expandedPrimary);
     return;
   }
 
-  var density=target.closest('button[data-density-option]');
+  var density=find('button[data-density-option]');
   if(density){
     setCardDensity(density.dataset.densityOption);
     return;
   }
 
-  var current=target.closest('[data-expand-source]');
+  var current=find('[data-expand-source]');
   if(current){
     expandCurrentDesktop(current.dataset.expandSource);
     return;
   }
 
-  var activateButton=target.closest('.activate');
+  var activateButton=find('.activate');
   if(activateButton){
     activate(Number(activateButton.dataset.id));
     return;
   }
 
-  var openButton=target.closest('.open-mode');
+  var openButton=find('.open-mode');
   if(openButton){
     focusOrExpandMode(openButton.closest('[data-mode-row]'));
     return;
   }
 
-  var trashButton=target.closest('.trash-mode');
+  var trashButton=find('.trash-mode');
   if(trashButton){
     openDeletePop(trashButton,trashButton.dataset.id);
     return;
   }
 
-  var displayButton=target.closest('.quick-display');
+  var displayButton=find('.quick-display');
   if(displayButton){
     openDisplayPop(displayButton,displayButton.dataset.id);
     return;
   }
 
-  var appButton=target.closest('.quick-app');
+  var appButton=find('.quick-app');
   if(appButton){
     openAppPop(appButton,appButton.dataset.id);
     return;
   }
 
-  var shortcutButton=target.closest('.quick-shortcut');
+  var shortcutButton=find('.quick-shortcut');
   if(shortcutButton){
     openShortcut(shortcutButton.dataset.id);
     return;
   }
 
-  if(target.closest('#expandedClose')){
+  if(find('#expandedClose')){
     collapseExpandedMode(true);
     return;
   }
 
-  var expandedApp=target.closest('#expandedApp');
+  var expandedApp=find('#expandedApp');
   if(expandedApp){
     openExpandedAppPicker(expandedApp);
     return;
   }
 
-  if(target.closest('#expandedShortcut')){
+  if(find('#expandedShortcut')){
     openShortcut('expanded');
     return;
   }
 
-  if(target.closest('#expandedReset')){
+  if(find('#expandedReset')){
     expandedConfig=cloneModeConfig(newModeBase);
     refreshExpandedConfig();
     return;
   }
 
-  if(target.closest('#expandedSave')){
+  if(find('#expandedSave')){
     createModeFromExpanded();
     return;
   }
 
-  if(target.closest('#expandedActivate')){
+  if(find('#expandedActivate')){
     if(expandedModeId!==null)activate(expandedModeId,true);
     return;
   }
 
-  if(target.closest('#expandedTest')){
+  if(find('#expandedTest')){
     testExpandedMode();
     return;
   }
 
-  var toggleSurface=target.closest('[data-expanded-toggle]');
+  var toggleSurface=find('[data-expanded-toggle]');
   if(toggleSurface){
-    if(target.closest(EXPANDED_TOGGLE_EXCLUDE_SELECTOR)||hasTextSelection())return;
+    if(find(EXPANDED_TOGGLE_EXCLUDE_SELECTOR)||hasTextSelection())return;
     collapseExpandedMode(true);
     return;
   }
 
-  var card=target.closest('.saved-mode-card:not(.mode-expanded)');
+  var card=find('.saved-mode-card:not(.mode-expanded)');
   if(!card)return;
-  if(target.closest(INTERACTIVE_SELECTOR)||hasTextSelection())return;
+  if(find(INTERACTIVE_SELECTOR)||hasTextSelection())return;
 
   focusOrExpandMode(card);
 }
