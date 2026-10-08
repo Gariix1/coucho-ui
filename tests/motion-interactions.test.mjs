@@ -209,3 +209,56 @@ test('one choreography synchronizes outgoing, incoming and neighboring FLIP',asy
     assert.equal(host.classes.has('layout-motion-active'),false);
   });
 });
+
+test('tactile feedback does not alter geometry of a morph trigger',async()=>{
+  await fakeBrowser(async({doc,win})=>{
+    const root=eventHub();
+    bindPressFeedback(root);
+    const trigger=new FakeElement({left:24,top:72,width:300,height:72});
+    const target={closest:()=>trigger};
+    const before=trigger.getBoundingClientRect();
+
+    root.dispatch('pointerdown',{button:0,pointerId:1,target});
+    win.dispatch('pointerup',{pointerId:1});
+    assert.equal(trigger.animations.length,2);
+    assert.ok(trigger.animations.every(animation=>
+      animation.frames.every(frame=>!Object.hasOwn(frame,'transform'))),
+      'A press must never overwrite the transform owned by Morph/FLIP'
+    );
+    assert.deepEqual(trigger.getBoundingClientRect(),before);
+
+    // The same source is now captured for opening, while feedback is releasing.
+    const transition=modeSurfaceTransition.prepare(trigger);
+    const destination=new FakeElement({left:35,top:90,width:640,height:340});
+    const running=transition.play(destination,'open');
+    assert.equal(doc.body.children.length,2);
+
+    doc.hidden=true;
+    doc.dispatch('visibilitychange');
+    await running;
+    assert.equal(doc.body.children.length,0);
+    assert.equal(destination.classes.has('mode-transition-live-hidden'),false);
+  });
+});
+
+test('fixed viewport snapshots never become children of the scrollable main',async()=>{
+  await fakeBrowser(async({host,doc})=>{
+    const main=new FakeElement({left:100,top:30,width:600,height:450});
+    const source=new FakeElement({left:150,top:120,width:120,height:68});
+    source.closest=()=>main;
+    const transition=modeSurfaceTransition.prepare(source);
+    assert.equal(main.children.length,0);
+    assert.equal(host.children.length,1);
+    assert.equal(host.children[0].styles['--motion-left'],'150px');
+    assert.equal(host.children[0].styles['--motion-top'],'120px');
+
+    const destination=new FakeElement({left:130,top:95,width:400,height:350});
+    const running=transition.play(destination,'open');
+    assert.equal(main.children.length,0);
+    assert.equal(host.children.length,2);
+    doc.hidden=true;
+    doc.dispatch('visibilitychange');
+    await running;
+    assert.equal(host.children.length,0);
+  });
+});
