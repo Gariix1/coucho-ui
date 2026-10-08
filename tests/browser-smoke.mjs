@@ -78,13 +78,14 @@ try{
     list.addEventListener('click',event=>{
       window.__motionTrace.push({type:'bubble',open:!!event.target.closest('.open-mode')});
     });
-    new MutationObserver(()=>{
+    window.__motionObserver=new MutationObserver(()=>{
       window.__motionTrace.push({
         type:'mutation',
         expanded:!!document.querySelector('#expandedMode'),
         busy:document.querySelector('.mode-workbench')?.getAttribute('aria-busy')
       });
-    }).observe(list,{childList:true,subtree:true});
+    });
+    window.__motionObserver.observe(list,{childList:true,subtree:true});
   });
 
   await check('open saved Couchset',async()=>{
@@ -93,6 +94,7 @@ try{
   });
   assert.equal(await page.locator('#expandedName').innerText(),'Gaming');
   assert.equal(await page.locator('#expandedMode').isVisible(),true);
+  await page.evaluate(()=>window.__motionObserver?.disconnect());
 
   await check('switch expanded Couchset',async()=>{
     await page.locator('[data-mode-row="2"] .open-mode').click();
