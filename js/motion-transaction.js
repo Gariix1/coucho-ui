@@ -39,7 +39,8 @@ export async function runMotionTransaction({
           anchorKey:layout.anchorKey,
           excludeKeys:layout.excludeKeys||[],
           duration:layout.duration,
-          easing:layout.easing
+          easing:layout.easing,
+          animateSize:!!layout.animateSize
         })
       :Promise.resolve();
 
