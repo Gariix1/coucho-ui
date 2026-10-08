@@ -9,17 +9,15 @@ import {
   cancelAnimation
 } from './motion-settings.js';
 
-// Viewport coordinates are the only source of truth for connected surfaces.
-// Portals live outside scroll containers, so scrolling, clipping and FLIP
-// cannot change a snapshot's containing block in the middle of its travel.
+// One owner per property:
+// shell: left/top/width/height/border-radius (geometry);
+// content layers: opacity only (no stretched text, icons or controls);
+// portal: scroll displacement only (independent from the geometry timeline).
 function viewportRect(element){
   if(!element?.isConnected)return null;
   const rect=element.getBoundingClientRect();
   if(!usableRect(rect))return null;
-  return {
-    left:rect.left,top:rect.top,
-    width:rect.width,height:rect.height
-  };
+  return {left:rect.left,top:rect.top,width:rect.width,height:rect.height};
 }
 
 function sanitizeClone(root){
@@ -32,37 +30,40 @@ function sanitizeClone(root){
   return root;
 }
 
-function createSnapshot(element,kind,layer){
-  const rect=viewportRect(element);
-  if(!usableRect(rect))return null;
-
-  const snapshot=document.createElement('div');
-  snapshot.className='mode-transition-snapshot mode-transition-'+kind;
-  snapshot.setAttribute('aria-hidden','true');
-  snapshot.setAttribute('inert','');
-  snapshot.style.zIndex=String((kind==='destination'?121:120)+layer*4);
-  setCssVars(snapshot,{
-    '--motion-left':rect.left+'px','--motion-top':rect.top+'px',
-    '--motion-width':rect.width+'px','--motion-height':rect.height+'px'
+function createContent(element,rect,kind){
+  const layer=document.createElement('div');
+  layer.className='mode-transition-content mode-transition-content-'+kind;
+  setCssVars(layer,{
+    '--motion-content-width':rect.width+'px',
+    '--motion-content-height':rect.height+'px'
   });
-  const content=document.createElement('div');
-  content.className='mode-transition-content';
-  content.appendChild(sanitizeClone(element.cloneNode(true)));
-  snapshot.appendChild(content);
-  document.body.appendChild(snapshot);
-  return {element:snapshot,content,rect};
+  layer.appendChild(sanitizeClone(element.cloneNode(true)));
+  return layer;
 }
 
-function transform(x,y,scaleX,scaleY){
-  return 'translate3d('+x+'px,'+y+'px,0) scale('+scaleX+','+scaleY+')';
-}
+// Scroll changes the physical viewport position of BOTH endpoints equally.
+// Apply only their common displacement to the portal, never to text or the
+// animated shell. No scroll blocking and no per-frame remeasurement.
+function followScroll(portal,source){
+  const scroller=source?.closest?.('.main')||document.querySelector('.main');
+  const initialX=scroller?.scrollLeft||0;
+  const initialY=scroller?.scrollTop||0;
+  const initialWindowX=window.scrollX||0;
+  const initialWindowY=window.scrollY||0;
 
-// Both snapshots follow the exact same visual rectangle at every point in time.
-// One is defined from the source; the other is defined backwards from the destination.
-function transformsBetween(from,to){
-  return {
-    sourceEnd:transform(to.left-from.left,to.top-from.top,to.width/from.width,to.height/from.height),
-    destinationStart:transform(from.left-to.left,from.top-to.top,from.width/to.width,from.height/to.height)
+  function update(){
+    const x=(scroller?.scrollLeft||0)-initialX+(window.scrollX||0)-initialWindowX;
+    const y=(scroller?.scrollTop||0)-initialY+(window.scrollY||0)-initialWindowY;
+    portal.style.transform='translate3d('+(-x)+'px,'+(-y)+'px,0)';
+  }
+
+  scroller?.addEventListener?.('scroll',update,{passive:true});
+  window.addEventListener('scroll',update,{passive:true});
+  update();
+
+  return ()=>{
+    scroller?.removeEventListener?.('scroll',update);
+    window.removeEventListener('scroll',update);
   };
 }
 
@@ -71,12 +72,33 @@ function prepare(source,{layer=0}={}){
     return {play:async()=>{},cancel:()=>{}};
   }
 
-  const flight=createSnapshot(source,'flight',layer);
-  if(!flight)return {play:async()=>{},cancel:()=>{}};
+  const from=viewportRect(source);
+  if(!from)return {play:async()=>{},cancel:()=>{}};
+
+  // The only portal for this connected surface. It never contributes to the
+  // scroll height and contains exactly one moving, clipping shell.
+  const portal=document.createElement('div');
+  portal.className='mode-transition-portal';
+  portal.setAttribute('aria-hidden','true');
+  portal.setAttribute('inert','');
+  portal.style.zIndex=String(120+layer*4);
+
+  const shell=document.createElement('div');
+  shell.className='mode-transition-shell';
+  setCssVars(shell,{
+    '--motion-left':from.left+'px',
+    '--motion-top':from.top+'px',
+    '--motion-width':from.width+'px',
+    '--motion-height':from.height+'px'
+  });
+  const outgoing=createContent(source,from,'source');
+  shell.appendChild(outgoing);
+  portal.appendChild(shell);
+  document.body.appendChild(portal);
 
   let disposed=false;
-  let destinationSnapshot=null;
   let destinationElement=null;
+  let stopFollowingScroll=()=>{};
   const animations=[];
   const onResize=()=>dispose();
   const onVisibilityChange=()=>{if(document.hidden)dispose()};
@@ -88,60 +110,55 @@ function prepare(source,{layer=0}={}){
     disposed=true;
     window.removeEventListener('resize',onResize);
     document.removeEventListener('visibilitychange',onVisibilityChange);
+    stopFollowingScroll();
     animations.forEach(cancelAnimation);
-    // Reveal the actual destination in the same frame as snapshot removal.
+    // Restore the real, normally laid-out destination, with no transform.
     destinationElement?.classList.remove('mode-transition-live-hidden');
-    destinationSnapshot?.element.remove();
-    flight.element.remove();
+    portal.remove();
     animations.length=0;
   }
 
   async function play(destination,direction='open',{duration:sharedDuration=null,easing:sharedEasing=null}={}){
-    if(disposed||!destination?.isConnected){
-      dispose();
-      return;
-    }
+    if(disposed||!destination?.isConnected){dispose();return;}
+    const to=viewportRect(destination);
+    if(!to){dispose();return;}
 
-    destinationSnapshot=createSnapshot(destination,'destination',layer);
-    if(!destinationSnapshot){
-      dispose();
-      return;
-    }
+    const incoming=createContent(destination,to,'destination');
+    shell.appendChild(incoming);
 
-    const to=destinationSnapshot.rect;
-    const {sourceEnd,destinationStart}=transformsBetween(flight.rect,to);
-    const open=direction!=='close';
-    const duration=sharedDuration??(open?MOTION_DURATION.open:MOTION_DURATION.close);
-    const easing=sharedEasing??(open?MOTION_EASING.open:MOTION_EASING.close);
-    const expanded=open&&destination.classList.contains('new-mode-expanded');
-    flight.element.classList.toggle('to-create',expanded);
-    flight.element.classList.toggle('to-expanded',open&&!expanded);
-    flight.element.classList.toggle('to-card',!open);
+    const opening=direction!=='close';
+    const duration=sharedDuration??(opening?MOTION_DURATION.open:MOTION_DURATION.close);
+    const easing=sharedEasing??(opening?MOTION_EASING.open:MOTION_EASING.close);
+    const isNew=opening&&destination.classList.contains('new-mode-expanded');
+    shell.classList.toggle('to-create',isNew);
+    shell.classList.toggle('to-expanded',opening&&!isNew);
+    shell.classList.toggle('to-card',!opening);
 
-    // No rendered destination flashes through while the shared surface is moving.
     destinationElement=destination;
     destinationElement.classList.add('mode-transition-live-hidden');
+    // The automatic anchor adjustment has already completed before play().
+    // Baselines for user scroll must therefore be recorded at THIS moment.
+    stopFollowingScroll=followScroll(portal,destination);
+
+    const fromRadius=getComputedStyle(source).borderTopLeftRadius||'16px';
+    const toRadius=getComputedStyle(destination).borderTopLeftRadius||'18px';
 
     const travel={duration,easing,fill:'both'};
     animations.push(
-      flight.element.animate([
-        {transform:'translate3d(0,0,0) scale(1,1)'},
-        {transform:sourceEnd}
+      shell.animate([
+        {left:from.left+'px',top:from.top+'px',width:from.width+'px',height:from.height+'px',borderRadius:fromRadius},
+        {left:to.left+'px',top:to.top+'px',width:to.width+'px',height:to.height+'px',borderRadius:toRadius}
       ],travel),
-      destinationSnapshot.element.animate([
-        {transform:destinationStart},
-        {transform:'translate3d(0,0,0) scale(1,1)'}
-      ],travel),
-      flight.element.animate([
+      outgoing.animate([
         {opacity:1,offset:0},
-        {opacity:1,offset:.32},
-        {opacity:.22,offset:.82},
+        {opacity:1,offset:.12},
+        {opacity:0,offset:.42},
         {opacity:0,offset:1}
       ],{duration,easing:MOTION_EASING.linear,fill:'both'}),
-      destinationSnapshot.element.animate([
+      incoming.animate([
         {opacity:0,offset:0},
-        {opacity:0,offset:.28},
-        {opacity:.9,offset:.82},
+        {opacity:0,offset:.30},
+        {opacity:1,offset:.85},
         {opacity:1,offset:1}
       ],{duration,easing:MOTION_EASING.linear,fill:'both'})
     );
