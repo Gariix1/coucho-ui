@@ -76,7 +76,8 @@ function prepare(root,{
     anchorKey:nextAnchorKey=anchorKey,
     excludeKeys=[],
     duration=MOTION_DURATION.open,
-    easing=MOTION_EASING.layout
+    easing=MOTION_EASING.layout,
+    animateSize=false
   }={}){
     if(disposed)return;
 
@@ -111,15 +112,22 @@ function prepare(root,{
       if(!next||!next.element.isConnected)return;
 
       const delta=animationDelta(entry.rect,next.rect);
-      if(!shouldMove(delta))return;
+      const sizeChanged=animateSize&&(
+        Math.abs(entry.rect.width-next.rect.width)>.5||
+        Math.abs(entry.rect.height-next.rect.height)>.5
+      );
+      if(!shouldMove(delta)&&!sizeChanged)return;
 
+      const scaleX=sizeChanged?entry.rect.width/next.rect.width:1;
+      const scaleY=sizeChanged?entry.rect.height/next.rect.height:1;
       animations.push(next.element.animate([
-        {transform:'translate3d('+delta.x+'px,'+delta.y+'px,0)'},
-        {transform:'translate3d(0,0,0)'}
+        {transform:'translate3d('+delta.x+'px,'+delta.y+'px,0) scale('+scaleX+','+scaleY+')',transformOrigin:'top left'},
+        {transform:'translate3d(0,0,0) scale(1,1)',transformOrigin:'top left'}
       ],{
         duration,
         easing,
-        fill:'both'
+        fill:'both',
+        composite:'replace'
       }));
     });
 
