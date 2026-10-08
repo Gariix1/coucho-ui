@@ -1332,6 +1332,7 @@ q('#keep').onclick=function(){
     q('#testOverlay').classList.remove('open');
     commitSets();
     render();
+    celebrateSurface(q('[data-mode-row="'+testContext.id+'"]'));
     toast(testContext.name,'Pantallas guardadas');
     testContext=null;
     return;
@@ -1351,6 +1352,7 @@ q('#keep').onclick=function(){
     q('#testOverlay').classList.remove('open');
     commitSets();
     render();
+    celebrateSurface(q('[data-mode-row="'+created.id+'"]'));
     toast(created.name,'Guardado y activo');
     testContext=null;
     return;
@@ -1375,6 +1377,7 @@ q('#keep').onclick=function(){
     q('#testOverlay').classList.remove('open');
     commitSets();
     render();
+    if(edited)celebrateSurface(q('[data-mode-row="'+edited.id+'"]'));
     toast(editedName,'Activo');
     testContext=null;
     return;
