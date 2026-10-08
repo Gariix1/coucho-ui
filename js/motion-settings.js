@@ -37,6 +37,14 @@ export function animationFinished(animation){
   return animation.finished.catch(()=>{});
 }
 
+// All UI animations must be observed at creation time: cancel() rejects the
+// Web Animations finished promise even if the caller is not awaiting it.
+export function startAnimation(element,keyframes,options){
+  const animation=element.animate(keyframes,options);
+  animationFinished(animation);
+  return animation;
+}
+
 export function cancelAnimation(animation){
   if(!animation)return;
   try{animation.cancel()}catch(_){}
