@@ -10,7 +10,10 @@ Este mockup debe sentirse como **un espacio continuo**, no como varias pantallas
 | Transición conectada | `js/motion.js` | Dos snapshots que viajan por el mismo rectángulo y se cruzan visualmente durante el recorrido. |
 | Ajuste de layout (FLIP) | `js/layout-motion.js` | Mover hermanos cuando un Couchset se expande o cuando cambia la densidad; tamaño animado opcional. |
 | Coordinador | `js/motion-transaction.js` | Capturar -> mutar -> acomodar layout -> ejecutar las superficies -> limpiar siempre. |
-| Microinteracciones | `js/ui/interaction-motion.js` | Feedback de puntero/teclado, confirmación sutil y aparición de avisos. |
+| Microinteracciones | `js/ui/interaction-motion.js` | Feedback de puntero/teclado sin modificar geometría, confirmaciones y avisos. |
+| Ciclo de vida WAAPI | `js/motion-settings.js` | `startAnimation()` maneja las cancelaciones de `Animation.finished`. |
+| Actualizaciones diferidas | `js/motion-scheduler.js` | Aplaza renders de temporizadores que coinciden con Morph/FLIP. |
+| Delegación de eventos | `js/core/dom.js` | `closestWithin()` evita confundir datos del contenedor con controles accionables. |
 | Estilos de transición | `css/ui/motion.css` | Snapshots y ocultación del destino real mientras se ejecuta la transición. |
 
 ## Principios
@@ -50,6 +53,9 @@ await runMotionTransaction({
 - Si solo cambian hermanos, omitir `surfaces`.
 - Si no hay desplazamiento de hermanos, omitir `layout`.
 - No crear copias nuevas de Morph/FLIP en `app.js`. Reutilizar el coordinador.
+- No animar `transform` en botones que sirven de origen a Morph: la pulsación no debe modificar su rectángulo.
+- Mantener separados los atributos del estado del contenedor (`data-density`) y las acciones (`data-density-option`).
+- Cualquier render programado por temporizadores debe pasar por `createMotionScheduler()` si puede coincidir con una transición.
 
 ## Tiempos
 
@@ -57,11 +63,13 @@ Los valores se modifican en `js/motion-settings.js`. `installMotionTokens()` los
 
 ## Verificaciones
 
-Pruebas unitarias de geometría, transacciones, capas y pulsaciones sin dependencias externas:
+Pruebas de geometría, delegación de eventos, scheduler, transacciones y cancelaciones:
 
 ```sh
 node --experimental-default-type=module --test tests/*.test.mjs
 ```
+
+CI también ejecuta ESLint (`no-undef`) y un smoke test de Chrome real (`tests/browser-smoke.mjs`). Los comandos para CI están en `.github/workflows/mockup-motion.yml`.
 
 Pruebas visuales manuales necesarias antes de fusionar:
 
