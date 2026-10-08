@@ -3,6 +3,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {modeSurfaceTransition} from '../js/motion.js';
 import {bindPressFeedback} from '../js/ui/interaction-motion.js';
+import {runMotionTransaction} from '../js/motion-transaction.js';
+import {MOTION_DURATION,MOTION_EASING} from '../js/motion-settings.js';
 
 function eventHub(){
   const listeners=new Map();
@@ -159,5 +161,51 @@ test('press feedback releases on window pointerup, keyboard and document hide',a
     doc.hidden=true;
     doc.dispatch('visibilitychange');
     assert.equal(button.animations.length,6,'Hide releases a held pointer');
+  });
+});
+
+test('one choreography synchronizes outgoing, incoming and neighboring FLIP',async()=>{
+  await fakeBrowser(async({host,doc})=>{
+    const cardA=new FakeElement();
+    const cardB=new FakeElement({left:30,top:220,width:120,height:60});
+    const editor=new FakeElement({left:30,top:150,width:500,height:340});
+    const closedCard=new FakeElement({left:30,top:40,width:120,height:60});
+
+    const root=new FakeElement();
+    const sibling=new FakeElement({left:20,top:320,width:300,height:100});
+    sibling.dataset.layoutKey='mode:neighbor';
+    root.querySelectorAll=()=>[sibling];
+
+    const transaction=runMotionTransaction({
+      root,
+      surfaces:[
+        {source:editor,destination:()=>closedCard,direction:'close'},
+        {source:cardB,destination:()=>editor,direction:'open'}
+      ],
+      layout:{scrollElement:host,duration:MOTION_DURATION.open},
+      mutate(){
+        sibling.rect={left:40,top:390,width:300,height:100};
+      }
+    });
+
+    assert.equal(sibling.animations.length,1);
+    assert.equal(sibling.animations[0].options.easing,MOTION_EASING.open);
+    assert.equal(sibling.animations[0].options.duration,MOTION_DURATION.open);
+
+    const snapshotTracks=host.children.flatMap(node=>node.animations);
+    assert.equal(snapshotTracks.length,8);
+    for(const track of snapshotTracks){
+      assert.equal(track.options.duration,MOTION_DURATION.open);
+    }
+    // All geometric tracks follow one curve. Opacity crossfades are linear.
+    const geometric=snapshotTracks.filter(track=>track.frames[0].transform);
+    assert.equal(geometric.length,4);
+    assert.ok(geometric.every(track=>track.options.easing===MOTION_EASING.open));
+
+    doc.hidden=true;
+    doc.dispatch('visibilitychange');
+    await transaction;
+    assert.equal(host.children.length,0);
+    assert.equal(host.classes.has('layout-motion-active'),false);
   });
 });
