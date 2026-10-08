@@ -273,8 +273,7 @@ async function setCardDensity(next){
       anchorKey,
       scrollElement:q('.main'),
       excludeKeys:anchorKey?[anchorKey]:[],
-      duration:MOTION_DURATION.density,
-      animateSize:true
+      duration:MOTION_DURATION.density
     },
     onBusy:setModeTransitioning,
     mutate(){
