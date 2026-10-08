@@ -1,13 +1,6 @@
-:root{
-  /* CSS interaction feedback; surface morph timing lives in motion-settings.js. */
-  --motion-feedback-duration:140ms;
-  --motion-feedback-fast-duration:120ms;
-  --motion-progress-duration:400ms;
-  --motion-feedback-easing:ease;
-}
+/* Motion tokens are written by installMotionTokens() in motion-settings.js. */
 
-/* Connected mode transition.
-   Source content dissolves before deformation; the destination resolves on the same surface. */
+/* Connected mode transition: two snapshots share one path and crossfade in flight. */
 
 .mode-transition-snapshot{
 position:absolute;left:var(--motion-left);top:var(--motion-top);
@@ -61,7 +54,11 @@ z-index:120;border:1px solid var(--transition-border,var(--glass-border));border
 }
 
 .mode-transition-destination{
-z-index:121;overflow:visible;opacity:0
+z-index:121;overflow:hidden;opacity:0
+}
+
+.mode-transition-live-hidden{
+visibility:hidden!important
 }
 
 .mode-transition-content{
