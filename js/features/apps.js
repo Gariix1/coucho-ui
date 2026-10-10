@@ -111,5 +111,8 @@ export function initApps({getModes}){
   });
 
   render();
-  return {render};
+  return {
+    render,
+    getManagedApps:()=>apps.map(item=>({...item}))
+  };
 }
