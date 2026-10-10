@@ -30,6 +30,7 @@ import {bindPressFeedback,celebrateSurface} from './ui/interaction-motion.js';
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
+import {openModal,closeModal} from './ui/modal.js';
 import {expandedModeMarkup,modeCardMarkup,currentDesktopMarkup} from './ui/mode-markup.js';
 import {initTheme} from './features/theme.js';
 import {initSettings} from './features/settings.js';
@@ -1201,7 +1202,7 @@ q('#restoreDemo').onclick=function(){
 
 
 function closeShortcutOverlay(){
-  q('#shortcutOverlay').classList.remove('open');
+  closeModal(q('#shortcutOverlay'));
   shortcutEditTarget=null;
   captured=null;
   q('#capUse').hidden=true;
@@ -1230,8 +1231,10 @@ function openShortcut(rawId){
   q('#captureResult').innerHTML='<span class="capture-placeholder">Guide + …</span>';
   q('#capUse').hidden=true;
   syncShortcutKeys(null);
-  q('#shortcutOverlay').classList.add('open');
-  q('#capA').focus();
+  openModal(q('#shortcutOverlay'),{
+    initialFocus:q('#capA'),
+    onCancel:closeShortcutOverlay
+  });
 }
 
 function capture(v){
