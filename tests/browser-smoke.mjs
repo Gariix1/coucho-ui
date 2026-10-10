@@ -280,10 +280,12 @@ try{
     await page.locator('#settingsReset').click();
     assert.equal(await page.locator('#couchoDialog').isVisible(),true);
     assert.equal(await page.locator('#couchoDialog').getAttribute('role'),'alertdialog');
+    assert.equal(await page.locator('.window[inert]').count(),1,'Modal must disable background controls');
     assert.ok((await page.locator('#couchoDialogDescription').innerText()).includes('NO se eliminarán'));
     assert.equal(await page.locator('#couchoDialog [data-dialog-confirm]').innerText(),'Restablecer preferencias');
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('#couchoDialog').isVisible(),false);
+    assert.equal(await page.locator('.window[inert]').count(),0,'Modal background must unlock');
     assert.equal(await page.evaluate(()=>document.activeElement?.id),'settingsReset');
     await page.locator('#settingsReset').click();
     await page.locator('#couchoDialog [data-dialog-confirm]').click();
