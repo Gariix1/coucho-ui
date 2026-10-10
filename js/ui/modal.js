@@ -72,6 +72,7 @@ export function createDialog(root){
 
   return {
     open({heading,message,confirmText,confirmStyle='primary',options=[],value=null,onConfirm}){
+      root.setAttribute('role',options.length?'dialog':'alertdialog');
       title.textContent=heading;
       description.textContent=message;
       confirm.textContent=confirmText;
