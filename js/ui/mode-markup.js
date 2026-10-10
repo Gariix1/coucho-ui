@@ -1,10 +1,38 @@
 import {esc} from '../core/dom.js';
 import {iconMarkup,modeIconMarkup} from '../core/icons.js';
+import {getDisplay} from '../data/catalog.js';
 import {
   displayCountLabel,
   displayMarkup,
+  displaySummary,
   shortcutCardLabel
 } from '../model.js';
+
+// A small, factual preview of the actual selected monitors, not a second
+// display editor. Activation/editing remains in the existing screens workflow.
+export function currentDesktopMarkup(appliedSession){
+  const configuration=appliedSession||null;
+  const ids=configuration&&!configuration.preserve&&Array.isArray(configuration.displayIds)
+    ?configuration.displayIds:[];
+  const devices=ids.map(getDisplay).filter(Boolean).slice(0,3);
+  const preview=devices.map(display=>{
+    const primary=display.id===configuration.primaryDisplayId;
+    return '<span class="current-mini-screen'+(primary?' is-primary':'')+'" title="'+esc(display.name)+(primary?' · Principal':'')+'">'+
+      '<span class="current-mini-shape '+(display.kind==='tv'?'is-tv':'is-monitor')+'">'+
+        (primary?'<span class="current-mini-primary">'+iconMarkup('star-filled')+'</span>':'')+
+      '</span>'+
+      '<span class="current-mini-name">'+esc(display.name)+'</span>'+
+    '</span>';
+  }).join('');
+  return '<button class="mode-list-item current" data-expand-source="current" data-layout-key="current" type="button" aria-label="Crear modo desde el escritorio actual">'+
+    '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
+    '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+
+      (configuration?esc(displaySummary(configuration)):'Estado actual')+
+    '</small></span>'+
+    (preview?'<span class="current-mini-displays" aria-hidden="true">'+preview+'</span>':'')+
+    '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
+  '</button>';
+}
 
 export function expandedModeMarkup({kind,id,layoutKey}){
   const saved=kind==='mode';
