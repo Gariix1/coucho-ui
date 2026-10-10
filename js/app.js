@@ -30,7 +30,7 @@ import {bindPressFeedback,celebrateSurface} from './ui/interaction-motion.js';
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
-import {expandedModeMarkup,modeCardMarkup} from './ui/mode-markup.js';
+import {expandedModeMarkup,modeCardMarkup,currentDesktopMarkup} from './ui/mode-markup.js';
 import {initTheme} from './features/theme.js';
 import {initSettings} from './features/settings.js';
 import {
@@ -432,11 +432,7 @@ function renderModeList(){
       id:null,
       layoutKey:layoutKeyForMode(null)
     })
-    :'<button class="mode-list-item current" data-expand-source="current" data-layout-key="current">'+
-      '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
-      '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+esc(appliedSession?displaySummary(appliedSession):'Estado actual')+'</small></span>'+
-      '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
-    '</button>';
+    :currentDesktopMarkup(appliedSession);
 
   var saved=modesForRender(sets,{
     expandedOpen:expandedOpen,
