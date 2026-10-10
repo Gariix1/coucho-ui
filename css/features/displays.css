@@ -142,6 +142,8 @@ color:var(--text);font-weight:600
 }
 .display-overview-head .display-topology-detail{color:var(--accent);font-size:11px}
 .display-topology-detail[hidden]{display:none}
+.display-overview-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.display-overview-controls .btn{min-height:34px;font-size:11px}
 .display-demo-chip{
   flex:0 0 auto;white-space:nowrap;padding:6px 10px;border-radius:999px;
   background:var(--glass-command);border:1px solid var(--glass-soft-border);
@@ -159,6 +161,29 @@ color:var(--text);font-weight:600
 .overview-display.primary{
   border-color:var(--selected-border);background:var(--selected-bg)
 }
+/* Editing owns only selection and primary state, with no layout animation. */
+.overview-display.is-editing{position:relative;padding:0}
+.overview-toggle{
+  appearance:none;display:flex;flex-direction:column;justify-content:center;
+  align-items:center;min-width:0;width:100%;height:100%;min-height:189px;
+  padding:18px 12px 16px;background:transparent;border:0;
+  color:inherit;text-align:center;font:inherit;cursor:pointer;border-radius:inherit
+}
+.overview-display.is-editing:hover{border-color:var(--selected-border);background:var(--glass-control)}
+.overview-toggle:focus-visible,.overview-make-primary:focus-visible{
+  outline:2px solid var(--accent);outline-offset:-4px
+}
+.overview-make-primary{
+  display:grid;place-items:center;position:absolute;top:8px;right:8px;
+  z-index:2;width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--glass-border);background:var(--glass-command);
+  color:var(--text2);cursor:pointer
+}
+.overview-make-primary:hover{background:var(--glass-pill);color:var(--accent)}
+.overview-make-primary.is-primary{
+  border-color:var(--selected-border);color:var(--accent);background:var(--selected-bg)
+}
+.overview-make-primary .ui-icon{width:15px;height:15px}
 .overview-monitor-art{height:88px;display:grid;place-items:center;width:100%}
 .overview-screen-shape{
   position:relative;display:block;width:94px;height:58px;
@@ -206,6 +231,14 @@ color:var(--text);font-weight:600
 .display-overview-actions .display-identify-help{max-width:540px;color:var(--text2)}
 .display-identify-help[hidden]{display:none}
 .display-overview-actions .btn{flex:0 0 auto;min-width:130px}
+.display-edit-actions{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:18px;margin-top:20px;padding-top:18px;border-top:1px solid var(--divider)
+}
+.display-edit-actions[hidden],.display-overview-actions[hidden]{display:none!important}
+.display-edit-actions>span{font-size:11px;line-height:1.5;color:var(--muted)}
+.display-edit-buttons{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.display-edit-buttons .btn{min-width:112px}
 .display-help-footer{
   display:flex;align-items:center;justify-content:space-between;gap:18px;
   margin:17px 3px 0
@@ -231,6 +264,10 @@ color:var(--text);font-weight:600
   .overview-display{min-height:160px}
   .display-overview-actions{align-items:flex-start;flex-direction:column}
   .display-overview-actions .btn{width:100%}
+  .display-overview-controls{justify-content:flex-start}
+  .display-edit-actions{align-items:stretch;flex-direction:column}
+  .display-edit-buttons{width:100%}
+  .display-edit-buttons .btn{flex:1;min-width:0}
 }
 
 /* Feature-specific shared primitive sizing. */
