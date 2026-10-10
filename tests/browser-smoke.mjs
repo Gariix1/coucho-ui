@@ -224,9 +224,13 @@ try{
     assert.equal(await page.locator('[data-settings-panel]:visible').count(),1);
     await page.locator('#settingsLanguage').selectOption('es-419');
     await page.locator('#settingsStartupSurface').selectOption('control');
+    await page.locator('#settingsCloseBehavior').selectOption('exit');
     await page.locator('#settingsTabAppearance').click();
     await page.locator('#settingsThemeSelect').selectOption('light');
     assert.equal(await page.locator('html').getAttribute('data-theme'),'light');
+    assert.equal(await page.locator('#settingsTransparencyDetails').isVisible(),false);
+    await page.locator('#settingsTransparencyToggle').click();
+    assert.equal(await page.locator('#settingsTransparencyToggle').getAttribute('aria-expanded'),'true');
     await page.locator('#settingsControlOpacity').fill('65');
     assert.equal(await page.locator('#settingsControlOpacityValue').innerText(),'65%');
     assert.equal(await page.locator('#settingsControlPreview').evaluate(el=>el.style.getPropertyValue('--preview-opacity')),'65%');
@@ -237,10 +241,17 @@ try{
     await page.locator('#settingsBtn').click();
     assert.equal(await page.locator('#settingsLanguage').inputValue(),'es-419');
     assert.equal(await page.locator('#settingsStartupSurface').inputValue(),'control');
+    assert.equal(await page.locator('#settingsCloseBehavior').inputValue(),'exit');
     await page.locator('#settingsTabAppearance').click();
     assert.equal(await page.locator('#settingsThemeSelect').inputValue(),'light');
     assert.equal(await page.locator('#settingsControlOpacity').inputValue(),'65');
     await page.locator('#settingsTabHop').click();
+    await page.locator('#settingsShortcutExplain').click();
+    assert.equal(await page.locator('#settingsShortcutInfo').isVisible(),true);
+    await page.locator('#settingsShortcutClose').click();
+    await page.locator('#settingsHopEnabled').uncheck();
+    assert.equal(await page.locator('#settingsShortcutExplain').isDisabled(),true);
+    await page.locator('#settingsHopEnabled').check();
     await page.locator('#settingsHopExit').selectOption('background');
     await page.locator('#settingsTrayIcon').uncheck();
     assert.equal(await page.locator('#settingsHopExit').inputValue(),'control');
@@ -250,6 +261,7 @@ try{
   await check('reset confirms its scope and preserves existing Couchsets',async()=>{
     const cardCount=await page.locator('.saved-mode-card:not(.mode-expanded)').count();
     await page.locator('#settingsTabAdvanced').click();
+    assert.equal(await page.locator('#settingsPanelAdvanced h2').innerText(),'Más opciones');
     await page.locator('#settingsReset').click();
     assert.equal(await page.locator('#settingsResetConfirm').isVisible(),true);
     await page.locator('#settingsResetCancel').click();
@@ -258,6 +270,7 @@ try{
     await page.locator('#settingsResetAccept').click();
     await page.locator('#settingsTabGeneral').click();
     assert.equal(await page.locator('#settingsLanguage').inputValue(),'system');
+    assert.equal(await page.locator('#settingsCloseBehavior').inputValue(),'minimize');
     await page.locator('#settingsTabAppearance').click();
     assert.equal(await page.locator('#settingsThemeSelect').inputValue(),'dark');
     assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
