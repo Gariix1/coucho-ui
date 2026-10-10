@@ -114,6 +114,54 @@ border-color:var(--create-border);color:var(--create-accent);
   background:rgba(125,211,252,.055)
 }
 
+/* The current desktop is slightly more visual but keeps the same
+   one-click source for the connected Morph. Mini displays are informative,
+   not separate click targets competing with the screens editor. */
+.mode-list-item.current:has(.current-mini-displays){
+  grid-template-columns:40px minmax(0,1fr) auto 28px;
+  min-height:92px;
+  gap:13px
+}
+.current-mini-displays{display:flex;align-items:flex-start;gap:13px;min-width:0}
+.current-mini-screen{
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  min-width:62px;max-width:88px;color:var(--text2)
+}
+.current-mini-shape{
+  position:relative;display:block;
+  width:54px;height:33px;
+  border:1.5px solid var(--monitor-border);
+  border-radius:5px;
+  background:linear-gradient(155deg,var(--monitor-bg-a),var(--monitor-bg-b));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.035)
+}
+.current-mini-shape.is-tv{width:68px;height:38px}
+.current-mini-shape:after{
+  content:"";position:absolute;left:50%;bottom:-6px;
+  width:17px;height:5px;transform:translateX(-50%);
+  border-bottom:1.5px solid var(--monitor-stand);
+  border-left:1.5px solid var(--monitor-stand);
+  border-right:1.5px solid var(--monitor-stand);
+  border-radius:1px
+}
+.current-mini-screen.is-primary .current-mini-shape{
+  border-color:var(--selected-border);
+  box-shadow:inset 0 0 0 1px var(--monitor-glow)
+}
+.current-mini-primary{position:absolute;right:3px;top:2px;color:var(--accent)}
+.current-mini-primary .ui-icon{width:10px;height:10px}
+.current-mini-name{
+  display:block;max-width:80px;font-size:9px;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+@media(max-width:830px){
+  .current-mini-displays{display:none}
+  .mode-list-item.current:has(.current-mini-displays){
+    grid-template-columns:40px minmax(0,1fr) 28px;
+    min-height:72px
+  }
+}
+
 .mode-source-expand{
 width:28px;height:28px;display:grid;place-items:center;color:var(--muted)
 }
