@@ -92,10 +92,7 @@
     <section class="shell-view" id="view-displays" data-shell-view="displays" hidden>
       <div class="shell-placeholder display-page">
         <header class="shell-page-head display-page-head">
-          <div>
-            <h1>Pantallas</h1>
-            <p>Conoce tus pantallas y cuáles utiliza el modo activo.</p>
-          </div>
+          <div><h1>Pantallas</h1></div>
         </header>
 
         <section class="display-topology display-topology-simple" aria-labelledby="displayDesktopTitle">
@@ -105,21 +102,29 @@
               <p id="displayTopologyStatus" aria-live="polite"></p>
               <p id="displayTopologyDetail" class="display-topology-detail" hidden></p>
             </div>
-            <span class="display-demo-chip">Vista simulada</span>
+            <div class="display-overview-controls">
+              <span class="display-demo-chip">Demo</span>
+              <button class="btn" id="editDesktopDisplays" type="button">Editar pantallas</button>
+            </div>
           </header>
           <div class="display-overview-stage" id="displayOverviewStage" data-identifying="false"></div>
-          <div class="display-overview-actions">
+          <div class="display-overview-actions" id="displayReadActions">
             <div>
-              <strong>¿Cuál es cuál?</strong>
-              <p>Comprueba qué número corresponde a cada pantalla.</p>
-              <p class="display-identify-help" id="displayIdentifyHelp" hidden>Los números se muestran solo aquí. La aplicación para Windows podrá identificarlas en cada monitor físico.</p>
+              <p class="display-identify-help" id="displayIdentifyHelp" hidden>Estos números son una demostración; no aparecen en tus monitores físicos.</p>
             </div>
-            <button class="btn" id="identifyDisplays" type="button" aria-pressed="false">Mostrar números</button>
+            <button class="btn" id="identifyDisplays" type="button" aria-pressed="false">Identificar pantallas</button>
+          </div>
+          <div class="display-edit-actions" id="displayEditActions" hidden>
+            <span id="displayEditHint">Selecciona las pantallas y su principal.</span>
+            <div class="display-edit-buttons">
+              <button class="btn" id="cancelDesktopDisplays" type="button">Cancelar</button>
+              <button class="btn primary" id="applyDesktopDisplays" type="button" disabled>Probar cambios</button>
+            </div>
           </div>
         </section>
 
         <footer class="display-page-foot display-help-footer">
-          <p>Para cambiar las pantallas de un Couchset, utiliza <button type="button" id="displayGoToModes" class="display-inline-link">Modos</button>.</p>
+          <button type="button" id="displayGoToModes" class="display-inline-link">Editar Couchsets</button>
           <a class="display-inline-link" href="https://support.microsoft.com/es-es/windows/hardware/display-graphics/how-to-use-multiple-monitors-in-windows" target="_blank" rel="noopener noreferrer">Cómo configurar pantallas en Windows <span aria-hidden="true">↗</span></a>
         </footer>
       </div>
