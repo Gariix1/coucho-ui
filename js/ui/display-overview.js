@@ -44,7 +44,7 @@ export function displayOverviewMarkup(overview,{editing=false}={}){
   return overview.displays.map(display=>{
     const classes=['overview-display',display.used?'on':'not-used'];
     if(display.primary)classes.push('primary');
-    const state=display.primary?'Principal':display.state;
+    const state=editing?(display.primary?'Principal':display.used?'Seleccionada':'Sin seleccionar'):(display.primary?'Principal':display.state);
     const shape=display.kind==='tv'?'tv':'pc';
     const art='<div class="overview-monitor-art">'+
       '<span class="overview-screen-shape '+shape+'" aria-hidden="true">'+
