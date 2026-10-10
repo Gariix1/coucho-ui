@@ -116,10 +116,6 @@
   .mode-expanded-actions{width:100%}
   .mode-expanded-actions .btn{flex:1}
 
-  .display-overview{grid-template-columns:1fr}
-  .display-overview-stage{grid-template-columns:1fr}
-  .display-state-card{min-height:260px}
-
   .app-options{grid-template-columns:repeat(2,1fr)}
   .screen-map{grid-template-columns:1fr}
   .screen-face{min-height:122px}
