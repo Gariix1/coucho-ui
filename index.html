@@ -204,7 +204,7 @@
               <div class="settings-expander">
                 <button class="settings-expand-trigger" id="settingsTransparencyToggle" type="button" aria-controls="settingsTransparencyDetails" aria-expanded="false">
                   <span class="settings-field-copy"><strong>Transparencia</strong><span>Control y Hop pueden tener una apariencia diferente.</span></span>
-                  <span class="settings-expand-summary" id="settingsTransparencySummary">Personalizar <span aria-hidden="true">⌄</span></span>
+                  <span class="settings-expand-summary"><span id="settingsTransparencySummary">Personalizar</span><span class="settings-expand-chevron" aria-hidden="true"></span></span>
                 </button>
                 <div id="settingsTransparencyDetails" class="settings-expand-details" hidden>
                   <div class="settings-group">
@@ -239,12 +239,7 @@
                 </label>
                 <div class="settings-field" id="settingsHopShortcutRow">
                   <div class="settings-field-copy"><strong>Atajo del mando</strong><p>La combinación para abrir Hop.</p></div>
-                  <div class="settings-shortcut-right"><span class="settings-shortcut-value">Ambos sticks</span><button type="button" class="settings-action" id="settingsShortcutExplain" aria-expanded="false" aria-controls="settingsShortcutInfo">Cambiar</button></div>
-                </div>
-                <div class="settings-inline-info" id="settingsShortcutInfo" hidden>
-                  <strong>Personalizar el atajo</strong>
-                  <p>En Coucho para Windows podrás pulsar la combinación que prefieras en tu mando para registrarla. Este navegador no configura mandos.</p>
-                  <button type="button" class="settings-action" id="settingsShortcutClose">Entendido</button>
+                  <div class="settings-shortcut-right"><span class="settings-shortcut-value">Ambos sticks</span><button type="button" class="settings-action" id="settingsShortcutExplain" aria-haspopup="dialog">Cambiar</button></div>
                 </div>
                 <div class="settings-field">
                   <div class="settings-field-copy"><label for="settingsHopExit">Al salir de Hop</label><p>Decide dónde continúa Coucho.</p></div>
@@ -278,10 +273,6 @@
                 <div class="settings-field">
                   <div class="settings-field-copy"><strong>Restablecer preferencias</strong><p>Vuelve a los valores originales de General, Apariencia y Hop.</p></div>
                   <button class="settings-action" id="settingsReset" type="button">Restablecer</button>
-                </div>
-                <div class="settings-reset-confirm" id="settingsResetConfirm" hidden>
-                  <div><strong>¿Restablecer ajustes?</strong><p>Los Couchsets, pantallas y apps guardadas no se borrarán.</p></div>
-                  <div class="settings-reset-actions"><button type="button" class="settings-action" id="settingsResetCancel">Cancelar</button><button type="button" class="settings-action settings-action-danger" id="settingsResetAccept">Sí, restablecer</button></div>
                 </div>
               </div>
               <p class="settings-hint">Restablecer solo afecta a las preferencias de este prototipo. Los modos y aplicaciones guardados se mantienen.</p>
@@ -332,6 +323,18 @@
   <div class="delete-actions">
     <button class="btn" id="deleteCancel">Cancelar</button>
     <button class="btn danger" id="deleteConfirm">Eliminar</button>
+  </div>
+</div>
+
+<div class="coucho-modal" id="couchoDialog" role="alertdialog" aria-modal="true" aria-labelledby="couchoDialogTitle" aria-describedby="couchoDialogDescription" hidden>
+  <div class="coucho-dialog">
+    <header class="coucho-dialog-header"><h2 id="couchoDialogTitle" data-dialog-title></h2></header>
+    <p id="couchoDialogDescription" data-dialog-description></p>
+    <div data-dialog-choices hidden></div>
+    <footer class="coucho-dialog-actions">
+      <button class="btn" type="button" data-dialog-cancel>Cancelar</button>
+      <button class="btn primary" type="button" data-dialog-confirm>Confirmar</button>
+    </footer>
   </div>
 </div>
 
