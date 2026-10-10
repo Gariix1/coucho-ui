@@ -1,0 +1,46 @@
+/* Shared Coucho dialogs: confirmation, focused choices and future short workflows.
+   Modals own focus and actions; they never animate the underlying cards. */
+.coucho-modal{
+  position:fixed;inset:32px 0 0;z-index:110;
+  display:grid;place-items:center;padding:20px;
+  background:var(--scrim);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px)
+}
+.coucho-modal[hidden]{display:none!important}
+.coucho-dialog{
+  width:min(440px,100%);max-height:min(620px,calc(100vh - 90px));
+  display:flex;flex-direction:column;gap:16px;
+  overflow:auto;
+  padding:23px 24px 20px;
+  border-radius:var(--r-panel);border:1px solid var(--glass-border);
+  background:var(--floating-bg);box-shadow:var(--shadow);
+  color:var(--text)
+}
+.coucho-dialog-header h2{
+  margin:0;font-size:18px;line-height:1.35;font-weight:650;letter-spacing:-.01em
+}
+.coucho-dialog>p{
+  margin:0;color:var(--text2);font-size:12px;line-height:1.65
+}
+.coucho-dialog-actions{
+  display:flex;justify-content:flex-end;gap:9px;margin-top:5px
+}
+.coucho-dialog-actions .btn{min-height:37px}
+.modal-choice-group{display:grid;gap:8px}
+.modal-choice{
+  display:flex;gap:12px;align-items:center;min-height:64px;
+  padding:12px;border:1px solid var(--glass-soft-border);
+  border-radius:var(--r-control);background:var(--glass-control);cursor:pointer
+}
+.modal-choice:has(input:checked){border-color:var(--selected-border);background:var(--selected-bg)}
+.modal-choice input{accent-color:var(--accent);margin:0;flex:0 0 auto}
+.modal-choice strong,.modal-choice small{display:block}
+.modal-choice strong{font-size:12px;font-weight:650}
+.modal-choice small{font-size:11px;margin-top:3px;color:var(--muted);line-height:1.45}
+.modal-choice:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:530px){
+  .coucho-modal{padding:12px}
+  .coucho-dialog{padding:20px 17px 17px}
+  .coucho-dialog-actions .btn{flex:1}
+}
