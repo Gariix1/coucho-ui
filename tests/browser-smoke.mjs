@@ -88,6 +88,10 @@ try{
     window.__motionObserver.observe(list,{childList:true,subtree:true});
   });
 
+  // The current desktop preview reflects known screens without becoming an editor.
+  assert.equal(await page.locator('[data-expand-source="current"]').count(),1);
+  assert.ok(await page.locator('[data-expand-source="current"] .current-mini-screen').count()>=1);
+
   await check('open saved Couchset',async()=>{
     await page.locator('[data-mode-row="1"] .open-mode').click();
     await page.waitForSelector('#expandedMode',{timeout:5000});
@@ -109,6 +113,8 @@ try{
   await check('quick display editor opens and closes',async()=>{
     await page.locator('[data-mode-row="1"] .quick-display').click();
     await page.waitForSelector('#displayPop.open',{timeout:3000});
+    assert.equal(await page.locator('#screenMap .screen-device').count(),3);
+    assert.equal(await page.locator('#screenMap .screen-visibility').count(),3);
     await page.locator('#closeDisplays').click();
   });
   assert.equal(await page.locator('#displayPop.open').count(),0);
@@ -247,8 +253,15 @@ try{
     assert.equal(await page.locator('#settingsControlOpacity').inputValue(),'65');
     await page.locator('#settingsTabHop').click();
     await page.locator('#settingsShortcutExplain').click();
-    assert.equal(await page.locator('#settingsShortcutInfo').isVisible(),true);
-    await page.locator('#settingsShortcutClose').click();
+    assert.equal(await page.locator('#couchoDialog').isVisible(),true);
+    assert.equal(await page.locator('#couchoDialog').getAttribute('role'),'dialog');
+    await page.locator('#couchoDialog input[value="bumpers"]').check();
+    await page.locator('#couchoDialog [data-dialog-cancel]').click();
+    assert.equal(await page.locator('#settingsHopShortcutValue').innerText(),'Ambos sticks');
+    await page.locator('#settingsShortcutExplain').click();
+    await page.locator('#couchoDialog input[value="bumpers"]').check();
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    assert.equal(await page.locator('#settingsHopShortcutValue').innerText(),'LB + RB');
     await page.locator('#settingsHopEnabled').uncheck();
     assert.equal(await page.locator('#settingsShortcutExplain').isDisabled(),true);
     await page.locator('#settingsHopEnabled').check();
@@ -263,17 +276,23 @@ try{
     await page.locator('#settingsTabAdvanced').click();
     assert.equal(await page.locator('#settingsPanelAdvanced h2').innerText(),'Más opciones');
     await page.locator('#settingsReset').click();
-    assert.equal(await page.locator('#settingsResetConfirm').isVisible(),true);
-    await page.locator('#settingsResetCancel').click();
-    assert.equal(await page.locator('#settingsResetConfirm').isVisible(),false);
+    assert.equal(await page.locator('#couchoDialog').isVisible(),true);
+    assert.equal(await page.locator('#couchoDialog').getAttribute('role'),'alertdialog');
+    assert.ok((await page.locator('#couchoDialogDescription').innerText()).includes('NO se eliminarán'));
+    assert.equal(await page.locator('#couchoDialog [data-dialog-confirm]').innerText(),'Restablecer preferencias');
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('#couchoDialog').isVisible(),false);
+    assert.equal(await page.evaluate(()=>document.activeElement?.id),'settingsReset');
     await page.locator('#settingsReset').click();
-    await page.locator('#settingsResetAccept').click();
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
     await page.locator('#settingsTabGeneral').click();
     assert.equal(await page.locator('#settingsLanguage').inputValue(),'system');
     assert.equal(await page.locator('#settingsCloseBehavior').inputValue(),'minimize');
     await page.locator('#settingsTabAppearance').click();
     assert.equal(await page.locator('#settingsThemeSelect').inputValue(),'dark');
     assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
+    await page.locator('#settingsTabHop').click();
+    assert.equal(await page.locator('#settingsHopShortcutValue').innerText(),'Ambos sticks');
     await page.locator('[data-nav-view="modes"]').click();
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),cardCount);
   });
