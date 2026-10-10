@@ -10,13 +10,15 @@ test('new users receive understandable, safe preference defaults',()=>{
 test('saved settings reject unknown language, surfaces and invalid values',()=>{
   const value=normalizeSettings({
     language:'not-valid',startupSurface:'unknown',hopExit:'broken',
-    startWithWindows:'yes',trayIcon:123,
+    startWithWindows:'yes',closeBehavior:'remove',hopEnabled:'yes',trayIcon:123,
     controlOpacity:-600,hopOpacity:Infinity
   });
   assert.equal(value.language,'system');
   assert.equal(value.startupSurface,SETTINGS_DEFAULTS.startupSurface);
   assert.equal(value.hopExit,'control');
   assert.equal(value.startWithWindows,false);
+  assert.equal(value.closeBehavior,'minimize');
+  assert.equal(value.hopEnabled,true);
   assert.equal(value.trayIcon,true);
   assert.equal(value.controlOpacity,20);
   assert.equal(value.hopOpacity,85);
@@ -25,10 +27,12 @@ test('saved settings reject unknown language, surfaces and invalid values',()=>{
 test('legitimate languages and appearance levels are preserved',()=>{
   const value=normalizeSettings({
     language:'es-419',startupSurface:'control',startWithWindows:true,
+    closeBehavior:'exit',hopEnabled:false,
     controlOpacity:65,hopOpacity:95,hopExit:'background',trayIcon:true
   });
   assert.deepEqual(value,{
     language:'es-419',startupSurface:'control',startWithWindows:true,
+    closeBehavior:'exit',hopEnabled:false,
     controlOpacity:65,hopOpacity:95,hopExit:'background',trayIcon:true
   });
 });
