@@ -68,24 +68,15 @@
     </section>
 
     <section class="shell-view" id="view-apps" data-shell-view="apps" hidden>
-      <div class="shell-placeholder">
-        <header class="shell-page-head">
+      <div class="shell-placeholder apps-page">
+        <header class="shell-page-head apps-page-head">
           <h1>Apps</h1>
+          <div class="apps-head-actions">
+            <span class="display-demo-chip">Demo</span>
+            <button class="btn primary" id="appsAdd" type="button">Añadir app</button>
+          </div>
         </header>
-        <div class="resource-grid">
-          <article class="resource-card">
-            <div class="resource-visual"><div class="app-logo app-logo-large">S</div></div>
-            <div class="resource-copy"><div><h3>Steam</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip" id="steamUsage">Gaming</span></div>
-          </article>
-          <article class="resource-card">
-            <div class="resource-visual"><div class="app-logo app-logo-large">P</div></div>
-            <div class="resource-copy"><div><h3>Playnite</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip muted-chip" id="playniteUsage">Sin usar</span></div>
-          </article>
-          <article class="resource-card">
-            <div class="resource-visual"><div class="app-logo app-logo-large">P</div></div>
-            <div class="resource-copy"><div><h3>Plex</h3><small><span class="status-dot"></span>Disponible</small></div><span class="usage-chip" id="plexUsage">Películas</span></div>
-          </article>
-        </div>
+        <div class="managed-app-list" id="appsList" aria-label="Apps de Coucho"></div>
       </div>
     </section>
 
@@ -98,24 +89,24 @@
         <section class="display-topology display-topology-simple" aria-labelledby="displayDesktopTitle">
           <header class="display-overview-head">
             <div>
-              <h2 id="displayDesktopTitle">Tu escritorio</h2>
+              <h2 id="displayDesktopTitle">Escritorio actual</h2>
               <p id="displayTopologyStatus" aria-live="polite"></p>
               <p id="displayTopologyDetail" class="display-topology-detail" hidden></p>
             </div>
             <div class="display-overview-controls">
               <span class="display-demo-chip">Demo</span>
-              <button class="btn" id="editDesktopDisplays" type="button">Editar pantallas</button>
+              <button class="btn" id="editDesktopDisplays" type="button">Editar</button>
             </div>
           </header>
           <div class="display-overview-stage" id="displayOverviewStage" data-identifying="false"></div>
           <div class="display-overview-actions" id="displayReadActions">
             <div>
-              <p class="display-identify-help" id="displayIdentifyHelp" hidden>Estos números son una demostración; no aparecen en tus monitores físicos.</p>
+              <p class="display-identify-help" id="displayIdentifyHelp" hidden>Solo en esta vista.</p>
             </div>
-            <button class="btn" id="identifyDisplays" type="button" aria-pressed="false">Identificar pantallas</button>
+            <button class="btn" id="identifyDisplays" type="button" aria-pressed="false">Identificar</button>
           </div>
           <div class="display-edit-actions" id="displayEditActions" hidden>
-            <span id="displayEditHint">Selecciona las pantallas y su principal.</span>
+            <span id="displayEditHint">Los Couchsets no cambian.</span>
             <div class="display-edit-buttons">
               <button class="btn" id="cancelDesktopDisplays" type="button">Cancelar</button>
               <button class="btn primary" id="applyDesktopDisplays" type="button" disabled>Probar cambios</button>
@@ -124,8 +115,8 @@
         </section>
 
         <footer class="display-page-foot display-help-footer">
-          <button type="button" id="displayGoToModes" class="display-inline-link">Editar Couchsets</button>
-          <a class="display-inline-link" href="https://support.microsoft.com/es-es/windows/hardware/display-graphics/how-to-use-multiple-monitors-in-windows" target="_blank" rel="noopener noreferrer">Cómo configurar pantallas en Windows <span aria-hidden="true">↗</span></a>
+          <button type="button" id="displayGoToModes" class="display-inline-link">Couchsets</button>
+          <a class="display-inline-link" href="https://support.microsoft.com/es-es/windows/hardware/display-graphics/how-to-use-multiple-monitors-in-windows" target="_blank" rel="noopener noreferrer">Pantallas de Windows <span aria-hidden="true">↗</span></a>
         </footer>
       </div>
     </section>
@@ -135,7 +126,7 @@
         <header class="shell-page-head settings-page-header">
           <div>
             <h1>Ajustes</h1>
-            <p>Personaliza Coucho sin complicarte.</p>
+            
           </div>
           <span class="settings-save-state" id="settingsSaveState" role="status" aria-live="polite">Se guarda automáticamente</span>
         </header>
@@ -152,11 +143,11 @@
             <section class="settings-panel" id="settingsPanelGeneral" role="tabpanel" aria-labelledby="settingsTabGeneral" data-settings-panel="general">
               <header class="settings-section-head">
                 <h2>General</h2>
-                <p>Lo esencial para empezar y usar Coucho.</p>
+                
               </header>
               <div class="settings-group">
                 <div class="settings-field">
-                  <div class="settings-field-copy"><label for="settingsLanguage">Idioma</label><p>El idioma que prefieres para Coucho.</p></div>
+                  <div class="settings-field-copy"><label for="settingsLanguage">Idioma</label></div>
                   <select id="settingsLanguage" class="settings-select">
                     <option value="system">Igual que Windows</option>
                     <option value="es-419">Español (Latinoamérica)</option>
@@ -170,18 +161,18 @@
                   </select>
                 </div>
                 <div class="settings-field">
-                  <div class="settings-field-copy"><label for="settingsStartupSurface">Al abrir Coucho</label><p>Elige qué pantalla ver primero.</p></div>
+                  <div class="settings-field-copy"><label for="settingsStartupSurface">Al abrir Coucho</label></div>
                   <select id="settingsStartupSurface" class="settings-select">
                     <option value="control">Control (escritorio)</option>
                     <option value="hop">Hop (mando)</option>
                   </select>
                 </div>
                 <label class="settings-field settings-field-clickable" for="settingsStartupWindows">
-                  <span class="settings-field-copy"><strong>Iniciar con Windows</strong><span>Abre Coucho al encender tu PC.</span></span>
+                  <span class="settings-field-copy"><strong>Iniciar con Windows</strong></span>
                   <input id="settingsStartupWindows" class="settings-switch" type="checkbox" role="switch">
                 </label>
                 <div class="settings-field">
-                  <div class="settings-field-copy"><label for="settingsCloseBehavior">Al cerrar Control</label><p>Elige si Coucho se minimiza o deja de ejecutarse.</p></div>
+                  <div class="settings-field-copy"><label for="settingsCloseBehavior">Al cerrar Control</label></div>
                   <select id="settingsCloseBehavior" class="settings-select">
                     <option value="minimize">Minimizar</option>
                     <option value="exit">Salir de Coucho</option>
@@ -193,11 +184,11 @@
             <section class="settings-panel" id="settingsPanelAppearance" role="tabpanel" aria-labelledby="settingsTabAppearance" data-settings-panel="appearance" hidden>
               <header class="settings-section-head">
                 <h2>Apariencia</h2>
-                <p>Un aspecto cómodo, en Control y en Hop.</p>
+                
               </header>
               <div class="settings-group">
                 <div class="settings-field">
-                  <div class="settings-field-copy"><label for="settingsThemeSelect">Tema</label><p>Control y Hop comparten esta elección.</p></div>
+                  <div class="settings-field-copy"><label for="settingsThemeSelect">Tema</label></div>
                   <select id="settingsThemeSelect" class="settings-select">
                     <option value="system">Igual que Windows</option>
                     <option value="dark">Oscuro</option>
@@ -207,17 +198,17 @@
               </div>
               <div class="settings-expander">
                 <button class="settings-expand-trigger" id="settingsTransparencyToggle" type="button" aria-controls="settingsTransparencyDetails" aria-expanded="false">
-                  <span class="settings-field-copy"><strong>Transparencia</strong><span>Control y Hop pueden tener una apariencia diferente.</span></span>
+                  <span class="settings-field-copy"><strong>Transparencia</strong></span>
                   <span class="settings-expand-summary"><span id="settingsTransparencySummary">Personalizar</span><span class="settings-expand-chevron" aria-hidden="true"></span></span>
                 </button>
                 <div id="settingsTransparencyDetails" class="settings-expand-details" hidden>
                   <div class="settings-group">
                   <div class="settings-field settings-field-range">
-                    <div class="settings-field-copy"><label for="settingsControlOpacity">Opacidad de Control</label><p>Cuánto se ve el fondo detrás de la ventana.</p></div>
+                    <div class="settings-field-copy"><label for="settingsControlOpacity">Opacidad de Control</label></div>
                     <div class="settings-range-control"><input id="settingsControlOpacity" type="range" min="20" max="100" step="5" value="85"><output id="settingsControlOpacityValue" for="settingsControlOpacity">85%</output></div>
                   </div>
                   <div class="settings-field settings-field-range">
-                    <div class="settings-field-copy"><label for="settingsHopOpacity">Opacidad de Hop</label><p>Ajusta la superficie que usas con el mando.</p></div>
+                    <div class="settings-field-copy"><label for="settingsHopOpacity">Opacidad de Hop</label></div>
                     <div class="settings-range-control"><input id="settingsHopOpacity" type="range" min="20" max="100" step="5" value="85"><output id="settingsHopOpacityValue" for="settingsHopOpacity">85%</output></div>
                   </div>
                   </div>
@@ -225,7 +216,7 @@
                   <div class="settings-preview-surface" id="settingsControlPreview"><span class="settings-preview-dot"></span><span>Control</span><i></i></div>
                   <div class="settings-preview-surface settings-preview-hop" id="settingsHopPreview"><span class="settings-preview-dot"></span><span>Hop</span><i></i></div>
                 </div>
-                    <span>Vista previa de la transparencia</span>
+                    
                   </div>
                 </div>
               </div>
@@ -234,26 +225,26 @@
             <section class="settings-panel" id="settingsPanelHop" role="tabpanel" aria-labelledby="settingsTabHop" data-settings-panel="hop" hidden>
               <header class="settings-section-head">
                 <h2>Hop</h2>
-                <p>Qué ocurre al entrar y salir de la interfaz para el mando.</p>
+                
               </header>
               <div class="settings-group">
                 <label class="settings-field settings-field-clickable" for="settingsHopEnabled">
-                  <span class="settings-field-copy"><strong>Abrir Hop con el mando</strong><span>Usa tu mando para acceder a Hop rápidamente.</span></span>
+                  <span class="settings-field-copy"><strong>Abrir Hop con el mando</strong></span>
                   <input id="settingsHopEnabled" class="settings-switch" type="checkbox" role="switch" checked>
                 </label>
                 <div class="settings-field" id="settingsHopShortcutRow">
-                  <div class="settings-field-copy"><strong>Atajo del mando</strong><p>La combinación para abrir Hop.</p></div>
+                  <div class="settings-field-copy"><strong>Atajo del mando</strong></div>
                   <div class="settings-shortcut-right"><span class="settings-shortcut-value" id="settingsHopShortcutValue">Ambos sticks</span><button type="button" class="settings-action" id="settingsShortcutExplain" aria-haspopup="dialog">Cambiar</button></div>
                 </div>
                 <div class="settings-field">
-                  <div class="settings-field-copy"><label for="settingsHopExit">Al salir de Hop</label><p>Decide dónde continúa Coucho.</p></div>
+                  <div class="settings-field-copy"><label for="settingsHopExit">Al salir de Hop</label></div>
                   <select id="settingsHopExit" class="settings-select">
                     <option value="control">Volver a Control</option>
                     <option value="background">Seguir en segundo plano</option>
                   </select>
                 </div>
                 <label class="settings-field settings-field-clickable" for="settingsTrayIcon">
-                  <span class="settings-field-copy"><strong>Icono en la bandeja</strong><span>Accede a Coucho desde la barra de tareas.</span></span>
+                  <span class="settings-field-copy"><strong>Icono en la bandeja</strong></span>
                   <input id="settingsTrayIcon" class="settings-switch" type="checkbox" role="switch">
                 </label>
               </div>
@@ -263,27 +254,27 @@
             <section class="settings-panel" id="settingsPanelAdvanced" role="tabpanel" aria-labelledby="settingsTabAdvanced" data-settings-panel="advanced" hidden>
               <header class="settings-section-head">
                 <h2>Más opciones</h2>
-                <p>Herramientas útiles cuando quieras recuperar o trasladar tus ajustes.</p>
+                
               </header>
               <div class="settings-group">
                 <div class="settings-field settings-information-row">
-                  <div class="settings-field-copy"><strong>Copias de tus modos</strong><p>Exporta o importa Couchsets y perfiles para llevarlos a otro PC.</p></div>
+                  <div class="settings-field-copy"><strong>Copias de tus modos</strong></div>
                   <span class="settings-availability">En Coucho para Windows</span>
                 </div>
                 <div class="settings-field settings-information-row">
-                  <div class="settings-field-copy"><strong>Diagnóstico y recuperación</strong><p>Resuelve problemas y prepara información de soporte cuando haga falta.</p></div>
+                  <div class="settings-field-copy"><strong>Diagnóstico y recuperación</strong></div>
                   <span class="settings-availability">En Coucho para Windows</span>
                 </div>
                 <div class="settings-field">
-                  <div class="settings-field-copy"><strong>Restablecer preferencias</strong><p>Vuelve a los valores originales de General, Apariencia y Hop.</p></div>
+                  <div class="settings-field-copy"><strong>Restablecer preferencias</strong></div>
                   <button class="settings-action" id="settingsReset" type="button">Restablecer</button>
                 </div>
               </div>
-              <p class="settings-hint">Restablecer solo afecta a las preferencias de este prototipo. Los modos y aplicaciones guardados se mantienen.</p>
+              
             </section>
           </div>
         </div>
-        <p class="settings-prototype-note">Prototipo interactivo: estos valores se guardan en este navegador, no modifican Windows ni la instalación de Coucho. El cambio de idioma de toda la aplicación aún no está conectado.</p>
+        <p class="settings-prototype-note">Demo · Ajustes guardados en este navegador.</p>
       </div>
     </section>
   </main>
@@ -294,7 +285,7 @@
   <header class="display-editor-head">
     <div>
       <h2 class="pop-title" id="displayPopTitle">Pantallas</h2>
-      <div class="display-editor-sub">Elige las pantallas y marca la principal con la estrella.</div>
+      
     </div>
     <button class="btn icon" id="closeDisplays" title="Cerrar" aria-label="Cerrar"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-close"></use></svg></button>
   </header>
@@ -302,7 +293,7 @@
   <footer class="display-editor-foot">
     <div>
       <div class="display-editor-summary" id="displayEditorSummary"></div>
-      <button class="btn preserve-btn" id="preserveDisplays"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-preserve"></use></svg><span>No cambiar pantallas</span></button>
+      <button class="btn preserve-btn" id="preserveDisplays"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#icon-preserve"></use></svg><span>Conservar pantallas</span></button>
     </div>
     <div class="display-editor-actions">
       <button class="btn" id="tryDisplays">Probar</button>
@@ -314,10 +305,7 @@
 <div class="pop" id="appPop" role="dialog" aria-labelledby="appPopTitle">
   <h2 class="pop-title" id="appPopTitle">Apps</h2>
   <div class="app-options">
-    <button class="app-option" data-app="Ninguna"><div><div class="app-logo">—</div><b>Ninguna</b></div></button>
-    <button class="app-option" data-app="Steam"><div><div class="app-logo">S</div><b>Steam</b></div></button>
-    <button class="app-option" data-app="Playnite"><div><div class="app-logo">P</div><b>Playnite</b></div></button>
-    <button class="app-option" data-app="Plex"><div><div class="app-logo">P</div><b>Plex</b></div></button>
+    <!-- Populated from the same demo catalog used by Apps. -->
   </div>
 </div>
 
