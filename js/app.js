@@ -206,12 +206,23 @@ function hasPendingCreateChanges(){
   );
 }
 
+function confirmDiscardDraft(onDiscard){
+  createDialog(q('#couchoDialog')).open({
+    heading:'¿Descartar el nuevo modo?',
+    message:'Los cambios sin guardar se perderán.',
+    confirmText:'Descartar',
+    confirmStyle:'danger',
+    onConfirm:onDiscard
+  });
+}
+
 function guardExpandedSwitch(nextId){
-  if(!expandedOpen||expandedModeId===nextId)return true;
-  if(!hasPendingCreateChanges())return true;
-  toast('Nuevo modo','Crea o restablece el borrador antes de cambiar');
-  var surface=q('.mode-expanded');
-  if(surface)surface.focus({preventScroll:true});
+  if(!expandedOpen||expandedModeId===nextId||!hasPendingCreateChanges())return true;
+  confirmDiscardDraft(async()=>{
+    await collapseExpandedMode(false,null,true);
+    const source=elementForMode(nextId);
+    if(source)await expandModeSurface(nextId,source);
+  });
   return false;
 }
 
@@ -363,8 +374,12 @@ function expandSavedMode(id,source){
   return expandModeSurface(mode.id,source);
 }
 
-async function collapseExpandedMode(restore,afterClose){
+async function collapseExpandedMode(restore,afterClose,discardConfirmed=false){
   if(!expandedOpen||modeTransitioning)return false;
+  if(hasPendingCreateChanges()&&!discardConfirmed){
+    confirmDiscardDraft(()=>collapseExpandedMode(restore,afterClose,true));
+    return false;
+  }
 
   closePops();
   const closingId=expandedModeId;
@@ -1439,6 +1454,12 @@ document.addEventListener('click',function(e){
   }
 });
 
+window.addEventListener('beforeunload',event=>{
+  if(!hasPendingCreateChanges())return;
+  event.preventDefault();
+  event.returnValue='';
+});
+
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape')return;
 
@@ -1466,6 +1487,13 @@ let shellView='modes';
 // Shell navigation and global event wiring.
 function openShellView(viewName){
   if(modeTransitioning)return;
+  if(viewName!==shellView&&hasPendingCreateChanges()){
+    confirmDiscardDraft(async()=>{
+      await collapseExpandedMode(false,null,true);
+      openShellView(viewName);
+    });
+    return;
+  }
   if(shellView==='displays'&&viewName!=='displays'&&desktopDisplayDraft){
     desktopDisplayDraft=null;
     renderDisplayOverview();
