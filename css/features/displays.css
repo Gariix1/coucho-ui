@@ -123,7 +123,7 @@ color:var(--text);font-weight:600
 }
 
 /* Read-only overview: monitoring and identifying displays, not editing modes. */
-.display-page{max-width:980px}
+.shell-placeholder.display-page{max-width:980px}
 .display-page-head p{
   margin:7px 0 0;font-size:12px;line-height:1.6;color:var(--muted)
 }
