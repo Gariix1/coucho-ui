@@ -347,7 +347,9 @@ try{
   await check('Couchset App picker uses the shared demo catalog',async()=>{
     await page.locator('[data-nav-view="modes"]').click();
     await page.locator('[data-mode-row="1"] .quick-app').click();
-    assert.equal(await page.locator('#appPop .app-option').count(),6);
+    assert.equal(await page.locator('#appPop .app-option').count(),4);
+    assert.equal(await page.locator('#appPop [data-app="Discord"]').count(),0);
+    assert.equal(await page.locator('#appPop [data-app="Kodi"]').count(),0);
     assert.equal(await page.locator('#appPop [data-app="Steam"]').getAttribute('aria-pressed'),'true');
     await page.locator('#appPop [data-app="Steam"]').click();
   });
@@ -445,6 +447,31 @@ try{
     assert.equal(await page.locator('.overview-display.primary').getAttribute('data-display-id'),'aux');
   });
 
+  await check('manual desktop survives reload while saved Gaming stays untouched',async()=>{
+    const before=await page.evaluate(()=>JSON.parse(localStorage.getItem('coucho-applied-session-v1')));
+    assert.deepEqual(before.displayIds.slice().sort(),['aux','main','tv']);
+    assert.equal(before.primaryDisplayId,'aux');
+    const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('coucho-test-sets')));
+    assert.deepEqual(saved.find(mode=>mode.id===1).displayIds,['tv','main']);
+    await page.reload({waitUntil:'networkidle'});
+    await page.locator('[data-nav-view="displays"]').click();
+    assert.equal(await page.locator('.overview-display.primary').getAttribute('data-display-id'),'aux');
+    assert.equal(await page.locator('.overview-display.on').count(),3);
+    assert.match(await page.locator('#displayTopologyDetail').innerText(),/guardado no cambió/);
+    await page.locator('#displayGoToModes').click();
+    assert.equal(await page.locator('[data-mode-row="1"] .mode-list-badge').innerText(),'Pendiente');
+    assert.equal(await page.locator('[data-mode-row="1"] .activate').innerText(),'Aplicar');
+  });
+
+  await check('active mode is not silently deletable and may be reapplied',async()=>{
+    assert.equal(await page.locator('[data-mode-row="1"] .trash-mode').count(),0);
+    await page.locator('[data-mode-row="1"] .activate').click();
+    await page.waitForTimeout(1050);
+    assert.equal(await page.locator('[data-mode-row="1"] .mode-list-badge').innerText(),'Activo');
+    const persisted=await page.evaluate(()=>JSON.parse(localStorage.getItem('coucho-applied-session-v1')));
+    assert.equal(persisted.primaryDisplayId,'tv');
+  });
+
   await check('displays stay legible at narrow viewport without horizontal overflow',async()=>{
     await page.setViewportSize({width:440,height:820});
     await page.locator('[data-nav-view="displays"]').click();
@@ -473,6 +500,28 @@ try{
     assert.equal(await dialog.locator('[data-dialog-confirm]').innerText(),'Eliminar modo');
     await dialog.locator('[data-dialog-confirm]').click();
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),prior-1);
+  });
+
+  await check('demo reset and clear require explicit confirmation',async()=>{
+    const before=await page.locator('.saved-mode-card:not(.mode-expanded)').count();
+    await page.locator('#clearModes').click();
+    assert.equal(await page.locator('#couchoDialog').isVisible(),true);
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),before);
+    await page.locator('#clearModes').click();
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),0);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-applied-session-v1')),null);
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),0);
+    await page.locator('#testBtn').click();
+    await page.locator('#restoreDemo').click();
+    assert.equal(await page.locator('#couchoDialog').isVisible(),true);
+    await page.locator('#couchoDialog [data-dialog-cancel]').click();
+    assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),0);
+    await page.locator('#restoreDemo').click();
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),3);
   });
 
   assert.equal(await page.locator('.mode-transition-portal').count(),0);
