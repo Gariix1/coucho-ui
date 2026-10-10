@@ -1,6 +1,7 @@
 // A single modal owner for focused choices and confirmations.
 // No feature may open a second dialog over an active one.
 let active=null;
+const dialogInstances=new WeakMap();
 
 export function closeModal(surface){
   if(!active||active.surface!==surface)return;
@@ -47,6 +48,7 @@ export function openModal(surface,{initialFocus=null,onCancel=()=>{},returnFocus
 // Reusable presentation. Choices are rendered as safe text, never HTML.
 export function createDialog(root){
   if(!root)return null;
+  if(dialogInstances.has(root))return dialogInstances.get(root);
   const title=root.querySelector('[data-dialog-title]');
   const description=root.querySelector('[data-dialog-description]');
   const choices=root.querySelector('[data-dialog-choices]');
@@ -70,7 +72,7 @@ export function createDialog(root){
     callback?.(value);
   });
 
-  return {
+  const controller={
     open({heading,message,confirmText,confirmStyle='primary',options=[],value=null,onConfirm}){
       root.setAttribute('role',options.length?'dialog':'alertdialog');
       title.textContent=heading;
@@ -115,4 +117,6 @@ export function createDialog(root){
     close,
     get isOpen(){return !root.hidden;}
   };
+  dialogInstances.set(root,controller);
+  return controller;
 }
