@@ -456,6 +456,7 @@ function renderModeList(){
     }
     return modeCardMarkup(mode,{
       applying:activatingId===mode.id,
+      pending:!!(mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode)),
       density:cardDensity,
       layoutKey:layoutKeyForMode(mode.id)
     });
@@ -659,7 +660,8 @@ function completeActivation(id){
 
 function activate(id,force){
   const target=byId(id);
-  if(!target||(!force&&target.active)||activatingId!==null||modeTransitioning)return;
+  if(!target||(target.active&&!force&&sessionMatchesMode(appliedSession,target))||
+    activatingId!==null||modeTransitioning)return;
   activatingId=id;
   motionScheduler.cancel('activation');
   clearTimeout(activationTimer);
