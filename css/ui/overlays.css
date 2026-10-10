@@ -40,22 +40,6 @@ border-color:var(--selected-border);background:var(--selected-bg)
 font-size:9px
 }
 
-.delete-confirm{
-width:290px;min-width:290px;padding:12px
-}
-
-.delete-title{
-color:#fecaca
-}
-
-.delete-copy{
-color:var(--text2);font-size:11px;line-height:1.45;padding:0 4px 4px
-}
-
-.delete-actions{
-display:flex;justify-content:flex-end;gap:7px;margin-top:10px
-}
-
 .capture-wrap,
 .test-wrap{
 display:none;position:fixed;inset:32px 0 0;background:var(--scrim);place-items:center
