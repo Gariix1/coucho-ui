@@ -32,6 +32,7 @@ import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
 import {openModal,closeModal,createDialog} from './ui/modal.js';
 import {expandedModeMarkup,modeCardMarkup,currentDesktopMarkup} from './ui/mode-markup.js';
+import {buildDisplayOverview,displayOverviewMarkup} from './ui/display-overview.js';
 import {initTheme} from './features/theme.js';
 import {initSettings} from './features/settings.js';
 import {
@@ -738,47 +739,25 @@ function openDeletePop(_anchor,rawId){
 }
 
 // Displays overview and display picker.
+let displayIdentificationVisible=false;
+
 function renderDisplayOverview(){
-  var session=appliedSession;
-  var mode=active();
-  var stage=q('#displayOverviewStage');
+  const stage=q('#displayOverviewStage');
   if(!stage)return;
 
-  if(!session){
-    stage.innerHTML='<div class="empty-state"><div><div class="empty-icon">'+iconMarkup('display')+'</div><h3>Sin sesión aplicada</h3><p>Activa o prueba un modo para ver el estado de tus pantallas.</p></div></div>';
-    q('#displayStateMode').textContent='—';
-    q('#displayStateIcon').innerHTML=iconMarkup('display');
-    q('#displayStateApp').textContent='Sin sesión';
-    q('#displayStateCount').textContent='0';
-    q('#displayStatePrimary').textContent='—';
-    q('#displayTopologyStatus').textContent='Sin configuración aplicada';
-    return;
-  }
+  const overview=buildDisplayOverview(appliedSession,active(),simulatedDisplays);
+  stage.innerHTML=displayOverviewMarkup(overview);
+  stage.dataset.identifying=String(displayIdentificationVisible);
+  q('#displayTopologyStatus').textContent=overview.title;
 
-  var ids=session.displayIds;
-  var primary=getDisplay(session.primaryDisplayId);
-  var hasPending=mode&&mode.id===session.modeId&&!sessionMatchesMode(session,mode);
+  const detail=q('#displayTopologyDetail');
+  detail.hidden=!overview.detail;
+  detail.textContent=overview.detail;
 
-  stage.innerHTML=simulatedDisplays.map(function(d){
-    var on=ids.indexOf(d.id)>=0;
-    var isPrimary=session.primaryDisplayId===d.id;
-    var cls=d.kind==='tv'?'tv':'pc';
-    var badge=isPrimary?iconMarkup('star-filled')+'<span>Principal</span>':on?(session.preserve?'Conservada':'Activa'):'Apagada';
-    return '<div class="overview-display '+(on?'on':'off')+(isPrimary?' primary':'')+'">'+
-      '<span class="overview-badge">'+badge+'</span>'+
-      '<div class="monitor '+cls+(isPrimary?' primary':'')+'"></div>'+
-      '<b>'+esc(d.name)+'</b><small>'+esc(d.detail)+'</small>'+
-    '</div>';
-  }).join('');
-
-  q('#displayStateMode').textContent=session.name;
-  q('#displayStateIcon').innerHTML=modeIconMarkup(session.icon);
-  q('#displayStateApp').textContent=session.app;
-  q('#displayStateCount').textContent=String(session.displayIds.length);
-  q('#displayStatePrimary').textContent=primary?primary.name:'—';
-  q('#displayTopologyStatus').textContent=hasPending
-    ?'Cambios guardados pendientes de aplicar'
-    :session.preserve?'Se conservó la configuración existente':displaySummary(session);
+  const button=q('#identifyDisplays');
+  button.setAttribute('aria-pressed',String(displayIdentificationVisible));
+  button.textContent=displayIdentificationVisible?'Ocultar números':'Mostrar números';
+  button.disabled=overview.count===0;
 }
 
 function openDisplayPop(anchor,rawId){
@@ -1476,9 +1455,13 @@ q('.nav-rail').addEventListener('click',function(event){
   var trigger=event.target.closest('[data-nav-view]');
   if(trigger)openShellView(trigger.dataset.navView);
 });
-q('#identifyDisplays').onclick=function(){toast('Pantallas','Identificación simulada')};
-q('#advancedDisplays').onclick=function(){toast('Pantallas','Configuración avanzada · prototipo')};
-q('#restoreDisplays').onclick=function(){toast('Pantallas','Recuperación simulada')};
+q('#identifyDisplays').onclick=function(){
+  displayIdentificationVisible=!displayIdentificationVisible;
+  renderDisplayOverview();
+};
+q('#displayGoToModes').onclick=function(){
+  openShellView('modes');
+};
 
 installMotionTokens();
 bindPressFeedback();
