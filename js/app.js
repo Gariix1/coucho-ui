@@ -809,7 +809,7 @@ function renderDisplayEditor(){
       '<button class="screen-face screen-toggle" data-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'">'+
         '<span class="screen-number">'+d.number+'</span>'+
         '<span class="screen-shape"></span>'+
-        '<span class="screen-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.detail)+'</small></span>'+
+        '<span class="screen-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.detail)+'</small><em class="screen-visibility">'+(selected?'Activa':'Apagada')+'</em></span>'+
       '</button>'+
       '<button class="primary-screen-btn" data-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es la pantalla principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
     '</div>';
