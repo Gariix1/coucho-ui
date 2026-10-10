@@ -35,6 +35,8 @@ import {expandedModeMarkup,modeCardMarkup,currentDesktopMarkup} from './ui/mode-
 import {buildDisplayOverview,displayOverviewMarkup} from './ui/display-overview.js';
 import {initTheme} from './features/theme.js';
 import {initSettings} from './features/settings.js';
+import {initApps} from './features/apps.js';
+import {SAMPLE_APPS} from './data/app-catalog.js';
 import {
   layoutKeyForMode,
   modesForRender
@@ -176,25 +178,10 @@ function newModeConfigFromApplied(){
   };
 }
 
-function appUsage(app){
-  var matches=sets.filter(function(mode){return mode.app===app});
-  if(matches.length===0)return {text:'Sin usar',empty:true};
-  if(matches.length===1)return {text:matches[0].name,empty:false};
-  return {text:matches.length+' modos',empty:false};
-}
-
+// Apps owns its own list and Hop-visibility settings; modes only provide usage.
+const appLibrary=initApps({getModes:()=>sets});
 function renderResourceViews(){
-  [
-    ['Steam','#steamUsage'],
-    ['Playnite','#playniteUsage'],
-    ['Plex','#plexUsage']
-  ].forEach(function(pair){
-    var el=q(pair[1]);
-    if(!el)return;
-    var usage=appUsage(pair[0]);
-    el.textContent=usage.text;
-    el.classList.toggle('muted-chip',usage.empty);
-  });
+  appLibrary.render();
 }
 
 // Modes list and inline expanded visualizer.
@@ -862,11 +849,12 @@ function makePrimary(id){
 }
 
 function syncAppOptions(selectedApp){
-  qa('#appPop .app-option').forEach(function(option){
-    var selected=option.dataset.app===selectedApp;
-    option.classList.toggle('selected',selected);
-    option.setAttribute('aria-pressed',selected?'true':'false');
-  });
+  const options=[{id:'Ninguna',name:'Ninguna',monogram:'—'},...SAMPLE_APPS];
+  q('#appPop .app-options').innerHTML=options.map(option=>
+    '<button class="app-option'+(option.id===selectedApp?' selected':'')+
+      '" data-app="'+esc(option.id)+'" aria-pressed="'+String(option.id===selectedApp)+'">'+
+    '<div><div class="app-logo">'+esc(option.monogram)+'</div><b>'+esc(option.name)+'</b></div></button>'
+  ).join('');
 }
 
 function openAppPop(anchor,rawId){
@@ -923,8 +911,9 @@ q('#tryDisplays').onclick=function(){
   startTest(ctx);
 };
 
-qa('#appPop .app-option').forEach(function(b){
-  b.onclick=function(){
+q('#appPop').addEventListener('click',function(event){
+  const b=event.target.closest('.app-option');
+  if(!b||!q('#appPop').contains(b))return;
     var app=b.dataset.app;
     var target=appEditTarget;
     closePops();
@@ -947,7 +936,6 @@ qa('#appPop .app-option').forEach(function(b){
     commitSets();
     render();
     toast('Apps',app);
-  };
 });
 
 // Settings controls are owned by the dedicated settings component.
