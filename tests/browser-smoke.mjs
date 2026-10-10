@@ -301,6 +301,64 @@ try{
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),cardCount);
   });
 
+  await check('displays show monitor usage without claiming a physical monitor is off',async()=>{
+    await page.locator('[data-nav-view="displays"]').click();
+    await page.waitForSelector('#view-displays:not([hidden]) .overview-display');
+    assert.equal(await page.locator('#displayOverviewStage .overview-display').count(),3);
+    assert.equal(await page.locator('#displayOverviewStage .overview-display.primary').count(),1);
+    assert.ok(await page.locator('#displayOverviewStage .overview-display.not-used').count()>=1);
+    assert.equal(await page.locator('#restoreDisplays').count(),0);
+    assert.equal(await page.locator('#advancedDisplays').count(),0);
+    assert.equal(await page.locator('.display-state-card').count(),0);
+    assert.ok((await page.locator('#displayTopologyStatus').innerText()).includes('pantallas de ejemplo'));
+    const labels=await page.locator('.overview-monitor-state').allInnerTexts();
+    assert.equal(labels.includes('Apagada'),false);
+    assert.ok(labels.includes('No usada por el modo'));
+    assert.equal(await page.locator('.overview-identify-number:visible').count(),0);
+
+    await page.locator('#identifyDisplays').click();
+    assert.equal(await page.locator('#identifyDisplays').getAttribute('aria-pressed'),'true');
+    assert.equal(await page.locator('.overview-identify-number:visible').count(),3);
+    assert.equal(await page.locator('#displayIdentifyHelp').isVisible(),true);
+    await page.locator('#identifyDisplays').click();
+    assert.equal(await page.locator('#identifyDisplays').getAttribute('aria-pressed'),'false');
+    assert.equal(await page.locator('.overview-identify-number:visible').count(),0);
+  });
+
+  await check('displays reflect mode changes and link to the original mode editor',async()=>{
+    await page.locator('#displayGoToModes').click();
+    assert.equal(await page.locator('#view-modes').isVisible(),true);
+    const active=await page.locator('[data-mode-row="1"] .mode-list-badge').count();
+    if(!active)await page.locator('[data-mode-row="1"] .activate').click();
+    await page.waitForTimeout(1050);
+    await page.locator('[data-nav-view="displays"]').click();
+    assert.match(await page.locator('#displayTopologyStatus').innerText(),/Gaming utiliza 2 de 3/);
+    assert.equal(await page.locator('.overview-display.on').count(),2);
+    assert.equal(await page.locator('.overview-display.not-used').count(),1);
+    assert.equal(await page.locator('#view-displays a[href*="support.microsoft.com"]').count(),1);
+    await page.locator('#displayGoToModes').click();
+  });
+
+  await check('displays stay legible at narrow viewport without horizontal overflow',async()=>{
+    await page.setViewportSize({width:440,height:820});
+    await page.locator('[data-nav-view="displays"]').click();
+    await page.waitForSelector('#displayOverviewStage .overview-display');
+    const dimensions=await page.evaluate(()=>{
+      const cards=document.querySelectorAll('.overview-display');
+      return {
+        columns:getComputedStyle(document.querySelector('#displayOverviewStage')).gridTemplateColumns.split(' ').length,
+        cardCount:cards.length,
+        pageWidth:document.documentElement.scrollWidth,
+        viewportWidth:document.documentElement.clientWidth
+      };
+    });
+    assert.equal(dimensions.cardCount,3);
+    assert.equal(dimensions.columns,1);
+    assert.ok(dimensions.pageWidth<=dimensions.viewportWidth+2,'No horizontal page overflow');
+    await page.setViewportSize({width:1280,height:900});
+    await page.locator('#displayGoToModes').click();
+  });
+
   await check('delete mode uses the same safe modal and removes only the selected one',async()=>{
     const prior=await page.locator('.saved-mode-card:not(.mode-expanded)').count();
     await page.locator('[data-mode-row="3"] .trash-mode').click();
