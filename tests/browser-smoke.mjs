@@ -133,8 +133,10 @@ try{
 
   await check('delete confirmation cancels without deleting',async()=>{
     await page.locator('[data-mode-row="3"] .trash-mode').click();
-    await page.waitForSelector('#deletePop.open',{timeout:3000});
-    await page.locator('#deleteCancel').click();
+    await page.waitForSelector('#couchoDialog.open',{timeout:3000});
+    assert.equal(await page.locator('#couchoDialog').getAttribute('role'),'alertdialog');
+    assert.ok((await page.locator('#couchoDialogTitle').innerText()).includes('Escritorio'));
+    await page.locator('#couchoDialog [data-dialog-cancel]').click();
   });
   assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),3);
 
@@ -295,6 +297,16 @@ try{
     assert.equal(await page.locator('#settingsHopShortcutValue').innerText(),'Ambos sticks');
     await page.locator('[data-nav-view="modes"]').click();
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),cardCount);
+  });
+
+  await check('delete mode uses the same safe modal and removes only the selected one',async()=>{
+    const prior=await page.locator('.saved-mode-card:not(.mode-expanded)').count();
+    await page.locator('[data-mode-row="3"] .trash-mode').click();
+    const dialog=page.locator('#couchoDialog');
+    assert.equal(await dialog.getAttribute('role'),'alertdialog');
+    assert.equal(await dialog.locator('[data-dialog-confirm]').innerText(),'Eliminar modo');
+    await dialog.locator('[data-dialog-confirm]').click();
+    assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),prior-1);
   });
 
   assert.equal(await page.locator('.mode-transition-portal').count(),0);
