@@ -310,7 +310,7 @@ try{
     assert.equal(await page.locator('#restoreDisplays').count(),0);
     assert.equal(await page.locator('#advancedDisplays').count(),0);
     assert.equal(await page.locator('.display-state-card').count(),0);
-    assert.ok((await page.locator('#displayTopologyStatus').innerText()).includes('pantallas de ejemplo'));
+    assert.ok((await page.locator('#displayTopologyStatus').innerText()).includes('de 3 en uso'));
     const labels=await page.locator('.overview-monitor-state').allInnerTexts();
     assert.equal(labels.includes('Apagada'),false);
     assert.ok(labels.includes('No usada por el modo'));
@@ -332,7 +332,7 @@ try{
     if(!active)await page.locator('[data-mode-row="1"] .activate').click();
     await page.waitForTimeout(1050);
     await page.locator('[data-nav-view="displays"]').click();
-    assert.match(await page.locator('#displayTopologyStatus').innerText(),/Gaming utiliza 2 de 3/);
+    assert.match(await page.locator('#displayTopologyStatus').innerText(),/Gaming · 2 de 3 en uso/);
     assert.equal(await page.locator('.overview-display.on').count(),2);
     assert.equal(await page.locator('.overview-display.not-used').count(),1);
     assert.equal(await page.locator('#view-displays a[href*="support.microsoft.com"]').count(),1);
@@ -343,7 +343,7 @@ try{
     await page.locator('[data-nav-view="displays"]').click();
     const beforeSaved=await page.evaluate(()=>localStorage.getItem('coucho-test-sets'));
     const before=await page.locator('#displayTopologyStatus').innerText();
-    assert.match(before,/Gaming utiliza 2 de 3/);
+    assert.match(before,/Gaming · 2 de 3 en uso/);
 
     await page.locator('#editDesktopDisplays').click();
     assert.equal(await page.locator('#displayEditActions').isVisible(),true);
@@ -371,7 +371,7 @@ try{
     assert.equal(await page.locator('.overview-display.primary').getAttribute('data-display-id'),'aux');
     assert.equal(await page.locator('.overview-display.on').count(),3);
     assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-test-sets')),beforeSaved);
-    assert.match(await page.locator('#displayTopologyDetail').innerText(),/diferente del modo guardado/);
+    assert.match(await page.locator('#displayTopologyDetail').innerText(),/guardado no cambió/);
   });
 
   await check('cancel and restore desktop edits without modifying current session',async()=>{
