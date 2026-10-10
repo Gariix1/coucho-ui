@@ -860,7 +860,13 @@ function makePrimary(id){
 }
 
 function syncAppOptions(selectedApp){
-  const options=[{id:'Ninguna',name:'Ninguna',monogram:'—'},...SAMPLE_APPS];
+  const managedIds=new Set(appLibrary.getManagedApps().map(app=>app.id));
+  // Legacy Couchsets may refer to an app not yet in the demo library.
+  // Show the current selection without offering other unmanaged apps.
+  const options=[
+    {id:'Ninguna',name:'Ninguna',monogram:'—'},
+    ...SAMPLE_APPS.filter(app=>managedIds.has(app.id)||app.id===selectedApp)
+  ];
   q('#appPop .app-options').innerHTML=options.map(option=>
     '<button class="app-option'+(option.id===selectedApp?' selected':'')+
       '" data-app="'+esc(option.id)+'" aria-pressed="'+String(option.id===selectedApp)+'">'+
