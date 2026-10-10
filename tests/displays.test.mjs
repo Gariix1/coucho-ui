@@ -42,13 +42,13 @@ test('preserved modes report preserved layout without inventing a hardware actio
   assert.match(overview.detail,/conserva la configuración/);
 });
 
-test('edits pending application appear as such, not as already active screens',()=>{
+test('current state mismatches saved mode without claiming which was edited',()=>{
   const edited={...sets[0],displayIds:['main','aux'],primaryDisplayId:'main'};
   const applied={modeId:edited.id,name:edited.name,app:edited.app,preserve:false,
     displayIds:['tv','main'],primaryDisplayId:'tv'};
   const overview=buildDisplayOverview(applied,edited,simulatedDisplays);
   assert.equal(overview.pending,true);
-  assert.match(overview.detail,/pendientes de aplicar/);
+  assert.match(overview.detail,/diferente del modo guardado/);
   assert.equal(overview.displays[0].primary,true);
   assert.equal(overview.displays[2].used,false);
 });
@@ -72,4 +72,16 @@ test('display names are escaped in read-only markup',()=>{
   const html=displayOverviewMarkup(overview);
   assert.doesNotMatch(html,/<script>|<bad>/);
   assert.match(html,/&lt;script&gt;/);
+});
+
+test('edit mode exposes accessible controls without nested buttons',()=>{
+  const gaming=sets[0];
+  const overview=buildDisplayOverview({modeId:gaming.id,name:gaming.name,app:gaming.app,
+    preserve:false,displayIds:[...gaming.displayIds],
+    primaryDisplayId:gaming.primaryDisplayId},gaming,simulatedDisplays);
+  const html=displayOverviewMarkup(overview,{editing:true});
+  assert.equal((html.match(/class="overview-toggle"/g)||[]).length,3);
+  assert.equal((html.match(/class="overview-make-primary/g)||[]).length,3);
+  assert.equal((html.match(/aria-pressed="true"/g)||[]).length,3);
+  assert.match(html,/Elegir Monitor 2 como principal/);
 });
