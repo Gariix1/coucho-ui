@@ -308,6 +308,7 @@ try{
     assert.equal(await page.locator('[data-managed-app="Steam"] .managed-app-name strong').innerText(),'Steam');
     assert.equal(await page.locator('[data-managed-app="Steam"] .managed-app-name small').innerText(),'Gaming');
     assert.equal(await page.locator('[data-app-visibility="Steam"]').isChecked(),true);
+    assert.equal(await page.locator('[data-app-remove="Steam"]').count(),0,'Apps used by Couchsets cannot be removed silently');
     assert.equal(await page.locator('[data-app-visibility="Playnite"]').isChecked(),false);
     await page.locator('[data-app-visibility="Playnite"]').check();
     assert.equal(await page.locator('[data-app-visibility="Playnite"]').isChecked(),true);
@@ -333,7 +334,7 @@ try{
 
     await page.locator('[data-app-remove="Discord"]').click();
     assert.equal(await page.locator('#couchoDialog').getAttribute('role'),'alertdialog');
-    assert.match(await page.locator('#couchoDialogDescription').innerText(),/no de Windows/);
+    assert.match(await page.locator('#couchoDialogDescription').innerText(),/No se desinstalará/);
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('[data-managed-app="Discord"]').count(),1);
     await page.locator('[data-app-remove="Discord"]').click();
