@@ -301,6 +301,56 @@ try{
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),cardCount);
   });
 
+  await check('Apps library replaces decorative cards with working Hop controls',async()=>{
+    await page.locator('[data-nav-view="apps"]').click();
+    assert.equal(await page.locator('#view-apps .resource-card').count(),0);
+    assert.equal(await page.locator('#appsList .managed-app-row').count(),3);
+    assert.equal(await page.locator('[data-managed-app="Steam"] .managed-app-name strong').innerText(),'Steam');
+    assert.equal(await page.locator('[data-managed-app="Steam"] .managed-app-name small').innerText(),'Gaming');
+    assert.equal(await page.locator('[data-app-visibility="Steam"]').isChecked(),true);
+    assert.equal(await page.locator('[data-app-visibility="Playnite"]').isChecked(),false);
+    await page.locator('[data-app-visibility="Playnite"]').check();
+    assert.equal(await page.locator('[data-app-visibility="Playnite"]').isChecked(),true);
+  });
+
+  await check('Apps persist, add from demo catalog and remove without changing modes',async()=>{
+    await page.reload({waitUntil:'networkidle'});
+    await page.locator('[data-nav-view="apps"]').click();
+    assert.equal(await page.locator('[data-app-visibility="Playnite"]').isChecked(),true);
+    const savedModes=await page.evaluate(()=>localStorage.getItem('coucho-test-sets'));
+
+    await page.locator('#appsAdd').click();
+    assert.equal(await page.locator('#couchoDialog').isVisible(),true);
+    assert.equal(await page.locator('#couchoDialogTitle').innerText(),'Añadir app');
+    await page.locator('#couchoDialog [data-dialog-cancel]').click();
+    assert.equal(await page.locator('#appsList .managed-app-row').count(),3);
+
+    await page.locator('#appsAdd').click();
+    await page.locator('#couchoDialog input[value="Discord"]').check();
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    assert.equal(await page.locator('#appsList .managed-app-row').count(),4);
+    assert.equal(await page.locator('[data-app-visibility="Discord"]').isChecked(),true);
+
+    await page.locator('[data-app-remove="Discord"]').click();
+    assert.equal(await page.locator('#couchoDialog').getAttribute('role'),'alertdialog');
+    assert.match(await page.locator('#couchoDialogDescription').innerText(),/no de Windows/);
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('[data-managed-app="Discord"]').count(),1);
+    await page.locator('[data-app-remove="Discord"]').click();
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    assert.equal(await page.locator('[data-managed-app="Discord"]').count(),0);
+    assert.equal(await page.locator('#appsList .managed-app-row').count(),3);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-test-sets')),savedModes);
+  });
+
+  await check('Couchset App picker uses the shared demo catalog',async()=>{
+    await page.locator('[data-nav-view="modes"]').click();
+    await page.locator('[data-mode-row="1"] .quick-app').click();
+    assert.equal(await page.locator('#appPop .app-option').count(),6);
+    assert.equal(await page.locator('#appPop [data-app="Steam"]').getAttribute('aria-pressed'),'true');
+    await page.locator('#appPop [data-app="Steam"]').click();
+  });
+
   await check('displays show monitor usage without claiming a physical monitor is off',async()=>{
     await page.locator('[data-nav-view="displays"]').click();
     await page.waitForSelector('#view-displays:not([hidden]) .overview-display');
