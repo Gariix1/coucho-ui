@@ -618,7 +618,7 @@ function makeExpandedPrimary(id){
 
 function removeSet(id){
   var removed=byId(id);
-  if(!removed)return;
+  if(!removed||removed.active)return false;
 
   if(activatingId===id){
     clearTimeout(activationTimer);
@@ -627,18 +627,7 @@ function removeSet(id){
     activatingId=null;
   }
 
-  var wasActive=!!removed.active;
   sets=sets.filter(function(s){return s.id!==id});
-
-  if(wasActive){
-    sets.forEach(function(s){s.active=false});
-    if(sets.length){
-      sets[0].active=true;
-      appliedSession=sessionFromMode(sets[0]);
-    }else{
-      appliedSession=null;
-    }
-  }
 
   if(expandedModeId===id){
     resetExpandedState();
@@ -646,6 +635,7 @@ function removeSet(id){
   commitSets();
   render();
   toast('Modo eliminado',removed.name);
+  return true;
 }
 
 function completeActivation(id){
@@ -725,11 +715,12 @@ function openDeletePop(_anchor,rawId){
   const mode=byId(id);
   if(!mode)return;
 
+  if(mode.active){
+    toast('Modo activo','Activa otro modo antes de eliminarlo');
+    return;
+  }
   closePops();
-  const fallback=mode.active?sets.find(other=>other.id!==id):null;
-  const message=mode.active&&fallback
-    ?'Este modo se eliminará y “'+fallback.name+'” pasará a estar activo. La eliminación no se puede deshacer.'
-    :'Este modo se eliminará de tus Couchsets. La eliminación no se puede deshacer.';
+  const message='Este modo se eliminará. No se puede deshacer.';
 
   createDialog(q('#couchoDialog')).open({
     heading:'¿Eliminar “'+mode.name+'”?',
@@ -1195,22 +1186,41 @@ function bindModeListEvents(){
 }
 
 
-q('#clearModes').onclick=function(){
-  sets=[];
+function resetDemoModes(next){
+  // Do not allow pending asynchronous activation to reinsert a state after reset.
+  clearTimeout(activationTimer);
+  activationTimer=null;
+  motionScheduler.cancel('activation');
+  activatingId=null;
+  desktopDisplayDraft=null;
+  clearTestTimers();
+  sets=next;
   appliedSession=null;
   resetExpandedState();
   commitSets();
   render();
-  toast('Modos vaciados','Ya puedes probar el flujo desde cero');
+}
+
+q('#clearModes').onclick=function(){
+  if(q('#testOverlay').classList.contains('open')||modeTransitioning)return;
+  createDialog(q('#couchoDialog')).open({
+    heading:'¿Vaciar todos los modos?',
+    message:'Se eliminarán todos tus Couchsets de esta demo.',
+    confirmText:'Vaciar modos',
+    confirmStyle:'danger',
+    onConfirm:()=>resetDemoModes([])
+  });
 };
 
 q('#restoreDemo').onclick=function(){
-  sets=demoSets();
-  appliedSession=null;
-  resetExpandedState();
-  commitSets();
-  render();
-  toast('Demo restaurada','3 modos');
+  if(q('#testOverlay').classList.contains('open')||modeTransitioning)return;
+  createDialog(q('#couchoDialog')).open({
+    heading:'¿Restaurar modos de ejemplo?',
+    message:'Se reemplazarán tus Couchsets actuales.',
+    confirmText:'Restaurar ejemplos',
+    confirmStyle:'danger',
+    onConfirm:()=>resetDemoModes(demoSets())
+  });
 };
 
 
