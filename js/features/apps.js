@@ -47,7 +47,7 @@ export function initApps({getModes}){
         '<label class="managed-app-hop"><span>En Hop</span>'+
           '<input type="checkbox" class="settings-switch" data-app-visibility="'+esc(app.id)+'" role="switch" aria-label="Mostrar '+esc(app.name)+' en Hop"'+
           (item.showInHop?' checked':'')+'></label>'+
-        '<button class="managed-app-remove" type="button" data-app-remove="'+esc(app.id)+'" aria-label="Quitar '+esc(app.name)+' de Coucho">Quitar</button>'+
+        (used.length?'':'<button class="managed-app-remove" type="button" data-app-remove="'+esc(app.id)+'" aria-label="Quitar '+esc(app.name)+' de la lista">Quitar</button>')+
       '</article>';
     }).join('');
     if(!apps.length)list.innerHTML='<p class="managed-app-empty">Aún no hay apps.</p>';
@@ -73,10 +73,10 @@ export function initApps({getModes}){
     const app=SAMPLE_APPS.find(item=>item.id===id);
     if(!app)return;
     const linked=appUsedByModes(getModes(),id);
-    const modeText=linked.length?' Tus modos no se modificarán.':'';
+    if(linked.length)return;
     dialog.open({
       heading:'¿Quitar '+app.name+'?',
-      message:'Se quitará de Coucho, no de Windows.'+modeText,
+      message:'Se quitará de esta lista. No se desinstalará.',
       confirmText:'Quitar app',
       confirmStyle:'danger',
       onConfirm:()=>{
