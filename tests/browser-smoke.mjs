@@ -365,7 +365,7 @@ try{
     assert.equal(await page.locator('#keep').innerText(),'Conservar cambios');
     await page.waitForSelector('#confirm.show',{timeout:7000});
     await page.locator('#keep').click();
-    await page.waitForSelector('#testOverlay:not(.open)',{timeout:5000});
+    await page.waitForFunction(()=>!document.querySelector('#testOverlay')?.classList.contains('open'),null,{timeout:5000});
 
     assert.equal(await page.locator('#displayEditActions').isVisible(),false);
     assert.equal(await page.locator('.overview-display.primary').getAttribute('data-display-id'),'aux');
@@ -387,7 +387,7 @@ try{
     await page.locator('#applyDesktopDisplays').click();
     await page.waitForSelector('#confirm.show',{timeout:7000});
     await page.locator('#revert').click();
-    await page.waitForSelector('#testOverlay:not(.open)',{timeout:5500});
+    await page.waitForFunction(()=>!document.querySelector('#testOverlay')?.classList.contains('open'),null,{timeout:5500});
     assert.equal(await page.locator('#displayEditActions').isVisible(),true);
     await page.locator('#cancelDesktopDisplays').click();
     assert.equal(await page.locator('#displayTopologyStatus').innerText(),baseline);
