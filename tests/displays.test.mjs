@@ -15,7 +15,7 @@ test('applied Gaming shows physical examples without claiming unused screens are
   assert.equal(overview.selectedCount,2);
   assert.equal(overview.primaryId,'tv');
   assert.equal(overview.pending,false);
-  assert.match(overview.title,/Gaming utiliza 2 de 3 pantallas de ejemplo/);
+  assert.match(overview.title,/Gaming · 2 de 3 en uso/);
   assert.deepEqual(overview.displays.map(d=>d.state),
     ['En uso','En uso','No usada por el modo']);
   const html=displayOverviewMarkup(overview);
@@ -39,7 +39,7 @@ test('preserved modes report preserved layout without inventing a hardware actio
     displayIds:['main'],primaryDisplayId:'main'};
   const overview=buildDisplayOverview(applied,saved,simulatedDisplays);
   assert.equal(overview.selectedCount,1);
-  assert.match(overview.detail,/conserva la configuración/);
+  assert.match(overview.detail,/Conserva la configuración/);
 });
 
 test('current state mismatches saved mode without claiming which was edited',()=>{
@@ -48,7 +48,7 @@ test('current state mismatches saved mode without claiming which was edited',()=
     displayIds:['tv','main'],primaryDisplayId:'tv'};
   const overview=buildDisplayOverview(applied,edited,simulatedDisplays);
   assert.equal(overview.pending,true);
-  assert.match(overview.detail,/diferente del modo guardado/);
+  assert.match(overview.detail,/guardado no cambió/);
   assert.equal(overview.displays[0].primary,true);
   assert.equal(overview.displays[2].used,false);
 });
@@ -58,7 +58,7 @@ test('unknown display identifiers are catalog mismatches, not proof of disconnec
     displayIds:['tv','missing-id'],primaryDisplayId:'tv'};
   const overview=buildDisplayOverview(applied,null,simulatedDisplays);
   assert.deepEqual(overview.missing,['missing-id']);
-  assert.match(overview.detail,/catálogo de ejemplo/);
+  assert.match(overview.detail,/este ejemplo/);
   assert.equal(overview.selectedCount,1);
 });
 
