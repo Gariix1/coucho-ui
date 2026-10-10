@@ -5,9 +5,10 @@ const dialogInstances=new WeakMap();
 
 export function closeModal(surface){
   if(!active||active.surface!==surface)return;
-  const {returnFocus,keyHandler,previousOverflow}=active;
+  const {returnFocus,keyHandler,previousOverflow,appShell,wasInert}=active;
   document.removeEventListener('keydown',keyHandler,true);
   document.body.style.overflow=previousOverflow;
+  if(appShell&&!wasInert)appShell.removeAttribute('inert');
   surface.classList.remove('open');
   surface.hidden=true;
   active=null;
@@ -17,6 +18,9 @@ export function closeModal(surface){
 export function openModal(surface,{initialFocus=null,onCancel=()=>{},returnFocus=document.activeElement}={}){
   if(active)closeModal(active.surface);
   const previousOverflow=document.body.style.overflow;
+  const appShell=document.querySelector('.window');
+  const wasInert=appShell?.hasAttribute('inert')||false;
+  appShell?.setAttribute('inert','');
   surface.hidden=false;
   surface.classList.add('open');
   const keyHandler=event=>{
@@ -38,7 +42,7 @@ export function openModal(surface,{initialFocus=null,onCancel=()=>{},returnFocus
       event.preventDefault();first.focus();
     }
   };
-  active={surface,returnFocus,keyHandler,previousOverflow};
+  active={surface,returnFocus,keyHandler,previousOverflow,appShell,wasInert};
   document.body.style.overflow='hidden';
   document.addEventListener('keydown',keyHandler,true);
   const target=initialFocus||surface.querySelector('button:not([disabled])');
