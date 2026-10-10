@@ -19,11 +19,11 @@ export function buildDisplayOverview(session,mode,displays){
     ))
   ));
   const title=session
-    ?session.name+' utiliza '+used.length+' de '+displays.length+' pantallas de ejemplo.'
-    :'Ningún modo aplicado · '+displays.length+' pantallas de ejemplo.';
-  const detail=pending?'El escritorio actual es diferente del modo guardado.':
-    missing.length?'Algunas pantallas del modo no están en este catálogo de ejemplo.':
-    session?.preserve?'Este modo conserva la configuración de pantallas anterior.':'';
+    ?(pending?'Escritorio actual':session.name)+' · '+used.length+' de '+displays.length+' en uso'
+    :'Ningún modo aplicado · '+displays.length+' pantallas';
+  const detail=pending?session.name+' guardado no cambió.':
+    missing.length?'Algunas pantallas no aparecen en este ejemplo.':
+    session?.preserve?'Conserva la configuración anterior.':'';
   return {
     count:displays.length,
     selectedCount:used.length,
