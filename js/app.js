@@ -748,6 +748,7 @@ function renderDisplayOverview(){
   const overview=buildDisplayOverview(appliedSession,active(),simulatedDisplays);
   stage.innerHTML=displayOverviewMarkup(overview);
   stage.dataset.identifying=String(displayIdentificationVisible);
+  q('#displayIdentifyHelp').hidden=!displayIdentificationVisible;
   q('#displayTopologyStatus').textContent=overview.title;
 
   const detail=q('#displayTopologyDetail');
