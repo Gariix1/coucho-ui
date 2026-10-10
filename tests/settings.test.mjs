@@ -27,12 +27,12 @@ test('saved settings reject unknown language, surfaces and invalid values',()=>{
 test('legitimate languages and appearance levels are preserved',()=>{
   const value=normalizeSettings({
     language:'es-419',startupSurface:'control',startWithWindows:true,
-    closeBehavior:'exit',hopEnabled:false,
+    closeBehavior:'exit',hopEnabled:false,hopShortcut:'bumpers',
     controlOpacity:65,hopOpacity:95,hopExit:'background',trayIcon:true
   });
   assert.deepEqual(value,{
     language:'es-419',startupSurface:'control',startWithWindows:true,
-    closeBehavior:'exit',hopEnabled:false,
+    closeBehavior:'exit',hopEnabled:false,hopShortcut:'bumpers',
     controlOpacity:65,hopOpacity:95,hopExit:'background',trayIcon:true
   });
 });
@@ -41,4 +41,10 @@ test('closing tray access forces Hop to return to Control',()=>{
   const value=normalizeSettings({hopExit:'background',trayIcon:false});
   assert.equal(value.hopExit,'control');
   assert.equal(value.trayIcon,false);
+});
+
+test('old preferences automatically receive a safe default Hop shortcut',()=>{
+  const migrated=normalizeSettings({hopEnabled:true});
+  assert.equal(migrated.hopShortcut,'sticks');
+  assert.equal(normalizeSettings({hopShortcut:'unknown'}).hopShortcut,'sticks');
 });
