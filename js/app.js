@@ -651,6 +651,7 @@ function completeActivation(id){
   }
 
   sets.forEach(function(s){s.active=s.id===id});
+  desktopDisplayDraft=null;
   appliedSession=sessionFromMode(current);
   commitSets();
   activatingId=null;
@@ -738,26 +739,50 @@ function openDeletePop(_anchor,rawId){
   });
 }
 
-// Displays overview and display picker.
+// Displays overview and display picker. Editing changes ONLY the current
+// desktop session, never the active Couchset's saved configuration.
 let displayIdentificationVisible=false;
+let desktopDisplayDraft=null;
+
+function desktopDraftIsChanged(){
+  if(!desktopDisplayDraft)return false;
+  const current=appliedSession;
+  if(!current)return true;
+  return desktopDisplayDraft.preserve!==!!current.preserve||
+    desktopDisplayDraft.primaryDisplayId!==current.primaryDisplayId||
+    desktopDisplayDraft.displayIds.slice().sort().join('|')!==
+      (current.displayIds||[]).slice().sort().join('|');
+}
 
 function renderDisplayOverview(){
   const stage=q('#displayOverviewStage');
   if(!stage)return;
 
-  const overview=buildDisplayOverview(appliedSession,active(),simulatedDisplays);
-  stage.innerHTML=displayOverviewMarkup(overview);
-  stage.dataset.identifying=String(displayIdentificationVisible);
-  q('#displayIdentifyHelp').hidden=!displayIdentificationVisible;
-  q('#displayTopologyStatus').textContent=overview.title;
+  const editing=desktopDisplayDraft!==null;
+  const session=editing
+    ?{...(appliedSession||{}),...desktopDisplayDraft}
+    :appliedSession;
+  const overview=buildDisplayOverview(session,active(),simulatedDisplays);
+  stage.innerHTML=displayOverviewMarkup(overview,{editing});
+  stage.dataset.identifying=String(!editing&&displayIdentificationVisible);
+  q('#displayIdentifyHelp').hidden=editing||!displayIdentificationVisible;
+  q('#displayTopologyStatus').textContent=editing
+    ?overview.selectedCount+' de '+overview.count+' seleccionadas'
+    :overview.title;
 
   const detail=q('#displayTopologyDetail');
-  detail.hidden=!overview.detail;
-  detail.textContent=overview.detail;
+  detail.hidden=editing||!overview.detail;
+  detail.textContent=editing?'':overview.detail;
+
+  q('#editDesktopDisplays').hidden=editing;
+  q('#displayReadActions').hidden=editing;
+  q('#displayEditActions').hidden=!editing;
+  q('#applyDesktopDisplays').disabled=!editing||!desktopDraftIsChanged();
+  q('#displayEditHint').textContent='Los Couchsets guardados no cambian.';
 
   const button=q('#identifyDisplays');
-  button.setAttribute('aria-pressed',String(displayIdentificationVisible));
-  button.textContent=displayIdentificationVisible?'Ocultar números':'Mostrar números';
+  button.setAttribute('aria-pressed',String(!editing&&displayIdentificationVisible));
+  button.textContent=displayIdentificationVisible?'Ocultar números':'Identificar pantallas';
   button.disabled=overview.count===0;
 }
 
@@ -1286,7 +1311,7 @@ function startTest(ctx){
   q('#testDisplay').innerHTML='<div class="displays">'+displayMarkup(ctx)+'</div>';
   q('#testApp').textContent=logo(ctx.app);
   q('#testText').textContent='Probando '+ctx.name+'…';
-  q('#keep').textContent=ctx.kind==='saved-mode'?'Activar':ctx.kind==='new-mode'?'Guardar y activar':'Guardar';
+  q('#keep').textContent=ctx.kind==='desktop-display'?'Conservar cambios':ctx.kind==='saved-mode'?'Activar':ctx.kind==='new-mode'?'Guardar y activar':'Guardar';
   setTestProgress(0);q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
 
   var pct=0;
@@ -1314,6 +1339,20 @@ function startTest(ctx){
 q('#keep').onclick=function(){
   clearTestTimers();
   var kind=testContext&&testContext.kind;
+
+  if(kind==='desktop-display'){
+    const base=appliedSession||{
+      modeId:null,name:'Escritorio actual',icon:'desktop',app:'Ninguna',
+      preserve:false,displayIds:[],primaryDisplayId:null
+    };
+    appliedSession=applyDisplayConfig({...base},testContext);
+    desktopDisplayDraft=null;
+    q('#testOverlay').classList.remove('open');
+    render();
+    toast('Pantallas','Escritorio actualizado · Couchsets sin cambios');
+    testContext=null;
+    return;
+  }
 
   if(kind==='display'){
     var s=byId(testContext.id);
@@ -1433,6 +1472,10 @@ let shellView='modes';
 // Shell navigation and global event wiring.
 function openShellView(viewName){
   if(modeTransitioning)return;
+  if(shellView==='displays'&&viewName!=='displays'&&desktopDisplayDraft){
+    desktopDisplayDraft=null;
+    renderDisplayOverview();
+  }
   shellView=viewName;
   closePops();
 
@@ -1460,6 +1503,63 @@ q('#identifyDisplays').onclick=function(){
   displayIdentificationVisible=!displayIdentificationVisible;
   renderDisplayOverview();
 };
+q('#editDesktopDisplays').onclick=function(){
+  if(q('#testOverlay').classList.contains('open'))return;
+  ensureAppliedSession();
+  const current=appliedSession;
+  const initial=current&&current.displayIds.length?current.displayIds.slice():['main'];
+  desktopDisplayDraft={
+    preserve:false,
+    displayIds:initial,
+    primaryDisplayId:current&&initial.includes(current.primaryDisplayId)
+      ?current.primaryDisplayId:initial[0]
+  };
+  displayIdentificationVisible=false;
+  renderDisplayOverview();
+  q('#cancelDesktopDisplays').focus({preventScroll:true});
+};
+
+q('#cancelDesktopDisplays').onclick=function(){
+  desktopDisplayDraft=null;
+  renderDisplayOverview();
+  q('#editDesktopDisplays').focus({preventScroll:true});
+};
+
+// Match the exact Couchset display rules: at least one display, one primary.
+// Rerender replaces the edited card, so restore keyboard focus to the action.
+q('#displayOverviewStage').addEventListener('click',function(event){
+  if(!desktopDisplayDraft||q('#testOverlay').classList.contains('open'))return;
+  const target=event.target;
+  if(!(target instanceof Element))return;
+  const root=event.currentTarget;
+  const primary=closestWithin(target,'[data-primary-desktop]',root);
+  const toggle=closestWithin(target,'[data-toggle-desktop]',root);
+  if(!primary&&!toggle)return;
+
+  if(primary){
+    selectPrimaryDisplay(desktopDisplayDraft,primary.dataset.primaryDesktop);
+  }else if(!toggleSelectedDisplay(desktopDisplayDraft,toggle.dataset.toggleDesktop)){
+    toast('Pantallas','Debe quedar al menos una pantalla activa');
+    return;
+  }
+  const id=primary?primary.dataset.primaryDesktop:toggle.dataset.toggleDesktop;
+  renderDisplayOverview();
+  const selector=primary?'[data-primary-desktop="'+id+'"]':'[data-toggle-desktop="'+id+'"]';
+  root.querySelector(selector)?.focus({preventScroll:true});
+});
+
+q('#applyDesktopDisplays').onclick=function(){
+  if(!desktopDisplayDraft||!desktopDraftIsChanged()||
+    q('#testOverlay').classList.contains('open'))return;
+  const base=appliedSession;
+  startTest({
+    kind:'desktop-display',name:'Pantallas del escritorio',icon:base?.icon||'desktop',
+    app:base?.app||'Ninguna',preserve:false,
+    displayIds:desktopDisplayDraft.displayIds.slice(),
+    primaryDisplayId:desktopDisplayDraft.primaryDisplayId
+  });
+};
+
 q('#displayGoToModes').onclick=function(){
   openShellView('modes');
 };
