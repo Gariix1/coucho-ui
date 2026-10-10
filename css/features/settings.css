@@ -115,3 +115,40 @@ html[data-theme="light"] .settings-action-danger{color:#991b1b}
   .settings-select{width:100%;max-width:100%}
   .settings-range-control{width:100%}
 }
+
+/* Only three daily categories have equal visual weight.
+   Secondary utilities are reachable without looking like a fourth daily task. */
+.settings-tab-more{margin-top:20px;position:relative;justify-content:space-between;gap:8px}
+.settings-tab-more:before{content:"";position:absolute;top:-12px;left:4px;right:4px;border-top:1px solid var(--divider)}
+.settings-nav-chevron{font-size:20px;font-weight:400;line-height:1;color:var(--muted)}
+.settings-expander{margin-top:10px;border:1px solid var(--glass-soft-border);border-radius:var(--r-card);background:var(--glass-card);overflow:hidden}
+.settings-expand-trigger{display:flex;width:100%;align-items:center;justify-content:space-between;gap:20px;min-height:74px;padding:15px 18px;background:transparent;color:var(--text);border:0;text-align:left;font:inherit;cursor:pointer}
+.settings-expand-trigger:hover{background:var(--glass-command)}
+.settings-expand-trigger:focus-visible,.settings-shortcut-right button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.settings-expand-trigger[aria-expanded="true"]{border-bottom:1px solid var(--divider)}
+.settings-expand-summary{display:flex;align-items:center;gap:9px;white-space:nowrap;font-size:11px;font-weight:600;color:var(--text2)}
+.settings-expand-summary span{font-size:19px;line-height:1;transform-origin:center;transition:transform var(--motion-feedback-fast-duration) ease}
+.settings-expand-trigger[aria-expanded="true"] .settings-expand-summary span{transform:rotate(180deg)}
+.settings-expand-details{padding:16px 16px 18px}
+.settings-expand-details[hidden],.settings-inline-info[hidden]{display:none!important}
+.settings-expand-details .settings-field{min-height:68px}
+.settings-expand-details .settings-preview{margin-top:14px}
+.settings-shortcut-right{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+.settings-shortcut-value{font-size:11px;font-weight:600;color:var(--text2)}
+.settings-field.is-disabled{opacity:.45}
+.settings-action:disabled{opacity:.5;cursor:not-allowed}
+.settings-inline-info{padding:14px 18px;background:var(--glass-inset);border-bottom:1px solid var(--divider)}
+.settings-inline-info strong{display:block;font-size:12px}
+.settings-inline-info p{color:var(--muted);font-size:11px;line-height:1.6;margin:5px 0 12px;max-width:480px}
+.settings-information-row{min-height:76px}
+.settings-availability{flex:0 0 auto;font-size:10px;color:var(--muted);text-align:right}
+@media (max-width:790px){
+  .settings-tab-more{margin-top:0}
+  .settings-tab-more:before{display:none}
+  .settings-nav-chevron{display:none}
+}
+@media (max-width:530px){
+  .settings-expand-trigger{flex-wrap:wrap;gap:8px}
+  .settings-expand-summary{margin-left:auto}
+  .settings-availability{flex:0 0 100%;text-align:left}
+}
