@@ -4,11 +4,14 @@ const KEY='coucho-settings-preview-v1';
 const LANGUAGES=new Set(['system','es-419','es-ES','en-US','pt-BR','pt-PT','fr-FR','de-DE','it-IT']);
 const SURFACES=new Set(['control','hop']);
 const EXITS=new Set(['control','background']);
+const CLOSE_BEHAVIORS=new Set(['minimize','exit']);
 
 export const SETTINGS_DEFAULTS=Object.freeze({
   language:'system',
   startupSurface:'hop',
   startWithWindows:false,
+  closeBehavior:'minimize',
+  hopEnabled:true,
   controlOpacity:85,
   hopOpacity:85,
   hopExit:'control',
@@ -27,6 +30,8 @@ export function normalizeSettings(raw){
     language:LANGUAGES.has(value.language)?value.language:SETTINGS_DEFAULTS.language,
     startupSurface:SURFACES.has(value.startupSurface)?value.startupSurface:SETTINGS_DEFAULTS.startupSurface,
     startWithWindows:typeof value.startWithWindows==='boolean'?value.startWithWindows:SETTINGS_DEFAULTS.startWithWindows,
+    closeBehavior:CLOSE_BEHAVIORS.has(value.closeBehavior)?value.closeBehavior:SETTINGS_DEFAULTS.closeBehavior,
+    hopEnabled:typeof value.hopEnabled==='boolean'?value.hopEnabled:SETTINGS_DEFAULTS.hopEnabled,
     controlOpacity:safeNumber(value.controlOpacity,SETTINGS_DEFAULTS.controlOpacity),
     hopOpacity:safeNumber(value.hopOpacity,SETTINGS_DEFAULTS.hopOpacity),
     hopExit:EXITS.has(value.hopExit)?value.hopExit:SETTINGS_DEFAULTS.hopExit,
@@ -59,6 +64,8 @@ export function initSettings(){
     });
     panels.forEach(panel=>{panel.hidden=panel.dataset.settingsPanel!==name});
     el('settingsResetConfirm').hidden=true;
+    el('settingsShortcutInfo').hidden=true;
+    el('settingsShortcutExplain').setAttribute('aria-expanded','false');
   }
   tabs.forEach((tab,index)=>{
     tab.addEventListener('click',()=>openTab(tab.dataset.settingsTab));
@@ -85,6 +92,14 @@ export function initSettings(){
     el('settingsLanguage').value=settings.language;
     el('settingsStartupSurface').value=settings.startupSurface;
     el('settingsStartupWindows').checked=settings.startWithWindows;
+    el('settingsCloseBehavior').value=settings.closeBehavior;
+    el('settingsHopEnabled').checked=settings.hopEnabled;
+    el('settingsShortcutExplain').disabled=!settings.hopEnabled;
+    el('settingsHopShortcutRow').classList.toggle('is-disabled',!settings.hopEnabled);
+    if(!settings.hopEnabled){
+      el('settingsShortcutInfo').hidden=true;
+      el('settingsShortcutExplain').setAttribute('aria-expanded','false');
+    }
     el('settingsThemeSelect').value=getThemePreference();
     for(const [input,value] of [
       ['settingsControlOpacity',settings.controlOpacity],
@@ -108,6 +123,8 @@ export function initSettings(){
     ['settingsLanguage','language'],
     ['settingsStartupSurface','startupSurface'],
     ['settingsStartupWindows','startWithWindows'],
+    ['settingsCloseBehavior','closeBehavior'],
+    ['settingsHopEnabled','hopEnabled'],
     ['settingsControlOpacity','controlOpacity'],
     ['settingsHopOpacity','hopOpacity'],
     ['settingsHopExit','hopExit'],
@@ -124,6 +141,26 @@ export function initSettings(){
       render();
     });
   });
+  const transparencyToggle=el('settingsTransparencyToggle');
+  transparencyToggle.addEventListener('click',()=>{
+    const details=el('settingsTransparencyDetails');
+    details.hidden=!details.hidden;
+    transparencyToggle.setAttribute('aria-expanded',String(!details.hidden));
+  });
+
+  const shortcutButton=el('settingsShortcutExplain');
+  shortcutButton.addEventListener('click',()=>{
+    if(!settings.hopEnabled)return;
+    const info=el('settingsShortcutInfo');
+    info.hidden=!info.hidden;
+    shortcutButton.setAttribute('aria-expanded',String(!info.hidden));
+  });
+  el('settingsShortcutClose').addEventListener('click',()=>{
+    el('settingsShortcutInfo').hidden=true;
+    shortcutButton.setAttribute('aria-expanded','false');
+    shortcutButton.focus();
+  });
+
   el('settingsThemeSelect').addEventListener('change',event=>{
     setThemePreference(event.target.value);
     render();
