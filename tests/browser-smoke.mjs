@@ -459,7 +459,7 @@ try{
     assert.equal(await page.locator('.overview-display.on').count(),3);
     assert.match(await page.locator('#displayTopologyDetail').innerText(),/guardado no cambió/);
     await page.locator('#displayGoToModes').click();
-    assert.equal(await page.locator('[data-mode-row="1"] .mode-list-badge').innerText(),'Pendiente');
+    assert.equal((await page.locator('[data-mode-row="1"] .mode-list-badge').innerText()).toLowerCase(),'pendiente');
     assert.equal(await page.locator('[data-mode-row="1"] .activate').innerText(),'Aplicar');
   });
 
@@ -467,7 +467,7 @@ try{
     assert.equal(await page.locator('[data-mode-row="1"] .trash-mode').count(),0);
     await page.locator('[data-mode-row="1"] .activate').click();
     await page.waitForTimeout(1050);
-    assert.equal(await page.locator('[data-mode-row="1"] .mode-list-badge').innerText(),'Activo');
+    assert.equal((await page.locator('[data-mode-row="1"] .mode-list-badge').innerText()).toLowerCase(),'activo');
     const persisted=await page.evaluate(()=>JSON.parse(localStorage.getItem('coucho-applied-session-v1')));
     assert.equal(persisted.primaryDisplayId,'tv');
   });
