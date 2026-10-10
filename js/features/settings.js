@@ -1,10 +1,12 @@
 import {getThemePreference,setThemePreference} from './theme.js';
+import {createDialog} from '../ui/modal.js';
 
 const KEY='coucho-settings-preview-v1';
 const LANGUAGES=new Set(['system','es-419','es-ES','en-US','pt-BR','pt-PT','fr-FR','de-DE','it-IT']);
 const SURFACES=new Set(['control','hop']);
 const EXITS=new Set(['control','background']);
 const CLOSE_BEHAVIORS=new Set(['minimize','exit']);
+const HOP_SHORTCUTS=new Set(['sticks','bumpers']);
 
 export const SETTINGS_DEFAULTS=Object.freeze({
   language:'system',
@@ -12,6 +14,7 @@ export const SETTINGS_DEFAULTS=Object.freeze({
   startWithWindows:false,
   closeBehavior:'minimize',
   hopEnabled:true,
+  hopShortcut:'sticks',
   controlOpacity:85,
   hopOpacity:85,
   hopExit:'control',
@@ -32,6 +35,7 @@ export function normalizeSettings(raw){
     startWithWindows:typeof value.startWithWindows==='boolean'?value.startWithWindows:SETTINGS_DEFAULTS.startWithWindows,
     closeBehavior:CLOSE_BEHAVIORS.has(value.closeBehavior)?value.closeBehavior:SETTINGS_DEFAULTS.closeBehavior,
     hopEnabled:typeof value.hopEnabled==='boolean'?value.hopEnabled:SETTINGS_DEFAULTS.hopEnabled,
+    hopShortcut:HOP_SHORTCUTS.has(value.hopShortcut)?value.hopShortcut:SETTINGS_DEFAULTS.hopShortcut,
     controlOpacity:safeNumber(value.controlOpacity,SETTINGS_DEFAULTS.controlOpacity),
     hopOpacity:safeNumber(value.hopOpacity,SETTINGS_DEFAULTS.hopOpacity),
     hopExit:EXITS.has(value.hopExit)?value.hopExit:SETTINGS_DEFAULTS.hopExit,
@@ -51,6 +55,8 @@ export function initSettings(){
   if(!root)return;
   let settings=loadSettings();
   const el=id=>document.getElementById(id);
+  const dialog=createDialog(el('couchoDialog'));
+
   const panels=[...root.querySelectorAll('[data-settings-panel]')];
   const tabs=[...root.querySelectorAll('[data-settings-tab]')];
 
@@ -63,9 +69,7 @@ export function initSettings(){
       if(focus&&active)tab.focus();
     });
     panels.forEach(panel=>{panel.hidden=panel.dataset.settingsPanel!==name});
-    el('settingsResetConfirm').hidden=true;
-    el('settingsShortcutInfo').hidden=true;
-    el('settingsShortcutExplain').setAttribute('aria-expanded','false');
+    dialog.close();
   }
   tabs.forEach((tab,index)=>{
     tab.addEventListener('click',()=>openTab(tab.dataset.settingsTab));
@@ -96,10 +100,7 @@ export function initSettings(){
     el('settingsHopEnabled').checked=settings.hopEnabled;
     el('settingsShortcutExplain').disabled=!settings.hopEnabled;
     el('settingsHopShortcutRow').classList.toggle('is-disabled',!settings.hopEnabled);
-    if(!settings.hopEnabled){
-      el('settingsShortcutInfo').hidden=true;
-      el('settingsShortcutExplain').setAttribute('aria-expanded','false');
-    }
+    el('settingsHopShortcutValue').textContent=settings.hopShortcut==='bumpers'?'LB + RB':'Ambos sticks';
     el('settingsThemeSelect').value=getThemePreference();
     for(const [input,value] of [
       ['settingsControlOpacity',settings.controlOpacity],
@@ -146,19 +147,27 @@ export function initSettings(){
     const details=el('settingsTransparencyDetails');
     details.hidden=!details.hidden;
     transparencyToggle.setAttribute('aria-expanded',String(!details.hidden));
+    el('settingsTransparencySummary').textContent=details.hidden?'Personalizar':'Ocultar';
   });
 
-  const shortcutButton=el('settingsShortcutExplain');
-  shortcutButton.addEventListener('click',()=>{
+  el('settingsShortcutExplain').addEventListener('click',()=>{
     if(!settings.hopEnabled)return;
-    const info=el('settingsShortcutInfo');
-    info.hidden=!info.hidden;
-    shortcutButton.setAttribute('aria-expanded',String(!info.hidden));
-  });
-  el('settingsShortcutClose').addEventListener('click',()=>{
-    el('settingsShortcutInfo').hidden=true;
-    shortcutButton.setAttribute('aria-expanded','false');
-    shortcutButton.focus();
+    dialog.open({
+      heading:'Atajo para abrir Hop',
+      message:'Elige una combinación cómoda de mantener pulsada con el mando. Esta elección se guarda solo en el prototipo.',
+      confirmText:'Usar atajo',
+      value:settings.hopShortcut,
+      options:[
+        {value:'sticks',label:'Ambos sticks',description:'Mantén pulsados los dos sticks (predeterminado).'},
+        {value:'bumpers',label:'LB + RB',description:'Mantén pulsados los dos botones superiores.'}
+      ],
+      onConfirm:value=>{
+        if(!HOP_SHORTCUTS.has(value))return;
+        settings=normalizeSettings({...settings,hopShortcut:value});
+        save();
+        render();
+      }
+    });
   });
 
   el('settingsThemeSelect').addEventListener('change',event=>{
@@ -172,20 +181,18 @@ export function initSettings(){
   });
 
   el('settingsReset').addEventListener('click',()=>{
-    el('settingsResetConfirm').hidden=false;
-    el('settingsResetCancel').focus();
-  });
-  el('settingsResetCancel').addEventListener('click',()=>{
-    el('settingsResetConfirm').hidden=true;
-    el('settingsReset').focus();
-  });
-  el('settingsResetAccept').addEventListener('click',()=>{
-    settings={...SETTINGS_DEFAULTS};
-    setThemePreference('dark');
-    save();
-    render();
-    el('settingsResetConfirm').hidden=true;
-    el('settingsReset').focus();
+    dialog.open({
+      heading:'¿Restablecer las preferencias?',
+      message:'General, Apariencia y Hop volverán a sus valores originales. Tus Couchsets, pantallas y apps guardadas NO se eliminarán.',
+      confirmText:'Restablecer preferencias',
+      confirmStyle:'danger',
+      onConfirm:()=>{
+        settings={...SETTINGS_DEFAULTS};
+        setThemePreference('dark');
+        save();
+        render();
+      }
+    });
   });
 
   render();
