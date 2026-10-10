@@ -524,6 +524,45 @@ try{
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),3);
   });
 
+  await check('unsaved new-mode draft offers Cancel or Discard when leaving',async()=>{
+    const before=await page.locator('.saved-mode-card:not(.mode-expanded)').count();
+    await page.locator('[data-expand-source="current"]').click();
+    await page.waitForSelector('#expandedMode.new-mode-expanded');
+    await page.locator('#expandedName').dblclick();
+    await page.locator('#expandedName[contenteditable="true"]').fill('Mi borrador');
+    await page.locator('#expandedName').press('Enter');
+    assert.equal(await page.locator('#expandedName').innerText(),'Mi borrador');
+
+    await page.locator('[data-nav-view="apps"]').click();
+    assert.equal(await page.locator('#couchoDialog').isVisible(),true);
+    assert.match(await page.locator('#couchoDialogTitle').innerText(),/Descartar/);
+    await page.locator('#couchoDialog [data-dialog-cancel]').click();
+    assert.equal(await page.locator('#view-modes').isVisible(),true);
+    assert.equal(await page.locator('#expandedName').innerText(),'Mi borrador');
+
+    await page.locator('[data-nav-view="apps"]').click();
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    await page.waitForSelector('#view-apps:not([hidden])',{timeout:5500});
+    assert.equal(await page.locator('#expandedMode').count(),0);
+    await page.locator('[data-nav-view="modes"]').click();
+    assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),before);
+  });
+
+  await check('closing changed new-mode draft also requests confirmation',async()=>{
+    await page.locator('[data-expand-source="current"]').click();
+    await page.waitForSelector('#expandedMode.new-mode-expanded');
+    await page.locator('#expandedName').dblclick();
+    await page.locator('#expandedName[contenteditable="true"]').fill('Sin guardar');
+    await page.locator('#expandedName').press('Enter');
+    await page.locator('#expandedClose').click();
+    assert.equal(await page.locator('#couchoDialog').isVisible(),true);
+    await page.locator('#couchoDialog [data-dialog-cancel]').click();
+    assert.equal(await page.locator('#expandedName').innerText(),'Sin guardar');
+    await page.locator('#expandedClose').click();
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    await page.waitForFunction(()=>!document.querySelector('#expandedMode'),null,{timeout:5500});
+  });
+
   assert.equal(await page.locator('.mode-transition-portal').count(),0);
   assert.equal(await page.locator('.main.layout-motion-active').count(),0);
   assert.equal(await page.locator('.mode-workbench[inert]').count(),0);
