@@ -115,9 +115,8 @@ export function initSettings(){
     el('settingsTrayIcon').checked=settings.trayIcon;
     const background=el('settingsHopExit').querySelector('option[value="background"]');
     background.disabled=!settings.trayIcon;
-    el('settingsHopHint').textContent=settings.trayIcon
-      ?'El icono de la bandeja permite volver a Coucho si Hop se queda en segundo plano.'
-      :'Sin icono en la bandeja, al salir de Hop siempre se vuelve a Control.';
+    el('settingsHopHint').hidden=settings.trayIcon;
+    el('settingsHopHint').textContent='Sin icono en la bandeja, Hop vuelve a Control.';
   }
 
   const bindings=[
