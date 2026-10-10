@@ -339,6 +339,61 @@ try{
     await page.locator('#displayGoToModes').click();
   });
 
+  await check('edit desktop screens safely without overwriting Gaming',async()=>{
+    await page.locator('[data-nav-view="displays"]').click();
+    const beforeSaved=await page.evaluate(()=>localStorage.getItem('coucho-test-sets'));
+    const before=await page.locator('#displayTopologyStatus').innerText();
+    assert.match(before,/Gaming utiliza 2 de 3/);
+
+    await page.locator('#editDesktopDisplays').click();
+    assert.equal(await page.locator('#displayEditActions').isVisible(),true);
+    assert.equal(await page.locator('#displayReadActions').isVisible(),false);
+    assert.equal(await page.locator('.overview-toggle').count(),3);
+    assert.equal(await page.locator('.overview-make-primary').count(),3);
+    assert.equal(await page.locator('#applyDesktopDisplays').isDisabled(),true);
+
+    // A selection does not touch the applied desktop until explicitly tested and confirmed.
+    await page.locator('[data-toggle-desktop="aux"]').click();
+    await page.locator('[data-primary-desktop="aux"]').click();
+    assert.equal(await page.locator('.overview-display.on').count(),3);
+    assert.equal(await page.locator('.overview-display.primary').getAttribute('data-display-id'),'aux');
+    assert.equal(await page.locator('#applyDesktopDisplays').isEnabled(),true);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-test-sets')),beforeSaved);
+
+    await page.locator('#applyDesktopDisplays').click();
+    await page.waitForSelector('#testOverlay.open',{timeout:3000});
+    assert.equal(await page.locator('#keep').innerText(),'Conservar cambios');
+    await page.waitForSelector('#confirm.show',{timeout:7000});
+    await page.locator('#keep').click();
+    await page.waitForSelector('#testOverlay:not(.open)',{timeout:5000});
+
+    assert.equal(await page.locator('#displayEditActions').isVisible(),false);
+    assert.equal(await page.locator('.overview-display.primary').getAttribute('data-display-id'),'aux');
+    assert.equal(await page.locator('.overview-display.on').count(),3);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-test-sets')),beforeSaved);
+    assert.match(await page.locator('#displayTopologyDetail').innerText(),/diferente del modo guardado/);
+  });
+
+  await check('cancel and restore desktop edits without modifying current session',async()=>{
+    const baseline=await page.locator('#displayTopologyStatus').innerText();
+    await page.locator('#editDesktopDisplays').click();
+    await page.locator('[data-toggle-desktop="aux"]').click();
+    assert.equal(await page.locator('#applyDesktopDisplays').isEnabled(),true);
+    await page.locator('#cancelDesktopDisplays').click();
+    assert.equal(await page.locator('#displayTopologyStatus').innerText(),baseline);
+
+    await page.locator('#editDesktopDisplays').click();
+    await page.locator('[data-toggle-desktop="aux"]').click();
+    await page.locator('#applyDesktopDisplays').click();
+    await page.waitForSelector('#confirm.show',{timeout:7000});
+    await page.locator('#revert').click();
+    await page.waitForSelector('#testOverlay:not(.open)',{timeout:5500});
+    assert.equal(await page.locator('#displayEditActions').isVisible(),true);
+    await page.locator('#cancelDesktopDisplays').click();
+    assert.equal(await page.locator('#displayTopologyStatus').innerText(),baseline);
+    assert.equal(await page.locator('.overview-display.primary').getAttribute('data-display-id'),'aux');
+  });
+
   await check('displays stay legible at narrow viewport without horizontal overflow',async()=>{
     await page.setViewportSize({width:440,height:820});
     await page.locator('[data-nav-view="displays"]').click();
