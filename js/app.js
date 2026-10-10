@@ -30,7 +30,7 @@ import {bindPressFeedback,celebrateSurface} from './ui/interaction-motion.js';
 import {toast} from './ui/feedback.js';
 import {bindTouchRename,editInlineText} from './ui/inline-edit.js';
 import {positionPopover} from './ui/popover.js';
-import {openModal,closeModal} from './ui/modal.js';
+import {openModal,closeModal,createDialog} from './ui/modal.js';
 import {expandedModeMarkup,modeCardMarkup,currentDesktopMarkup} from './ui/mode-markup.js';
 import {initTheme} from './features/theme.js';
 import {initSettings} from './features/settings.js';
@@ -79,7 +79,6 @@ let displayEditModeId=null;
 let displayDraft=null;
 let appEditTarget=null;
 let shortcutEditTarget=null;
-let deleteTarget=null;
 let captured=null;
 
 // Test flow state.
@@ -692,12 +691,10 @@ function openAnchoredPop(pop,anchor){
 function closePops(){
   q('#displayPop').classList.remove('open');
   q('#appPop').classList.remove('open');
-  q('#deletePop').classList.remove('open');
 
   displayDraft=null;
   displayEditModeId=null;
   appEditTarget=null;
-  deleteTarget=null;
   currentPop=null;
   currentPopAnchor=null;
 }
@@ -714,28 +711,31 @@ function syncOpenPopPosition(){
 window.addEventListener('resize',syncOpenPopPosition);
 q('.main').addEventListener('scroll',syncOpenPopPosition,{passive:true});
 
-function openDeletePop(anchor,rawId){
-  var id=resolveId(rawId);
-  var mode=byId(id);
+function openDeletePop(_anchor,rawId){
+  const id=resolveId(rawId);
+  const mode=byId(id);
   if(!mode)return;
 
   closePops();
-  deleteTarget=id;
-  var fallback=mode.active?sets.find(function(s){return s.id!==mode.id}):null;
-  q('#deleteText').textContent=mode.active&&fallback
-    ?'¿Eliminar “'+mode.name+'”? Se activará “'+fallback.name+'”.'
-    :'¿Eliminar “'+mode.name+'”? Esta acción no se puede deshacer.';
-  openAnchoredPop(q('#deletePop'),anchor);
-  requestAnimationFrame(function(){q('#deleteCancel').focus()});
-}
+  const fallback=mode.active?sets.find(other=>other.id!==id):null;
+  const message=mode.active&&fallback
+    ?'Este modo se eliminará y “'+fallback.name+'” pasará a estar activo. La eliminación no se puede deshacer.'
+    :'Este modo se eliminará de tus Couchsets. La eliminación no se puede deshacer.';
 
-q('#deleteCancel').onclick=closePops;
-q('#deleteConfirm').onclick=function(){
-  var id=deleteTarget;
-  if(id===null)return;
-  closePops();
-  removeSet(id);
-};
+  createDialog(q('#couchoDialog')).open({
+    heading:'¿Eliminar “'+mode.name+'”?',
+    message,
+    confirmText:'Eliminar modo',
+    confirmStyle:'danger',
+    onConfirm:()=>{
+      if(!byId(id))return;
+      removeSet(id);
+      const next=q('.saved-mode-card:not(.mode-expanded) .open-mode')||
+        q('[data-expand-source="current"]');
+      next?.focus({preventScroll:true});
+    }
+  });
+}
 
 // Displays overview and display picker.
 function renderDisplayOverview(){
@@ -1421,8 +1421,7 @@ document.addEventListener('click',function(e){
   var path=typeof e.composedPath==='function'?e.composedPath():[];
   var insideDisplayPop=path.indexOf(q('#displayPop'))>=0;
   var insideAppPop=path.indexOf(q('#appPop'))>=0;
-  var insideDeletePop=path.indexOf(q('#deletePop'))>=0;
-  if(!insideDisplayPop&&!insideAppPop&&!insideDeletePop&&!e.target.closest('.quick-display')&&!e.target.closest('.quick-app')&&!e.target.closest('#expandedApp')&&!e.target.closest('.trash-mode')){
+  if(!insideDisplayPop&&!insideAppPop&&!e.target.closest('.quick-display')&&!e.target.closest('.quick-app')&&!e.target.closest('#expandedApp')&&!e.target.closest('.trash-mode')){
     closePops();
   }
 });
@@ -1430,7 +1429,7 @@ document.addEventListener('click',function(e){
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape')return;
 
-  if(q('#displayPop').classList.contains('open')||q('#appPop').classList.contains('open')||q('#deletePop').classList.contains('open')){
+  if(q('#displayPop').classList.contains('open')||q('#appPop').classList.contains('open')){
     closePops();
     return;
   }
