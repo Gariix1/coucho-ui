@@ -37,6 +37,7 @@ import {initTheme} from './features/theme.js';
 import {initSettings} from './features/settings.js';
 import {initApps} from './features/apps.js';
 import {SAMPLE_APPS} from './data/app-catalog.js';
+import {readAppliedSession,writeAppliedSession} from './data/session-store.js';
 import {
   layoutKeyForMode,
   modesForRender
@@ -55,7 +56,7 @@ const EXPANDED_TOGGLE_EXCLUDE_SELECTOR=INTERACTIVE_SELECTOR+',.mode-name-edit';
 
 // Persistent mode/session state.
 let sets=loadSets();
-let appliedSession=null;
+let appliedSession=readAppliedSession(sets,simulatedDisplays);
 let activatingId=null;
 let activationTimer=null;
 
@@ -116,6 +117,7 @@ function resolveId(raw){
 function commitSets(){
   normalizeActive();
   persistSets(sets);
+  writeAppliedSession(appliedSession);
 }
 function normalizeActive(){
   var kept=false;
@@ -152,7 +154,10 @@ function sessionFromMode(mode){
 function ensureAppliedSession(){
   if(appliedSession)return;
   var mode=active();
-  if(mode)appliedSession=sessionFromMode(mode);
+  if(mode){
+    appliedSession=sessionFromMode(mode);
+    writeAppliedSession(appliedSession);
+  }
 }
 
 function sessionMatchesMode(session,mode){
@@ -1334,6 +1339,7 @@ q('#keep').onclick=function(){
       preserve:false,displayIds:[],primaryDisplayId:null
     };
     appliedSession=applyDisplayConfig({...base},testContext);
+    writeAppliedSession(appliedSession);
     desktopDisplayDraft=null;
     q('#testOverlay').classList.remove('open');
     render();
