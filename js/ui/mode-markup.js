@@ -99,7 +99,7 @@ export function modeCardMarkup(mode,{applying=false,density='detailed',layoutKey
       '<div class="saved-mode-actions">'+
         (!mode.active?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+' title="Activar modo">'+(applying?'…':'Activar')+'</button>':'')+
         '<button class="open-mode" data-id="'+mode.id+'" title="Expandir '+safeName+'" aria-label="Expandir '+safeName+'">'+iconMarkup('expand')+'</button>'+
-        '<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>'+
+        (!mode.active?'<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>':'')+
       '</div>'+
     '</div>'+
     '<div class="saved-mode-body">'+
