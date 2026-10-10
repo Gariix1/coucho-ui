@@ -105,9 +105,12 @@ export function createDialog(root){
           const copy=document.createElement('span');
           const name=document.createElement('strong');
           name.textContent=option.label;
-          const helper=document.createElement('small');
-          helper.textContent=option.description||'';
-          copy.append(name,helper);
+          copy.append(name);
+          if(option.description){
+            const helper=document.createElement('small');
+            helper.textContent=option.description;
+            copy.append(helper);
+          }
           label.append(radio,copy);
           group.appendChild(label);
           radio.addEventListener('change',()=>{
