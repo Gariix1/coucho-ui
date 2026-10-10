@@ -503,6 +503,7 @@ try{
   });
 
   await check('demo reset and clear require explicit confirmation',async()=>{
+    if(!await page.locator('.test-tools').isVisible())await page.locator('#testBtn').click();
     const before=await page.locator('.saved-mode-card:not(.mode-expanded)').count();
     await page.locator('#clearModes').click();
     assert.equal(await page.locator('#couchoDialog').isVisible(),true);
@@ -514,7 +515,6 @@ try{
     assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-applied-session-v1')),null);
     await page.reload({waitUntil:'networkidle'});
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),0);
-    await page.locator('#testBtn').click();
     await page.locator('#restoreDemo').click();
     assert.equal(await page.locator('#couchoDialog').isVisible(),true);
     await page.locator('#couchoDialog [data-dialog-cancel]').click();
