@@ -1,6 +1,12 @@
 /* Only visible in prototype test mode. Scenarios are reversible and scoped
    to Control; there is no simulated Hop screen. */
-.test-tools{flex-wrap:wrap;row-gap:9px}
+.test-tools{
+  position:sticky;top:0;z-index:25;
+  flex-wrap:wrap;row-gap:9px;
+  margin:0 0 4px;padding:11px 24px;
+  border-radius:0;border-left:0;border-right:0;
+  background:var(--floating-bg)
+}
 .test-tools-actions{align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .scenario-picker{display:inline-flex;align-items:center;gap:8px;font-size:11px}
 .scenario-picker select{
