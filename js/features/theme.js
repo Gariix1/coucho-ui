@@ -1,8 +1,9 @@
+import {controlStorage} from '../demo/scenarios.js';
 const THEME_KEY='coucho-theme';
 const THEMES=new Set(['system','light','dark']);
 
 export function getThemePreference(){
-  const saved=localStorage.getItem(THEME_KEY);
+  const saved=controlStorage.getItem(THEME_KEY);
   return THEMES.has(saved)?saved:'dark';
 }
 
@@ -16,7 +17,7 @@ function applyTheme(){
 
 export function setThemePreference(value){
   if(!THEMES.has(value))return;
-  localStorage.setItem(THEME_KEY,value);
+  controlStorage.setItem(THEME_KEY,value);
   applyTheme();
 }
 
