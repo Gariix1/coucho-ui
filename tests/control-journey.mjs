@@ -75,10 +75,11 @@ try{
     assert.match(await page.locator('[data-expand-source="current"]').innerText(),/Crear tu primer Couchset/);
     await page.locator('[data-nav-view="apps"]').click();
     assert.equal(await page.locator('#appsList .managed-app-row').count(),0);
-    const otherTab=await page.context().newPage();
+    const otherContext=await browser.newContext({locale:'es-EC'});
+    const otherTab=await otherContext.newPage();
     await otherTab.goto('http://127.0.0.1:8123/',{waitUntil:'networkidle'});
     assert.equal(await otherTab.locator('.saved-mode-card:not(.mode-expanded)').count(),3);
-    await otherTab.close();
+    await otherContext.close();
     await page.locator('[data-add-detected="Steam"]').click();
     assert.equal(await page.locator('[data-managed-app="Steam"]').count(),1);
   });
