@@ -8,7 +8,7 @@ export function buildDisplayOverview(session,mode,displays){
   const known=new Set(displays.map(display=>display.id));
   const ids=session&&Array.isArray(session.displayIds)?session.displayIds:[];
   const selected=new Set(ids);
-  const used=displays.filter(display=>selected.has(display.id));
+  const used=displays.filter(display=>selected.has(display.id)&&display.available!==false);
   const missing=ids.filter(id=>!known.has(id));
   const pending=!!(mode&&session&&mode.id===session.modeId&&(
     session.app!==mode.app||
@@ -35,8 +35,8 @@ export function buildDisplayOverview(session,mode,displays){
       state:display.available===false?'No detectada':
         !session?'Sin sesión':
         selected.has(display.id)?'En uso':'No usada por el modo',
-      used:!!session&&selected.has(display.id),
-      primary:!!session&&selected.has(display.id)&&session.primaryDisplayId===display.id
+      used:!!session&&selected.has(display.id)&&display.available!==false,
+      primary:!!session&&selected.has(display.id)&&display.available!==false&&session.primaryDisplayId===display.id
     }))
   };
 }
