@@ -996,6 +996,14 @@ function syncTestMode(){
 }
 
 function stopDemoScenario(){
+  if(hasPendingCreateChanges()){
+    confirmDiscardDraft(()=>{
+      resetExpandedState();
+      leaveScenario();
+      window.location.reload();
+    });
+    return;
+  }
   leaveScenario();
   window.location.reload();
 }
@@ -1013,6 +1021,7 @@ q('#demoStart').onclick=function(){
   if(testContext||modeTransitioning)return;
   if(hasPendingCreateChanges()){
     confirmDiscardDraft(()=>{
+      resetExpandedState();
       if(enterScenario(q('#demoScenario').value))window.location.reload();
     });
     return;
