@@ -1,0 +1,35 @@
+/* Only visible in prototype test mode. Scenarios are reversible and scoped
+   to Control; there is no simulated Hop screen. */
+.test-tools{flex-wrap:wrap;row-gap:9px}
+.test-tools-actions{align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.scenario-picker{display:inline-flex;align-items:center;gap:8px;font-size:11px}
+.scenario-picker select{
+  min-height:32px;max-width:190px;
+  border-radius:8px;border:1px solid var(--glass-border);
+  color:var(--text);background:var(--glass-control);padding:5px 8px;
+  font:inherit;font-size:11px
+}
+#demoExit:not([hidden]){border-color:var(--selected-border);color:var(--accent)}
+#demoExit[hidden],#displayRecovery[hidden],#appsRetry[hidden]{display:none!important}
+.display-recovery{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;margin-top:16px;padding:14px 15px;
+  border-radius:var(--r-control);border:1px solid var(--selected-border);
+  background:var(--glass-inset)
+}
+.display-recovery strong{font-size:12px;font-weight:650}
+.display-recovery .btn{min-height:33px}
+.overview-display.unavailable{border-style:dashed;opacity:.74}
+.overview-display.unavailable .overview-monitor-state{color:var(--accent)}
+.overview-make-primary:disabled{opacity:.35;cursor:not-allowed}
+.managed-app-status{font-size:10px;color:var(--accent);font-weight:600}
+.managed-app-row.is-unavailable .managed-app-icon{opacity:.5}
+.cbtn.shortcut-taken{border-color:var(--selected-border)}
+@media(max-width:690px){
+  .test-tools{align-items:flex-start;flex-direction:column}
+  .test-tools-actions{justify-content:flex-start}
+}
+@media(max-width:460px){
+  .display-recovery{flex-direction:column;align-items:flex-start}
+  .display-recovery .btn{width:100%}
+}
