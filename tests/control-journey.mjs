@@ -6,7 +6,7 @@ import {demoSets} from '../js/data/catalog.js';
 
 const browser=await chromium.launch({channel:'chrome',headless:true,
   args:['--no-sandbox','--disable-dev-shm-usage']});
-const page=await browser.newPage({viewport:{width:1280,height:900}});
+const page=await browser.newPage({viewport:{width:1280,height:900},locale:'es-EC'});
 await page.addInitScript(({modes,apps})=>{
   if(localStorage.getItem('coucho-test-sets')===null)
     localStorage.setItem('coucho-test-sets',JSON.stringify(modes));
@@ -65,9 +65,7 @@ try{
     assert.match(await page.locator('[data-expand-source="current"]').innerText(),/Crear tu primer Couchset/);
     await page.locator('[data-nav-view="apps"]').click();
     assert.equal(await page.locator('#appsList .managed-app-row').count(),0);
-    await page.locator('#appsAdd').click();
-    await page.locator('#couchoDialog input[value="Steam"]').check();
-    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    await page.locator('[data-add-detected="Steam"]').click();
     assert.equal(await page.locator('[data-managed-app="Steam"]').count(),1);
   });
 
