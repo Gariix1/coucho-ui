@@ -1,5 +1,6 @@
 import {esc} from '../core/dom.js';
 import {createDialog} from '../ui/modal.js';
+import {getScenario,appAvailable,setScenarioWithoutReload} from '../demo/scenarios.js';
 import {
   SAMPLE_APPS,
   normalizeManagedApps,
@@ -20,7 +21,7 @@ function readApps(){
   }
 }
 
-export function initApps({getModes}){
+export function initApps({getModes,onRecovered=()=>{}}){
   const root=document.getElementById('view-apps');
   const list=document.getElementById('appsList');
   if(!root||!list)return {render:()=>{}};
@@ -28,6 +29,7 @@ export function initApps({getModes}){
   let apps=readApps();
   const dialog=createDialog(document.getElementById('couchoDialog'));
   const add=document.getElementById('appsAdd');
+  const retry=document.getElementById('appsRetry');
 
   function save(){
     localStorage.setItem(STORAGE_KEY,JSON.stringify(apps));
@@ -40,10 +42,12 @@ export function initApps({getModes}){
       if(!app)return '';
       const used=appUsedByModes(modes,item.id);
       const useLabel=used.length===1?used[0]:used.length?used.length+' modos':'';
-      return '<article class="managed-app-row" data-managed-app="'+esc(app.id)+'">'+
+      const unavailable=!appAvailable(app.id);
+      return '<article class="managed-app-row'+(unavailable?' is-unavailable':'')+'" data-managed-app="'+esc(app.id)+'">'+
         '<span class="managed-app-icon" aria-hidden="true">'+esc(app.monogram)+'</span>'+
         '<div class="managed-app-name"><strong>'+esc(app.name)+'</strong>'+
-          (useLabel?'<small>'+esc(useLabel)+'</small>':'')+'</div>'+
+          (useLabel?'<small>'+esc(useLabel)+'</small>':'')+
+          (unavailable?'<span class="managed-app-status">No encontrada</span>':'')+'</div>'+
         '<label class="managed-app-hop"><span>En Hop</span>'+
           '<input type="checkbox" class="settings-switch" data-app-visibility="'+esc(app.id)+'" role="switch" aria-label="Mostrar '+esc(app.name)+' en Hop"'+
           (item.showInHop?' checked':'')+'></label>'+
@@ -52,6 +56,7 @@ export function initApps({getModes}){
     }).join('');
     if(!apps.length)list.innerHTML='<p class="managed-app-empty">Aún no hay apps.</p>';
     add.disabled=apps.length===SAMPLE_APPS.length;
+    retry.hidden=getScenario()!=='missing-app';
   }
 
   list.addEventListener('change',event=>{
@@ -86,6 +91,12 @@ export function initApps({getModes}){
         add.focus({preventScroll:true});
       }
     });
+  });
+
+  retry.addEventListener('click',()=>{
+    setScenarioWithoutReload('normal');
+    onRecovered();
+    render();
   });
 
   add.addEventListener('click',()=>{
