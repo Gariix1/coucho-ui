@@ -82,9 +82,9 @@ export function expandedModeMarkup({kind,id,layoutKey}){
   '</'+rootTag+'>';
 }
 
-export function modeCardMarkup(mode,{applying=false,pending=false,issue=null,density='detailed',layoutKey}={}){
+export function modeCardMarkup(mode,{applying=false,pending=false,issue=null,appName=null,density='detailed',layoutKey}={}){
   const safeName=esc(mode.name);
-  const safeApp=esc(mode.app);
+  const safeApp=esc(appName||mode.app);
   const safeShortcut=esc(shortcutCardLabel(mode.shortcut));
   const titleId='mode-title-'+mode.id;
 
