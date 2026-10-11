@@ -35,6 +35,7 @@ import {openModal,closeModal,createDialog} from './ui/modal.js';
 import {expandedModeMarkup,modeCardMarkup,currentDesktopMarkup} from './ui/mode-markup.js';
 import {buildDisplayOverview,displayOverviewMarkup} from './ui/display-overview.js';
 import {initTheme,getThemePreference} from './features/theme.js';
+import {translateControl} from './features/locale.js';
 import {exportPreview,importPreview} from './features/transfer.js';
 import {initSettings} from './features/settings.js';
 import {initApps} from './features/apps.js';
@@ -595,6 +596,7 @@ function refreshExpandedConfig(){
   renderResourceViews();
   renderDisplayOverview();
   renderWorkbench();
+  translateControl();
 }
 
 function renderWorkbench(){
@@ -1809,6 +1811,7 @@ bindDisplayEditorEvents();
 openShellView('modes');
 initTheme();
 initSettings();
+translateControl();
 syncTestMode();
 commitSets();
 render();
