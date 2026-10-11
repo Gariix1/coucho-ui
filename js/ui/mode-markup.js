@@ -10,7 +10,7 @@ import {
 
 // A small, factual preview of the actual selected monitors, not a second
 // display editor. Activation/editing remains in the existing screens workflow.
-export function currentDesktopMarkup(appliedSession){
+export function currentDesktopMarkup(appliedSession,{firstUse=false}={}){
   const configuration=appliedSession||null;
   const ids=configuration&&!configuration.preserve&&Array.isArray(configuration.displayIds)
     ?configuration.displayIds:[];
@@ -24,10 +24,10 @@ export function currentDesktopMarkup(appliedSession){
       '<span class="current-mini-name">'+esc(display.name)+'</span>'+
     '</span>';
   }).join('');
-  return '<button class="mode-list-item current" data-expand-source="current" data-layout-key="current" type="button" aria-label="Crear modo desde el escritorio actual">'+
+  return '<button class="mode-list-item current" data-expand-source="current" data-layout-key="current" type="button" aria-label="'+(firstUse?'Crear tu primer Couchset':'Crear modo desde el escritorio actual')+'">'+
     '<span class="mode-list-icon">'+iconMarkup('display')+'</span>'+
-    '<span class="mode-list-copy"><b>Escritorio actual</b><small>'+
-      (configuration?esc(displaySummary(configuration)):'Estado actual')+
+    '<span class="mode-list-copy"><b>'+(firstUse?'Crear tu primer Couchset':'Escritorio actual')+'</b><small>'+
+      (firstUse?'Empieza aquí':configuration?esc(displaySummary(configuration)):'Estado actual')+
     '</small></span>'+
     (preview?'<span class="current-mini-displays" aria-hidden="true">'+preview+'</span>':'')+
     '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
