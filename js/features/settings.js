@@ -92,7 +92,7 @@ export function initSettings(){
     status.textContent='Guardado';
     translateControl();
     clearTimeout(statusTimer);
-    statusTimer=setTimeout(()=>{status.textContent='Se guarda automáticamente'},1600);
+    statusTimer=setTimeout(()=>{status.textContent='Se guarda automáticamente';translateControl(status);},1600);
   }
 
   function render(){
@@ -120,6 +120,7 @@ export function initSettings(){
     background.disabled=!settings.trayIcon;
     el('settingsHopHint').hidden=settings.trayIcon;
     el('settingsHopHint').textContent='Sin icono en la bandeja, Hop vuelve a Control.';
+    translateControl();
   }
 
   const bindings=[
@@ -150,6 +151,7 @@ export function initSettings(){
     details.hidden=!details.hidden;
     transparencyToggle.setAttribute('aria-expanded',String(!details.hidden));
     el('settingsTransparencySummary').textContent=details.hidden?'Personalizar':'Ocultar';
+    translateControl(el('settingsTransparencyToggle'));
   });
 
   el('settingsShortcutExplain').addEventListener('click',()=>{
