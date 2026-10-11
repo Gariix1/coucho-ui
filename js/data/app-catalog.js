@@ -8,11 +8,7 @@ export const SAMPLE_APPS=Object.freeze([
   {id:'Kodi',name:'Kodi',monogram:'K'}
 ]);
 
-export const DEFAULT_MANAGED_APPS=Object.freeze([
-  {id:'Steam',showInHop:true},
-  {id:'Playnite',showInHop:false},
-  {id:'Plex',showInHop:true}
-]);
+export const DEFAULT_MANAGED_APPS=Object.freeze([]);
 
 const knownIds=new Set(SAMPLE_APPS.map(app=>app.id));
 
