@@ -1,4 +1,5 @@
 import {esc} from '../core/dom.js';
+import {translateControl} from './locale.js';
 import {createDialog} from '../ui/modal.js';
 import {getScenario,appAvailable,setScenarioWithoutReload,controlStorage} from '../demo/scenarios.js';
 import {
@@ -57,6 +58,7 @@ export function initApps({getModes,onRecovered=()=>{}}){
     ).join('');
     section.hidden=!detected.length;
     retry.hidden=getScenario()!=='missing-app';
+    translateControl(list.parentElement||document);
   }
 
   list.addEventListener('change',event=>{
