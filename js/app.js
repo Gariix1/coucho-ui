@@ -39,6 +39,7 @@ import {translateControl} from './features/locale.js';
 import {exportPreview,importPreview} from './features/transfer.js';
 import {initSettings} from './features/settings.js';
 import {initApps} from './features/apps.js';
+import {applyDisplayAliases,renameDisplay,validDisplayAlias} from './features/display-aliases.js';
 import {SAMPLE_APPS,getAppDetails,getAppLabel} from './data/app-catalog.js';
 import {readAppliedSession,writeAppliedSession} from './data/session-store.js';
 import {shortcutOwner,validateCouchset} from './features/shortcut-validation.js';
@@ -169,6 +170,19 @@ function ensureAppliedSession(){
   }
 }
 
+// In the browser, this models an independent observation, not a saved Couchset.
+// Native Control will replace it with fresh Windows topology observations.
+function currentDesktopObservation(){
+  const base=appliedSession||{
+    modeId:null,name:'Escritorio actual',icon:'desktop',app:'Ninguna',
+    preserve:false,displayIds:['tv','main','aux'],primaryDisplayId:'main'
+  };
+  if(getScenario()==='external-change'){
+    return {...base,name:'Escritorio actual',displayIds:['main','aux'],primaryDisplayId:'aux',preserve:false};
+  }
+  return base;
+}
+
 function sessionMatchesMode(session,mode){
   if(!session||!mode||session.modeId!==mode.id)return false;
   if(session.app!==mode.app||session.preserve!==!!mode.preserve)return false;
@@ -179,13 +193,9 @@ function sessionMatchesMode(session,mode){
   return a===b;
 }
 function newModeConfigFromApplied(){
-  ensureAppliedSession();
-  var ids=appliedSession&&appliedSession.displayIds.length
-    ?appliedSession.displayIds.slice()
-    :['main','aux'];
-  var primary=appliedSession&&appliedSession.primaryDisplayId
-    ?appliedSession.primaryDisplayId
-    :(ids[0]||'main');
+  const observed=currentDesktopObservation();
+  var ids=observed.displayIds.length?observed.displayIds.slice():['main'];
+  var primary=observed.primaryDisplayId||ids[0];
   return {
     id:null,name:'Nuevo modo',icon:'desktop',preserve:false,
     displayIds:ids,primaryDisplayId:primary,app:'Ninguna',shortcut:'Manual'
@@ -449,7 +459,7 @@ function renderModeList(){
       id:null,
       layoutKey:layoutKeyForMode(null)
     })
-    :currentDesktopMarkup(appliedSession,{firstUse:sets.length===0});
+    :currentDesktopMarkup(currentDesktopObservation(),{firstUse:sets.length===0});
 
   var saved=modesForRender(sets,{
     expandedOpen:expandedOpen,
@@ -468,6 +478,8 @@ function renderModeList(){
       appName:getAppLabel(mode.app,appLibrary.getManagedApps()),
       issue:validateActivation(mode),
       pending:!!(mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode)),
+      changedExternally:!!(mode.active&&sessionMatchesMode(appliedSession,mode)&&
+        !sessionMatchesMode(currentDesktopObservation(),mode)),
       density:cardDensity,
       layoutKey:layoutKeyForMode(mode.id)
     });
@@ -558,6 +570,8 @@ function renderExpandedMode(){
   var dirty=changeCount>0;
   var mode=isNew?null:byId(expandedModeId);
   var pending=!!(mode&&mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode));
+  var changedExternally=!!(mode&&mode.active&&!pending&&
+    !sessionMatchesMode(currentDesktopObservation(),mode));
 
   var profileIcon=q('#expandedProfileIcon');
   if(profileIcon)profileIcon.innerHTML=modeIconMarkup(expandedConfig.icon);
@@ -566,12 +580,12 @@ function renderExpandedMode(){
   q('#expandedShortcutName').textContent=shortcutCardLabel(expandedConfig.shortcut);
 
   var state=q('#expandedState');
-  var activeState=!!(mode&&mode.active&&!pending);
-  state.hidden=!(dirty||pending||activeState);
+  var activeState=!!(mode&&mode.active&&!pending&&!changedExternally);
+  state.hidden=!(dirty||pending||changedExternally||activeState);
   state.textContent=dirty
     ?(changeCount===1?'1 cambio':changeCount+' cambios')
-    :(pending?'Pendiente':activeState?'Activo':'');
-  state.classList.toggle('dirty',dirty||pending);
+    :(pending?'Pendiente':changedExternally?'Cambió fuera de Coucho':activeState?'Activo':'');
+  state.classList.toggle('dirty',dirty||pending||changedExternally);
   state.classList.toggle('active',activeState);
 
   var resetButton=q('#expandedReset');
@@ -580,10 +594,10 @@ function renderExpandedMode(){
   var activateButton=q('#expandedActivate');
   if(activateButton){
     var applying=!!(mode&&activatingId===mode.id);
-    activateButton.hidden=!!(mode&&mode.active&&!pending);
+    activateButton.hidden=!!(mode&&mode.active&&!pending&&!changedExternally);
     activateButton.disabled=applying;
     activateButton.setAttribute('aria-busy',applying?'true':'false');
-    activateButton.textContent=applying?'…':pending?'Aplicar':'Activar';
+    activateButton.textContent=applying?'…':pending?'Aplicar':changedExternally?'Reaplicar':'Activar';
   }
   q('#expandedClose').title=isNew?'Cancelar':'Compactar';
   q('#expandedClose').setAttribute('aria-label',isNew?'Cancelar':'Compactar');
@@ -675,6 +689,7 @@ function completeActivation(id){
   sets.forEach(function(s){s.active=s.id===id});
   desktopDisplayDraft=null;
   appliedSession=sessionFromMode(current);
+  if(getScenario()==='external-change')setScenarioWithoutReload('normal');
   commitSets();
   activatingId=null;
   render();
@@ -685,6 +700,7 @@ function completeActivation(id){
 function activate(id,force){
   const target=byId(id);
   if(!target||(target.active&&!force&&sessionMatchesMode(appliedSession,target)&&
+    sessionMatchesMode(currentDesktopObservation(),target)&&
     !validateActivation(target))||activatingId!==null||modeTransitioning)return;
   const issue=validateActivation(target);
   if(issue){showDemoFailure(issue,()=>activate(id,true));return;}
@@ -772,7 +788,7 @@ let desktopDisplayDraft=null;
 
 function desktopDraftIsChanged(){
   if(!desktopDisplayDraft)return false;
-  const current=appliedSession;
+  const current=currentDesktopObservation();
   if(!current)return true;
   return desktopDisplayDraft.preserve!==!!current.preserve||
     desktopDisplayDraft.primaryDisplayId!==current.primaryDisplayId||
@@ -782,18 +798,19 @@ function desktopDraftIsChanged(){
 
 function renderDisplayOverview(){
   syncScenarioDisplays();
+  applyDisplayAliases(simulatedDisplays);
   const stage=q('#displayOverviewStage');
   if(!stage)return;
 
   const editing=desktopDisplayDraft!==null;
   const session=editing
-    ?{...(appliedSession||{}),...desktopDisplayDraft}
-    :appliedSession;
+    ?{...currentDesktopObservation(),...desktopDisplayDraft}
+    :currentDesktopObservation();
   const scenario=getScenario();
   const devices=scenario==='no-displays'?[]:simulatedDisplays.map(device=>({
     ...device,available:displayAvailable(device.id,scenario)
   }));
-  const overview=buildDisplayOverview(session,active(),devices);
+  const overview=buildDisplayOverview(session,active(),devices,{externalChange:scenario==='external-change'&&!editing});
   stage.innerHTML=displayOverviewMarkup(overview,{editing});
   const outage=['no-displays','missing-screen','ambiguous-screen'].includes(scenario);
   const recovery=q('#displayRecovery');
@@ -1169,6 +1186,12 @@ function handleModeListClick(event){
     return;
   }
 
+  var createCouchset=find('[data-create-couchset]');
+  if(createCouchset){
+    expandCurrentDesktop('current');
+    return;
+  }
+
   var current=find('[data-expand-source]');
   if(current){
     expandCurrentDesktop(current.dataset.expandSource);
@@ -1498,11 +1521,9 @@ q('#keep').onclick=function(){
   var kind=testContext&&testContext.kind;
 
   if(kind==='desktop-display'){
-    const base=appliedSession||{
-      modeId:null,name:'Escritorio actual',icon:'desktop',app:'Ninguna',
-      preserve:false,displayIds:[],primaryDisplayId:null
-    };
+    const base=currentDesktopObservation();
     appliedSession=applyDisplayConfig({...base},testContext);
+    if(getScenario()==='external-change')setScenarioWithoutReload('normal');
     writeAppliedSession(appliedSession);
     desktopDisplayDraft=null;
     closeModal(q('#testOverlay'));
@@ -1691,7 +1712,7 @@ q('#displayRetry').onclick=function(){
 q('#editDesktopDisplays').onclick=function(){
   if(q('#testOverlay').classList.contains('open'))return;
   ensureAppliedSession();
-  const current=appliedSession;
+  const current=currentDesktopObservation();
   const initial=current&&current.displayIds.length?current.displayIds.slice():['main'];
   desktopDisplayDraft={
     preserve:false,
@@ -1713,10 +1734,27 @@ q('#cancelDesktopDisplays').onclick=function(){
 // Match the exact Couchset display rules: at least one display, one primary.
 // Rerender replaces the edited card, so restore keyboard focus to the action.
 q('#displayOverviewStage').addEventListener('click',function(event){
-  if(!desktopDisplayDraft||q('#testOverlay').classList.contains('open'))return;
+  if(q('#testOverlay').classList.contains('open'))return;
   const target=event.target;
   if(!(target instanceof Element))return;
   const root=event.currentTarget;
+  const rename=closestWithin(target,'[data-rename-display]',root);
+  if(rename&&!desktopDisplayDraft){
+    const display=getDisplay(rename.dataset.renameDisplay);
+    if(!display)return;
+    createDialog(q('#couchoDialog')).open({
+      heading:'Cambiar nombre de pantalla',message:'El modelo físico no cambiará.',
+      confirmText:'Guardar nombre',field:{label:'Nombre visible en Coucho',
+        value:display.name,maxLength:50,
+        validate:name=>validDisplayAlias(name)&&!simulatedDisplays.some(other=>
+          other.id!==display.id&&other.name.toLocaleLowerCase()===name.toLocaleLowerCase())},
+      onConfirm:name=>{
+        if(renameDisplay(simulatedDisplays,display.id,name))render();
+      }
+    });
+    return;
+  }
+  if(!desktopDisplayDraft)return;
   const primary=closestWithin(target,'[data-primary-desktop]',root);
   const toggle=closestWithin(target,'[data-toggle-desktop]',root);
   if(!primary&&!toggle)return;
@@ -1740,7 +1778,7 @@ q('#displayOverviewStage').addEventListener('click',function(event){
 q('#applyDesktopDisplays').onclick=function(){
   if(!desktopDisplayDraft||!desktopDraftIsChanged()||
     q('#testOverlay').classList.contains('open'))return;
-  const base=appliedSession;
+  const base=currentDesktopObservation();
   startTest({
     kind:'desktop-display',name:'Pantallas del escritorio',icon:base?.icon||'desktop',
     app:base?.app||'Ninguna',preserve:false,

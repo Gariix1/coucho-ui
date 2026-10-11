@@ -297,3 +297,10 @@ margin:0;font-size:18px;font-weight:600
 .empty-state p{
 margin:6px 0 16px;color:var(--text2);font-size:12px
 }
+
+
+.overview-monitor-spec{font-size:10px;color:var(--text2);white-space:normal}
+.overview-display:not(.is-editing){position:relative;padding-bottom:39px}
+.overview-rename{position:absolute;bottom:9px;right:9px;min-height:26px;padding:4px 8px;border:1px solid var(--glass-soft-border);border-radius:7px;background:var(--glass-command);color:var(--text2);font:inherit;font-size:10px;cursor:pointer}
+.overview-rename:hover,.overview-rename:focus-visible{color:var(--accent);border-color:var(--selected-border)}
+

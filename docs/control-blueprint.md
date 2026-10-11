@@ -37,6 +37,7 @@ El laboratorio se abre desde la barra lateral de Control y permanece accesible e
 | Primer uso | Sin Couchsets ni apps → añadir app → crear Couchset → activar |
 | Sin pantallas | Estado vacío → comprobar de nuevo |
 | Pantalla nueva | Nuevo monitor detectado → seleccionar/identificar → probar → conservar/descartar |
+| Cambio externo de pantallas | Observación distinta del Couchset aplicado → estado de escritorio observado → reaplicar sin sobrescribir el Couchset |
 | Pantalla sin identificar | Bloquear aplicación insegura → identificar/comprobar → reintentar |
 | TV desconectada | Pantalla «No detectada» → activar Películas → error → reintentar |
 | App no encontrada | Steam «No encontrada» en Apps → comprobar |
@@ -50,7 +51,9 @@ Los escenarios simulan las **respuestas que podría dar el motor**, no el estado
 
 - **Primer arranque real**: sin Couchsets ni apps gestionadas precargadas. Aparecen «Crear tu primer Couchset» y apps **Encontradas** (datos de ejemplo, no detección de Windows).
 - **Apps**: apps detectadas de demostración, gestionadas y añadidas manualmente. Un Couchset muestra el nombre real de la app propia, no su identificador. Las apps referenciadas no se pueden quitar silenciosamente.
-- **Pantallas**: nueva pantalla y pantalla sin identificar, selección de pantalla principal, pruebas reversibles, mensajes «No detectada», «Nueva» o «Sin seleccionar», sin confundir esto con monitor físicamente apagado.
+- **Pantallas**: nueva pantalla y pantalla sin identificar, selección de pantalla principal, pruebas reversibles, mensajes «No detectada», «Nueva» o «Sin seleccionar», sin confundir esto con monitor físicamente apagado. Alias local persistente con modelo y resolución/Hz visibles; el alias no modifica la identidad ni los datos físicos.
+- **Escritorio actual**: proyección de una observación simulada aun sin Couchset activo. El laboratorio permite distinguir un cambio externo de una modificación guardada del Couchset. En la aplicación Windows se utilizarán observaciones frescas del subsistema Displays.
+- **Creación**: «Crear Couchset» permanece visible junto a «Escritorio actual», y comparte el editor existente con la expansión contextual.
 - **Recuperación**: éxito, error, aplicación parcial y restauración sin verificar son estados distintos. Ningún resultado de demostración sustituye el contrato nativo de journals/rollback.
 - **Ajustes**: español e inglés como **vista previa de localización HTML**. El resto de idiomas siguen siendo responsabilidad de la implementación real; no presentar opciones inertes en el mockup.
 - **Configuración portable**: importar/exportar y confirmar el reemplazo de contenido mediante `coucho-control-demo.json`, formato exclusivo del prototipo; **no es** el `.coucho` nativo (format version 2).

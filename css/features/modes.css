@@ -662,3 +662,12 @@ background:var(--glass-command)
 .mode-expanded .mode-expanded-head .mode-name-edit{
 cursor:text
 }
+
+
+/* Separate, unmistakable creation CTA without nesting buttons or interfering with Morph. */
+.current-source-container{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;gap:12px}
+.current-source-container>.mode-list-item.current{min-width:0}
+.current-create-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:166px;border-radius:var(--r-compact);font-weight:650}
+.current-create-button .ui-icon{width:17px;height:17px}
+@media(max-width:1060px){.current-source-container{grid-template-columns:1fr}.current-create-button{min-height:42px}}
+

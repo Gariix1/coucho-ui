@@ -5,7 +5,8 @@ const SANDBOX_PREFIX='coucho-sandbox-v2:';
 const LEGACY_RECOVERY='coucho-control-scenario-recovery-v1';
 const DATA_KEYS=[
   'coucho-test-sets','coucho-applied-session-v1','coucho-apps-demo-v1',
-  'coucho-settings-preview-v1','coucho-theme','coucho-card-density'
+  'coucho-settings-preview-v1','coucho-theme','coucho-card-density',
+  'coucho-display-aliases-v1'
 ];
 export const SCENARIOS=Object.freeze([
   {id:'normal',label:'Normal'},
@@ -13,6 +14,7 @@ export const SCENARIOS=Object.freeze([
   {id:'no-displays',label:'Sin pantallas'},
   {id:'missing-screen',label:'TV desconectada'},
   {id:'new-screen',label:'Pantalla nueva'},
+  {id:'external-change',label:'Cambio externo de pantallas'},
   {id:'ambiguous-screen',label:'Pantalla sin identificar'},
   {id:'missing-app',label:'App no encontrada'},
   {id:'apply-error',label:'Error al aplicar'},

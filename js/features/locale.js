@@ -47,6 +47,10 @@ const EN=Object.freeze({
   'Primer uso':'First use','Sin pantallas':'No displays',
   'TV desconectada':'TV disconnected','Pantalla nueva':'New display',
   'Pantalla sin identificar':'Unidentified display',
+  'Cambio externo de pantallas':'External display change',
+  'Cambió fuera de Coucho':'Changed outside Coucho',
+  'Reaplicar':'Reapply','Renombrar':'Rename',
+  'Crear Couchset':'Create Couchset','Crear tu primer Couchset':'Create your first Couchset',
   'App no encontrada':'App not found','Error al aplicar':'Apply error',
   'Aplicación parcial':'Partial apply','Restauración fallida':'Restore failed',
   'Normal':'Normal','Vaciar modos':'Clear Couchsets','Restaurar demo':'Restore examples'

@@ -4,7 +4,7 @@ import {iconMarkup} from '../core/icons.js';
 // Display overview and editable draft projection. State ownership stays in app.js.
 // A configured display that a mode does not use is NOT necessarily off or
 // disconnected; the browser mockup has no hardware detection capability.
-export function buildDisplayOverview(session,mode,displays){
+export function buildDisplayOverview(session,mode,displays,{externalChange=false}={}){
   const known=new Set(displays.map(display=>display.id));
   const ids=session&&Array.isArray(session.displayIds)?session.displayIds:[];
   const selected=new Set(ids);
@@ -18,10 +18,10 @@ export function buildDisplayOverview(session,mode,displays){
       (mode.displayIds||[]).slice().sort().join('|')!==ids.slice().sort().join('|')
     ))
   ));
-  const title=session
-    ?(pending?'Escritorio actual':session.name)+' · '+used.length+' de '+displays.length+' en uso'
-    :'Ningún modo aplicado · '+displays.length+' pantallas';
-  const detail=pending?session.name+' guardado no cambió.':
+  const title=(externalChange||!mode||pending?'Escritorio actual':session?.name||'Escritorio actual')+
+    ' · '+used.length+' de '+displays.length+' en uso';
+  const detail=externalChange?'Cambió fuera de Coucho. Los Couchsets guardados no se modificaron.':
+    pending?session.name+' guardado no cambió.':
     missing.length?'Algunas pantallas no aparecen en este ejemplo.':
     session?.preserve?'Conserva la configuración anterior.':'';
   return {
@@ -59,12 +59,13 @@ export function displayOverviewMarkup(overview,{editing=false}={}){
     const copy='<div class="overview-monitor-copy">'+
       '<b>'+esc(display.name)+'</b>'+
       '<span class="overview-monitor-state'+(display.primary?' primary':'')+'">'+esc(state)+'</span>'+
-      '<small>'+esc(display.model)+'</small>'+
+      '<small>'+esc(display.model||'Modelo no disponible')+'</small>'+
+      '<small class="overview-monitor-spec">'+esc([display.resolution,display.hz].filter(Boolean).join(' · ')||'Datos no disponibles')+'</small>'+
     '</div>';
     const inner=editing
       ?'<button type="button" class="overview-toggle" data-toggle-desktop="'+esc(display.id)+'" aria-pressed="'+String(display.used)+'" aria-label="'+esc((display.used?'Dejar de usar ':'Usar ')+display.name)+'">'+art+copy+'</button>'+
        '<button type="button" class="overview-make-primary'+(display.primary?' is-primary':'')+'" data-primary-desktop="'+esc(display.id)+'"'+(display.available===false?' disabled':'')+' aria-pressed="'+String(display.primary)+'" aria-label="'+esc(display.primary?display.name+' es principal':'Elegir '+display.name+' como principal')+'" title="'+esc(display.primary?'Pantalla principal':'Hacer principal')+'">'+iconMarkup(display.primary?'star-filled':'star')+'</button>'
-      :art+copy;
+      :art+copy+'<button type="button" class="overview-rename" data-rename-display="'+esc(display.id)+'" aria-label="Cambiar nombre de '+esc(display.name)+'">Renombrar</button>';
     return '<article class="'+classes.join(' ')+(editing?' is-editing':'')+'" data-display-id="'+esc(display.id)+'">'+inner+'</article>';
   }).join('');
 }
