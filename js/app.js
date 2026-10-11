@@ -650,11 +650,14 @@ function removeSet(id){
 
 function completeActivation(id){
   if(activatingId!==id)return;
-  if(getScenario()==='apply-error'){
+  if(['apply-error','partial-apply'].includes(getScenario())){
+    const partial=getScenario()==='partial-apply';
     activatingId=null;
     renderWorkbench();
     showDemoFailure(
-      {title:'No se pudo activar',message:'Se mantuvo el escritorio anterior.'},
+      partial
+        ?{title:'Activación parcial',message:'El resultado necesita revisión. No se marcó como activo.',actionText:'Comprobar'}
+        :{title:'No se pudo activar',message:'Se mantuvo el escritorio anterior.'},
       ()=>activate(id,true)
     );
     return;
@@ -1423,7 +1426,7 @@ function showDemoFailure(issue,onRetry){
   createDialog(q('#couchoDialog')).open({
     heading:issue.title,
     message:issue.message,
-    confirmText:'Reintentar',
+    confirmText:issue.actionText||'Reintentar',
     onConfirm:()=>{
       setScenarioWithoutReload('normal');
       render();
@@ -1456,13 +1459,16 @@ function startTest(ctx){
     pct+=25;setTestProgress(pct);
     if(pct>=100){
       clearInterval(progressTimer);progressTimer=null;
-      if(getScenario()==='apply-error'){
+      if(['apply-error','partial-apply'].includes(getScenario())){
+        const partial=getScenario()==='partial-apply';
         clearTestTimers();
         const failed=testContext;
         testContext=null;
         closeModal(q('#testOverlay'));
         showDemoFailure(
-          {title:'No se pudo aplicar',message:'Se mantuvo la configuración anterior.'},
+          partial
+            ?{title:'Aplicación parcial',message:'Los cambios requieren comprobación antes de continuar.',actionText:'Comprobar'}
+            :{title:'No se pudo aplicar',message:'Se mantuvo la configuración anterior.'},
           ()=>startTest(failed)
         );
         return;
@@ -1571,6 +1577,14 @@ function finishRestore(){
   closeModal(q('#testOverlay'));
   testContext=null;
   renderWorkbench();
+  if(getScenario()==='restore-error'){
+    showDemoFailure({
+      title:'Restauración sin verificar',
+      message:'Revisa las pantallas antes de volver a aplicar.',
+      actionText:'Comprobar'
+    },()=>openShellView('displays'));
+    return;
+  }
   toast('Restaurado','Configuración anterior');
 }
 
