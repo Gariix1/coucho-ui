@@ -56,6 +56,16 @@ async function leave(){
 }
 
 try{
+  const clean=await browser.newPage({locale:'es-EC'});
+  await clean.goto('http://127.0.0.1:8123/',{waitUntil:'networkidle'});
+  assert.equal(await clean.locator('.saved-mode-card:not(.mode-expanded)').count(),0);
+  assert.match(await clean.locator('[data-expand-source="current"]').innerText(),/Crear tu primer Couchset/);
+  await clean.locator('[data-nav-view="apps"]').click();
+  assert.equal(await clean.locator('#appsList .managed-app-row').count(),0);
+  assert.equal(await clean.locator('#appsFoundList .discovered-app').count(),5);
+  await clean.close();
+  console.log('PASS actual first launch without demo presets');
+
   await page.goto('http://127.0.0.1:8123/',{waitUntil:'networkidle'});
   await page.locator('#testBtn').click();
 
@@ -222,6 +232,39 @@ try{
     const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('coucho-test-sets')));
     assert.equal(saved.find(mode=>mode.id===2).shortcut,'Guide + X');
     assert.equal(saved.find(mode=>mode.id===1).shortcut,'Guide + A');
+  });
+
+  await check('configuration export and import require confirmation',async()=>{
+    const {readFile}=await import('node:fs/promises');
+    await page.locator('[data-nav-view="settings"]').click();
+    await page.locator('#settingsTabAdvanced').click();
+    const downloadWait=page.waitForEvent('download',{timeout:6000});
+    await page.locator('#settingsExport').click();
+    const download=await downloadWait;
+    assert.equal(download.suggestedFilename(),'coucho-control-demo.json');
+    const copy=await readFile(await download.path(),'utf8');
+    const parsed=JSON.parse(copy);
+    assert.equal(parsed.format,'coucho-control-preview');
+    assert.ok(parsed.couchsets.length>=3);
+
+    await page.locator('#settingsImportFile').setInputFiles({
+      name:'configuration.json',mimeType:'application/json',
+      buffer:Buffer.from(copy)
+    });
+    await page.waitForSelector('#couchoDialog.open',{timeout:4000});
+    assert.match(await page.locator('#couchoDialogTitle').innerText(),/Importar/);
+    await page.locator('#couchoDialog [data-dialog-cancel]').click();
+    assert.ok((await page.locator('.saved-mode-card:not(.mode-expanded)').count())>=3);
+    await page.locator('#settingsImportFile').setInputFiles({
+      name:'configuration.json',mimeType:'application/json',
+      buffer:Buffer.from(copy)
+    });
+    await Promise.all([
+      page.waitForEvent('load',{timeout:8000}),
+      page.locator('#couchoDialog [data-dialog-confirm]').click()
+    ]);
+    assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),parsed.couchsets.length);
+    assert.equal(await page.locator('.mode-list-badge').count(),0);
   });
 }finally{
   await browser.close();
