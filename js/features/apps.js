@@ -48,7 +48,7 @@ export function initApps({getModes,onRecovered=()=>{}}){
     }).join('');
     if(!apps.length)list.innerHTML='<p class="managed-app-empty">Todavía no has añadido apps.</p>';
 
-    const detected=SAMPLE_APPS.filter(candidate=>!apps.some(app=>app.id===candidate.id));
+    const detected=SAMPLE_APPS.filter(candidate=>appAvailable(candidate.id)&&!apps.some(app=>app.id===candidate.id));
     found.innerHTML=detected.map(app=>
       '<article class="managed-app-row discovered-app" data-discovered-app="'+esc(app.id)+'">'+
         '<span class="managed-app-icon" aria-hidden="true">'+esc(app.monogram)+'</span>'+
