@@ -1,6 +1,6 @@
 import {esc} from '../core/dom.js';
 import {createDialog} from '../ui/modal.js';
-import {getScenario,appAvailable,setScenarioWithoutReload} from '../demo/scenarios.js';
+import {getScenario,appAvailable,setScenarioWithoutReload,controlStorage} from '../demo/scenarios.js';
 import {
   SAMPLE_APPS,
   normalizeManagedApps,
@@ -14,7 +14,7 @@ const STORAGE_KEY='coucho-apps-demo-v1';
 
 function readApps(){
   try{
-    const raw=localStorage.getItem(STORAGE_KEY);
+    const raw=controlStorage.getItem(STORAGE_KEY);
     return normalizeManagedApps(raw===null?null:JSON.parse(raw));
   }catch{
     return normalizeManagedApps(null);
@@ -32,7 +32,7 @@ export function initApps({getModes,onRecovered=()=>{}}){
   const retry=document.getElementById('appsRetry');
 
   function save(){
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(apps));
+    controlStorage.setItem(STORAGE_KEY,JSON.stringify(apps));
   }
 
   function render(){
