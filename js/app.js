@@ -508,8 +508,8 @@ function renderExpandedScreens(){
     var selected=expandedConfig.displayIds.indexOf(d.id)>=0;
     var primary=selected&&expandedConfig.primaryDisplayId===d.id;
     return '<div class="mode-expanded-display '+(selected?'on':'off')+(primary?' primary':'')+'" data-display-layout="'+d.id+'">'+
-      '<button class="mode-expanded-display-screen" data-expanded-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'" title="'+(selected?'Apagar ':'Activar ')+esc(d.name)+'">'+
-        '<span class="mode-expanded-display-state">'+(selected?'Activa':'Apagada')+'</span>'+
+      '<button class="mode-expanded-display-screen" data-expanded-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'" title="'+(selected?'Dejar de usar ':'Usar ')+esc(d.name)+'">'+
+        '<span class="mode-expanded-display-state">'+(selected?'En uso':'Sin seleccionar')+'</span>'+
         '<span class="mode-expanded-display-number">'+d.number+'</span>'+
       '</button>'+
       '<button class="mode-expanded-display-primary" data-expanded-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
@@ -852,7 +852,7 @@ function renderDisplayEditor(){
       '<button class="screen-face screen-toggle" data-display="'+d.id+'" aria-pressed="'+(selected?'true':'false')+'">'+
         '<span class="screen-number">'+d.number+'</span>'+
         '<span class="screen-shape"></span>'+
-        '<span class="screen-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.detail)+'</small><em class="screen-visibility">'+(selected?'Activa':'Apagada')+'</em></span>'+
+        '<span class="screen-copy"><b>'+esc(d.name)+'</b><small>'+esc(d.detail)+'</small><em class="screen-visibility">'+(selected?'En uso':'Sin seleccionar')+'</em></span>'+
       '</button>'+
       '<button class="primary-screen-btn" data-primary="'+d.id+'" aria-pressed="'+(primary?'true':'false')+'" title="'+(primary?'Pantalla principal':'Hacer principal')+'" aria-label="'+(primary?d.name+' es la pantalla principal':'Hacer '+d.name+' principal')+'">'+iconMarkup(primary?'star-filled':'star')+'</button>'+
     '</div>';
