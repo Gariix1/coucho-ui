@@ -39,6 +39,10 @@ import {initApps} from './features/apps.js';
 import {SAMPLE_APPS} from './data/app-catalog.js';
 import {readAppliedSession,writeAppliedSession} from './data/session-store.js';
 import {
+  getScenario,enterScenario,leaveScenario,scenarioIsActive,
+  setScenarioWithoutReload,displayAvailable,validateActivation
+} from './demo/scenarios.js';
+import {
   layoutKeyForMode,
   modesForRender
 } from './features/mode-layout.js';
@@ -440,7 +444,7 @@ function renderModeList(){
       id:null,
       layoutKey:layoutKeyForMode(null)
     })
-    :currentDesktopMarkup(appliedSession);
+    :currentDesktopMarkup(appliedSession,{firstUse:sets.length===0});
 
   var saved=modesForRender(sets,{
     expandedOpen:expandedOpen,
@@ -476,7 +480,7 @@ function renderModeList(){
         '</div>'+
       '</div>'+
       '<div class="mode-grid '+cardDensity+'">'+
-        (saved||'<div class="mode-list-empty">Aún no has guardado modos.</div>')+
+        (saved||'<div class="mode-list-empty">Tus Couchsets aparecerán aquí.</div>')+
       '</div>'+
     '</div>';
 
@@ -641,6 +645,15 @@ function removeSet(id){
 
 function completeActivation(id){
   if(activatingId!==id)return;
+  if(getScenario()==='apply-error'){
+    activatingId=null;
+    renderWorkbench();
+    showDemoFailure(
+      {title:'No se pudo activar',message:'Se mantuvo el escritorio anterior.'},
+      ()=>activate(id,true)
+    );
+    return;
+  }
   const current=byId(id);
   if(!current){
     activatingId=null;
@@ -662,6 +675,8 @@ function activate(id,force){
   const target=byId(id);
   if(!target||(target.active&&!force&&sessionMatchesMode(appliedSession,target))||
     activatingId!==null||modeTransitioning)return;
+  const issue=validateActivation(target);
+  if(issue){showDemoFailure(issue,()=>activate(id,true));return;}
   activatingId=id;
   motionScheduler.cancel('activation');
   clearTimeout(activationTimer);
@@ -960,18 +975,41 @@ q('#appPop').addEventListener('click',function(event){
 // Settings controls are owned by the dedicated settings component.
 
 let testMode=localStorage.getItem(TEST_MODE_KEY)==='1';
+if(scenarioIsActive())testMode=true;
 function syncTestMode(){
   document.body.classList.toggle('test-mode',testMode);
   q('#testBtn').classList.toggle('active',testMode);
   q('#testBtn').title=testMode?'Salir del modo de prueba':'Modo de prueba';
   q('#testBtn').setAttribute('aria-label',q('#testBtn').title);
+  q('#demoScenario').value=getScenario();
+  q('#demoExit').hidden=!scenarioIsActive();
 }
 
+function stopDemoScenario(){
+  leaveScenario();
+  window.location.reload();
+}
 q('#testBtn').onclick=function(){
+  if(testMode&&scenarioIsActive()){
+    localStorage.setItem(TEST_MODE_KEY,'0');
+    stopDemoScenario();
+    return;
+  }
   testMode=!testMode;
   localStorage.setItem(TEST_MODE_KEY,testMode?'1':'0');
   syncTestMode();
 };
+q('#demoStart').onclick=function(){
+  if(testContext||modeTransitioning)return;
+  if(hasPendingCreateChanges()){
+    confirmDiscardDraft(()=>{
+      if(enterScenario(q('#demoScenario').value))window.location.reload();
+    });
+    return;
+  }
+  if(enterScenario(q('#demoScenario').value))window.location.reload();
+};
+q('#demoExit').onclick=stopDemoScenario;
 
 function beginExpandedRename(){
   var element=q('#expandedName');
@@ -1329,7 +1367,23 @@ function setTestProgress(percent){
   setCssVars(q('#progress'),{'--test-progress':value+'%'});
 }
 
+function showDemoFailure(issue,onRetry){
+  createDialog(q('#couchoDialog')).open({
+    heading:issue.title,
+    message:issue.message,
+    confirmText:'Reintentar',
+    onConfirm:()=>{
+      setScenarioWithoutReload('normal');
+      render();
+      syncTestMode();
+      onRetry?.();
+    }
+  });
+}
+
 function startTest(ctx){
+  const issue=validateActivation(ctx);
+  if(issue){showDemoFailure(issue,()=>startTest(ctx));return;}
   closePops();
   closeShortcutOverlay();
   clearTestTimers();
@@ -1345,6 +1399,17 @@ function startTest(ctx){
     pct+=25;setTestProgress(pct);
     if(pct>=100){
       clearInterval(progressTimer);progressTimer=null;
+      if(getScenario()==='apply-error'){
+        clearTestTimers();
+        const failed=testContext;
+        testContext=null;
+        q('#testOverlay').classList.remove('open');
+        showDemoFailure(
+          {title:'No se pudo aplicar',message:'Se mantuvo la configuración anterior.'},
+          ()=>startTest(failed)
+        );
+        return;
+      }
       q('#testText').textContent='Listo';q('#confirm').classList.add('show');
       var left=15;q('#count').textContent=left;
       countdownTimer=setInterval(function(){
