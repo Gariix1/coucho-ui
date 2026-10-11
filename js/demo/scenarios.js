@@ -21,12 +21,12 @@ export const SCENARIOS=Object.freeze([
 ]);
 const VALID=new Set(SCENARIOS.map(item=>item.id));
 
-export function getScenario(store=sessionStorage){
-  const value=store.getItem(SCENARIO_KEY);
+export function getScenario(store=typeof sessionStorage==='undefined'?null:sessionStorage){
+  const value=store?.getItem(SCENARIO_KEY);
   return VALID.has(value)?value:'normal';
 }
-export function scenarioIsActive(store=sessionStorage){
-  return store.getItem(SNAPSHOT_KEY)!==null;
+export function scenarioIsActive(store=typeof sessionStorage==='undefined'?null:sessionStorage){
+  return store?.getItem(SNAPSHOT_KEY)!==null&&!!store;
 }
 
 // A storage facade. All CRUD modules use this instead of localStorage:
