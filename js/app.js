@@ -188,7 +188,7 @@ function newModeConfigFromApplied(){
 }
 
 // Apps owns its own list and Hop-visibility settings; modes only provide usage.
-const appLibrary=initApps({getModes:()=>sets});
+const appLibrary=initApps({getModes:()=>sets,onRecovered:()=>{render();syncTestMode();}});
 function renderResourceViews(){
   appLibrary.render();
 }
