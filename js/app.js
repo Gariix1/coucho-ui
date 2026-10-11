@@ -777,8 +777,17 @@ function renderDisplayOverview(){
   const session=editing
     ?{...(appliedSession||{}),...desktopDisplayDraft}
     :appliedSession;
-  const overview=buildDisplayOverview(session,active(),simulatedDisplays);
+  const scenario=getScenario();
+  const devices=scenario==='no-displays'?[]:simulatedDisplays.map(device=>({
+    ...device,available:displayAvailable(device.id,scenario)
+  }));
+  const overview=buildDisplayOverview(session,active(),devices);
   stage.innerHTML=displayOverviewMarkup(overview,{editing});
+  const outage=scenario==='no-displays'||scenario==='missing-screen';
+  const recovery=q('#displayRecovery');
+  recovery.hidden=!outage;
+  recovery.querySelector('strong').textContent=scenario==='no-displays'
+    ?'No se detectaron pantallas.':'TV Sala no detectada.';
   stage.dataset.identifying=String(!editing&&displayIdentificationVisible);
   q('#displayIdentifyHelp').hidden=editing||!displayIdentificationVisible;
   q('#displayTopologyStatus').textContent=editing
@@ -789,7 +798,7 @@ function renderDisplayOverview(){
   detail.hidden=editing||!overview.detail;
   detail.textContent=editing?'':overview.detail;
 
-  q('#editDesktopDisplays').hidden=editing;
+  q('#editDesktopDisplays').hidden=editing||scenario==='no-displays';
   q('#displayReadActions').hidden=editing;
   q('#displayEditActions').hidden=!editing;
   q('#applyDesktopDisplays').disabled=!editing||!desktopDraftIsChanged();
@@ -1608,6 +1617,12 @@ q('#identifyDisplays').onclick=function(){
   displayIdentificationVisible=!displayIdentificationVisible;
   renderDisplayOverview();
 };
+q('#displayRetry').onclick=function(){
+  setScenarioWithoutReload('normal');
+  desktopDisplayDraft=null;
+  render();
+  syncTestMode();
+};
 q('#editDesktopDisplays').onclick=function(){
   if(q('#testOverlay').classList.contains('open'))return;
   ensureAppliedSession();
@@ -1642,6 +1657,10 @@ q('#displayOverviewStage').addEventListener('click',function(event){
   if(!primary&&!toggle)return;
 
   if(primary){
+    if(!displayAvailable(primary.dataset.primaryDesktop)){
+      toast('Pantallas','Pantalla no detectada');
+      return;
+    }
     selectPrimaryDisplay(desktopDisplayDraft,primary.dataset.primaryDesktop);
   }else if(!toggleSelectedDisplay(desktopDisplayDraft,toggle.dataset.toggleDesktop)){
     toast('Pantallas','Debe quedar al menos una pantalla activa');
