@@ -1427,7 +1427,12 @@ function startTest(ctx){
   q('#testApp').textContent=logo(ctx.app);
   q('#testText').textContent='Probando '+ctx.name+'…';
   q('#keep').textContent=ctx.kind==='desktop-display'?'Conservar cambios':ctx.kind==='saved-mode'?'Activar':ctx.kind==='new-mode'?'Guardar y activar':'Guardar';
-  setTestProgress(0);q('#confirm').classList.remove('show');q('#testOverlay').classList.add('open');
+  setTestProgress(0);
+  q('#confirm').classList.remove('show');
+  openModal(q('#testOverlay'),{
+    initialFocus:q('#testOverlay'),
+    onCancel:()=>q('#revert').click()
+  });
 
   var pct=0;
   progressTimer=setInterval(function(){
@@ -1438,7 +1443,7 @@ function startTest(ctx){
         clearTestTimers();
         const failed=testContext;
         testContext=null;
-        q('#testOverlay').classList.remove('open');
+        closeModal(q('#testOverlay'));
         showDemoFailure(
           {title:'No se pudo aplicar',message:'Se mantuvo la configuración anterior.'},
           ()=>startTest(failed)
@@ -1474,7 +1479,7 @@ q('#keep').onclick=function(){
     appliedSession=applyDisplayConfig({...base},testContext);
     writeAppliedSession(appliedSession);
     desktopDisplayDraft=null;
-    q('#testOverlay').classList.remove('open');
+    closeModal(q('#testOverlay'));
     render();
     toast('Pantallas','Escritorio actualizado · Couchsets sin cambios');
     testContext=null;
@@ -1487,7 +1492,7 @@ q('#keep').onclick=function(){
       applyDisplayConfig(s,testContext);
       if(s.active)appliedSession=sessionFromMode(s);
     }
-    q('#testOverlay').classList.remove('open');
+    closeModal(q('#testOverlay'));
     commitSets();
     render();
     celebrateSurface(q('[data-mode-row="'+testContext.id+'"]'));
@@ -1507,7 +1512,7 @@ q('#keep').onclick=function(){
     sets.push(created);
     appliedSession=sessionFromMode(created);
     resetExpandedState();
-    q('#testOverlay').classList.remove('open');
+    closeModal(q('#testOverlay'));
     commitSets();
     render();
     celebrateSurface(q('[data-mode-row="'+created.id+'"]'));
@@ -1532,7 +1537,7 @@ q('#keep').onclick=function(){
       expandedConfig=cloneModeConfig(edited);
       newModeBase=null;
     }
-    q('#testOverlay').classList.remove('open');
+    closeModal(q('#testOverlay'));
     commitSets();
     render();
     if(edited)celebrateSurface(q('[data-mode-row="'+edited.id+'"]'));
@@ -1546,7 +1551,7 @@ q('#keep').onclick=function(){
 
 function finishRestore(){
   clearTestTimers();
-  q('#testOverlay').classList.remove('open');
+  closeModal(q('#testOverlay'));
   testContext=null;
   renderWorkbench();
   toast('Restaurado','Configuración anterior');
