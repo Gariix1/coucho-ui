@@ -19,7 +19,7 @@ test('Couchset creation requires a name and valid primary monitor',()=>{
   assert.match(validateCouchset({...mode,name:'  '},context),/nombre/);
   assert.match(validateCouchset({...mode,displayIds:[]},context),/pantalla/);
   assert.match(validateCouchset({...mode,primaryDisplayId:'tv'},context),/principal/);
-  assert.match(validateCouchset({...mode,displayIds:['gone']},context),/desconocidas/);
+  assert.match(validateCouchset({...mode,displayIds:['gone'],primaryDisplayId:'gone'},context),/desconocidas/);
   assert.equal(validateCouchset({...mode,preserve:true,displayIds:[],primaryDisplayId:null},context),null);
 });
 
