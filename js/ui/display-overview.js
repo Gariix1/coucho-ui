@@ -33,6 +33,7 @@ export function buildDisplayOverview(session,mode,displays){
     displays:displays.map(display=>({
       ...display,
       state:display.available===false?'No detectada':
+        display.newlyDetected&&!selected.has(display.id)?'Nueva':
         !session?'Sin sesión':
         selected.has(display.id)?'En uso':'No usada por el modo',
       used:!!session&&selected.has(display.id)&&display.available!==false,
@@ -47,7 +48,8 @@ export function displayOverviewMarkup(overview,{editing=false}={}){
     if(display.available===false)classes.push('unavailable');
     if(display.primary)classes.push('primary');
     const state=display.available===false?'No detectada':
-      editing?(display.primary?'Principal':display.used?'Seleccionada':'Sin seleccionar'):(display.primary?'Principal':display.state);
+      editing?(display.primary?'Principal':display.used?'Seleccionada':'Sin seleccionar'):
+        (display.newlyDetected&&!display.used?'Nueva':display.primary?'Principal':display.state);
     const shape=display.kind==='tv'?'tv':'pc';
     const art='<div class="overview-monitor-art">'+
       '<span class="overview-screen-shape '+shape+'" aria-hidden="true">'+
