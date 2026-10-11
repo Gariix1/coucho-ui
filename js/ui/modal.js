@@ -66,6 +66,7 @@ export function createDialog(root){
     action=null;
     selected=null;
     choices.replaceChildren();
+    confirm.disabled=false;
   }
 
   cancel.addEventListener('click',close);
@@ -77,8 +78,8 @@ export function createDialog(root){
   });
 
   const controller={
-    open({heading,message,confirmText,confirmStyle='primary',options=[],value=null,onConfirm}){
-      root.setAttribute('role',options.length?'dialog':'alertdialog');
+    open({heading,message,confirmText,confirmStyle='primary',options=[],field=null,value=null,onConfirm}){
+      root.setAttribute('role',options.length||field?'dialog':'alertdialog');
       title.textContent=heading;
       description.textContent=message;
       confirm.textContent=confirmText;
@@ -87,7 +88,8 @@ export function createDialog(root){
       action=onConfirm;
       selected=value;
       choices.replaceChildren();
-      choices.hidden=options.length===0;
+      choices.hidden=options.length===0&&!field;
+      confirm.disabled=!!field;
 
       if(options.length){
         const group=document.createElement('div');
@@ -119,7 +121,29 @@ export function createDialog(root){
         });
         choices.append(group);
       }
-      openModal(root,{initialFocus:options.length?choices.querySelector('input:checked'):cancel,onCancel:close});
+      if(field){
+        const container=document.createElement('label');
+        container.className='modal-text-field';
+        container.textContent=field.label||'Nombre';
+        const input=document.createElement('input');
+        input.type='text';
+        input.maxLength=field.maxLength||50;
+        input.placeholder=field.placeholder||'';
+        input.value=field.value||'';
+        input.setAttribute('aria-label',field.label||'Nombre');
+        input.addEventListener('input',()=>{
+          selected=input.value.trim();
+          confirm.disabled=!!field.validate&&!field.validate(selected);
+        });
+        input.addEventListener('keydown',event=>{
+          if(event.key==='Enter'&&!confirm.disabled){event.preventDefault();confirm.click();}
+        });
+        container.append(input);
+        choices.append(container);
+        selected=input.value.trim();
+        confirm.disabled=!!field.validate&&!field.validate(selected);
+      }
+      openModal(root,{initialFocus:field?choices.querySelector('input'):options.length?choices.querySelector('input:checked'):cancel,onCancel:close});
     },
     close,
     get isOpen(){return !root.hidden;}
