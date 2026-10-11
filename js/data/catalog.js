@@ -59,7 +59,7 @@ export function loadSets(){
       if(Array.isArray(parsed))return parsed.map(migrateSet);
     }
   }catch(_){}
-  return demoSets();
+  return [];
 }
 
 export function saveSets(sets){
