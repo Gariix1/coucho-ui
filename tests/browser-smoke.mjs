@@ -393,6 +393,24 @@ try{
     assert.equal(await page.locator('.overview-identify-number:visible').count(),0);
   });
 
+  await check('display aliases persist across reload and update Couchset display labels',async()=>{
+    await page.locator('[data-rename-display="main"]').click();
+    assert.equal(await page.locator('#couchoDialog').isVisible(),true);
+    await page.locator('#couchoDialog .modal-text-field input').fill('Monitor Gaming');
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    assert.equal(await page.locator('[data-display-id="main"] .overview-monitor-copy b').innerText(),'Monitor Gaming');
+    assert.match(await page.locator('[data-display-id="main"] .overview-monitor-spec').innerText(),/165 Hz/);
+    await page.reload({waitUntil:'networkidle'});
+    await page.locator('[data-nav-view="displays"]').click();
+    assert.equal(await page.locator('[data-display-id="main"] .overview-monitor-copy b').innerText(),'Monitor Gaming');
+    await page.locator('[data-rename-display="main"]').click();
+    await page.locator('#couchoDialog .modal-text-field input').fill('Monitor 1');
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    await page.locator('[data-nav-view="modes"]').click();
+    assert.equal(await page.locator('[data-create-couchset]').isVisible(),true);
+    await page.locator('[data-nav-view="displays"]').click();
+  });
+
   await check('displays reflect mode changes and link to the original mode editor',async()=>{
     await page.locator('#displayGoToModes').click();
     assert.equal(await page.locator('#view-modes').isVisible(),true);

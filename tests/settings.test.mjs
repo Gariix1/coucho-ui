@@ -48,3 +48,11 @@ test('old preferences automatically receive a safe default Hop shortcut',()=>{
   assert.equal(migrated.hopShortcut,'sticks');
   assert.equal(normalizeSettings({hopShortcut:'unknown'}).hopShortcut,'sticks');
 });
+
+
+test('disabling Hop cannot leave Hop as startup destination',()=>{
+  const normalized=normalizeSettings({hopEnabled:false,startupSurface:'hop'});
+  assert.equal(normalized.startupSurface,'control');
+  assert.equal(normalized.hopEnabled,false);
+});
+

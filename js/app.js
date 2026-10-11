@@ -180,7 +180,8 @@ function currentDesktopObservation(){
   if(getScenario()==='external-change'){
     return {...base,name:'Escritorio actual',displayIds:['main','aux'],primaryDisplayId:'aux',preserve:false};
   }
-  return base;
+  // Preserving displays is a Couchset command, never a property of observation.
+  return {...base,preserve:false};
 }
 
 function sessionMatchesMode(session,mode){
@@ -480,6 +481,7 @@ function renderModeList(){
       pending:!!(mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode)),
       changedExternally:!!(mode.active&&sessionMatchesMode(appliedSession,mode)&&
         !sessionMatchesMode(currentDesktopObservation(),mode)),
+      uncertain:!!(mode.active&&['partial-apply','restore-error'].includes(getScenario())),
       density:cardDensity,
       layoutKey:layoutKeyForMode(mode.id)
     });
@@ -572,6 +574,7 @@ function renderExpandedMode(){
   var pending=!!(mode&&mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode));
   var changedExternally=!!(mode&&mode.active&&!pending&&
     !sessionMatchesMode(currentDesktopObservation(),mode));
+  var uncertain=!!(mode&&mode.active&&['partial-apply','restore-error'].includes(getScenario()));
 
   var profileIcon=q('#expandedProfileIcon');
   if(profileIcon)profileIcon.innerHTML=modeIconMarkup(expandedConfig.icon);
@@ -580,12 +583,12 @@ function renderExpandedMode(){
   q('#expandedShortcutName').textContent=shortcutCardLabel(expandedConfig.shortcut);
 
   var state=q('#expandedState');
-  var activeState=!!(mode&&mode.active&&!pending&&!changedExternally);
-  state.hidden=!(dirty||pending||changedExternally||activeState);
+  var activeState=!!(mode&&mode.active&&!pending&&!changedExternally&&!uncertain);
+  state.hidden=!(dirty||pending||changedExternally||uncertain||activeState);
   state.textContent=dirty
     ?(changeCount===1?'1 cambio':changeCount+' cambios')
-    :(pending?'Pendiente':changedExternally?'Cambió fuera de Coucho':activeState?'Activo':'');
-  state.classList.toggle('dirty',dirty||pending||changedExternally);
+    :(uncertain?'Estado sin verificar':pending?'Pendiente':changedExternally?'Cambió fuera de Coucho':activeState?'Activo':'');
+  state.classList.toggle('dirty',dirty||pending||changedExternally||uncertain);
   state.classList.toggle('active',activeState);
 
   var resetButton=q('#expandedReset');
@@ -594,10 +597,10 @@ function renderExpandedMode(){
   var activateButton=q('#expandedActivate');
   if(activateButton){
     var applying=!!(mode&&activatingId===mode.id);
-    activateButton.hidden=!!(mode&&mode.active&&!pending&&!changedExternally);
+    activateButton.hidden=!!(mode&&mode.active&&!pending&&!changedExternally&&!uncertain);
     activateButton.disabled=applying;
     activateButton.setAttribute('aria-busy',applying?'true':'false');
-    activateButton.textContent=applying?'…':pending?'Aplicar':changedExternally?'Reaplicar':'Activar';
+    activateButton.textContent=applying?'…':uncertain?'Revisar':pending?'Aplicar':changedExternally?'Reaplicar':'Activar';
   }
   q('#expandedClose').title=isNew?'Cancelar':'Compactar';
   q('#expandedClose').setAttribute('aria-label',isNew?'Cancelar':'Compactar');
@@ -673,7 +676,7 @@ function completeActivation(id){
     renderWorkbench();
     showDemoFailure(
       partial
-        ?{title:'Activación parcial',message:'El resultado necesita revisión. No se marcó como activo.',actionText:'Comprobar'}
+        ?{title:'Activación parcial',message:'El escritorio puede haber cambiado. Comprueba las pantallas antes de volver a aplicar.',actionText:'Revisar pantallas',recoveryOnly:true}
         :{title:'No se pudo activar',message:'Se mantuvo el escritorio anterior.'},
       ()=>activate(id,true)
     );
@@ -699,6 +702,10 @@ function completeActivation(id){
 
 function activate(id,force){
   const target=byId(id);
+  if(target?.active&&['partial-apply','restore-error'].includes(getScenario())){
+    openShellView('displays');
+    return;
+  }
   if(!target||(target.active&&!force&&sessionMatchesMode(appliedSession,target)&&
     sessionMatchesMode(currentDesktopObservation(),target)&&
     !validateActivation(target))||activatingId!==null||modeTransitioning)return;
@@ -812,12 +819,14 @@ function renderDisplayOverview(){
   }));
   const overview=buildDisplayOverview(session,active(),devices,{externalChange:scenario==='external-change'&&!editing});
   stage.innerHTML=displayOverviewMarkup(overview,{editing});
-  const outage=['no-displays','missing-screen','ambiguous-screen'].includes(scenario);
+  const outage=['no-displays','missing-screen','ambiguous-screen','partial-apply','restore-error'].includes(scenario);
   const recovery=q('#displayRecovery');
   recovery.hidden=!outage;
   recovery.querySelector('strong').textContent=scenario==='no-displays'
     ?'No se detectaron pantallas.':scenario==='ambiguous-screen'
-      ?'Hay una pantalla sin identificar.':'TV Sala no detectada.';
+      ?'Hay una pantalla sin identificar.':scenario==='partial-apply'
+        ?'Resultado parcial: verifica el escritorio antes de continuar.':scenario==='restore-error'
+          ?'Restauración sin verificar: revisa las pantallas.':'TV Sala no detectada.';
   stage.dataset.identifying=String(!editing&&displayIdentificationVisible);
   q('#displayIdentifyHelp').hidden=editing||!displayIdentificationVisible;
   q('#displayTopologyStatus').textContent=scenario==='no-displays'
@@ -1300,8 +1309,10 @@ function resetDemoModes(next){
   activatingId=null;
   desktopDisplayDraft=null;
   clearTestTimers();
+  const desktop=currentDesktopObservation();
   sets=next;
-  appliedSession=null;
+  appliedSession=next.some(mode=>mode.active)?null:
+    {...desktop,modeId:null,name:'Escritorio actual',app:'Ninguna',preserve:false};
   resetExpandedState();
   commitSets();
   render();
@@ -1454,6 +1465,7 @@ function showDemoFailure(issue,onRetry){
     message:issue.message,
     confirmText:issue.actionText||'Reintentar',
     onConfirm:()=>{
+      if(issue.recoveryOnly){openShellView('displays');render();return;}
       setScenarioWithoutReload('normal');
       render();
       syncTestMode();
@@ -1493,7 +1505,7 @@ function startTest(ctx){
         closeModal(q('#testOverlay'));
         showDemoFailure(
           partial
-            ?{title:'Aplicación parcial',message:'Los cambios requieren comprobación antes de continuar.',actionText:'Comprobar'}
+            ?{title:'Aplicación parcial',message:'Los cambios requieren comprobación antes de continuar.',actionText:'Revisar pantallas',recoveryOnly:true}
             :{title:'No se pudo aplicar',message:'Se mantuvo la configuración anterior.'},
           ()=>startTest(failed)
         );
@@ -1673,6 +1685,15 @@ function openShellView(viewName){
     return;
   }
   if(shellView==='displays'&&viewName!=='displays'&&desktopDisplayDraft){
+    if(desktopDraftIsChanged()){
+      createDialog(q('#couchoDialog')).open({
+        heading:'¿Descartar los cambios de pantallas?',
+        message:'No se aplicarán los cambios del escritorio.',
+        confirmText:'Descartar',confirmStyle:'danger',
+        onConfirm:()=>{desktopDisplayDraft=null;renderDisplayOverview();openShellView(viewName);}
+      });
+      return;
+    }
     desktopDisplayDraft=null;
     renderDisplayOverview();
   }

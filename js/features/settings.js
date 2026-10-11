@@ -44,6 +44,7 @@ export function normalizeSettings(raw){
     trayIcon:typeof value.trayIcon==='boolean'?value.trayIcon:SETTINGS_DEFAULTS.trayIcon
   };
   if(!safe.trayIcon&&safe.hopExit==='background')safe.hopExit='control';
+  if(!safe.hopEnabled&&safe.startupSurface==='hop')safe.startupSurface='control';
   return safe;
 }
 

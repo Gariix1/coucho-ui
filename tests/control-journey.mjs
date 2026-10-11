@@ -59,7 +59,9 @@ try{
   const clean=await browser.newPage({locale:'es-EC'});
   await clean.goto('http://127.0.0.1:8123/',{waitUntil:'networkidle'});
   assert.equal(await clean.locator('.saved-mode-card:not(.mode-expanded)').count(),0);
-  assert.match(await clean.locator('[data-expand-source="current"]').innerText(),/Crear tu primer Couchset/);
+  assert.equal(await clean.locator('[data-create-couchset]').isVisible(),true);
+  assert.match(await clean.locator('[data-create-couchset]').innerText(),/Crear tu primer Couchset/);
+  assert.match(await clean.locator('[data-expand-source="current"]').innerText(),/Escritorio actual/);
   await clean.locator('[data-nav-view="apps"]').click();
   assert.equal(await clean.locator('#appsList .managed-app-row').count(),0);
   assert.equal(await clean.locator('#appsFoundList .discovered-app').count(),5);
@@ -72,7 +74,7 @@ try{
   await check('first use is genuinely empty and isolated',async()=>{
     await selectScenario('first-use');
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),0);
-    assert.match(await page.locator('[data-expand-source="current"]').innerText(),/Crear tu primer Couchset/);
+    assert.match(await page.locator('[data-create-couchset]').innerText(),/Crear tu primer Couchset/);
     await page.locator('[data-nav-view="apps"]').click();
     assert.equal(await page.locator('#appsList .managed-app-row').count(),0);
     const otherContext=await browser.newContext({locale:'es-EC',storageState:await page.context().storageState()});
@@ -86,7 +88,7 @@ try{
 
   await check('first-use journey creates and activates its first Couchset',async()=>{
     await page.locator('[data-nav-view="modes"]').click();
-    await page.locator('[data-expand-source="current"]').click();
+    await page.locator('[data-create-couchset]').click();
     await page.waitForSelector('#expandedMode.new-mode-expanded',{timeout:6000});
     await page.locator('#expandedSave').click();
     await page.waitForFunction(()=>!document.querySelector('#expandedMode')&&
@@ -146,6 +148,23 @@ try{
     await leave();
     await page.locator('[data-nav-view="displays"]').click();
     assert.equal(await page.locator('.overview-display').count(),3);
+  });
+
+  await check('external Windows display change is observed without changing saved Couchsets',async()=>{
+    await selectScenario('external-change');
+    const before=await page.evaluate(()=>localStorage.getItem('coucho-test-sets'));
+    await page.locator('[data-nav-view="displays"]').click();
+    assert.equal(await page.locator('.overview-display.primary').getAttribute('data-display-id'),'aux');
+    assert.match(await page.locator('#displayTopologyDetail').innerText(),/fuera de Coucho/);
+    assert.equal(await page.locator('.overview-display.on').count(),2);
+    await page.locator('[data-nav-view="modes"]').click();
+    assert.match(await page.locator('[data-expand-source="current"]').innerText(),/2 pantallas/);
+    assert.match(await page.locator('[data-mode-row="1"] .mode-list-badge').innerText(),/Cambió fuera de Coucho/);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-test-sets')),before);
+    await page.locator('[data-mode-row="1"] .activate').click();
+    await page.waitForTimeout(1200);
+    assert.match(await page.locator('[data-mode-row="1"] .mode-list-badge').innerText(),/Activo/);
+    await leave();
   });
 
   await check('ambiguous monitor identity blocks operations until checked',async()=>{

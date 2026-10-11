@@ -54,7 +54,7 @@ Los escenarios simulan las **respuestas que podría dar el motor**, no el estado
 - **Pantallas**: nueva pantalla y pantalla sin identificar, selección de pantalla principal, pruebas reversibles, mensajes «No detectada», «Nueva» o «Sin seleccionar», sin confundir esto con monitor físicamente apagado. Alias local persistente con modelo y resolución/Hz visibles; el alias no modifica la identidad ni los datos físicos.
 - **Escritorio actual**: proyección de una observación simulada aun sin Couchset activo. El laboratorio permite distinguir un cambio externo de una modificación guardada del Couchset. En la aplicación Windows se utilizarán observaciones frescas del subsistema Displays.
 - **Creación**: «Crear Couchset» permanece visible junto a «Escritorio actual», y comparte el editor existente con la expansión contextual.
-- **Recuperación**: éxito, error, aplicación parcial y restauración sin verificar son estados distintos. Ningún resultado de demostración sustituye el contrato nativo de journals/rollback.
+- **Recuperación**: éxito, error, aplicación parcial y restauración sin verificar son estados distintos. Un resultado incierto muestra «Estado sin verificar» y lleva a Pantallas para revisar antes de cualquier reintento; nunca se convierte en éxito por pulsar «Comprobar». Ningún resultado de demostración sustituye el contrato nativo de journals/rollback.
 - **Ajustes**: español e inglés como **vista previa de localización HTML**. El resto de idiomas siguen siendo responsabilidad de la implementación real; no presentar opciones inertes en el mockup.
 - **Configuración portable**: importar/exportar y confirmar el reemplazo de contenido mediante `coucho-control-demo.json`, formato exclusivo del prototipo; **no es** el `.coucho` nativo (format version 2).
 
@@ -73,6 +73,10 @@ Los escenarios simulan las **respuestas que podría dar el motor**, no el estado
 - `node tests/browser-smoke.mjs` — CRUD, cambios de pantalla, modales, motion, ajustes y recarga.
 - `node tests/control-journey.mjs` — primer uso, simulación de desconexión, app ausente, recuperación, fallo y conflicto de atajos.
 - Revisar visualmente en Chrome, Safari y Firefox, teclado, toque, DPI, movimiento reducido y modo claro. GitHub CI actualmente usa Chrome; **no equivale a validación multiplataforma/nativa**.
+
+## Relación con perfiles nativos
+
+Control nativo utiliza Display Profiles y App Profiles reutilizables. El mockup mantiene la selección sencilla de pantallas y apps por Couchset como flujo visible. Antes de integrar cada editor WinUI, mapear su intención a perfiles existentes o a la creación de un perfil propio sin alterar silenciosamente otro Couchset que comparte ese perfil. En el HTML no se simulan identidades físicas, reconciliación de perfiles ni archivos `.coucho` nativos.
 
 ## Antes de portar a Coucho WinUI
 

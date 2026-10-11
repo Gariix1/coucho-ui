@@ -33,7 +33,7 @@ export function currentDesktopMarkup(appliedSession,{firstUse=false}={}){
     '<span class="mode-source-expand" aria-hidden="true">'+iconMarkup('expand')+'</span>'+
   '</button>'+
   '<button class="btn primary current-create-button" type="button" data-create-couchset="true" aria-label="'+(firstUse?'Crear tu primer Couchset':'Crear Couchset')+'">'+
-    iconMarkup('plus')+' <span>'+(firstUse?'Crear tu primer Couchset':'Crear Couchset')+'</span></button></div>';
+    '<span aria-hidden="true">+</span> <span>'+(firstUse?'Crear tu primer Couchset':'Crear Couchset')+'</span></button></div>';
 }
 
 export function expandedModeMarkup({kind,id,layoutKey}){
@@ -84,7 +84,7 @@ export function expandedModeMarkup({kind,id,layoutKey}){
   '</'+rootTag+'>';
 }
 
-export function modeCardMarkup(mode,{applying=false,pending=false,changedExternally=false,issue=null,appName=null,density='detailed',layoutKey}={}){
+export function modeCardMarkup(mode,{applying=false,pending=false,changedExternally=false,uncertain=false,issue=null,appName=null,density='detailed',layoutKey}={}){
   const safeName=esc(mode.name);
   const safeApp=esc(appName||mode.app);
   const safeShortcut=esc(shortcutCardLabel(mode.shortcut));
@@ -95,11 +95,11 @@ export function modeCardMarkup(mode,{applying=false,pending=false,changedExterna
       '<div class="saved-mode-name">'+
         '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
         '<span class="saved-mode-name-copy"><b class="mode-list-name" id="'+titleId+'">'+safeName+'</b>'+
-          (mode.active?'<small><span class="mode-list-badge">'+(issue?'Atención':pending?'Pendiente':changedExternally?'Cambió fuera de Coucho':'Activo')+'</span></small>':'')+
+          (mode.active?'<small><span class="mode-list-badge">'+(uncertain?'Estado sin verificar':issue?'Atención':pending?'Pendiente':changedExternally?'Cambió fuera de Coucho':'Activo')+'</span></small>':'')+
         '</span>'+
       '</div>'+
       '<div class="saved-mode-actions">'+
-        (!mode.active||pending||changedExternally||issue?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+' title="'+(issue?'Comprobar disponibilidad':pending?'Aplicar cambios':changedExternally?'Reaplicar modo':'Activar modo')+'">'+(applying?'…':issue?'Comprobar':pending?'Aplicar':changedExternally?'Reaplicar':'Activar')+'</button>':'')+
+        (!mode.active||pending||changedExternally||uncertain||issue?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+' title="'+(uncertain?'Revisar pantallas':issue?'Comprobar disponibilidad':pending?'Aplicar cambios':changedExternally?'Reaplicar modo':'Activar modo')+'">'+(applying?'…':uncertain?'Revisar':issue?'Comprobar':pending?'Aplicar':changedExternally?'Reaplicar':'Activar')+'</button>':'')+
         '<button class="open-mode" data-id="'+mode.id+'" title="Expandir '+safeName+'" aria-label="Expandir '+safeName+'">'+iconMarkup('expand')+'</button>'+
         (!mode.active?'<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>':'')+
       '</div>'+

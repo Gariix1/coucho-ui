@@ -30,3 +30,16 @@ test('import rejects corrupt and incompatible content without partial changes',(
   const duplicate={...demoSets()[0],active:false};
   assert.throws(()=>importPreview(JSON.stringify({...base,apps:[{id:'Steam',showInHop:true}],couchsets:[duplicate,duplicate]}),simulatedDisplays),/duplicados/);
 });
+
+
+test('import rejects unknown shortcuts and unresolved display identities',()=>{
+  const raw={format:'coucho-control-preview',version:1,apps:[],couchsets:[
+    {id:11,name:'Test',preserve:false,displayIds:['main'],primaryDisplayId:'main',app:'Ninguna',shortcut:'Guide + B'}
+  ]};
+  assert.throws(()=>importPreview(JSON.stringify(raw),simulatedDisplays),/atajo/);
+  raw.couchsets[0].shortcut='Manual';
+  raw.couchsets[0].displayIds=['unresolved'];
+  raw.couchsets[0].primaryDisplayId='unresolved';
+  assert.throws(()=>importPreview(JSON.stringify(raw),simulatedDisplays),/no se reconocen/);
+});
+

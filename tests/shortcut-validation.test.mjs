@@ -28,3 +28,11 @@ test('duplicate shortcut validation never modifies an existing mode',()=>{
   assert.match(validateCouchset(config,{modes,displays:simulatedDisplays,excludeId:2}),/Gaming/);
   assert.equal(modes[0].shortcut,'Guide + A');
 });
+
+
+test('unsupported shortcuts cannot arrive through imported configurations',()=>{
+  const valid={name:'Gaming nuevo',preserve:false,displayIds:['main'],primaryDisplayId:'main'};
+  assert.match(validateCouchset({...valid,shortcut:'Guide + B'},{modes:[],displays:simulatedDisplays}),/no es compatible/);
+  assert.match(validateCouchset({...valid,shortcut:'Control + F'},{modes:[],displays:simulatedDisplays}),/no es compatible/);
+});
+

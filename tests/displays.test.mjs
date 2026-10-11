@@ -20,6 +20,8 @@ test('applied Gaming shows physical examples without claiming unused screens are
     ['En uso','En uso','No usada por el modo']);
   const html=displayOverviewMarkup(overview);
   assert.match(html,/Principal/);
+  assert.match(html,/3840 × 2160 · 120 Hz/);
+  assert.match(html,/data-rename-display="tv"/);
   assert.doesNotMatch(html,/Apagada|Desconectada|Restaurar/);
   assert.equal((html.match(/class="overview-display/g)||[]).length,3);
   assert.equal((html.match(/overview-identify-number/g)||[]).length,3);
@@ -30,7 +32,7 @@ test('no applied Couchset never claims a monitor is currently in use',()=>{
   assert.equal(overview.selectedCount,0);
   assert.equal(overview.hasSession,false);
   assert.ok(overview.displays.every(d=>d.state==='Sin sesión'));
-  assert.match(overview.title,/Ningún modo aplicado/);
+  assert.match(overview.title,/Escritorio actual/);
 });
 
 test('preserved modes report preserved layout without inventing a hardware action',()=>{

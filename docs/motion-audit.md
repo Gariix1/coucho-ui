@@ -1,4 +1,6 @@
-# Auditoría de interacciones y Motion — Coucho UI
+# Auditoría histórica de interacciones y Motion — Coucho UI
+
+> Registro de la revisión de la rama de refactorización de octubre de 2026. No describe el estado vigente de `main`; para el contrato actual, revisar `docs/control-blueprint.md`.
 
 Rama: `refactor/mockup-motion-cleanup-20261007`  
 PR: https://github.com/Gariix1/coucho-ui/pull/1

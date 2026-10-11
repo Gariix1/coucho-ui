@@ -43,7 +43,8 @@ export function importPreview(raw,displays){
     };
     if(!allowedApps.has(mode.app))throw Error('Primero debes vincular las apps que faltan.');
     const issue=validateCouchset(mode,{modes,displays});
-    if(issue)throw Error(issue);
+    if(issue)throw Error(issue.includes('desconocidas')?
+      'Esta copia referencia pantallas que no se reconocen aquí. Comprueba las pantallas antes de importar.':issue);
     ids.add(mode.id);
     modes.push(mode);
   }

@@ -15,6 +15,9 @@ export function validateCouchset(config,{displays=[],modes=[],excludeId=null}={}
     if(!ids.includes(config.primaryDisplayId))return 'Elige una pantalla principal.';
     if(ids.some(id=>!displays.some(display=>display.id===id)))return 'Hay pantallas desconocidas.';
   }
+  if(config.shortcut!=='Manual'&&!COUCHSET_SHORTCUTS.includes(config.shortcut)){
+    return 'El atajo no es compatible.';
+  }
   const owner=shortcutOwner(modes,config.shortcut,excludeId);
   if(owner)return 'El atajo ya lo usa '+owner.name+'.';
   return null;
