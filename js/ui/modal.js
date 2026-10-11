@@ -1,3 +1,4 @@
+import {translateControl} from '../features/locale.js';
 // A single modal owner for focused choices and confirmations.
 // No feature may open a second dialog over an active one.
 let active=null;
@@ -144,6 +145,7 @@ export function createDialog(root){
         confirm.disabled=!!field.validate&&!field.validate(selected);
       }
       openModal(root,{initialFocus:field?choices.querySelector('input'):options.length?choices.querySelector('input:checked'):cancel,onCancel:close});
+      translateControl(root);
     },
     close,
     get isOpen(){return !root.hidden;}
