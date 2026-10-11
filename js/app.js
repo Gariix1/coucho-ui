@@ -38,6 +38,7 @@ import {initSettings} from './features/settings.js';
 import {initApps} from './features/apps.js';
 import {SAMPLE_APPS} from './data/app-catalog.js';
 import {readAppliedSession,writeAppliedSession} from './data/session-store.js';
+import {shortcutOwner,validateCouchset} from './features/shortcut-validation.js';
 import {
   getScenario,enterScenario,leaveScenario,scenarioIsActive,
   setScenarioWithoutReload,displayAvailable,validateActivation
@@ -1035,6 +1036,10 @@ function beginExpandedRename(){
 async function createModeFromExpanded(){
   if(!expandedConfig||expandedModeId!==null||modeTransitioning)return;
 
+  const validation=validateCouchset(expandedConfig,{
+    displays:simulatedDisplays,modes:sets
+  });
+  if(validation){toast('Modo',validation);return;}
   const created=cloneModeConfig(expandedConfig);
   created.id=Date.now();
   created.active=false;
@@ -1286,11 +1291,18 @@ function closeShortcutOverlay(){
   q('#capUse').hidden=true;
 }
 
+function shortcutEditingId(){
+  return shortcutEditTarget?.kind==='expanded'
+    ?expandedModeId:shortcutEditTarget?.id;
+}
 function syncShortcutKeys(selectedKey){
   qa('[data-shortcut-key]').forEach(function(button){
-    var selected=button.dataset.shortcutKey===selectedKey;
+    const selected=button.dataset.shortcutKey===selectedKey;
+    const owner=shortcutOwner(sets,'Guide + '+button.dataset.shortcutKey,shortcutEditingId());
     button.classList.toggle('selected',selected);
-    button.setAttribute('aria-pressed',selected?'true':'false');
+    button.classList.toggle('shortcut-taken',!!owner);
+    button.title=owner?'Lo usa '+owner.name:'Guide + '+button.dataset.shortcutKey;
+    button.setAttribute('aria-pressed',String(selected));
   });
 }
 
@@ -1316,10 +1328,18 @@ function openShortcut(rawId){
 }
 
 function capture(v){
-  captured='Guide + '+v;
+  const value='Guide + '+v;
+  const owner=shortcutOwner(sets,value,shortcutEditingId());
+  if(owner){
+    captured=null;
+    q('#captureResult').textContent='Lo usa '+owner.name;
+    q('#capUse').hidden=true;
+    syncShortcutKeys(null);
+    return;
+  }
+  captured=value;
   q('#captureResult').innerHTML=shortcutMarkup(captured);
   q('#capUse').hidden=false;
-
   syncShortcutKeys(v);
 }
 
@@ -1352,6 +1372,12 @@ q('#capUse').onclick=function(){
   if(!captured||!shortcutEditTarget)return;
   var value=captured;
   var target=shortcutEditTarget;
+  const owner=shortcutOwner(sets,value,shortcutEditingId());
+  if(owner){
+    q('#captureResult').textContent='Lo usa '+owner.name;
+    q('#capUse').hidden=true;
+    return;
+  }
 
   if(target.kind==='expanded'){
     expandedConfig.shortcut=value;
