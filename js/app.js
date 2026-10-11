@@ -6,7 +6,8 @@ import {
   getDisplay,
   loadSets,
   saveSets as persistSets,
-  simulatedDisplays
+  simulatedDisplays,
+  syncScenarioDisplays
 } from './data/catalog.js';
 import {
   cloneModeConfig,
@@ -774,6 +775,7 @@ function desktopDraftIsChanged(){
 }
 
 function renderDisplayOverview(){
+  syncScenarioDisplays();
   const stage=q('#displayOverviewStage');
   if(!stage)return;
 
@@ -787,11 +789,12 @@ function renderDisplayOverview(){
   }));
   const overview=buildDisplayOverview(session,active(),devices);
   stage.innerHTML=displayOverviewMarkup(overview,{editing});
-  const outage=scenario==='no-displays'||scenario==='missing-screen';
+  const outage=['no-displays','missing-screen','ambiguous-screen'].includes(scenario);
   const recovery=q('#displayRecovery');
   recovery.hidden=!outage;
   recovery.querySelector('strong').textContent=scenario==='no-displays'
-    ?'No se detectaron pantallas.':'TV Sala no detectada.';
+    ?'No se detectaron pantallas.':scenario==='ambiguous-screen'
+      ?'Hay una pantalla sin identificar.':'TV Sala no detectada.';
   stage.dataset.identifying=String(!editing&&displayIdentificationVisible);
   q('#displayIdentifyHelp').hidden=editing||!displayIdentificationVisible;
   q('#displayTopologyStatus').textContent=scenario==='no-displays'
@@ -807,7 +810,7 @@ function renderDisplayOverview(){
   q('#displayReadActions').hidden=editing;
   q('#displayEditActions').hidden=!editing;
   q('#applyDesktopDisplays').disabled=!editing||!desktopDraftIsChanged();
-  q('#displayEditHint').textContent='Los Couchsets guardados no cambian.';
+  q('#displayEditHint').textContent='Los Couchsets no cambian.';
 
   const button=q('#identifyDisplays');
   button.setAttribute('aria-pressed',String(!editing&&displayIdentificationVisible));
