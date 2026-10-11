@@ -54,6 +54,8 @@ const EN=Object.freeze({
   'Cambiar nombre de pantalla':'Rename display','Guardar nombre':'Save name',
   'Nombre visible en Coucho':'Name shown in Coucho',
   'Reaplicar':'Reapply','Renombrar':'Rename',
+  'Cambiar nombre de pantalla':'Rename display',
+  'Guardar nombre':'Save name',
   'Crear Couchset':'Create Couchset','Crear tu primer Couchset':'Create your first Couchset',
   'App no encontrada':'App not found','Error al aplicar':'Apply error',
   'Aplicación parcial':'Partial apply','Restauración fallida':'Restore failed',

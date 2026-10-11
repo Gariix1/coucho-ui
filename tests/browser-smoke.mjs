@@ -545,7 +545,9 @@ try{
     await page.locator('#clearModes').click();
     await page.locator('#couchoDialog [data-dialog-confirm]').click();
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),0);
-    assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-applied-session-v1')),null);
+    const retained=await page.evaluate(()=>JSON.parse(localStorage.getItem('coucho-applied-session-v1')));
+    assert.equal(retained.modeId,null);
+    assert.ok(retained.displayIds.length>0,'The observed desktop must survive clearing Couchsets');
     await page.reload({waitUntil:'networkidle'});
     assert.equal(await page.locator('.saved-mode-card:not(.mode-expanded)').count(),0);
     await page.locator('#restoreDemo').click();

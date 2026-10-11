@@ -24,7 +24,7 @@ Regla: **guardar un Couchset no equivale a aplicar su configuración al escritor
 - **Editar escritorio:** elegir pantallas/primaria → Probar → Conservar/Restaurar. Guardar la sesión aplicada sin modificar el Couchset. Validar la sesión almacenada al cargar y rechazar identificadores inválidos u obsoletos.
 - **Apps:** añadir/quitar ejemplos y alternar visibilidad inmediatamente. No quitar apps referenciadas por un Couchset. El selector de Modos muestra únicamente apps gestionadas más cualquier selección legada existente.
 - **Ajustes:** preferencias inmediatas; Restablecer pide confirmación y no borra modos, apps ni escritorio.
-- **Vaciar/Restaurar modos de ejemplo:** modal antes de mutar; limpiar tareas de activación pendientes; no alterar biblioteca ni ajustes.
+- **Vaciar/Restaurar modos de ejemplo:** modal antes de mutar; limpiar tareas de activación pendientes; no alterar biblioteca ni ajustes. Vaciar Couchsets no borra la topología observada del escritorio; la desvincula del modo retirado.
 
 ## Pruebas automáticas
 
