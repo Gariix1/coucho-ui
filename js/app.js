@@ -36,7 +36,7 @@ import {buildDisplayOverview,displayOverviewMarkup} from './ui/display-overview.
 import {initTheme} from './features/theme.js';
 import {initSettings} from './features/settings.js';
 import {initApps} from './features/apps.js';
-import {SAMPLE_APPS} from './data/app-catalog.js';
+import {SAMPLE_APPS,getAppDetails,getAppLabel} from './data/app-catalog.js';
 import {readAppliedSession,writeAppliedSession} from './data/session-store.js';
 import {shortcutOwner,validateCouchset} from './features/shortcut-validation.js';
 import {
@@ -462,6 +462,7 @@ function renderModeList(){
     }
     return modeCardMarkup(mode,{
       applying:activatingId===mode.id,
+      appName:getAppLabel(mode.app,appLibrary.getManagedApps()),
       issue:validateActivation(mode),
       pending:!!(mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode)),
       density:cardDensity,
@@ -558,7 +559,7 @@ function renderExpandedMode(){
   var profileIcon=q('#expandedProfileIcon');
   if(profileIcon)profileIcon.innerHTML=modeIconMarkup(expandedConfig.icon);
   q('#expandedName').textContent=expandedConfig.name;
-  q('#expandedAppName').textContent=expandedConfig.app;
+  q('#expandedAppName').textContent=getAppLabel(expandedConfig.app,appLibrary.getManagedApps());
   q('#expandedShortcutName').textContent=shortcutCardLabel(expandedConfig.shortcut);
 
   var state=q('#expandedState');
@@ -890,12 +891,13 @@ function makePrimary(id){
 }
 
 function syncAppOptions(selectedApp){
-  const managedIds=new Set(appLibrary.getManagedApps().map(app=>app.id));
-  // Legacy Couchsets may refer to an app not yet in the demo library.
-  // Show the current selection without offering other unmanaged apps.
+  const managed=appLibrary.getManagedApps();
+  const ids=[...new Set([...managed.map(app=>app.id),selectedApp])];
   const options=[
     {id:'Ninguna',name:'Ninguna',monogram:'—'},
-    ...SAMPLE_APPS.filter(app=>managedIds.has(app.id)||app.id===selectedApp)
+    ...ids.filter(id=>id&&id!=='Ninguna').map(id=>
+      getAppDetails(id,managed)||{id,name:id,monogram:'?'}
+    )
   ];
   q('#appPop .app-options').innerHTML=options.map(option=>
     '<button class="app-option'+(option.id===selectedApp?' selected':'')+
