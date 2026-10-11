@@ -41,7 +41,7 @@ import {readAppliedSession,writeAppliedSession} from './data/session-store.js';
 import {shortcutOwner,validateCouchset} from './features/shortcut-validation.js';
 import {
   getScenario,enterScenario,leaveScenario,scenarioIsActive,
-  setScenarioWithoutReload,displayAvailable,validateActivation
+  recoverOrphanedScenario,setScenarioWithoutReload,displayAvailable,validateActivation
 } from './demo/scenarios.js';
 import {
   layoutKeyForMode,
@@ -59,7 +59,8 @@ const MANUAL_RESTORE_FINISH_MS=220;
 const INTERACTIVE_SELECTOR='button,a,input,select,textarea,[contenteditable="true"]';
 const EXPANDED_TOGGLE_EXCLUDE_SELECTOR=INTERACTIVE_SELECTOR+',.mode-name-edit';
 
-// Persistent mode/session state.
+// Persistent mode/session state. Restore closed-tab scenario data BEFORE hydrating stores.
+recoverOrphanedScenario();
 let sets=loadSets();
 let appliedSession=readAppliedSession(sets,simulatedDisplays);
 let activatingId=null;
