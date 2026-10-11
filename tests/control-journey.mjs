@@ -65,6 +65,10 @@ try{
     assert.match(await page.locator('[data-expand-source="current"]').innerText(),/Crear tu primer Couchset/);
     await page.locator('[data-nav-view="apps"]').click();
     assert.equal(await page.locator('#appsList .managed-app-row').count(),0);
+    const otherTab=await page.context().newPage();
+    await otherTab.goto('http://127.0.0.1:8123/',{waitUntil:'networkidle'});
+    assert.equal(await otherTab.locator('.saved-mode-card:not(.mode-expanded)').count(),3);
+    await otherTab.close();
     await page.locator('[data-add-detected="Steam"]').click();
     assert.equal(await page.locator('[data-managed-app="Steam"]').count(),1);
   });
@@ -115,6 +119,34 @@ try{
     await leave();
   });
 
+  await check('newly connected monitor is editable and safe to discard',async()=>{
+    await selectScenario('new-screen');
+    await page.locator('[data-nav-view="displays"]').click();
+    assert.equal(await page.locator('.overview-display').count(),4);
+    assert.equal(await page.locator('[data-display-id="projector"] .overview-monitor-state').innerText(),'Nueva');
+    await page.locator('#editDesktopDisplays').click();
+    await page.locator('[data-toggle-desktop="projector"]').click();
+    await page.locator('[data-primary-desktop="projector"]').click();
+    assert.equal(await page.locator('#applyDesktopDisplays').isEnabled(),true);
+    await page.locator('#applyDesktopDisplays').click();
+    await page.waitForSelector('#confirm.show',{timeout:7000});
+    await page.locator('#keep').click();
+    assert.equal(await page.locator('.overview-display.primary').getAttribute('data-display-id'),'projector');
+    await leave();
+    await page.locator('[data-nav-view="displays"]').click();
+    assert.equal(await page.locator('.overview-display').count(),3);
+  });
+
+  await check('ambiguous monitor identity blocks operations until checked',async()=>{
+    await selectScenario('ambiguous-screen');
+    await page.locator('[data-nav-view="displays"]').click();
+    assert.equal(await page.locator('#displayRecovery').isVisible(),true);
+    assert.match(await page.locator('#displayRecovery').innerText(),/sin identificar/);
+    await page.locator('#displayRetry').click();
+    assert.equal(await page.locator('#displayRecovery').isVisible(),false);
+    await leave();
+  });
+
   await check('missing app is discoverable and retry restores availability',async()=>{
     await selectScenario('missing-app');
     await page.locator('[data-nav-view="apps"]').click();
@@ -139,6 +171,44 @@ try{
     await page.waitForTimeout(1100);
     assert.equal(await page.locator('[data-mode-row="2"] .mode-list-badge').count(),1);
     await leave();
+  });
+
+  await check('partial activation is never reported as completed',async()=>{
+    await selectScenario('partial-apply');
+    await page.locator('[data-mode-row="2"] .activate').click();
+    await page.waitForSelector('#couchoDialog.open',{timeout:5500});
+    assert.match(await page.locator('#couchoDialogTitle').innerText(),/Activación parcial/);
+    assert.equal(await page.locator('[data-mode-row="2"] .mode-list-badge').count(),0);
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    await page.waitForTimeout(1100);
+    assert.equal(await page.locator('[data-mode-row="2"] .mode-list-badge').count(),1);
+    await leave();
+  });
+
+  await check('unverified restoration surfaces a recoverable warning',async()=>{
+    await selectScenario('restore-error');
+    await page.locator('[data-nav-view="displays"]').click();
+    await page.locator('#editDesktopDisplays').click();
+    await page.locator('[data-toggle-desktop="aux"]').click();
+    await page.locator('#applyDesktopDisplays').click();
+    await page.waitForSelector('#confirm.show',{timeout:7000});
+    await page.locator('#revert').click();
+    await page.waitForSelector('#couchoDialog.open',{timeout:7000});
+    assert.match(await page.locator('#couchoDialogTitle').innerText(),/Restauración sin verificar/);
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    assert.equal(await page.locator('#view-displays').isVisible(),true);
+    await leave();
+  });
+
+  await check('language preview switches Control labels and restores Spanish',async()=>{
+    await page.locator('[data-nav-view="settings"]').click();
+    await page.locator('#settingsLanguage').selectOption('en-US');
+    assert.equal(await page.locator('[data-nav-view="modes"]').innerText(),'Modes');
+    assert.equal(await page.locator('html').getAttribute('lang'),'en');
+    await page.locator('#settingsLanguage').selectOption('es-419');
+    assert.equal(await page.locator('[data-nav-view="modes"]').innerText(),'Modos');
+    assert.equal(await page.locator('html').getAttribute('lang'),'es');
+    await page.locator('[data-nav-view="modes"]').click();
   });
 
   await check('shortcut conflict is prevented inline and a free key can be saved',async()=>{
