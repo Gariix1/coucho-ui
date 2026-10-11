@@ -1,5 +1,5 @@
 import {normalizeIconKey} from '../core/icons.js';
-import {controlStorage} from '../demo/scenarios.js';
+import {controlStorage,getScenario} from '../demo/scenarios.js';
 
 const LEGACY_ICON_KEYS=new Map([
   ['\uD83C\uDFAE','gaming'],
@@ -16,6 +16,18 @@ export const simulatedDisplays=[
   {id:'main',number:2,name:'Monitor 1',model:'LG 27GP850-B',resolution:'2560 × 1440',hz:'165 Hz',detail:'2560 × 1440 · 165 Hz',kind:'monitor',layout:{left:37,top:22,width:28,aspect:1.78}},
   {id:'aux',number:3,name:'Monitor 2',model:'Dell P2422H',resolution:'1920 × 1080',hz:'75 Hz',detail:'1920 × 1080 · 75 Hz',kind:'monitor',layout:{left:67,top:38,width:25,aspect:1.78}}
 ];
+
+const DISCOVERED_MONITOR={
+  id:'projector',number:4,name:'Pantalla nueva',model:'Monitor externo',
+  resolution:'1920 × 1080',hz:'60 Hz',detail:'1920 × 1080 · 60 Hz',
+  kind:'monitor',layout:{left:74,top:18,width:23,aspect:1.78},newlyDetected:true
+};
+export function syncScenarioDisplays(){
+  const index=simulatedDisplays.findIndex(d=>d.id===DISCOVERED_MONITOR.id);
+  if(getScenario()==='new-screen'&&index<0)simulatedDisplays.push({...DISCOVERED_MONITOR});
+  if(getScenario()!=='new-screen'&&index>=0)simulatedDisplays.splice(index,1);
+}
+syncScenarioDisplays();
 
 export function demoSets(){
   return [
