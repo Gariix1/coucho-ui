@@ -2,6 +2,7 @@
 // exercise never overwrites the visitor's existing Couchsets/preferences.
 const SCENARIO_KEY='coucho-control-scenario-v1';
 const BACKUP_KEY='coucho-control-scenario-backup-v1';
+const RECOVERY_KEY='coucho-control-scenario-recovery-v1';
 const DATA_KEYS=['coucho-test-sets','coucho-applied-session-v1','coucho-apps-demo-v1'];
 export const SCENARIOS=Object.freeze([
   {id:'normal',label:'Normal'},
@@ -33,6 +34,9 @@ export function enterScenario(id,{session=sessionStorage,data=localStorage}={}){
     backup=Object.fromEntries(DATA_KEYS.map(key=>[key,data.getItem(key)]));
     session.setItem(BACKUP_KEY,JSON.stringify(backup));
   }
+  // Durable safeguard: browser/tab closure must not permanently replace
+  // the visitor's real Couchsets with a first-use simulation.
+  data.setItem(RECOVERY_KEY,JSON.stringify(backup));
   // Always start from the visitor's real state when changing scenarios.
   restoreData(backup,data);
   if(id==='first-use'){
@@ -54,6 +58,18 @@ export function leaveScenario({session=sessionStorage,data=localStorage}={}){
   if(backup&&typeof backup==='object')restoreData(backup,data);
   session.removeItem(SCENARIO_KEY);
   session.removeItem(BACKUP_KEY);
+  data.removeItem(RECOVERY_KEY);
+}
+
+export function recoverOrphanedScenario({session=sessionStorage,data=localStorage}={}){
+  // A new tab has no session-scoped sandbox but may see its durable backup.
+  if(session.getItem(BACKUP_KEY)!==null)return false;
+  let saved=null;
+  try{saved=JSON.parse(data.getItem(RECOVERY_KEY));}catch{}
+  if(!saved||typeof saved!=='object')return false;
+  restoreData(saved,data);
+  data.removeItem(RECOVERY_KEY);
+  return true;
 }
 
 export function setScenarioWithoutReload(id,session=sessionStorage){
