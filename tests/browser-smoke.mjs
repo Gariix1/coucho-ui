@@ -2,6 +2,7 @@
 // npm install --no-save playwright && node tests/browser-smoke.mjs
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
+import {demoSets} from '../js/data/catalog.js';
 
 const browser=await chromium.launch({
   channel:'chrome',
@@ -9,6 +10,16 @@ const browser=await chromium.launch({
   args:['--no-sandbox','--disable-dev-shm-usage']
 });
 const page=await browser.newPage({viewport:{width:1280,height:900}});
+await page.addInitScript(({modes,apps})=>{
+  if(localStorage.getItem('coucho-test-sets')===null)
+    localStorage.setItem('coucho-test-sets',JSON.stringify(modes));
+  if(localStorage.getItem('coucho-apps-demo-v1')===null)
+    localStorage.setItem('coucho-apps-demo-v1',JSON.stringify(apps));
+},{modes:demoSets(),apps:[
+  {id:'Steam',showInHop:true},
+  {id:'Playnite',showInHop:false},
+  {id:'Plex',showInHop:true}
+]});
 const errors=[];
 page.on('pageerror',error=>errors.push(error.message));
 
