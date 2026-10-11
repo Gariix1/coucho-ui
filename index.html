@@ -49,8 +49,20 @@
     <section class="shell-view active" id="view-modes" data-shell-view="modes">
       <div class="wrap workbench-wrap">
         <div class="test-tools">
-          <span>Modo de prueba · datos locales</span>
+          <span>Laboratorio de Control</span>
           <div class="test-tools-actions">
+            <label class="scenario-picker" for="demoScenario">Escenario
+              <select id="demoScenario" aria-label="Escenario de prueba">
+                <option value="normal">Normal</option>
+                <option value="first-use">Primer uso</option>
+                <option value="no-displays">Sin pantallas</option>
+                <option value="missing-screen">TV desconectada</option>
+                <option value="missing-app">App no encontrada</option>
+                <option value="apply-error">Error al aplicar</option>
+              </select>
+            </label>
+            <button class="btn" id="demoStart">Probar</button>
+            <button class="btn" id="demoExit" hidden>Salir de prueba</button>
             <button class="btn" id="clearModes">Vaciar modos</button>
             <button class="btn" id="restoreDemo">Restaurar demo</button>
           </div>
@@ -73,6 +85,7 @@
           <h1>Apps</h1>
           <div class="apps-head-actions">
             <span class="display-demo-chip">Demo</span>
+            <button class="btn" id="appsRetry" type="button" hidden>Comprobar</button>
             <button class="btn primary" id="appsAdd" type="button">Añadir app</button>
           </div>
         </header>
@@ -99,6 +112,10 @@
             </div>
           </header>
           <div class="display-overview-stage" id="displayOverviewStage" data-identifying="false"></div>
+          <div class="display-recovery" id="displayRecovery" hidden>
+            <strong>No se detectaron pantallas.</strong>
+            <button class="btn" type="button" id="displayRetry">Volver a comprobar</button>
+          </div>
           <div class="display-overview-actions" id="displayReadActions">
             <div>
               <p class="display-identify-help" id="displayIdentifyHelp" hidden>Solo en esta vista.</p>
