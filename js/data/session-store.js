@@ -1,5 +1,6 @@
 // The applied desktop is NOT the saved Couchset. Persist it separately so
 // manual screen edits survive reload without changing a saved mode.
+import {controlStorage} from '../demo/scenarios.js';
 export const APPLIED_SESSION_KEY='coucho-applied-session-v1';
 
 export function normalizeAppliedSession(raw,modes,displays){
@@ -22,14 +23,14 @@ export function normalizeAppliedSession(raw,modes,displays){
   };
 }
 
-export function readAppliedSession(modes,displays,storage=localStorage){
+export function readAppliedSession(modes,displays,storage=controlStorage){
   try{
     const raw=storage.getItem(APPLIED_SESSION_KEY);
     return raw===null?null:normalizeAppliedSession(JSON.parse(raw),modes,displays);
   }catch{return null;}
 }
 
-export function writeAppliedSession(session,storage=localStorage){
+export function writeAppliedSession(session,storage=controlStorage){
   if(session===null){storage.removeItem(APPLIED_SESSION_KEY);return;}
   storage.setItem(APPLIED_SESSION_KEY,JSON.stringify(session));
 }
