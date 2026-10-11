@@ -34,7 +34,8 @@ import {positionPopover} from './ui/popover.js';
 import {openModal,closeModal,createDialog} from './ui/modal.js';
 import {expandedModeMarkup,modeCardMarkup,currentDesktopMarkup} from './ui/mode-markup.js';
 import {buildDisplayOverview,displayOverviewMarkup} from './ui/display-overview.js';
-import {initTheme} from './features/theme.js';
+import {initTheme,getThemePreference} from './features/theme.js';
+import {exportPreview,importPreview} from './features/transfer.js';
 import {initSettings} from './features/settings.js';
 import {initApps} from './features/apps.js';
 import {SAMPLE_APPS,getAppDetails,getAppLabel} from './data/app-catalog.js';
@@ -1749,6 +1750,57 @@ q('#applyDesktopDisplays').onclick=function(){
 q('#displayGoToModes').onclick=function(){
   openShellView('modes');
 };
+
+q('#settingsExport').addEventListener('click',()=>{
+  try{
+    const raw=exportPreview({
+      modes:sets,
+      apps:appLibrary.getManagedApps(),
+      settings:JSON.parse(controlStorage.getItem('coucho-settings-preview-v1')||'{}'),
+      theme:getThemePreference()
+    });
+    const blob=new Blob([raw],{type:'application/json;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=url;
+    link.download='coucho-control-demo.json';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1200);
+    toast('Configuración','Copia exportada');
+  }catch{toast('Configuración','No se pudo exportar');}
+});
+
+q('#settingsImport').addEventListener('click',()=>q('#settingsImportFile').click());
+q('#settingsImportFile').addEventListener('change',async event=>{
+  const input=event.currentTarget;
+  const file=input.files?.[0];
+  input.value='';
+  if(!file)return;
+  if(file.size>160000){toast('Configuración','Archivo demasiado grande');return;}
+  try{
+    const data=importPreview(await file.text(),simulatedDisplays);
+    createDialog(q('#couchoDialog')).open({
+      heading:'¿Importar configuración?',
+      message:data.modes.length+' Couchsets y '+data.apps.length+' apps reemplazarán los actuales.',
+      confirmText:'Importar',
+      confirmStyle:'danger',
+      onConfirm:()=>{
+        clearTimeout(activationTimer);
+        clearTestTimers();
+        controlStorage.setItem('coucho-test-sets',JSON.stringify(data.modes));
+        controlStorage.setItem('coucho-apps-demo-v1',JSON.stringify(data.apps));
+        controlStorage.setItem('coucho-settings-preview-v1',JSON.stringify(data.settings));
+        controlStorage.setItem('coucho-theme',data.theme);
+        controlStorage.removeItem('coucho-applied-session-v1');
+        window.location.reload();
+      }
+    });
+  }catch(error){
+    toast('Configuración',error.message||'No se pudo importar');
+  }
+});
 
 installMotionTokens();
 bindPressFeedback();
