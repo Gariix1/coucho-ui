@@ -44,6 +44,10 @@ export function enterScenario(id,{session=sessionStorage,data=localStorage}={}){
   return true;
 }
 
+export function scenarioIsActive(session=sessionStorage){
+  return session.getItem(BACKUP_KEY)!==null;
+}
+
 export function leaveScenario({session=sessionStorage,data=localStorage}={}){
   let backup=null;
   try{backup=JSON.parse(session.getItem(BACKUP_KEY));}catch{}
