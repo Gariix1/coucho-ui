@@ -28,18 +28,32 @@
 
 ## Entorno de pruebas reproducible
 
-En **Modos**, usa el icono de laboratorio de la barra lateral (no forma parte de la navegación de lanzamiento). Selecciona un escenario y pulsa **Probar**. La sesión de prueba conserva una copia temporal de Couchsets, biblioteca Apps y escritorio aplicado. **Salir de prueba** restaura esos datos, incluso tras recargar.
+El laboratorio se abre desde la barra lateral de Control y permanece accesible en cualquier sección. Selecciona un escenario y pulsa **Probar**. Sus cambios viven exclusivamente en el almacenamiento de esa pestaña: los Couchsets, apps, preferencias, tema y escritorio normales no se modifican. **Salir de prueba** vuelve a los datos originales. Cerrar una pestaña de prueba tampoco altera los datos normales.
 
 | Escenario | Qué probar |
 | --- | --- |
 | Normal | CRUD habitual, guardado vs aplicado |
+| Instalación limpia | Sin datos iniciales, creación del primer Couchset y apps detectadas disponibles para añadir |
 | Primer uso | Sin Couchsets ni apps → añadir app → crear Couchset → activar |
 | Sin pantallas | Estado vacío → comprobar de nuevo |
+| Pantalla nueva | Nuevo monitor detectado → seleccionar/identificar → probar → conservar/descartar |
+| Pantalla sin identificar | Bloquear aplicación insegura → identificar/comprobar → reintentar |
 | TV desconectada | Pantalla «No detectada» → activar Películas → error → reintentar |
 | App no encontrada | Steam «No encontrada» en Apps → comprobar |
 | Error al aplicar | Activar Películas → no confirmar éxito → reintentar |
+| Aplicación parcial | No declarar completado, pedir comprobación |
+| Restauración fallida | Advertencia de resultado sin verificar, acceso a Pantallas |
 
 Los escenarios simulan las **respuestas que podría dar el motor**, no el estado físico del PC. Los números de identificación se muestran **solo en la página**. Ninguna acción del mockup configura Windows ni detecta instalaciones reales.
+
+## Flujos cerrados de Control
+
+- **Primer arranque real**: sin Couchsets ni apps gestionadas precargadas. Aparecen «Crear tu primer Couchset» y apps **Encontradas** (datos de ejemplo, no detección de Windows).
+- **Apps**: apps detectadas de demostración, gestionadas y añadidas manualmente. Un Couchset muestra el nombre real de la app propia, no su identificador. Las apps referenciadas no se pueden quitar silenciosamente.
+- **Pantallas**: nueva pantalla y pantalla sin identificar, selección de pantalla principal, pruebas reversibles, mensajes «No detectada», «Nueva» o «Sin seleccionar», sin confundir esto con monitor físicamente apagado.
+- **Recuperación**: éxito, error, aplicación parcial y restauración sin verificar son estados distintos. Ningún resultado de demostración sustituye el contrato nativo de journals/rollback.
+- **Ajustes**: español e inglés como **vista previa de localización HTML**. El resto de idiomas siguen siendo responsabilidad de la implementación real; no presentar opciones inertes en el mockup.
+- **Configuración portable**: importar/exportar y confirmar el reemplazo de contenido mediante `coucho-control-demo.json`, formato exclusivo del prototipo; **no es** el `.coucho` nativo (format version 2).
 
 ## Contrato de validación y persistencia
 
