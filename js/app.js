@@ -461,6 +461,7 @@ function renderModeList(){
     }
     return modeCardMarkup(mode,{
       applying:activatingId===mode.id,
+      issue:validateActivation(mode),
       pending:!!(mode.active&&appliedSession&&!sessionMatchesMode(appliedSession,mode)),
       density:cardDensity,
       layoutKey:layoutKeyForMode(mode.id)
@@ -674,8 +675,8 @@ function completeActivation(id){
 
 function activate(id,force){
   const target=byId(id);
-  if(!target||(target.active&&!force&&sessionMatchesMode(appliedSession,target))||
-    activatingId!==null||modeTransitioning)return;
+  if(!target||(target.active&&!force&&sessionMatchesMode(appliedSession,target)&&
+    !validateActivation(target))||activatingId!==null||modeTransitioning)return;
   const issue=validateActivation(target);
   if(issue){showDemoFailure(issue,()=>activate(id,true));return;}
   activatingId=id;
@@ -791,12 +792,13 @@ function renderDisplayOverview(){
     ?'No se detectaron pantallas.':'TV Sala no detectada.';
   stage.dataset.identifying=String(!editing&&displayIdentificationVisible);
   q('#displayIdentifyHelp').hidden=editing||!displayIdentificationVisible;
-  q('#displayTopologyStatus').textContent=editing
-    ?overview.selectedCount+' de '+overview.count+' seleccionadas'
+  q('#displayTopologyStatus').textContent=scenario==='no-displays'
+    ?'Sin pantallas'
+    :editing?overview.selectedCount+' de '+overview.count+' seleccionadas'
     :overview.title;
 
   const detail=q('#displayTopologyDetail');
-  detail.hidden=editing||!overview.detail;
+  detail.hidden=editing||outage||!overview.detail;
   detail.textContent=editing?'':overview.detail;
 
   q('#editDesktopDisplays').hidden=editing||scenario==='no-displays';
