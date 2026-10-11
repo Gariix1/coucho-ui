@@ -158,7 +158,7 @@ try{
     assert.match(await page.locator('#displayTopologyDetail').innerText(),/fuera de Coucho/);
     assert.equal(await page.locator('.overview-display.on').count(),2);
     await page.locator('[data-nav-view="modes"]').click();
-    assert.match(await page.locator('[data-expand-source="current"]').innerText(),/2 pantallas/);
+    assert.match(await page.locator('[data-expand-source="current"]').innerText(),/Monitor 1 \+ Monitor 2/);
     assert.match(await page.locator('[data-mode-row="1"] .mode-list-badge').innerText(),/Cambió fuera de Coucho/);
     assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-test-sets')),before);
     await page.locator('[data-mode-row="1"] .activate').click();
@@ -210,8 +210,11 @@ try{
     assert.match(await page.locator('#couchoDialogTitle').innerText(),/Activación parcial/);
     assert.equal(await page.locator('[data-mode-row="2"] .mode-list-badge').count(),0);
     await page.locator('#couchoDialog [data-dialog-confirm]').click();
-    await page.waitForTimeout(1100);
-    assert.equal(await page.locator('[data-mode-row="2"] .mode-list-badge').count(),1);
+    assert.equal(await page.locator('#view-displays').isVisible(),true);
+    assert.match(await page.locator('#displayRecovery').innerText(),/Resultado parcial/);
+    await page.locator('[data-nav-view="modes"]').click();
+    assert.equal(await page.locator('[data-mode-row="2"] .mode-list-badge').count(),0);
+    assert.match(await page.locator('[data-mode-row="1"] .mode-list-badge').innerText(),/Estado sin verificar/);
     await leave();
   });
 
@@ -227,6 +230,7 @@ try{
     assert.match(await page.locator('#couchoDialogTitle').innerText(),/Restauración sin verificar/);
     await page.locator('#couchoDialog [data-dialog-confirm]').click();
     assert.equal(await page.locator('#view-displays').isVisible(),true);
+    assert.match(await page.locator('#displayRecovery').innerText(),/Restauración sin verificar/);
     await leave();
   });
 

@@ -43,7 +43,7 @@ El laboratorio se abre desde la barra lateral de Control y permanece accesible e
 | App no encontrada | Steam «No encontrada» en Apps → comprobar |
 | Error al aplicar | Activar Películas → no confirmar éxito → reintentar |
 | Aplicación parcial | No declarar completado, pedir comprobación |
-| Restauración fallida | Advertencia de resultado sin verificar, acceso a Pantallas |
+| Restauración fallida | Advertencia de resultado sin verificar, acceso a Pantallas; no marcar rollback exitoso al pulsar «Revisar» |
 
 Los escenarios simulan las **respuestas que podría dar el motor**, no el estado físico del PC. Los números de identificación se muestran **solo en la página**. Ninguna acción del mockup configura Windows ni detecta instalaciones reales.
 

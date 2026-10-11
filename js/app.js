@@ -1617,7 +1617,7 @@ function finishRestore(){
     showDemoFailure({
       title:'Restauración sin verificar',
       message:'Revisa las pantallas antes de volver a aplicar.',
-      actionText:'Comprobar'
+      actionText:'Revisar pantallas',recoveryOnly:true
     },()=>openShellView('displays'));
     return;
   }
