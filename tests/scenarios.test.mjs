@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  enterScenario,leaveScenario,getScenario,scenarioIsActive,
+  enterScenario,leaveScenario,getScenario,scenarioIsActive,recoverOrphanedScenario,
   displayAvailable,appAvailable,validateActivation,setScenarioWithoutReload
 } from '../js/demo/scenarios.js';
 
@@ -67,4 +67,30 @@ test('unknown demo scenarios cannot change stored data',()=>{
   assert.equal(enterScenario('whatever',{session,data}),false);
   assert.equal(data.getItem('coucho-test-sets'),'[1]');
   assert.equal(scenarioIsActive(session),false);
+});
+
+test('abandoned first-use scenario recovers original data after tab closure',()=>{
+  const data=storage({
+    'coucho-test-sets':'[{"id":17}]',
+    'coucho-apps-demo-v1':'[{"id":"Plex"}]'
+  });
+  const tabSession=storage();
+  enterScenario('first-use',{session:tabSession,data});
+  data.setItem('coucho-test-sets','[{"id":9000}]');
+  const newTab=storage();
+  assert.equal(recoverOrphanedScenario({session:newTab,data}),true);
+  assert.equal(data.getItem('coucho-test-sets'),'[{"id":17}]');
+  assert.equal(data.getItem('coucho-apps-demo-v1'),'[{"id":"Plex"}]');
+  assert.equal(recoverOrphanedScenario({session:newTab,data}),false);
+});
+
+test('reload inside active scenario retains its isolated data',()=>{
+  const data=storage({'coucho-test-sets':'[1]'});
+  const tabSession=storage();
+  enterScenario('first-use',{session:tabSession,data});
+  data.setItem('coucho-test-sets','[99]');
+  assert.equal(recoverOrphanedScenario({session:tabSession,data}),false);
+  assert.equal(data.getItem('coucho-test-sets'),'[99]');
+  leaveScenario({session:tabSession,data});
+  assert.equal(data.getItem('coucho-test-sets'),'[1]');
 });
