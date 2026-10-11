@@ -82,7 +82,7 @@ export function expandedModeMarkup({kind,id,layoutKey}){
   '</'+rootTag+'>';
 }
 
-export function modeCardMarkup(mode,{applying=false,pending=false,density='detailed',layoutKey}={}){
+export function modeCardMarkup(mode,{applying=false,pending=false,issue=null,density='detailed',layoutKey}={}){
   const safeName=esc(mode.name);
   const safeApp=esc(mode.app);
   const safeShortcut=esc(shortcutCardLabel(mode.shortcut));
@@ -93,11 +93,11 @@ export function modeCardMarkup(mode,{applying=false,pending=false,density='detai
       '<div class="saved-mode-name">'+
         '<span class="mode-list-icon">'+modeIconMarkup(mode.icon)+'</span>'+
         '<span class="saved-mode-name-copy"><b class="mode-list-name" id="'+titleId+'">'+safeName+'</b>'+
-          (mode.active?'<small><span class="mode-list-badge">'+(pending?'Pendiente':'Activo')+'</span></small>':'')+
+          (mode.active?'<small><span class="mode-list-badge">'+(issue?'Atención':pending?'Pendiente':'Activo')+'</span></small>':'')+
         '</span>'+
       '</div>'+
       '<div class="saved-mode-actions">'+
-        (!mode.active||pending?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+' title="'+(pending?'Aplicar cambios':'Activar modo')+'">'+(applying?'…':pending?'Aplicar':'Activar')+'</button>':'')+
+        (!mode.active||pending||issue?'<button class="btn activate" data-id="'+mode.id+'"'+(applying?' disabled aria-busy="true"':'')+' title="'+(issue?'Comprobar disponibilidad':pending?'Aplicar cambios':'Activar modo')+'">'+(applying?'…':issue?'Comprobar':pending?'Aplicar':'Activar')+'</button>':'')+
         '<button class="open-mode" data-id="'+mode.id+'" title="Expandir '+safeName+'" aria-label="Expandir '+safeName+'">'+iconMarkup('expand')+'</button>'+
         (!mode.active?'<button class="trash-mode" data-id="'+mode.id+'" title="Eliminar" aria-label="Eliminar '+safeName+'">'+iconMarkup('delete')+'</button>':'')+
       '</div>'+
