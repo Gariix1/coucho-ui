@@ -1,4 +1,5 @@
 import {normalizeIconKey} from '../core/icons.js';
+import {controlStorage} from '../demo/scenarios.js';
 
 const LEGACY_ICON_KEYS=new Map([
   ['\uD83C\uDFAE','gaming'],
@@ -52,7 +53,7 @@ export function migrateSet(source){
 
 export function loadSets(){
   try{
-    const saved=localStorage.getItem('coucho-test-sets');
+    const saved=controlStorage.getItem('coucho-test-sets');
     if(saved!==null){
       const parsed=JSON.parse(saved);
       if(Array.isArray(parsed))return parsed.map(migrateSet);
@@ -62,7 +63,7 @@ export function loadSets(){
 }
 
 export function saveSets(sets){
-  localStorage.setItem('coucho-test-sets',JSON.stringify(sets));
+  controlStorage.setItem('coucho-test-sets',JSON.stringify(sets));
 }
 
 export function autoMeta(app){
