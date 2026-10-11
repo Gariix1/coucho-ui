@@ -41,7 +41,7 @@ import {readAppliedSession,writeAppliedSession} from './data/session-store.js';
 import {shortcutOwner,validateCouchset} from './features/shortcut-validation.js';
 import {
   getScenario,enterScenario,leaveScenario,scenarioIsActive,
-  recoverOrphanedScenario,setScenarioWithoutReload,displayAvailable,validateActivation
+  recoverOrphanedScenario,setScenarioWithoutReload,displayAvailable,validateActivation,controlStorage
 } from './demo/scenarios.js';
 import {
   layoutKeyForMode,
@@ -69,7 +69,7 @@ let activationTimer=null;
 // Expanded mode state.
 let expandedModeId=null;
 let expandedOpen=false;
-let cardDensity=localStorage.getItem(CARD_DENSITY_KEY)==='compact'?'compact':'detailed';
+let cardDensity=controlStorage.getItem(CARD_DENSITY_KEY)==='compact'?'compact':'detailed';
 let expandedConfig=null;
 let newModeBase=null;
 let createAutoNamed=true;
@@ -289,7 +289,7 @@ async function setCardDensity(next){
     onBusy:setModeTransitioning,
     mutate(){
       cardDensity=next;
-      localStorage.setItem(CARD_DENSITY_KEY,cardDensity);
+      controlStorage.setItem(CARD_DENSITY_KEY,cardDensity);
       renderWorkbench();
     }
   });
