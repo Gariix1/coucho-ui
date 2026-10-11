@@ -9,7 +9,7 @@ const browser=await chromium.launch({
   headless:true,
   args:['--no-sandbox','--disable-dev-shm-usage']
 });
-const page=await browser.newPage({viewport:{width:1280,height:900}});
+const page=await browser.newPage({viewport:{width:1280,height:900},locale:'es-EC'});
 await page.addInitScript(({modes,apps})=>{
   if(localStorage.getItem('coucho-test-sets')===null)
     localStorage.setItem('coucho-test-sets',JSON.stringify(modes));
@@ -334,12 +334,11 @@ try{
     await page.locator('#appsAdd').click();
     assert.equal(await page.locator('#couchoDialog').isVisible(),true);
     assert.equal(await page.locator('#couchoDialogTitle').innerText(),'Añadir app');
+    assert.equal(await page.locator('#couchoDialog [data-dialog-confirm]').isDisabled(),true);
     await page.locator('#couchoDialog [data-dialog-cancel]').click();
     assert.equal(await page.locator('#appsList .managed-app-row').count(),3);
 
-    await page.locator('#appsAdd').click();
-    await page.locator('#couchoDialog input[value="Discord"]').check();
-    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    await page.locator('[data-add-detected="Discord"]').click();
     assert.equal(await page.locator('#appsList .managed-app-row').count(),4);
     assert.equal(await page.locator('[data-app-visibility="Discord"]').isChecked(),true);
 
@@ -353,12 +352,17 @@ try{
     assert.equal(await page.locator('[data-managed-app="Discord"]').count(),0);
     assert.equal(await page.locator('#appsList .managed-app-row').count(),3);
     assert.equal(await page.evaluate(()=>localStorage.getItem('coucho-test-sets')),savedModes);
+    await page.locator('#appsAdd').click();
+    await page.locator('#couchoDialog .modal-text-field input').fill('OBS Studio');
+    await page.locator('#couchoDialog [data-dialog-confirm]').click();
+    assert.equal(await page.locator('#appsList .managed-app-row').count(),4);
+    assert.equal(await page.locator('#appsList .managed-app-row:last-child .managed-app-name strong').innerText(),'OBS Studio');
   });
 
   await check('Couchset App picker uses the shared demo catalog',async()=>{
     await page.locator('[data-nav-view="modes"]').click();
     await page.locator('[data-mode-row="1"] .quick-app').click();
-    assert.equal(await page.locator('#appPop .app-option').count(),4);
+    assert.equal(await page.locator('#appPop .app-option').count(),5);
     assert.equal(await page.locator('#appPop [data-app="Discord"]').count(),0);
     assert.equal(await page.locator('#appPop [data-app="Kodi"]').count(),0);
     assert.equal(await page.locator('#appPop [data-app="Steam"]').getAttribute('aria-pressed'),'true');
