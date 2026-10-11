@@ -32,7 +32,8 @@ export function buildDisplayOverview(session,mode,displays){
     title,detail,pending,missing,
     displays:displays.map(display=>({
       ...display,
-      state:!session?'Sin sesión':
+      state:display.available===false?'No detectada':
+        !session?'Sin sesión':
         selected.has(display.id)?'En uso':'No usada por el modo',
       used:!!session&&selected.has(display.id),
       primary:!!session&&selected.has(display.id)&&session.primaryDisplayId===display.id
@@ -43,8 +44,10 @@ export function buildDisplayOverview(session,mode,displays){
 export function displayOverviewMarkup(overview,{editing=false}={}){
   return overview.displays.map(display=>{
     const classes=['overview-display',display.used?'on':'not-used'];
+    if(display.available===false)classes.push('unavailable');
     if(display.primary)classes.push('primary');
-    const state=editing?(display.primary?'Principal':display.used?'Seleccionada':'Sin seleccionar'):(display.primary?'Principal':display.state);
+    const state=display.available===false?'No detectada':
+      editing?(display.primary?'Principal':display.used?'Seleccionada':'Sin seleccionar'):(display.primary?'Principal':display.state);
     const shape=display.kind==='tv'?'tv':'pc';
     const art='<div class="overview-monitor-art">'+
       '<span class="overview-screen-shape '+shape+'" aria-hidden="true">'+
@@ -58,7 +61,7 @@ export function displayOverviewMarkup(overview,{editing=false}={}){
     '</div>';
     const inner=editing
       ?'<button type="button" class="overview-toggle" data-toggle-desktop="'+esc(display.id)+'" aria-pressed="'+String(display.used)+'" aria-label="'+esc((display.used?'Dejar de usar ':'Usar ')+display.name)+'">'+art+copy+'</button>'+
-       '<button type="button" class="overview-make-primary'+(display.primary?' is-primary':'')+'" data-primary-desktop="'+esc(display.id)+'" aria-pressed="'+String(display.primary)+'" aria-label="'+esc(display.primary?display.name+' es principal':'Elegir '+display.name+' como principal')+'" title="'+esc(display.primary?'Pantalla principal':'Hacer principal')+'">'+iconMarkup(display.primary?'star-filled':'star')+'</button>'
+       '<button type="button" class="overview-make-primary'+(display.primary?' is-primary':'')+'" data-primary-desktop="'+esc(display.id)+'"'+(display.available===false?' disabled':'')+' aria-pressed="'+String(display.primary)+'" aria-label="'+esc(display.primary?display.name+' es principal':'Elegir '+display.name+' como principal')+'" title="'+esc(display.primary?'Pantalla principal':'Hacer principal')+'">'+iconMarkup(display.primary?'star-filled':'star')+'</button>'
       :art+copy;
     return '<article class="'+classes.join(' ')+(editing?' is-editing':'')+'" data-display-id="'+esc(display.id)+'">'+inner+'</article>';
   }).join('');
