@@ -1,9 +1,10 @@
 import {getThemePreference,setThemePreference} from './theme.js';
 import {createDialog} from '../ui/modal.js';
+import {translateControl} from './locale.js';
 import {controlStorage} from '../demo/scenarios.js';
 
 const KEY='coucho-settings-preview-v1';
-const LANGUAGES=new Set(['system','es-419','es-ES','en-US','pt-BR','pt-PT','fr-FR','de-DE','it-IT']);
+const LANGUAGES=new Set(['system','es-419','en-US']);
 const SURFACES=new Set(['control','hop']);
 const EXITS=new Set(['control','background']);
 const CLOSE_BEHAVIORS=new Set(['minimize','exit']);
@@ -89,6 +90,7 @@ export function initSettings(){
     controlStorage.setItem(KEY,JSON.stringify(settings));
     const status=el('settingsSaveState');
     status.textContent='Guardado';
+    translateControl();
     clearTimeout(statusTimer);
     statusTimer=setTimeout(()=>{status.textContent='Se guarda automáticamente'},1600);
   }
@@ -196,5 +198,6 @@ export function initSettings(){
   });
 
   render();
+  translateControl();
   openTab('general');
 }
