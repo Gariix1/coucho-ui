@@ -1,5 +1,6 @@
 import {getThemePreference,setThemePreference} from './theme.js';
 import {createDialog} from '../ui/modal.js';
+import {controlStorage} from '../demo/scenarios.js';
 
 const KEY='coucho-settings-preview-v1';
 const LANGUAGES=new Set(['system','es-419','es-ES','en-US','pt-BR','pt-PT','fr-FR','de-DE','it-IT']);
@@ -46,7 +47,7 @@ export function normalizeSettings(raw){
 }
 
 function loadSettings(){
-  try{return normalizeSettings(JSON.parse(localStorage.getItem(KEY)))}
+  try{return normalizeSettings(JSON.parse(controlStorage.getItem(KEY)))}
   catch{return normalizeSettings(null)}
 }
 
@@ -85,7 +86,7 @@ export function initSettings(){
 
   let statusTimer;
   function save(){
-    localStorage.setItem(KEY,JSON.stringify(settings));
+    controlStorage.setItem(KEY,JSON.stringify(settings));
     const status=el('settingsSaveState');
     status.textContent='Guardado';
     clearTimeout(statusTimer);
