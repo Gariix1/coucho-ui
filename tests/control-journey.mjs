@@ -98,6 +98,7 @@ try{
     await page.locator('[data-nav-view="displays"]').click();
     assert.equal(await page.locator('.overview-display').count(),0);
     assert.equal(await page.locator('#displayRecovery').isVisible(),true);
+    assert.equal(await page.locator('#displayTopologyStatus').innerText(),'Sin pantallas');
     assert.equal(await page.locator('#editDesktopDisplays').isVisible(),false);
     await page.locator('#displayRetry').click();
     assert.equal(await page.locator('.overview-display').count(),3);
@@ -109,6 +110,10 @@ try{
     await selectScenario('missing-app');
     await page.locator('[data-nav-view="apps"]').click();
     assert.equal(await page.locator('[data-managed-app="Steam"] .managed-app-status').innerText(),'No encontrada');
+    await page.locator('[data-nav-view="modes"]').click();
+    assert.equal((await page.locator('[data-mode-row="1"] .mode-list-badge').innerText()).toLowerCase(),'atención');
+    assert.equal(await page.locator('[data-mode-row="1"] .activate').innerText(),'Comprobar');
+    await page.locator('[data-nav-view="apps"]').click();
     await page.locator('#appsRetry').click();
     assert.equal(await page.locator('[data-managed-app="Steam"] .managed-app-status').count(),0);
     await leave();
