@@ -277,6 +277,14 @@
               </header>
               <div class="settings-group">
                 <div class="settings-field">
+                  <div class="settings-field-copy"><strong>Configuración</strong></div>
+                  <div class="settings-transfer-actions">
+                    <button class="settings-action" id="settingsExport" type="button">Exportar</button>
+                    <button class="settings-action" id="settingsImport" type="button">Importar</button>
+                  </div>
+                  <input id="settingsImportFile" type="file" accept=".json,application/json" hidden>
+                </div>
+                <div class="settings-field">
                   <div class="settings-field-copy"><strong>Restablecer preferencias</strong></div>
                   <button class="settings-action" id="settingsReset" type="button">Restablecer</button>
                 </div>
