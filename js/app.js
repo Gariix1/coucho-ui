@@ -42,7 +42,7 @@ import {initApps} from './features/apps.js';
 import {applyDisplayAliases,renameDisplay,validDisplayAlias} from './features/display-aliases.js';
 import {SAMPLE_APPS,getAppDetails,getAppLabel} from './data/app-catalog.js';
 import {readAppliedSession,writeAppliedSession} from './data/session-store.js';
-import {shortcutOwner,validateCouchset} from './features/shortcut-validation.js';
+import {COUCHSET_SHORTCUT_PREFIX,shortcutOwner,validateCouchset} from './features/shortcut-validation.js';
 import {
   getScenario,enterScenario,leaveScenario,scenarioIsActive,
   recoverOrphanedScenario,setScenarioWithoutReload,displayAvailable,validateActivation,controlStorage
@@ -1355,10 +1355,10 @@ function shortcutEditingId(){
 function syncShortcutKeys(selectedKey){
   qa('[data-shortcut-key]').forEach(function(button){
     const selected=button.dataset.shortcutKey===selectedKey;
-    const owner=shortcutOwner(sets,'Guide + '+button.dataset.shortcutKey,shortcutEditingId());
+    const owner=shortcutOwner(sets,COUCHSET_SHORTCUT_PREFIX+button.dataset.shortcutKey,shortcutEditingId());
     button.classList.toggle('selected',selected);
     button.classList.toggle('shortcut-taken',!!owner);
-    button.title=owner?'Lo usa '+owner.name:'Guide + '+button.dataset.shortcutKey;
+    button.title=owner?'Lo usa '+owner.name:COUCHSET_SHORTCUT_PREFIX+button.dataset.shortcutKey;
     button.setAttribute('aria-pressed',String(selected));
   });
 }
@@ -1375,7 +1375,7 @@ function openShortcut(rawId){
   }
 
   captured=null;
-  q('#captureResult').innerHTML='<span class="capture-placeholder">Guide + …</span>';
+  q('#captureResult').innerHTML='<span class="capture-placeholder">LB + RB + …</span>';
   q('#capUse').hidden=true;
   syncShortcutKeys(null);
   openModal(q('#shortcutOverlay'),{
@@ -1385,7 +1385,7 @@ function openShortcut(rawId){
 }
 
 function capture(v){
-  const value='Guide + '+v;
+  const value=COUCHSET_SHORTCUT_PREFIX+v;
   const owner=shortcutOwner(sets,value,shortcutEditingId());
   if(owner){
     captured=null;
