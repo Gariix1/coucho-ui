@@ -19,10 +19,10 @@ Regla: **guardar un Couchset no equivale a aplicar su configuración al escritor
 ## Contrato de interacción
 
 - **Crear Couchset:** editar borrador → Guardar. Si intenta cerrarse, cambiarse de tarjeta o navegar con cambios, ofrecer Cancelar / Descartar. Al recargar con borrador, usar la advertencia nativa del navegador.
-- **Editar Couchset existente:** auto-guardar los campos; la tarjeta muestra `Pendiente` cuando el Couchset activo difiere del escritorio aplicado. El botón `Aplicar` permite volver a aplicarlo.
+- **Editar Couchset existente (prototipo):** el HTML auto-guarda campos para simplificar la demo. **Mapeo nativo deliberado:** Control WinUI mantiene un borrador y exige `Guardar` explícito antes de persistir; salir con cambios ofrece Guardar / Descartar / Seguir editando. Esta diferencia preserva revisión CAS, perfiles compartidos y concurrencia sin convertir cada control en una escritura. La tarjeta sigue distinguiendo configuración guardada de sesión aplicada; guardar nunca equivale a activar.
 - **Eliminar Couchset:** modal para no activos. El activo no puede eliminarse sin activar primero otro, evitando elegir un modo sustituto de manera silenciosa.
 - **Editar escritorio:** elegir pantallas/primaria → Probar → Conservar/Restaurar. Guardar la sesión aplicada sin modificar el Couchset. Validar la sesión almacenada al cargar y rechazar identificadores inválidos u obsoletos.
-- **Apps:** añadir/quitar ejemplos y alternar visibilidad inmediatamente. No quitar apps referenciadas por un Couchset. El selector de Modos muestra únicamente apps gestionadas más cualquier selección legada existente.
+- **Apps:** añadir/quitar ejemplos y alternar visibilidad inmediatamente. No quitar apps referenciadas por un Couchset. El selector de Modos muestra únicamente apps gestionadas más cualquier selección legada existente. **Mapeo nativo deliberado:** el editor contextual del mockup se materializa como un único `ContentDialog` no-light-dismiss en WinUI para mantener borrador, foco y picker de ejecutables bajo el mismo owner; no se duplica el formulario solo para imitar el popover HTML.
 - **Ajustes:** preferencias inmediatas; Restablecer pide confirmación y no borra modos, apps ni escritorio.
 - **Vaciar/Restaurar modos de ejemplo:** modal antes de mutar; limpiar tareas de activación pendientes; no alterar biblioteca ni ajustes. Vaciar Couchsets no borra la topología observada del escritorio; la desvincula del modo retirado.
 
