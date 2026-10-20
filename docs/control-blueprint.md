@@ -82,5 +82,5 @@ Control nativo utiliza Display Profiles y App Profiles reutilizables. El mockup 
 
 - Confirmar aquí cada estado que se enseña con datos reales del motor: detectado/no detectado, app disponible, aplicado/pendiente y restaurado.
 - Mapear los controles a sus servicios existentes y verificar que los efectos secundarios (lanzar app, recuperar escritorio) respeten el contrato real del repositorio.
-- Reproducir la experiencia de Modos, Apps, Pantallas, Ajustes, primeros usos y errores sustituyendo estados simulados por resultados verdaderos. Las diferencias nativas deliberadas —como Guardar transaccional en Couchsets existentes y el `ContentDialog` único de Apps— conservan la intención del flujo y deben usar los owners reales de CAS/picker/foco.
+- Reproducir la experiencia de Modos, Apps, Pantallas, Ajustes, primeros usos y errores sustituyendo estados simulados por resultados verdaderos. Las diferencias nativas deliberadas —como Guardar transaccional en Couchsets existentes, el `ContentDialog` único de Apps y mantener la activación/combinación del shortcut global de Hop en el único editor de **Atajos** mientras `Ajustes > Hop` enlaza a él— conservan la intención del flujo y deben usar los owners reales de CAS/picker/foco/policy.
 - Conservar documentación de diferencias inevitables entre DOM/CSS y WinUI/Composition; no reinterpretar el diseño sin aprobarlo.
