@@ -12,7 +12,7 @@
 - Una configuración **guardada** no está necesariamente **aplicada**. Nunca declarar «Activo» antes de verificar.
 - La pantalla principal de cada tarea tiene una responsabilidad: **Modos** crea/aplica Couchsets; **Pantallas** consulta y modifica el escritorio actual; **Apps** administra aplicaciones y su visibilidad en Hop; **Ajustes** contiene preferencias de Control.
 - No copiar las capas simuladas de detección/aplicación del mockup a la app nativa. En Windows sustituirlas por los contratos existentes de Orchestration.
-- Modales comparten `js/ui/modal.js`; el editor contextual de pantallas/apps es un popover, no un nuevo modal de confirmación.
+- En el prototipo, modales comparten `js/ui/modal.js` y el editor contextual de pantallas/apps es un popover. En Control WinUI, **Apps** puede usar un único `ContentDialog` no-light-dismiss cuando sea necesario para coordinar borrador, foco y picker nativo; esa adaptación no autoriza un segundo editor ni otra ruta de persistencia.
 - El sistema de movimiento de `docs/motion-system.md` posee geometría y transiciones, sin animaciones superpuestas por característica.
 
 ## Estado y decisiones por vista
@@ -82,5 +82,5 @@ Control nativo utiliza Display Profiles y App Profiles reutilizables. El mockup 
 
 - Confirmar aquí cada estado que se enseña con datos reales del motor: detectado/no detectado, app disponible, aplicado/pendiente y restaurado.
 - Mapear los controles a sus servicios existentes y verificar que los efectos secundarios (lanzar app, recuperar escritorio) respeten el contrato real del repositorio.
-- Copiar comportamiento de Modos, Apps, Pantallas, Ajustes, primeros usos y errores desde la especificación, sustituyendo estados simulados por resultados verdaderos.
+- Reproducir la experiencia de Modos, Apps, Pantallas, Ajustes, primeros usos y errores sustituyendo estados simulados por resultados verdaderos. Las diferencias nativas deliberadas —como Guardar transaccional en Couchsets existentes y el `ContentDialog` único de Apps— conservan la intención del flujo y deben usar los owners reales de CAS/picker/foco.
 - Conservar documentación de diferencias inevitables entre DOM/CSS y WinUI/Composition; no reinterpretar el diseño sin aprobarlo.
