@@ -24,4 +24,4 @@ Este repositorio es la **referencia UX/visual** de Coucho Control, no la impleme
 
 La aplicación real se implementa en WinUI y sustituye el estado simulado del navegador por servicios nativos de configuración, displays, apps, shortcuts, recovery y Host. Cuando una diferencia sea necesaria para conservar integridad o semántica nativa —por ejemplo, guardado transaccional frente a autosave— debe registrarse como una decisión explícita, no copiarse el comportamiento web a ciegas.
 
-El estado de la integración se mantiene únicamente en el tracker temporal del repositorio nativo de Coucho; este mockup conserva el contrato de experiencia y su documentación de diseño.
+El estado de la integración se mantiene únicamente en el tracker temporal del repositorio nativo de Coucho; este mockup conserva el contrato de experiencia y su documentación de diseño. En ese tracker se usa una sola convención: **F = fase/recorrido** y **C = caso concreto de brecha o decisión**.
