@@ -135,7 +135,10 @@ export function shortcutMarkup(value){
   if(value==='Manual')return '<span class="shortcut-muted">Sin atajo</span>';
 
   const parts=value.split(' + ');
-  return '<span class="key">'+parts[0]+'</span><span>+</span><span class="key round">'+parts[1]+'</span>';
+  return parts.map((part,index)=>{
+    const round=index===parts.length-1?' round':'';
+    return '<span class="key'+round+'">'+esc(part)+'</span>';
+  }).join('<span>+</span>');
 }
 
 function sortedDisplayIds(source){
