@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {demoSets,simulatedDisplays} from '../js/data/catalog.js';
+import {demoSets,migrateSet,simulatedDisplays} from '../js/data/catalog.js';
 import {shortcutOwner,validateCouchset} from '../js/features/shortcut-validation.js';
 
 const modes=demoSets();
@@ -36,3 +36,11 @@ test('unsupported shortcuts cannot arrive through imported configurations',()=>{
   assert.match(validateCouchset({...valid,shortcut:'Control + F'},{modes:[],displays:simulatedDisplays}),/no es compatible/);
 });
 
+
+test('legacy Guide shortcuts migrate to the native portable preset',()=>{
+  const migrated=migrateSet({
+    id:9,name:'Legacy',icon:'gaming',preserve:true,displayIds:[],
+    primaryDisplayId:null,app:'Ninguna',shortcut:'Guide + A'
+  });
+  assert.equal(migrated.shortcut,'LB + RB + A');
+});
