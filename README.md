@@ -20,7 +20,7 @@ Se mantiene como HTML, CSS y JavaScript nativo, sin dependencia de frameworks pa
 
 ## Relación con Coucho nativo
 
-Este repositorio es la **referencia UX/visual** de Coucho Control, no la implementación de producción. El baseline UX utilizado por el cutover nativo está congelado en `main@b76e2ff8bfb37cdc4c480f3bbf10f18b58b7999e`.
+Este repositorio es la **referencia UX/visual** de Coucho Control, no la implementación de producción. El baseline UX utilizado por el cutover nativo está congelado en `main@c5e16f2df6c4dd67c14754e9b1014b400e0cb7cf`.
 
 La aplicación real se implementa en WinUI y sustituye el estado simulado del navegador por servicios nativos de configuración, displays, apps, shortcuts, recovery y Host. Cuando una diferencia sea necesaria para conservar integridad o semántica nativa —por ejemplo, guardado transaccional frente a autosave— debe registrarse como una decisión explícita, no copiarse el comportamiento web a ciegas.
 
