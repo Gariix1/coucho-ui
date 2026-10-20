@@ -1,6 +1,12 @@
-// A shortcut can belong to only one Couchset. Global Hop opening shortcuts
-// are configured separately in Settings and do not occupy these Guide keys.
-export const COUCHSET_SHORTCUTS=Object.freeze(['Guide + A','Guide + X','Guide + Y']);
+// A shortcut can belong to only one Couchset. Coucho's native runtime observes
+// ordinary polled GameInput gamepad state; the system Guide button is not part
+// of that state. Keep the mockup aligned with the reliable native contract.
+export const COUCHSET_SHORTCUT_PREFIX='LB + RB + ';
+export const COUCHSET_SHORTCUTS=Object.freeze([
+  COUCHSET_SHORTCUT_PREFIX+'A',
+  COUCHSET_SHORTCUT_PREFIX+'X',
+  COUCHSET_SHORTCUT_PREFIX+'Y'
+]);
 
 export function shortcutOwner(modes,shortcut,excludeId=null){
   if(!COUCHSET_SHORTCUTS.includes(shortcut))return null;
