@@ -22,7 +22,7 @@
 | Modos | Crear, editar, activar, probar, eliminar | «Crear tu primer Couchset» | Pantalla/app no disponible; prueba de aplicación fallida | Reintentar sin declarar éxito; conservar escritorio anterior |
 | Pantallas | Identificar, editar selección y principal, probar | Ningún monitor detectado | Monitor requerido no disponible | Comprobar de nuevo; volver a aplicar el modo si corresponde |
 | Apps | Añadir app gestionada, mostrar en Hop, quitar si no hay referencias | Biblioteca vacía; «Añadir app» | App no encontrada | Comprobar de nuevo; no prometer lanzamiento |
-| Atajos Couchset | Elegir Guide + A/X/Y o Manual | Manual | Tecla ya asignada a otro Couchset | Mostrar propietario y exigir una tecla libre |
+| Atajos Couchset | Elegir LB + RB + A/X/Y o Manual | Manual | Combinación ya asignada a otro Couchset | Mostrar propietario y exigir una combinación libre |
 | Ajustes | Tema, idioma, comportamiento Control/Hop, restablecer | Valores predeterminados | Combinaciones inconsistentes (bandeja y segundo plano) | Normalizar valores; confirmar restablecimiento |
 | Prueba segura | Probar cambios de pantallas y Couchsets | — | Fallo al aplicar o confirmación vencida | Restaurar automáticamente; «Reintentar» en simulación |
 
@@ -60,7 +60,7 @@ Los escenarios simulan las **respuestas que podría dar el motor**, no el estado
 
 ## Contrato de validación y persistencia
 
-- `js/features/shortcut-validation.js` controla duplicados de atajos y configuraciones de pantallas válidas.
+- `js/features/shortcut-validation.js` controla duplicados de atajos y configuraciones de pantallas válidas. Los presets Couchset usan `LB + RB + A/X/Y`: conservan la intención de «modificador + face button» del diseño original usando únicamente estado de gamepad observable de forma fiable por el runtime nativo. `Guide` queda fuera de estos presets mientras la capa administrada actual no exponga identidad y estado press/release suficientes para varios mandos.
 - `js/data/session-store.js` almacena el escritorio aplicado separadamente de los Couchsets.
 - `js/demo/scenarios.js` es el proveedor intercambiable de errores de demostración y estados sin hardware.
 - `js/ui/modal.js` posee focos, teclado y exclusión del fondo durante confirmaciones y pruebas.
