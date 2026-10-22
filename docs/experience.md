@@ -87,13 +87,7 @@ Las tarjetas vecinas traducen desde su ubicación previa hasta la nueva. No anim
 
 ## Comprobación del mockup
 
-```sh
-node --experimental-default-type=module --test tests/*.test.mjs
-node tests/browser-smoke.mjs
-node tests/control-journey.mjs
-```
-
-Estos comandos corresponden al proyecto HTML; no prueban Windows. El navegador automatizado puede detectar errores de lógica, regresiones de DOM, scroll/Morph y limpieza. Revisar visualmente en los navegadores y tamaños admitidos cuando se modifique diseño.
+El procedimiento y los requisitos reales de las pruebas están en el [README](../README.md). Las pruebas del navegador detectan regresiones de interacción, DOM y Motion; no acreditan Windows. La calidad visual también requiere revisión humana en los tamaños y navegadores admitidos.
 
 ## Fuente vigente y finalización
 
