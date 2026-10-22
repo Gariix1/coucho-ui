@@ -6,7 +6,7 @@ import {exportPreview,importPreview} from '../js/features/transfer.js';
 test('portable preview can roundtrip Couchsets and manually added apps',()=>{
   const manual={id:'manual:abc123',name:'OBS Studio',showInHop:true,source:'manual'};
   const modes=demoSets().map(m=>({...m,active:false}));
-  modes.push({...modes[2],id:25,name:'Streaming',app:manual.id,shortcut:'Guide + X'});
+  modes.push({...modes[2],id:25,name:'Streaming',app:manual.id,shortcut:'LB + RB + X'});
   const exportText=exportPreview({
     modes,apps:[{id:'Steam',showInHop:true},{id:'Plex',showInHop:false},manual],
     settings:{language:'en-US',trayIcon:true},theme:'light'
