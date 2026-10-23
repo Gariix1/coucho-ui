@@ -254,8 +254,8 @@ try{
     assert.equal(await page.locator('#capUse').isVisible(),true);
     await page.locator('#capUse').click();
     const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('coucho-test-sets')));
-    assert.equal(saved.find(mode=>mode.id===2).shortcut,'Guide + X');
-    assert.equal(saved.find(mode=>mode.id===1).shortcut,'Guide + A');
+    assert.equal(saved.find(mode=>mode.id===2).shortcut,'LB + RB + X');
+    assert.equal(saved.find(mode=>mode.id===1).shortcut,'LB + RB + A');
   });
 
   await check('configuration export and import require confirmation',async()=>{
